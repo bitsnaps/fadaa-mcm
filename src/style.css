@@ -1,0 +1,159 @@
+:root {
+  --fadaa-blue: #0D6EFD; /* FADAA blue */
+  --fadaa-orange: #FD9800;
+  --fadaa-yellow: #FFD700;
+  --fadaa-green: #198754; /* Bootstrap success green */
+  --fadaa-light-blue: #e7f1ff;
+  --fadaa-dark-text: #333;
+  --fadaa-light-text: #fff;
+}
+
+body {
+  font-family: 'Inter', sans-serif; /* Example font, replace if you have a specific one */
+  color: var(--fadaa-dark-text);
+  background-color: #f8f9fa; /* Light grey background */
+}
+
+.dashboard-container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.text-fadaa-blue {
+  color: var(--fadaa-blue);
+}
+
+.text-fadaa-orange {
+  color: var(--fadaa-orange);
+}
+
+.text-fadaa-yellow {
+  color: var(--fadaa-yellow);
+}
+
+.text-fadaa-green {
+  color: var(--fadaa-green);
+}
+
+.bg-fadaa-blue {
+  background-color: var(--fadaa-blue) !important;
+  color: var(--fadaa-light-text);
+}
+
+.bg-fadaa-orange {
+  background-color: var(--fadaa-orange) !important;
+  color: var(--fadaa-light-text);
+}
+
+.bg-fadaa-yellow {
+  background-color: var(--fadaa-yellow) !important;
+  color: var(--fadaa-dark-text);
+}
+
+.bg-fadaa-green {
+  background-color: var(--fadaa-green) !important;
+  color: var(--fadaa-light-text);
+}
+
+.bg-fadaa-light-blue {
+  background-color: var(--fadaa-light-blue) !important;
+  color: var(--fadaa-blue);
+}
+
+.btn-fadaa-primary {
+  background-color: var(--fadaa-yellow);
+  border-color: var(--fadaa-yellow);
+  color: var(--fadaa-dark-text);
+}
+
+.btn-fadaa-primary:hover {
+  background-color: var(--fadaa-orange);
+  border-color: var(--fadaa-orange);
+  color: var(--fadaa-light-text);
+}
+
+.btn-fadaa-blue {
+  background-color: var(--fadaa-blue);
+  border-color: var(--fadaa-blue);
+  color: var(--fadaa-light-text);
+}
+
+.btn-fadaa-blue:hover {
+  background-color: #0b5ed7; /* Darker blue */
+  border-color: #0a58ca;
+  color: var(--fadaa-light-text);
+}
+
+.btn-fadaa-orange {
+  background-color: var(--fadaa-orange);
+  border-color: var(--fadaa-orange);
+  color: var(--fadaa-light-text);
+}
+
+.btn-fadaa-orange:hover {
+  background-color: #e08600; /* Darker orange */
+  border-color: #e08600;
+  color: var(--fadaa-light-text);
+}
+
+.btn-outline-fadaa-blue {
+  color: var(--fadaa-blue);
+  border-color: var(--fadaa-blue);
+}
+
+.btn-outline-fadaa-blue:hover {
+  color: var(--fadaa-light-text);
+  background-color: var(--fadaa-blue);
+  border-color: var(--fadaa-blue);
+}
+
+.page-item.active .page-link {
+  background-color: var(--fadaa-yellow);
+  border-color: var(--fadaa-yellow);
+  color: var(--fadaa-dark-text);
+}
+
+.page-link {
+  color: var(--fadaa-orange);
+}
+
+.page-link:hover {
+  color: #e08600; /* Darker orange */
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.card-header h5 {
+    color: var(--fadaa-dark-text); /* Default for light backgrounds */
+}
+
+.bg-fadaa-light-blue .card-header h5,
+.bg-fadaa-yellow .card-header h5 {
+    color: var(--fadaa-dark-text);
+}
+
+.bg-fadaa-blue .card-header h5,
+.bg-fadaa-orange .card-header h5,
+.bg-fadaa-green .card-header h5 {
+    color: var(--fadaa-light-text);
+}
+
+/* Ensure list group items in cards with custom backgrounds are styled correctly */
+.card .list-group-item {
+  background-color: transparent;
+  border-left: none;
+  border-right: none;
+}
+
+/* Specific for Investor Dashboard filter buttons */
+.btn-group .btn.active {
+    background-color: var(--fadaa-blue);
+    color: var(--fadaa-light-text);
+}
+
+/* Global adjustment for fixed-top navbar */
+body {
+  padding-top: 56px; /* Adjust if navbar height changes, matches common Bootstrap navbar height */
+}
