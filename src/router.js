@@ -2,8 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Login from './components/Login.vue';
 import SuperadminDashboard from './components/SuperadminDashboard.vue';
 import AssistantDashboard from './components/AssistantDashboard.vue';
-import InvestorDashboard from './components/InvestorDashboard.vue'; // Added InvestorDashboard
+import InvestorDashboard from './components/InvestorDashboard.vue';
 import Navbar from './components/Navbar.vue';
+// Note: InvestorDashboard route was missing, ensure it's added if needed or remove if not used.
+// For now, assuming it's used based on the import.
 
 const routes = [
   {
@@ -18,23 +20,45 @@ const routes = [
   {
     path: '/superadmin-dashboard',
     components: { default: SuperadminDashboard, header: Navbar }, // Add Navbar
-    meta: { requiresAuth: true, role: 'superadmin' }
+    meta: { requiresAuth: true, roles: ['superadmin'] } // Changed to roles array
   },
   {
     path: '/investor-dashboard',
-    components: { default: InvestorDashboard, header: Navbar },
-    meta: { requiresAuth: true, role: 'investor' }
+    components: { default: InvestorDashboard, header: Navbar }, 
+    meta: { requiresAuth: true, roles: ['investor'] } // Added InvestorDashboard route
   },
   {
     path: '/assistant-dashboard',
     components: { default: AssistantDashboard, header: Navbar },
-    meta: { requiresAuth: true, role: 'assistant' }
+    meta: { requiresAuth: true, roles: ['assistant'] } // Changed to roles array
   },
   {
-    path: '/investor-dashboard',
-    name: 'InvestorDashboard',
-    components: { default: InvestorDashboard, header: Navbar },
-    meta: { requiresAuth: true, role: 'investor' }
+    path: '/manage-users',
+    name: 'ManageUsers',
+    // component: ManageUsers, // Placeholder for future component
+    redirect: '/superadmin-dashboard', // Redirect for now
+    meta: { requiresAuth: true, roles: ['superadmin'] }
+  },
+  {
+    path: '/system-settings',
+    name: 'SystemSettings',
+    // component: SystemSettings, // Placeholder for future component
+    redirect: '/superadmin-dashboard', // Redirect for now
+    meta: { requiresAuth: true, roles: ['superadmin'] }
+  },
+  {
+    path: '/manage-clients',
+    name: 'ManageClients',
+    // component: ManageClients, // Placeholder for future component
+    redirect: '/assistant-dashboard', // Redirect for now
+    meta: { requiresAuth: true, roles: ['assistant'] }
+  },
+  {
+    path: '/tasks',
+    name: 'Tasks',
+    // component: Tasks, // Placeholder for future component
+    redirect: '/assistant-dashboard', // Redirect for now
+    meta: { requiresAuth: true, roles: ['assistant'] }
   }
 ];
 
@@ -43,18 +67,31 @@ const router = createRouter({
   routes
 });
 
+import { useAuthStore } from './stores/auth'; // Import the auth store
+
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  const userRole = localStorage.getItem('userRole');
+  const authStore = useAuthStore(); // Initialize the store
+  const isAuthenticated = authStore.isAuthenticated;
+  const userRole = authStore.userRole;
 
   if (to.meta.requiresAuth) {
     if (!isAuthenticated) {
       next('/login');
-    } else if (to.meta.role && to.meta.role !== userRole) {
-      // If role is required and doesn't match, redirect to home or an unauthorized page
-      // For simplicity, redirecting to home. In a real app, show an unauthorized page.
+    } else if (to.meta.roles && !to.meta.roles.includes(userRole)) {
+      // If roles are required and user's role is not in the list, redirect
       alert('You are not authorized to view this page.');
-      next('/');
+      // Redirect to their respective dashboard or a generic unauthorized page
+      if (userRole === 'superadmin') next('/superadmin-dashboard');
+      else if (userRole === 'assistant') next('/assistant-dashboard');
+      else if (userRole === 'investor') next('/investor-dashboard');
+      else next('/login'); // Fallback if role is unknown
+    } else if (to.meta.role && to.meta.role !== userRole) { // Keep handling for single role meta if still used
+        alert('You are not authorized to view this page (single role check).');
+        // Redirect to their respective dashboard or a generic unauthorized page
+        if (userRole === 'superadmin') next('/superadmin-dashboard');
+        else if (userRole === 'assistant') next('/assistant-dashboard');
+        else if (userRole === 'investor') next('/investor-dashboard');
+        else next('/login'); // Fallback if role is unknown
     } else {
       next();
     }

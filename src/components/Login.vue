@@ -23,38 +23,28 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 const email = ref('');
 const password = ref('');
 const error = ref('');
 const router = useRouter();
+const authStore = useAuthStore();
 
 const handleLogin = () => {
   // Mock login logic
   if (email.value === 'superadmin@fadaa.com' && password.value === 'password') {
-    // Simulate successful login for superadmin
-    localStorage.setItem('userRole', 'superadmin');
-    localStorage.setItem('isAuthenticated', 'true');
+    authStore.login('superadmin');
     router.push('/superadmin-dashboard');
   } else if (email.value === 'investor@fadaa.com' && password.value === 'password') {
-    // Simulate successful login for investor
-    localStorage.setItem('userRole', 'investor');
-    localStorage.setItem('isAuthenticated', 'true');
+    authStore.login('investor');
     router.push('/investor-dashboard');
   } else if (email.value === 'assistant@fadaa.com' && password.value === 'password') {
-    // Simulate successful login for assistant
-    localStorage.setItem('userRole', 'assistant');
-    localStorage.setItem('isAuthenticated', 'true');
+    authStore.login('assistant');
     router.push('/assistant-dashboard');
-  } else if (email.value === 'investor@fadaa.com' && password.value === 'password') {
-    // Simulate successful login for investor
-    localStorage.setItem('userRole', 'investor');
-    localStorage.setItem('isAuthenticated', 'true');
-    router.push('/investor-dashboard');
   } else {
     error.value = 'Invalid credentials. Please try again.';
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('isAuthenticated');
+    // No need to manually clear localStorage, store action handles it if necessary
   }
 };
 </script>

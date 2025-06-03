@@ -7,7 +7,7 @@
       </a>
       
       <!-- Sidebar Toggle Button (visible on smaller screens) -->
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation" v-if="showSidebarToggle">
         <span class="navbar-toggler-icon"></span>
       </button>
 
@@ -49,21 +49,23 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
 
-const isAuthenticated = computed(() => {
-  return localStorage.getItem('isAuthenticated') === 'true';
-});
+const isAuthenticated = computed(() => authStore.isAuthenticated);
+const userRole = computed(() => authStore.userRole);
 
-const userRole = computed(() => {
-  return localStorage.getItem('userRole');
+const showSidebarToggle = computed(() => {
+  // Show toggle only if authenticated and not on login page, and user role is superadmin or assistant
+  return isAuthenticated.value && route.path !== '/login' && ['superadmin', 'assistant'].includes(userRole.value);
 });
 
 const handleLogout = () => {
-  localStorage.removeItem('isAuthenticated');
-  localStorage.removeItem('userRole');
+  authStore.logout();
   router.push('/login');
 };
 </script>
