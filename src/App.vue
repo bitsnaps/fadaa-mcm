@@ -12,8 +12,8 @@ const userRole = computed(() => authStore.userRole);
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 
 const showSidebar = computed(() => {
-  // Show sidebar only for superadmin and assistant roles and if authenticated
-  return isAuthenticated.value && ['superadmin', 'assistant'].includes(userRole.value) && route.path !== '/login';
+  // Show sidebar only for admin and assistant roles and if authenticated
+  return isAuthenticated.value && ['admin', 'assistant'].includes(userRole.value) && route.path !== '/login';
 });
 </script>
 

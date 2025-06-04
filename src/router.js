@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from './components/Login.vue';
-import SuperadminDashboard from './components/SuperadminDashboard.vue';
+import AdminDashboard from './components/AdminDashboard.vue';
 import AssistantDashboard from './components/AssistantDashboard.vue';
 import InvestorDashboard from './components/InvestorDashboard.vue';
 import Navbar from './components/Navbar.vue';
@@ -18,9 +18,9 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
-    path: '/superadmin-dashboard',
-    components: { default: SuperadminDashboard, header: Navbar }, // Add Navbar
-    meta: { requiresAuth: true, roles: ['superadmin'] } // Changed to roles array
+    path: '/admin-dashboard',
+    components: { default: AdminDashboard, header: Navbar }, // Add Navbar
+    meta: { requiresAuth: true, roles: ['admin'] } // Changed to roles array
   },
   {
     path: '/investor-dashboard',
@@ -36,15 +36,15 @@ const routes = [
     path: '/manage-users',
     name: 'ManageUsers',
     // component: ManageUsers, // Placeholder for future component
-    redirect: '/superadmin-dashboard', // Redirect for now
-    meta: { requiresAuth: true, roles: ['superadmin'] }
+    redirect: '/admin-dashboard', // Redirect for now
+    meta: { requiresAuth: true, roles: ['admin'] }
   },
   {
     path: '/system-settings',
     name: 'SystemSettings',
     // component: SystemSettings, // Placeholder for future component
-    redirect: '/superadmin-dashboard', // Redirect for now
-    meta: { requiresAuth: true, roles: ['superadmin'] }
+    redirect: '/admin-dashboard', // Redirect for now
+    meta: { requiresAuth: true, roles: ['admin'] }
   },
   {
     path: '/manage-clients',
@@ -81,14 +81,14 @@ router.beforeEach((to, from, next) => {
       // If roles are required and user's role is not in the list, redirect
       alert('You are not authorized to view this page.');
       // Redirect to their respective dashboard or a generic unauthorized page
-      if (userRole === 'superadmin') next('/superadmin-dashboard');
+      if (userRole === 'admin') next('/admin-dashboard');
       else if (userRole === 'assistant') next('/assistant-dashboard');
       else if (userRole === 'investor') next('/investor-dashboard');
       else next('/login'); // Fallback if role is unknown
     } else if (to.meta.role && to.meta.role !== userRole) { // Keep handling for single role meta if still used
         alert('You are not authorized to view this page (single role check).');
         // Redirect to their respective dashboard or a generic unauthorized page
-        if (userRole === 'superadmin') next('/superadmin-dashboard');
+        if (userRole === 'admin') next('/admin-dashboard');
         else if (userRole === 'assistant') next('/assistant-dashboard');
         else if (userRole === 'investor') next('/investor-dashboard');
         else next('/login'); // Fallback if role is unknown

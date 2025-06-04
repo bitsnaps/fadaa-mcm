@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container container-fluid">
-    <h2 class="mb-4">Superadmin Dashboard</h2>
+    <h2 class="mb-4">Admin Dashboard</h2>
 
     <!-- Section 1: Major KPIs -->
     <div class="row gy-4 mb-4">

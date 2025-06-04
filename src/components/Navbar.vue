@@ -60,8 +60,8 @@ const isAuthenticated = computed(() => authStore.isAuthenticated);
 const userRole = computed(() => authStore.userRole);
 
 const showSidebarToggle = computed(() => {
-  // Show toggle only if authenticated and not on login page, and user role is superadmin or assistant
-  return isAuthenticated.value && route.path !== '/login' && ['superadmin', 'assistant'].includes(userRole.value);
+  // Show toggle only if authenticated and not on login page, and user role is admin or assistant
+  return isAuthenticated.value && route.path !== '/login' && ['admin', 'assistant'].includes(userRole.value);
 });
 
 const handleLogout = () => {

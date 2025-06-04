@@ -33,13 +33,13 @@ const authStore = useAuthStore();
 
 const handleLogin = () => {
   // Mock login logic
-  if (email.value === 'superadmin@fadaa.com' && password.value === 'password') {
-    authStore.login('superadmin');
-    router.push('/superadmin-dashboard');
-  } else if (email.value === 'investor@fadaa.com' && password.value === 'password') {
+  if (email.value === 'admin@fadaa.dz' && password.value === 'admin') {
+    authStore.login('admin');
+    router.push('/admin-dashboard');
+  } else if (email.value === 'investor@fadaa.dz' && password.value === 'investor') {
     authStore.login('investor');
     router.push('/investor-dashboard');
-  } else if (email.value === 'assistant@fadaa.com' && password.value === 'password') {
+  } else if (email.value === 'assistant@fadaa.dz' && password.value === 'assistant') {
     authStore.login('assistant');
     router.push('/assistant-dashboard');
   } else {

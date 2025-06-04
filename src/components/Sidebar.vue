@@ -2,19 +2,19 @@
   <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-fadaa-light-blue sidebar collapse">
     <div class="position-sticky pt-3 sidebar-sticky">
       <ul class="nav flex-column">
-        <li class="nav-item" v-if="userRole === 'superadmin'">
-          <router-link to="/superadmin-dashboard" class="nav-link" active-class="active-fadaa">
+        <li class="nav-item" v-if="userRole === 'admin'">
+          <router-link to="/admin-dashboard" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-shield-lock-fill me-2"></i>
-            Dashboard Superadmin
+            Dashboard admin
           </router-link>
         </li>
-        <li class="nav-item" v-if="userRole === 'superadmin'">
+        <li class="nav-item" v-if="userRole === 'admin'">
           <router-link to="/manage-users" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-people-fill me-2"></i>
             Gestion Utilisateurs
           </router-link>
         </li>
-        <li class="nav-item" v-if="userRole === 'superadmin'">
+        <li class="nav-item" v-if="userRole === 'admin'">
           <router-link to="/system-settings" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-gear-fill me-2"></i>
             Paramètres Système
@@ -44,13 +44,13 @@
 
       </ul>
 
-      <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase" v-if="userRole === 'superadmin'">
+      <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase" v-if="userRole === 'admin'">
         <span>Rapports</span>
         <a class="link-secondary" href="#" aria-label="Add a new report">
           <i class="bi bi-plus-circle"></i>
         </a>
       </h6>
-      <ul class="nav flex-column mb-2" v-if="userRole === 'superadmin'">
+      <ul class="nav flex-column mb-2" v-if="userRole === 'admin'">
         <li class="nav-item">
           <a class="nav-link" href="#">
             <i class="bi bi-file-earmark-text me-2"></i>
