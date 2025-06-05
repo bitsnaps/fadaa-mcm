@@ -1,3 +1,35 @@
+
+<script setup>
+import { computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+import { useSidebarStore } from '@/stores/sidebar';
+
+const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
+const sidebarStore = useSidebarStore();
+
+const isAuthenticated = computed(() => authStore.isAuthenticated);
+const userRole = computed(() => authStore.userRole);
+
+const toggleSidebar = () => {
+  sidebarStore.toggleSidebar();
+};
+
+const showSidebar = computed(() => {
+  // Show toggle only if authenticated and not on login page, and user role is admin or assistant
+  return isAuthenticated.value && ['admin', 'assistant'].includes(userRole.value) && route.path !== '/login';
+});
+
+const isSidebarCollapsed = computed(() => sidebarStore.isCollapsed );
+
+const handleLogout = () => {
+  authStore.logout();
+  router.push('/login');
+};
+</script>
+
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark bg-fadaa-blue fixed-top">
     <div class="container-fluid">
@@ -7,9 +39,16 @@
       </a>
       
       <!-- Sidebar Toggle Button (visible on smaller screens) -->
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation" v-if="showSidebarToggle">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation" v-if="showSidebar">
         <span class="navbar-toggler-icon"></span>
       </button>
+
+        <!-- Sidebar Toggle Button -->
+        <button v-if="showSidebar" 
+                @click="toggleSidebar" 
+                class="btn btn-sm btn-fadaa-orange sidebar-toggle">
+          <i class="bi" :class="isSidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
+        </button>
 
       <div class="collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav ms-auto align-items-center">
@@ -47,31 +86,24 @@
   </nav>
 </template>
 
-<script setup>
-import { computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
-
-const router = useRouter();
-const route = useRoute();
-const authStore = useAuthStore();
-
-const isAuthenticated = computed(() => authStore.isAuthenticated);
-const userRole = computed(() => authStore.userRole);
-
-const showSidebarToggle = computed(() => {
-  // Show toggle only if authenticated and not on login page, and user role is admin or assistant
-  return isAuthenticated.value && route.path !== '/login' && ['admin', 'assistant'].includes(userRole.value);
-});
-
-const handleLogout = () => {
-  authStore.logout();
-  router.push('/login');
-};
-</script>
-
 <style scoped>
-/* .bg-fadaa-blue is defined in style.css */
+/* Sidebar toggle button styles */
+.sidebar-toggle {
+  position: relative;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border-radius: 30%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
 .navbar-brand img {
   border-radius: 50%; /* Make logo circular if desired */

@@ -2,19 +2,23 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { useSidebarStore } from '@/stores/sidebar';
 import Navbar from '@/components/Navbar.vue';
 import Sidebar from '@/components/Sidebar.vue';
 
 const route = useRoute();
 const authStore = useAuthStore();
+const sidebarStore = useSidebarStore();
 
 const userRole = computed(() => authStore.userRole);
 const isAuthenticated = computed(() => authStore.isAuthenticated);
+const isSidebarCollapsed = computed(() => sidebarStore.isCollapsed);
 
 const showSidebar = computed(() => {
   // Show sidebar only for admin and assistant roles and if authenticated
   return isAuthenticated.value && ['admin', 'assistant'].includes(userRole.value) && route.path !== '/login';
 });
+
 </script>
 
 <template>
@@ -24,14 +28,17 @@ const showSidebar = computed(() => {
     </header>
 
     <div class="container-fluid flex-grow-1">
-      <div class="row">
-
+      <div class="row position-relative">
 
         <!-- Sidebar -->
         <Sidebar v-if="showSidebar" />
 
         <!-- Main content area -->
-        <main :class="{'col-md-9 ms-sm-auto col-lg-10 px-md-4': showSidebar, 'col-12': !showSidebar}">
+        <main :class="{
+          'col-md-9 ms-sm-auto col-lg-10 px-md-4': showSidebar && !isSidebarCollapsed,
+          'col-12': !showSidebar || isSidebarCollapsed,
+          'content-shifted': showSidebar && !isSidebarCollapsed
+        }">
           <router-view />
         </main>
              
@@ -44,11 +51,23 @@ const showSidebar = computed(() => {
 </template>
 
 <style>
-/* Global styles are now primarily in src/style.css */
-/* App.vue specific styles can be added here if necessary for layout that isn't covered by Bootstrap or global styles. */
+/* Transition for main content area */
+main {
+  transition: all 0.3s ease;
+  padding-left: 2rem; /* Space for the toggle button */
+}
 
-/* Example: If #app needs specific flex properties not handled by .d-flex.flex-column.min-vh-100 */
-/* #app {
-  some-property: value;
-} */
+.content-shifted {
+  padding-left: 3rem; /* Additional padding when sidebar is visible */
+}
+
+@media (max-width: 767.98px) {
+  main {
+    padding-left: 1rem;
+  }
+  
+  .content-shifted {
+    padding-left: 1rem;
+  }
+}
 </style>

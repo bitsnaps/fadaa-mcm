@@ -1,5 +1,5 @@
 <template>
-  <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-fadaa-light-blue sidebar collapse">
+  <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-fadaa-light-blue sidebar" :class="{ 'collapsed': isCollapsed }">
     <div class="position-sticky pt-3 sidebar-sticky">
       <ul class="nav flex-column">
         <li class="nav-item" v-if="userRole === 'admin'">
@@ -72,9 +72,13 @@
 <script setup>
 import { computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import { useSidebarStore } from '@/stores/sidebar';
 
 const authStore = useAuthStore();
+const sidebarStore = useSidebarStore();
+
 const userRole = computed(() => authStore.userRole);
+const isCollapsed = computed(() => sidebarStore.isCollapsed);
 </script>
 
 <style scoped>
@@ -87,18 +91,29 @@ const userRole = computed(() => authStore.userRole);
   padding: 0; /* Remove padding, handled by sidebar-sticky */
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
   background-color: var(--fadaa-light-blue); /* FADAA Light Blue */
+  transition: transform 0.3s ease, width 0.3s ease;
+  width: 16.666667%; /* Same as col-md-2 */
+}
+
+.sidebar.collapsed {
+  transform: translateX(-100%);
 }
 
 @media (max-width: 767.98px) {
   .sidebar {
-    /* top: 5rem; Bootstrap's default, adjust if navbar height is different on mobile */
-    /* For now, keep consistent with desktop */
     top: 56px;
     z-index: 1030; /* Ensure it's above content when collapsed on mobile */
+    width: 100%; /* Full width on mobile */
   }
-  /* When sidebar is collapsed on mobile, it might need specific styling if it overlays */
-  .sidebar.collapse:not(.show) {
-    /* Styles for when collapsed and not shown, if needed */
+  
+  .sidebar.collapsed {
+    display: none;
+  }
+}
+
+@media (min-width: 992px) {
+  .sidebar {
+    width: 16.666667%; /* Same as col-lg-2 */
   }
 }
 
