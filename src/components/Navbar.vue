@@ -4,6 +4,17 @@ import { computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useSidebarStore } from '@/stores/sidebar';
+import { 
+  BNavbar, 
+  BNavbarBrand, 
+  BNavbarToggle, 
+  BCollapse, 
+  BNavbarNav, 
+  BNavItem, 
+  BNavItemDropdown, 
+  BDropdownItem, 
+  BImg 
+} from 'bootstrap-vue-next';
 
 const router = useRouter();
 const route = useRoute();
@@ -31,59 +42,53 @@ const handleLogout = () => {
 </script>
 
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-fadaa-blue fixed-top">
-    <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center" href="#">
-        <img src="/src/public/logo.png" alt="FADAA Logo" width="30" height="30" class="d-inline-block align-text-top me-2">
-        FADAA-MCM
-      </a>
-      
-      <!-- Sidebar Toggle Button (visible on smaller screens) -->
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation" v-if="showSidebar">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+  <BNavbar toggleable="lg" variant="fadaa-blue" class="fixed-top navbar-dark">
+    <BNavbarBrand href="/" class="d-flex align-items-center">
+      <BImg src="/src/public/logo.png" alt="FADAA Logo" width="30" height="30" class="d-inline-block align-text-top me-2 rounded-circle" />
+      FADAA-MCM
+    </BNavbarBrand>
 
-        <!-- Sidebar Toggle Button -->
-        <button v-if="showSidebar" 
-                @click="toggleSidebar" 
-                class="btn btn-sm btn-fadaa-orange sidebar-toggle">
-          <i class="bi" :class="isSidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
-        </button>
+    <!-- Sidebar Toggle Button -->
+    <BButton v-if="showSidebar" 
+            @click="toggleSidebar"
+            class="sidebar-toggle"
+            variant="fadaa-orange"
+             squared>
+      <i class="bi" :class="isSidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
+    </BButton>
 
-      <div class="collapse navbar-collapse" id="navbarNavDropdown">
-        <ul class="navbar-nav ms-auto align-items-center">
-          <li class="nav-item" v-if="!isAuthenticated">
-            <router-link to="/login" class="nav-link" :class="{ 'active-fadaa': $route.path === '/login' }">Login</router-link>
-          </li>
-          
-          <template v-if="isAuthenticated">
-            <li class="nav-item">
-              <span class="navbar-text me-3">
-                Welcome, {{ userRole }}
-              </span>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-bell-fill"></i>
-                <span class="badge rounded-pill bg-danger">3</span> <!-- Mock notification count -->
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
-                <li><a class="dropdown-item" href="#">Notification 1</a></li>
-                <li><a class="dropdown-item" href="#">Notification 2</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">View all notifications</a></li>
-              </ul>
-            </li>
-            <li class="nav-item">
-              <a href="#" @click.prevent="handleLogout" class="nav-link">
-                <i class="bi bi-box-arrow-right me-1"></i>Logout
-              </a>
-            </li>
-          </template>
-        </ul>
-      </div>
-    </div>
-  </nav>
+    <BNavbarToggle target="nav-collapse" />
+
+    <BCollapse id="nav-collapse" is-nav>
+      <BNavbarNav class="ms-auto align-items-center">
+        <BNavItem v-if="!isAuthenticated" :to="{ path: '/login' }" :active="$route.path === '/login'" link-classes="nav-link">
+          Login
+        </BNavItem>        
+        <template v-else>
+          <BNavItemDropdown id="notificationDropdown" right menu-class="dropdown-menu-end">
+            <template #button-content>
+              <i class="bi bi-bell-fill"></i>
+              <span class="badge rounded-pill bg-danger">3</span> <!-- Mock notification count -->
+            </template>
+            <BDropdownItem href="#">Notification 1</BDropdownItem>
+            <BDropdownItem href="#">Notification 2</BDropdownItem>
+            <BDropdownItem divider />
+            <BDropdownItem href="#">View all notifications</BDropdownItem>
+          </BNavItemDropdown>
+
+          <BNavItemDropdown id="userProfileDropdown" right menu-class="dropdown-menu-end">
+            <template #button-content>
+              <i class="bi bi-person-circle me-1"></i> {{ userRole }}
+            </template>
+            <BDropdownItem :to="{ path: '/profile' }"><i class="bi bi-person-fill me-2"></i>Profile</BDropdownItem>
+            <BDropdownItem :to="{ path: '/settings' }"><i class="bi bi-gear-fill me-2"></i>Settings</BDropdownItem>
+            <BDropdownItem divider />
+            <BDropdownItem @click.prevent="handleLogout"><i class="bi bi-box-arrow-right me-2"></i>Logout</BDropdownItem>
+          </BNavItemDropdown>
+        </template>
+      </BNavbarNav>
+    </BCollapse>
+  </BNavbar>
 </template>
 
 <style scoped>
