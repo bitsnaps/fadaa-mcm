@@ -3,6 +3,8 @@ import Login from './components/Login.vue';
 import AdminDashboard from './components/AdminDashboard.vue';
 import AssistantDashboard from './components/AssistantDashboard.vue';
 import InvestorDashboard from './components/InvestorDashboard.vue';
+import UserProfile from './components/UserProfile.vue';
+import UserSettings from './components/UserSettings.vue';
 import Navbar from './components/Navbar.vue';
 // Note: InvestorDashboard route was missing, ensure it's added if needed or remove if not used.
 // For now, assuming it's used based on the import.
@@ -59,6 +61,18 @@ const routes = [
     // component: Tasks, // Placeholder for future component
     redirect: '/assistant-dashboard', // Redirect for now
     meta: { requiresAuth: true, roles: ['assistant'] }
+  },
+  {
+    path: '/profile',
+    name: 'UserProfile',
+    components: { default: UserProfile, header: Navbar },
+    meta: { requiresAuth: true } // Accessible to all authenticated users
+  },
+  {
+    path: '/settings',
+    name: 'UserSettings',
+    components: { default: UserSettings, header: Navbar },
+    meta: { requiresAuth: true } // Accessible to all authenticated users
   }
 ];
 
