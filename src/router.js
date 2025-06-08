@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Login from './components/Login.vue';
-import AdminDashboard from './components/AdminDashboard.vue';
-import AssistantDashboard from './components/AssistantDashboard.vue';
-import InvestorDashboard from './components/InvestorDashboard.vue';
-import UserProfile from './components/UserProfile.vue';
-import UserSettings from './components/UserSettings.vue';
+import Login from './views/Login.vue';
+import AdminDashboard from './views/AdminDashboard.vue';
+import AssistantDashboard from './views/AssistantDashboard.vue';
+import InvestorDashboard from './views/InvestorDashboard.vue';
+import ManageClients from './views/ManageClients.vue';
+import AddClient from './views/AddClient.vue';
+import UserProfile from './views/UserProfile.vue';
+import UserSettings from './views/UserSettings.vue';
 import Navbar from './components/Navbar.vue';
 // Note: InvestorDashboard route was missing, ensure it's added if needed or remove if not used.
 // For now, assuming it's used based on the import.
@@ -51,9 +53,15 @@ const routes = [
   {
     path: '/manage-clients',
     name: 'ManageClients',
-    // component: ManageClients, // Placeholder for future component
-    redirect: '/assistant-dashboard', // Redirect for now
-    meta: { requiresAuth: true, roles: ['assistant'] }
+    component: ManageClients, // Placeholder for future component
+    // redirect: '/assistant-dashboard', // Redirect for now
+    meta: { requiresAuth: true, roles: ['admin','assistant'] }
+  },
+  {
+    path: '/add-client',
+    name: 'AddClient',
+    component: AddClient,
+    meta: { requiresAuth: true, roles: ['admin','assistant'] }
   },
   {
     path: '/tasks',

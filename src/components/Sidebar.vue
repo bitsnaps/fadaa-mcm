@@ -14,23 +14,22 @@
             Gestion Utilisateurs
           </router-link>
         </li>
-        <li class="nav-item" v-if="userRole === 'admin'">
-          <router-link to="/system-settings" class="nav-link" active-class="active-fadaa">
-            <i class="bi bi-gear-fill me-2"></i>
-            Paramètres Système
-          </router-link>
-        </li>
-
         <li class="nav-item" v-if="userRole === 'assistant'">
           <router-link to="/assistant-dashboard" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-person-workspace me-2"></i>
             Dashboard Assistant
           </router-link>
         </li>
-        <li class="nav-item" v-if="userRole === 'assistant'">
+        <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant' ">
           <router-link to="/manage-clients" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-person-lines-fill me-2"></i>
             Gestion Clients
+          </router-link>
+        </li>
+        <li class="nav-item" v-if="userRole === 'admin'">
+          <router-link to="/system-settings" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-gear-fill me-2"></i>
+            Paramètres Système
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'assistant'">
