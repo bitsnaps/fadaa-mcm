@@ -7,6 +7,9 @@ import ManageClients from './views/ManageClients.vue';
 import AddClient from './views/AddClient.vue';
 import UserProfile from './views/UserProfile.vue';
 import UserSettings from './views/UserSettings.vue';
+import InvestmentTracking from './views/InvestmentTracking.vue';
+import FinancialReporting from './views/FinancialReporting.vue';
+import ComplianceManagement from './views/ComplianceManagement.vue';
 import Navbar from './components/Navbar.vue';
 // Note: InvestorDashboard route was missing, ensure it's added if needed or remove if not used.
 // For now, assuming it's used based on the import.
@@ -81,6 +84,24 @@ const routes = [
     name: 'UserSettings',
     components: { default: UserSettings, header: Navbar },
     meta: { requiresAuth: true } // Accessible to all authenticated users
+  },
+  {
+    path: '/investment-tracking',
+    name: 'InvestmentTracking',
+    components: { default: InvestmentTracking, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+  },
+  {
+    path: '/financial-reporting',
+    name: 'FinancialReporting',
+    components: { default: FinancialReporting, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+  },
+  {
+    path: '/compliance-management',
+    name: 'ComplianceManagement',
+    components: { default: ComplianceManagement, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
   }
 ];
 

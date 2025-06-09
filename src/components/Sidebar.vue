@@ -26,6 +26,12 @@
             Gestion Clients
           </router-link>
         </li>
+        <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+          <router-link to="/add-client" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-person-plus-fill me-2"></i>
+            Ajouter Client
+          </router-link>
+        </li>
         <li class="nav-item" v-if="userRole === 'admin'">
           <router-link to="/system-settings" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-gear-fill me-2"></i>
@@ -36,6 +42,26 @@
           <router-link to="/tasks" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-list-task me-2"></i>
             Tâches
+          </router-link>
+        </li>
+
+        <!-- FADAA Operational Core & Financials -->
+        <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+          <router-link to="/investment-tracking" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-graph-up me-2"></i>
+            Suivi des Investissements
+          </router-link>
+        </li>
+        <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+          <router-link to="/financial-reporting" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-file-earmark-medical me-2"></i>
+            Rapports Financiers
+          </router-link>
+        </li>
+        <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+          <router-link to="/compliance-management" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-shield-check me-2"></i>
+            Gestion Conformité
           </router-link>
         </li>
 
