@@ -70,6 +70,95 @@
       </div>
     </div>
 
+    <!-- Section: Investment Details -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-fadaa-light-blue">
+            <h5 class="mb-0"><i class="bi bi-briefcase-fill me-2"></i>Détails des Investissements</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Agence</th>
+                    <th>Montant Investi</th>
+                    <th>% de Participation</th>
+                    <th>Date Début Contrat</th>
+                    <th>Date Fin Contrat</th>
+                    <th>Statut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="investment in investments" :key="investment.id">
+                    <td>{{ investment.branchName }}</td>
+                    <td>{{ investment.amount }} €</td>
+                    <td>{{ investment.sharePercentage }}%</td>
+                    <td>{{ investment.contractStartDate }}</td>
+                    <td>{{ investment.contractEndDate }}</td>
+                    <td><span :class="`badge bg-${investment.status === 'Actif' ? 'success' : 'warning'}`">{{ investment.status }}</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section: Profit Share History -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-fadaa-light-blue">
+            <h5 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>Historique des Parts de Bénéfices</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Agence</th>
+                    <th>Montant Reçu</th>
+                    <th>Période Concernée</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="share in profitShares" :key="share.id">
+                    <td>{{ share.date }}</td>
+                    <td>{{ share.branchName }}</td>
+                    <td>{{ share.amount }} €</td>
+                    <td>{{ share.period }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section: Documents -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-fadaa-light-blue">
+            <h5 class="mb-0"><i class="bi bi-file-earmark-text-fill me-2"></i>Documents</h5>
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li v-for="doc in documents" :key="doc.id" class="list-group-item d-flex justify-content-between align-items-center">
+                <span><i :class="`bi ${doc.icon} me-2`"></i>{{ doc.name }}</span>
+                <a :href="doc.url" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-download me-1"></i> Télécharger</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Section 4: Call to Action -->
     <div class="row mb-4">
       <div class="col-12 text-center">
@@ -95,6 +184,82 @@ import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, Ca
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler);
 
 const chartFilter = ref('monthly'); // monthly, bi-yearly, yearly
+
+const investments = ref([
+  {
+    id: 1,
+    branchName: 'Paris Centre',
+    amount: '150,000',
+    sharePercentage: 10,
+    contractStartDate: '01/01/2023',
+    contractEndDate: '31/12/2025',
+    status: 'Actif',
+  },
+  {
+    id: 2,
+    branchName: 'Lyon Part-Dieu',
+    amount: '100,000',
+    sharePercentage: 8,
+    contractStartDate: '01/06/2022',
+    contractEndDate: '31/05/2025',
+    status: 'Actif',
+  },
+  {
+    id: 3,
+    branchName: 'Marseille Vieux-Port',
+    amount: '75,000',
+    sharePercentage: 12,
+    contractStartDate: '01/03/2024',
+    contractEndDate: '28/02/2027',
+    status: 'En attente',
+  },
+]);
+
+const profitShares = ref([
+  {
+    id: 1,
+    date: '15/04/2024',
+    branchName: 'Paris Centre',
+    amount: '3,500',
+    period: 'T1 2024',
+  },
+  {
+    id: 2,
+    date: '15/04/2024',
+    branchName: 'Lyon Part-Dieu',
+    amount: '2,800',
+    period: 'T1 2024',
+  },
+  {
+    id: 3,
+    date: '15/01/2024',
+    branchName: 'Paris Centre',
+    amount: '3,200',
+    period: 'T4 2023',
+  },
+]);
+
+const documents = ref([
+  {
+    id: 1,
+    name: 'Contrat d\'investissement - Paris Centre.pdf',
+    url: '#',
+    icon: 'bi-file-earmark-pdf-fill text-danger',
+  },
+  {
+    id: 2,
+    name: 'Rapport Annuel 2023.pdf',
+    url: '#',
+    icon: 'bi-file-earmark-bar-graph-fill text-primary',
+  },
+  {
+    id: 3,
+    name: 'Avenant Contrat - Lyon Part-Dieu.docx',
+    url: '#',
+    icon: 'bi-file-earmark-word-fill text-info',
+  },
+]);
+
 
 const monthlyData = {
   labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],

@@ -119,9 +119,10 @@
             <h5 class="mb-0"><i class="bi bi-download me-2"></i>Data Export</h5>
           </div>
           <div class="card-body text-center">
-            <button @click="exportData('excel')" class="btn btn-fadaa-orange me-2"><i class="bi bi-file-earmark-excel-fill me-1"></i>Excel</button>
+            <button @click="exportData('json')" class="btn btn-fadaa-orange me-2"><i class="bi bi-filetype-json me-1"></i>JSON</button>
             <button @click="exportData('csv')" class="btn btn-fadaa-orange me-2"><i class="bi bi-filetype-csv me-1"></i>CSV</button>
-            <button @click="exportData('pdf')" class="btn btn-fadaa-orange"><i class="bi bi-file-earmark-pdf-fill me-1"></i>PDF</button>
+            <button @click="exportData('excel')" class="btn btn-outline-fadaa-orange me-2"><i class="bi bi-file-earmark-excel-fill me-1"></i>Excel (Simulated)</button>
+            <button @click="exportData('pdf')" class="btn btn-outline-fadaa-orange"><i class="bi bi-file-earmark-pdf-fill me-1"></i>PDF (Simulated)</button>
           </div>
         </div>
       </div>
@@ -158,7 +159,50 @@ const mockData = ref({
 });
 
 const exportData = (format) => {
-  alert(`Exporting data to ${format}... (Placeholder - Full functionality in Task 3)`);
+  // Simulate data generation for export
+  const dataToExport = {
+    renewals: mockData.value.renewals,
+    expiringContracts: mockData.value.expiringContracts,
+    prospects: mockData.value.prospects,
+    officeStatus: mockData.value.officeStatus,
+    approvals: mockData.value.approvals
+  };
+
+  let content = '';
+  let filename = `assistant_dashboard_export.${format}`;
+  let mimeType = '';
+
+  if (format === 'json') { // Added JSON export for simplicity
+    content = JSON.stringify(dataToExport, null, 2);
+    mimeType = 'application/json';
+    filename = `assistant_dashboard_export.json`;
+  } else if (format === 'csv') {
+    // Basic CSV conversion for officeStatus as an example
+    let csvString = 'Office ID,Status,Occupancy\n';
+    dataToExport.officeStatus.forEach(office => {
+      csvString += `${office.id},${office.status},${office.occupancy}\n`;
+    });
+    content = csvString;
+    mimeType = 'text/csv';
+    filename = `assistant_dashboard_export.csv`;
+  } else {
+    // For Excel and PDF, we'll just show an alert as true generation is complex without libraries
+    alert(`Simulating export of dashboard data to ${format.toUpperCase()}.\nData (JSON preview):\n${JSON.stringify(dataToExport, null, 2).substring(0, 200)}...`);
+    console.log(`Simulated export data for ${format.toUpperCase()}:`, dataToExport);
+    return;
+  }
+
+  // Simulate file download
+  const blob = new Blob([content], { type: mimeType });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(link.href);
+  alert(`Data exported as ${filename}. Check your browser downloads or console for details.`);
+  console.log(`Exported ${filename} with content:`, content);
 };
 
 const statusBadge = (status) => {

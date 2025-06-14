@@ -10,6 +10,7 @@ import UserSettings from './views/UserSettings.vue';
 import InvestmentTracking from './views/InvestmentTracking.vue';
 import FinancialReporting from './views/FinancialReporting.vue';
 import ComplianceManagement from './views/ComplianceManagement.vue';
+import ClientPortal from './views/ClientPortal.vue';
 import Navbar from './components/Navbar.vue';
 // Note: InvestorDashboard route was missing, ensure it's added if needed or remove if not used.
 // For now, assuming it's used based on the import.
@@ -102,6 +103,12 @@ const routes = [
     name: 'ComplianceManagement',
     components: { default: ComplianceManagement, header: Navbar },
     meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+  },
+  {
+    path: '/client-portal',
+    name: 'ClientPortal',
+    components: { default: ClientPortal, header: Navbar },
+    meta: { requiresAuth: true, roles: ['client'] } // Assuming 'client' role for now
   }
 ];
 
@@ -127,6 +134,7 @@ router.beforeEach((to, from, next) => {
       if (userRole === 'admin') next('/admin-dashboard');
       else if (userRole === 'assistant') next('/assistant-dashboard');
       else if (userRole === 'investor') next('/investor-dashboard');
+      else if (userRole === 'client') next('/client-portal');
       else next('/login'); // Fallback if role is unknown
     } else if (to.meta.role && to.meta.role !== userRole) { // Keep handling for single role meta if still used
         alert('You are not authorized to view this page (single role check).');
