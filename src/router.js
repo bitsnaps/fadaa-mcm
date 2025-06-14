@@ -11,6 +11,7 @@ import InvestmentTracking from './views/InvestmentTracking.vue';
 import FinancialReporting from './views/FinancialReporting.vue';
 import ComplianceManagement from './views/ComplianceManagement.vue';
 import ClientPortal from './views/ClientPortal.vue';
+import ManageUsers from './views/ManageUsers.vue'; // Added ManageUsers import
 import Navbar from './components/Navbar.vue';
 // Note: InvestorDashboard route was missing, ensure it's added if needed or remove if not used.
 // For now, assuming it's used based on the import.
@@ -43,8 +44,7 @@ const routes = [
   {
     path: '/manage-users',
     name: 'ManageUsers',
-    // component: ManageUsers, // Placeholder for future component
-    redirect: '/admin-dashboard', // Redirect for now
+    components: { default: ManageUsers, header: Navbar }, // Use ManageUsers component and Navbar
     meta: { requiresAuth: true, roles: ['admin'] }
   },
   {
