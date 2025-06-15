@@ -73,7 +73,7 @@ const handleLogout = () => {
             <BDropdownItem href="#">Notification 1</BDropdownItem>
             <BDropdownItem href="#">Notification 2</BDropdownItem>
             <BDropdownItem divider />
-            <BDropdownItem href="#">View all notifications</BDropdownItem>
+            <BDropdownItem href="/manage-notifications">View all notifications</BDropdownItem>
           </BNavItemDropdown>
 
           <BNavItemDropdown id="userProfileDropdown" right menu-class="dropdown-menu-end">
@@ -82,6 +82,7 @@ const handleLogout = () => {
             </template>
             <BDropdownItem :to="{ path: '/profile' }"><i class="bi bi-person-fill me-2"></i>Profile</BDropdownItem>
             <BDropdownItem :to="{ path: '/settings' }"><i class="bi bi-gear-fill me-2"></i>Settings</BDropdownItem>
+            <!-- <BDropdownItem v-if="userRole === 'admin' || userRole === 'assistant'" :to="{ path: '/manage-notifications' }"><i class="bi bi-bell-slash-fill me-2"></i>Gérer les Notifications</BDropdownItem> -->
             <BDropdownItem divider />
             <BDropdownItem @click.prevent="handleLogout"><i class="bi bi-box-arrow-right me-2"></i>Logout</BDropdownItem>
           </BNavItemDropdown>

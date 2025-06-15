@@ -13,6 +13,7 @@ import ComplianceManagement from './views/ComplianceManagement.vue';
 import ClientPortal from './views/ClientPortal.vue';
 import ManageUsers from './views/ManageUsers.vue'; // Added ManageUsers import
 import SystemSettings from './views/SystemSettings.vue'; // Added SystemSettings import
+import ManageNotifications from './views/ManageNotifications.vue'; // Added ManageNotifications import
 import Navbar from './components/Navbar.vue';
 // Note: InvestorDashboard route was missing, ensure it's added if needed or remove if not used.
 // For now, assuming it's used based on the import.
@@ -109,6 +110,12 @@ const routes = [
     name: 'ClientPortal',
     components: { default: ClientPortal, header: Navbar },
     meta: { requiresAuth: true, roles: ['client'] } // Assuming 'client' role for now
+  },
+  {
+    path: '/manage-notifications',
+    name: 'ManageNotifications',
+    components: { default: ManageNotifications, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
   }
 ];
 
