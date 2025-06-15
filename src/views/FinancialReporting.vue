@@ -6,8 +6,8 @@
     <div class="row mb-5">
       <div class="col-12">
         <div class="card shadow-sm">
-          <div class="card-header bg-fadaa-primary text-white">
-            <h5 class="mb-0"><i class="bi bi-file-earmark-settings-fill me-2"></i>Générer un Rapport Personnalisé</h5>
+          <div class="card-header bg-fadaa-primary">
+            <h5 class="mb-0 text-white"><i class="bi bi-file-earmark-settings-fill me-2"></i>Rapport Personnalisé</h5>
           </div>
           <div class="card-body">
             <form @submit.prevent="generateReport">
@@ -64,7 +64,7 @@
             </div>
           </div>
           <div class="card-body">
-            <Line v-if="revenueExpenseChartData.datasets.length" :data="revenueExpenseChartData" :options="lineChartOptions" style="height: 350px;" />
+            <Line id="revenue-expense-chart" v-if="revenueExpenseChartData.datasets.length" :data="revenueExpenseChartData" :options="lineChartOptions" />
             <p v-else class="text-center text-muted">Chargement des données du graphique...</p>
           </div>
         </div>
@@ -74,18 +74,18 @@
     <!-- Section 2: Expense Breakdown Bar Chart -->
     <div class="row mb-4">
       <div class="col-lg-7">
-        <div class="card shadow-sm h-100">
+        <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
             <h5 class="mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>Répartition des Dépenses (Annuel)</h5>
           </div>
           <div class="card-body">
-            <Bar v-if="expenseBreakdownChartData.datasets.length" :data="expenseBreakdownChartData" :options="barChartOptions" style="height: 300px;" />
+            <Bar id="expense-barchart" v-if="expenseBreakdownChartData.datasets? expenseBreakdownChartData.datasets.length:false" :data="expenseBreakdownChartData" :options="barChartOptions" />
             <p v-else class="text-center text-muted">Chargement des données du graphique...</p>
           </div>
         </div>
       </div>
       <div class="col-lg-5">
-        <div class="card shadow-sm h-100">
+        <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
             <h5 class="mb-0"><i class="bi bi-wallet2 me-2"></i>Sommaire des Dépenses</h5>
           </div>
@@ -110,7 +110,7 @@ import { Line, Bar } from 'vue-chartjs';
 import {
   Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler
 } from 'chart.js';
-import { formatCurrency } from '@/helpers/utils.js';
+import { formatCurrency/*, getPreferredLanguage*/ } from '@/helpers/utils.js';
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler);
 
@@ -247,7 +247,7 @@ const barChartOptions = ref({
 const expenseSummary = computed(() => {
   return expenseCategories.map((category, index) => ({
     category,
-    amount: expenseBreakdownChartData.value.datasets[0].data[index].toLocaleString('fr-FR'),
+    amount: expenseBreakdownChartData.value.datasets?expenseBreakdownChartData.value.datasets[0].data[index]:0,//.toLocaleString(getPreferredLanguage()),
     icon: getCategoryIcon(category),
     color: expenseColors[index]
   }));
@@ -310,5 +310,13 @@ onMounted(() => {
 
 .form-label {
   font-weight: 500;
+}
+
+#expense-barchart {
+  height: 300px;
+}
+
+#revenue-expense-chart {
+  height: 350px;
 }
 </style>
