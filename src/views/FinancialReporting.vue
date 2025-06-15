@@ -93,7 +93,7 @@
             <ul class="list-group list-group-flush">
               <li v-for="(item, index) in expenseSummary" :key="index" class="list-group-item d-flex justify-content-between align-items-center">
                 <span><i :class="`bi ${item.icon} me-2`" :style="{color: item.color}"></i>{{ item.category }}</span>
-                <span class="fw-bold">{{ item.amount }} €</span>
+                <span class="fw-bold">{{ formatCurrency(item.amount) }} </span>
               </li>
             </ul>
           </div>
@@ -110,6 +110,7 @@ import { Line, Bar } from 'vue-chartjs';
 import {
   Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler
 } from 'chart.js';
+import { formatCurrency } from '@/helpers/utils.js';
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler);
 
@@ -139,7 +140,7 @@ const quarterlyRevExpData = {
   labels: ['T1 2023', 'T2 2023', 'T3 2023', 'T4 2023', 'T1 2024'],
   datasets: [
     {
-      label: 'Revenus (k€)',
+      label: 'Revenus (k)',
       borderColor: '#0D6EFD', // FADAA Blue
       backgroundColor: 'rgba(13, 110, 253, 0.1)',
       tension: 0.3,
@@ -147,7 +148,7 @@ const quarterlyRevExpData = {
       data: [300, 320, 350, 380, 400],
     },
     {
-      label: 'Dépenses (k€)',
+      label: 'Dépenses (k)',
       borderColor: '#DC3545', // Bootstrap Danger Red
       backgroundColor: 'rgba(220, 53, 69, 0.1)',
       tension: 0.3,
@@ -161,7 +162,7 @@ const yearlyRevExpData = {
   labels: ['2022', '2023', '2024 (Proj.)'],
   datasets: [
     {
-      label: 'Revenus (M€)',
+      label: 'Revenus (M)',
       borderColor: '#0D6EFD',
       backgroundColor: 'rgba(13, 110, 253, 0.1)',
       tension: 0.3,
@@ -169,7 +170,7 @@ const yearlyRevExpData = {
       data: [1.2, 1.5, 1.8],
     },
     {
-      label: 'Dépenses (M€)',
+      label: 'Dépenses (M)',
       borderColor: '#DC3545',
       backgroundColor: 'rgba(220, 53, 69, 0.1)',
       tension: 0.3,
@@ -203,11 +204,11 @@ watch(revExpFilter, (newFilter) => {
   if (newFilter === 'quarterly') {
     revenueExpenseChartData.value = quarterlyRevExpData;
     lineChartOptions.value.plugins.title.text = 'Revenus vs. Dépenses (Trimestriel)';
-    lineChartOptions.value.scales.y.title.text = 'Montant (k€)';
+    lineChartOptions.value.scales.y.title.text = 'Montant (k )';
   } else if (newFilter === 'yearly') {
     revenueExpenseChartData.value = yearlyRevExpData;
     lineChartOptions.value.plugins.title.text = 'Revenus vs. Dépenses (Annuel)';
-    lineChartOptions.value.scales.y.title.text = 'Montant (M€)';
+    lineChartOptions.value.scales.y.title.text = 'Montant (M)';
   }
 }, { immediate: true });
 
@@ -219,7 +220,7 @@ const expenseBreakdownChartData = ref({
   labels: expenseCategories,
   datasets: [
     {
-      label: 'Dépenses Annuelles (k€)',
+      label: 'Dépenses Annuelles (k)',
       backgroundColor: expenseColors,
       borderColor: expenseColors.map(color => color.replace(')', ', 0.7)').replace('rgb', 'rgba')), // slightly darker border
       borderWidth: 1,
@@ -238,7 +239,7 @@ const barChartOptions = ref({
     tooltip: { mode: 'index', intersect: false },
   },
   scales: {
-    x: { beginAtZero: true, title: { display: true, text: 'Montant (k€)' } },
+    x: { beginAtZero: true, title: { display: true, text: 'Montant (k)' } },
     y: { grid: { display: false } },
   },
 });

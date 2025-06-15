@@ -153,9 +153,9 @@ const contracts = ref([
 ]);
 
 const paymentHistory = ref([
-  { id: 'P001', date: '15/12/2023', description: 'Facture INV00123 - Suite A', amount: '€1200.00', status: 'Payé', invoiceUrl: '#' },
-  { id: 'P002', date: '15/11/2023', description: 'Facture INV00122 - Suite A', amount: '€1200.00', status: 'Payé', invoiceUrl: '#' },
-  { id: 'P003', date: '05/01/2024', description: 'Demande SR0045 - Nettoyage Extra', amount: '€50.00', status: 'En attente', invoiceUrl: '#' }
+  { id: 'P001', date: '15/12/2023', description: 'Facture INV00123 - Suite A', amount: 1200.00, status: 'Payé', invoiceUrl: '#' },
+  { id: 'P002', date: '15/11/2023', description: 'Facture INV00122 - Suite A', amount: 1200.00, status: 'Payé', invoiceUrl: '#' },
+  { id: 'P003', date: '05/01/2024', description: 'Demande SR0045 - Nettoyage Extra', amount: 50.00, status: 'En attente', invoiceUrl: '#' }
 ]);
 
 const serviceRequests = ref([

@@ -16,7 +16,7 @@
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-currency-euro me-2 text-fadaa-blue"></i>Revenu Total (Annuel)</h5>
-            <p class="card-text fs-4 fw-bold">€1,250,000</p>
+            <p class="card-text fs-4 fw-bold"> {{ formatCurrency(1250000)}}</p>
           </div>
         </div>
       </div>
@@ -61,7 +61,7 @@
           <div class="card-body">
             <ul class="list-group list-group-flush">
               <li class="list-group-item"><i class="bi bi-building-add text-success me-2"></i>Nouvelle agence "Paris Centre" ouverte avec succès. ROI initial: 12%.</li>
-              <li class="list-group-item"><i class="bi bi-cash-stack text-primary me-2"></i>Investissement supplémentaire de €50k dans l'agence "Lyon Part-Dieu".</li>
+              <li class="list-group-item"><i class="bi bi-cash-stack text-primary me-2"></i>Investissement supplémentaire de 50k dans l'agence "Lyon Part-Dieu".</li>
               <li class="list-group-item"><i class="bi bi-graph-up-arrow text-info me-2"></i>Performance de l'agence "Marseille Vieux-Port" en hausse de 5% ce trimestre.</li>
               <li class="list-group-item"><i class="bi bi-person-plus-fill text-fadaa-orange me-2"></i>Recrutement de 3 nouveaux gestionnaires pour l'expansion régionale.</li>
             </ul>
@@ -93,7 +93,7 @@
                 <tbody>
                   <tr v-for="investment in investments" :key="investment.id">
                     <td>{{ investment.branchName }}</td>
-                    <td>{{ investment.amount }} €</td>
+                    <td>{{ formatCurrency(investment.amount) }} </td>
                     <td>{{ investment.sharePercentage }}%</td>
                     <td>{{ investment.contractStartDate }}</td>
                     <td>{{ investment.contractEndDate }}</td>
@@ -129,7 +129,7 @@
                   <tr v-for="share in profitShares" :key="share.id">
                     <td>{{ share.date }}</td>
                     <td>{{ share.branchName }}</td>
-                    <td>{{ share.amount }} €</td>
+                    <td>{{ formatCurrency(share.amount) }}</td>
                     <td>{{ share.period }}</td>
                   </tr>
                 </tbody>
@@ -180,7 +180,7 @@
 import { ref, computed, watch } from 'vue';
 import { Line } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler } from 'chart.js';
-
+import { formatCurrency } from '@/helpers/utils.js';
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler);
 
 const chartFilter = ref('monthly'); // monthly, bi-yearly, yearly
@@ -330,7 +330,7 @@ const chartOptions = ref({
       beginAtZero: true,
       title: {
         display: true,
-        text: 'Revenus (en k€)'
+        text: 'Revenus (en k)'
       }
     },
     x: {

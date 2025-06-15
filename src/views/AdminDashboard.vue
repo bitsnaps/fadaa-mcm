@@ -16,7 +16,7 @@
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-cash-coin me-2 text-fadaa-orange"></i>Revenu Mensuel</h5>
-            <p class="card-text fs-4 fw-bold">€75,000</p>
+            <p class="card-text fs-4 fw-bold">{{ formatCurrency(75000) }}</p>
           </div>
         </div>
       </div>
@@ -24,7 +24,7 @@
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-graph-up-arrow me-2 text-fadaa-orange"></i>Net Mensuel</h5>
-            <p class="card-text fs-4 fw-bold">€25,000</p>
+            <p class="card-text fs-4 fw-bold">{{ formatCurrency(25000) }}</p>
           </div>
         </div>
       </div>
@@ -174,7 +174,7 @@
 import { ref, computed } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, Filler } from 'chart.js';
-
+import { formatCurrency } from '@/helpers/utils.js';
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, Filler);
 
 const mockOffices = ref([
@@ -326,7 +326,7 @@ const chartOptions = ref({
       beginAtZero: true,
       title: {
         display: true,
-        text: 'Montant des Ventes (en k€)'
+        text: 'Montant des Ventes (en k)'
       }
     },
   },
