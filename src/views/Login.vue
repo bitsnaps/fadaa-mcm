@@ -42,6 +42,9 @@ const handleLogin = () => {
   } else if (email.value === 'assistant@fadaa.dz' && password.value === 'assistant') {
     authStore.login('assistant');
     router.push('/assistant-dashboard');
+  } else if (email.value === 'client@fadaa.dz' && password.value === 'client') {
+    authStore.login('client');
+    router.push('/client-portal');
   } else {
     error.value = 'Invalid credentials. Please try again.';
     // No need to manually clear localStorage, store action handles it if necessary
