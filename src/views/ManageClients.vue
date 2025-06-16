@@ -14,8 +14,8 @@ let viewClientModal = null;
 const mockClients = [
   {
     id: 'cli001',
-    fullName: 'John Doe',
-    email: 'john.doe@example.com',
+    fullName: 'Ali Kara',
+    email: 'ali.kara@example.com',
     phone: '555-1234',
     status: 'Active',
     address: '123 Main St, Anytown, USA',
@@ -24,8 +24,8 @@ const mockClients = [
   },
   {
     id: 'cli002',
-    fullName: 'Jane Smith',
-    email: 'jane.smith@example.com',
+    fullName: 'Said Bentamer',
+    email: 'said.bentamer@example.com',
     phone: '555-5678',
     status: 'Inactive',
     address: '456 Oak Ave, Otherville, USA',
@@ -34,8 +34,8 @@ const mockClients = [
   },
   {
     id: 'cli003',
-    fullName: 'Alice Brown',
-    email: 'alice.brown@example.com',
+    fullName: 'Amine Rabeh',
+    email: 'amine.rabeh@example.com',
     phone: '555-8765',
     status: 'Active',
     address: '789 Pine Ln, Sometown, USA',
@@ -44,8 +44,8 @@ const mockClients = [
   },
   {
     id: 'cli004',
-    fullName: 'Robert Green',
-    email: 'robert.green@example.com',
+    fullName: 'Lakhdar Djemaa',
+    email: 'lakhdar.djemaa@example.com',
     phone: '555-4321',
     status: 'Pending',
     address: '101 Maple Dr, Yourtown, USA',

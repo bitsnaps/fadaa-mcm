@@ -40,7 +40,7 @@ const submitButtonText = computed(() => clientId.value ? 'Update Client' : 'Add 
 const mockClients = [
   {
     id: 'cli001',
-    name: 'John Doe',
+    name: 'Ali Kara',
     email: 'john.doe@example.com',
     phone: '555-1234',
     address: '123 Main St',
@@ -54,7 +54,7 @@ const mockClients = [
     taxId: 'NIF12345',
     nis: '',
     rcNumber: '',
-    contactPersonName: 'John Doe',
+    contactPersonName: 'Ali Kara',
     contactPersonEmail: 'john.doe@example.com',
     contactPersonPhone: '555-1234',
     contractStartDate: '2023-01-15',
@@ -65,7 +65,7 @@ const mockClients = [
   },
   {
     id: 'cli002',
-    name: 'Jane Smith Inc.',
+    name: 'Said Bentamer Inc.',
     email: 'jane.smith@example.com',
     phone: '555-5678',
     address: '456 Oak Ave',
@@ -79,7 +79,7 @@ const mockClients = [
     taxId: 'NIF67890',
     nis: 'NIS54321',
     rcNumber: 'RC98765',
-    contactPersonName: 'Jane Smith',
+    contactPersonName: 'Said Bentamer',
     contactPersonEmail: 'jane.smith@example.com',
     contactPersonPhone: '555-5678',
     contractStartDate: '2022-11-30',
