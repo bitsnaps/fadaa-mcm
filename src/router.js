@@ -15,6 +15,9 @@ import ManageUsers from './views/ManageUsers.vue'; // Added ManageUsers import
 import SystemSettings from './views/SystemSettings.vue'; // Added SystemSettings import
 import ManageNotifications from './views/ManageNotifications.vue'; // Added ManageNotifications import
 import Tasks from './views/Tasks.vue'; // Added Tasks import
+import ManageBranches from './views/ManageBranches.vue'; // Import ManageBranches
+import ManageServiceCategories from './views/ManageServiceCategories.vue'; // Import ManageServiceCategories
+import ManageClientServices from './views/ManageClientServices.vue'; // Import ManageClientServices
 import Navbar from './components/Navbar.vue';
 
 const routes = [
@@ -113,6 +116,24 @@ const routes = [
     path: '/manage-notifications',
     name: 'ManageNotifications',
     components: { default: ManageNotifications, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+  },
+  {
+    path: '/manage-branches',
+    name: 'ManageBranches',
+    components: { default: ManageBranches, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin'] }
+  },
+  {
+    path: '/manage-service-categories',
+    name: 'ManageServiceCategories',
+    components: { default: ManageServiceCategories, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin'] }
+  },
+  {
+    path: '/manage-client-services',
+    name: 'ManageClientServices',
+    components: { default: ManageClientServices, header: Navbar },
     meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
   }
 ];

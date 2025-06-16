@@ -14,6 +14,18 @@
             Gestion Utilisateurs
           </router-link>
         </li>
+        <li class="nav-item" v-if="userRole === 'admin'">
+          <router-link to="/manage-branches" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-building-gear me-2"></i>
+            Gestion Agences
+          </router-link>
+        </li>
+        <li class="nav-item" v-if="userRole === 'admin'">
+          <router-link to="/manage-service-categories" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-tags-fill me-2"></i>
+            Gestion Catégories Services
+          </router-link>
+        </li>
         <li class="nav-item" v-if="userRole === 'assistant'">
           <router-link to="/assistant-dashboard" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-person-workspace me-2"></i>
@@ -30,6 +42,12 @@
           <router-link to="/add-client" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-person-plus-fill me-2"></i>
             Ajouter Client
+          </router-link>
+        </li>
+        <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+          <router-link to="/manage-client-services" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-hdd-stack-fill me-2"></i>
+            Gestion Services Client
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'admin'">
