@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container container-fluid">
-    <h2 class="mb-4">Assistant Dashboard</h2>
+    <h2 class="mb-4">Dashboard | {{ authStore.userRole }}</h2>
 
     <div class="row gy-4">
       <!-- Client Contract Renewals -->
@@ -132,11 +132,15 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
 
 const mockData = ref({
   renewals: [
     { id: 1, clientName: 'Client A', daysLeft: 15 },
-    { id: 2, clientName: 'Client B', daysLeft: 25 },
+    { id: 2, clientName: 'Client B', daysLeft: 20 },
+    { id: 3, clientName: 'Client C', daysLeft: 10 },
   ],
   expiringContracts: [
     { id: 1, clientName: 'Client C', officeSpace: 'Office 101' },
