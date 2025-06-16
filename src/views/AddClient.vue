@@ -1,46 +1,137 @@
 <script setup>
-  import { ref } from 'vue';
-  import { apiClient } from '@/services/ApiClient'; // Assuming mock is set up for /clients
-  import { useRouter } from 'vue-router';
-  
-  const router = useRouter();
-  
-  const client = ref({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    country: '',
-    clientType: '', // e.g., 'Individual', 'Company'
-    serviceType: '', // e.g., 'Domiciliation', 'Office Rental'
-    idType: '', // e.g., 'National ID', 'Passport', 'Trade Register'
-    idNumber: '',
-    idExpiryDate: '',
-    taxId: '', // NIF
-    nis: '', // NIS for companies
-    rcNumber: '', // RC Number for companies
-    contactPersonName: '',
-    contactPersonEmail: '',
-    contactPersonPhone: '',
-    contractStartDate: '',
-    contractEndDate: '',
-    paymentTerms: '', // e.g., 'Monthly', 'Quarterly', 'Annually'
-    officeId: null, // To be linked with office booking
-    attachments: [], // For file uploads
-    status: 'Active', // Default status
-  });
+import { ref, onMounted, computed } from 'vue';
+import { apiClient } from '@/services/ApiClient';
+import { useRouter, useRoute } from 'vue-router';
 
-  const submitForm = async () => {
+const router = useRouter();
+const route = useRoute();
+const clientId = ref(route.params.clientId || null);
+
+const client = ref({
+  name: '',
+  email: '',
+  phone: '',
+  address: '',
+  city: '',
+  country: '',
+  clientType: '', // e.g., 'Individual', 'Company'
+  serviceType: '', // e.g., 'Domiciliation', 'Office Rental'
+  idType: '', // e.g., 'National ID', 'Passport', 'Trade Register'
+  idNumber: '',
+  idExpiryDate: '',
+  taxId: '', // NIF
+  nis: '', // NIS for companies
+  rcNumber: '', // RC Number for companies
+  contactPersonName: '',
+  contactPersonEmail: '',
+  contactPersonPhone: '',
+  contractStartDate: '',
+  contractEndDate: '',
+  paymentTerms: '', // e.g., 'Monthly', 'Quarterly', 'Annually'
+  officeId: null, // To be linked with office booking
+  attachments: [], // For file uploads
+  status: 'Active', // Default status
+});
+
+const pageTitle = computed(() => clientId.value ? 'Edit Client' : 'Add New Client');
+const submitButtonText = computed(() => clientId.value ? 'Update Client' : 'Add Client');
+
+// Mock data for demonstration as API for single client fetch is not defined
+const mockClients = [
+  {
+    id: 'cli001',
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    phone: '555-1234',
+    address: '123 Main St',
+    city: 'Anytown',
+    country: 'USA',
+    clientType: 'Individual',
+    serviceType: 'Domiciliation',
+    idType: 'Passport',
+    idNumber: 'X1234567',
+    idExpiryDate: '2028-12-31',
+    taxId: 'NIF12345',
+    nis: '',
+    rcNumber: '',
+    contactPersonName: 'John Doe',
+    contactPersonEmail: 'john.doe@example.com',
+    contactPersonPhone: '555-1234',
+    contractStartDate: '2023-01-15',
+    contractEndDate: '2024-01-14',
+    paymentTerms: 'Monthly',
+    officeId: 101,
+    status: 'Active',
+  },
+  {
+    id: 'cli002',
+    name: 'Jane Smith Inc.',
+    email: 'jane.smith@example.com',
+    phone: '555-5678',
+    address: '456 Oak Ave',
+    city: 'Otherville',
+    country: 'USA',
+    clientType: 'Company',
+    serviceType: 'Office Rental',
+    idType: 'Trade Register',
+    idNumber: 'RC98765',
+    idExpiryDate: '2025-06-30',
+    taxId: 'NIF67890',
+    nis: 'NIS54321',
+    rcNumber: 'RC98765',
+    contactPersonName: 'Jane Smith',
+    contactPersonEmail: 'jane.smith@example.com',
+    contactPersonPhone: '555-5678',
+    contractStartDate: '2022-11-30',
+    contractEndDate: '2023-11-29',
+    paymentTerms: 'Annually',
+    officeId: 205,
+    status: 'Inactive',
+  },
+];
+
+onMounted(async () => {
+  if (clientId.value) {
     try {
-        const response = await apiClient.post('/clients', client.value);
-        console.log('Client added:', response.data);
-        alert('Client added successfully!');
+      // In a real app, you would fetch this from an API: `/clients/${clientId.value}`
+      // const response = await apiClient.get(`/clients/${clientId.value}`);
+      // client.value = response.data;
+      const existingClient = mockClients.find(c => c.id === clientId.value);
+      if (existingClient) {
+        // Map fullName from mock to name for the form
+        const { fullName, ...formData } = existingClient;
+        client.value = { ...formData, name: fullName || existingClient.name }; 
+      } else {
+        console.error('Client not found for editing');
+        alert('Client data not found. Redirecting to client list.');
         router.push('/manage-clients');
+      }
     } catch (error) {
-        console.error('Error adding client:', error);
-        alert('Failed to add client.');
+      console.error('Error fetching client details:', error);
+      alert('Failed to load client data for editing.');
+      router.push('/manage-clients');
     }
+  }
+});
+
+const submitForm = async () => {
+  try {
+    if (clientId.value) {
+      // Update existing client
+      // const response = await apiClient.put(`/clients/${clientId.value}`, client.value);
+      console.log('Client updated:', client.value); // Mocking API call
+      alert('Client updated successfully!');
+    } else {
+      // Add new client
+      // const response = await apiClient.post('/clients', client.value);
+      console.log('Client added:', client.value); // Mocking API call
+      alert('Client added successfully!');
+    }
+    router.push('/manage-clients');
+  } catch (error) {
+    console.error(`Error ${clientId.value ? 'updating' : 'adding'} client:`, error);
+    alert(`Failed to ${clientId.value ? 'update' : 'add'} client.`);
+  }
 };
 
 const handleFileUpload = (event) => {
@@ -49,11 +140,11 @@ const handleFileUpload = (event) => {
   console.log('Files selected:', client.value.attachments);
 };
 
-  </script>
+</script>
 
 <template>
     <div class="container mt-4">
-      <h2>Add New Client</h2>
+      <h2>{{ pageTitle }}</h2>
       <form @submit.prevent="submitForm">
         <div class="mb-3">
           <label for="clientName" class="form-label">Client Name</label>
@@ -178,7 +269,8 @@ const handleFileUpload = (event) => {
           <label for="attachments" class="form-label">Attachments</label>
           <input type="file" class="form-control" id="attachments" @change="handleFileUpload" multiple>
         </div>
-        <button type="submit" class="btn btn-primary">Add Client</button>
+        <button type="submit" class="btn btn-primary me-2">{{ submitButtonText }}</button>
+        <router-link to="/manage-clients" class="btn btn-secondary">Cancel</router-link>
       </form>
     </div>
   </template>
