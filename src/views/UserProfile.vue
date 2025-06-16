@@ -1,85 +1,85 @@
 <template>
   <div class="container mt-5">
+    <h1 class="mb-4 text-fadaa-blue">Mon Profil</h1>
+
     <div class="row">
-      <div class="col-md-4">
-        <div class="card shadow mb-4">
-          <div class="card-header py-3">
-            <h5 class="m-0 font-weight-bold text-primary">Profile Picture</h5>
-          </div>
+      <!-- Profile Picture Section -->
+      <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
           <div class="card-body text-center">
-            <img :src="user.avatar || '/src/public/default-avatar.png'" class="rounded-circle mb-3" width="150" height="150" alt="Profile Picture">
-            <div class="d-flex justify-content-center">
-              <input type="file" ref="fileInput" class="d-none" @change="handleFileUpload" accept="image/*">
-              <button @click="$refs.fileInput.click()" class="btn btn-primary btn-sm me-2">
-                <i class="bi bi-upload me-1"></i> Upload
-              </button>
-              <button @click="removeAvatar" class="btn btn-outline-danger btn-sm">
-                <i class="bi bi-trash me-1"></i> Remove
-              </button>
-            </div>
+            <img :src="profileImageUrl" alt="Photo de profil" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+            <h5 class="card-title text-fadaa-orange">{{ user.firstName }} {{ user.lastName }}</h5>
+            <p class="text-muted">{{ user.role }}</p>
+            <input type="file" class="form-control form-control-sm mt-3" @change="onFileChange" accept="image/*">
+            <button class="btn btn-sm btn-primary mt-2" @click="uploadProfilePicture" :disabled="!selectedFile">
+              Télécharger Photo
+            </button>
           </div>
         </div>
       </div>
-      
-      <div class="col-md-8">
-        <div class="card shadow mb-4">
-          <div class="card-header py-3">
-            <h5 class="m-0 font-weight-bold text-primary">Personal Information</h5>
+
+      <!-- Personal Information Section -->
+      <div class="col-md-8 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-fadaa-light-blue">
+            <h5 class="mb-0 text-fadaa-blue">Informations Personnelles</h5>
           </div>
           <div class="card-body">
             <form @submit.prevent="updateProfile">
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <label class="form-label">First Name</label>
-                  <input v-model="user.firstName" type="text" class="form-control" required>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Last Name</label>
-                  <input v-model="user.lastName" type="text" class="form-control" required>
+              <div class="mb-3 row">
+                <label for="firstName" class="col-sm-3 col-form-label">Prénom</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="firstName" v-model="editableUser.firstName">
                 </div>
               </div>
-              
-              <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input v-model="user.email" type="email" class="form-control" required>
+              <div class="mb-3 row">
+                <label for="lastName" class="col-sm-3 col-form-label">Nom</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="lastName" v-model="editableUser.lastName">
+                </div>
               </div>
-              
-              <div class="mb-3">
-                <label class="form-label">Phone Number</label>
-                <input v-model="user.phone" type="tel" class="form-control">
+              <div class="mb-3 row">
+                <label for="email" class="col-sm-3 col-form-label">Email</label>
+                <div class="col-sm-9">
+                  <input type="email" class="form-control" id="email" v-model="editableUser.email" readonly>
+                   <small class="form-text text-muted">L'email ne peut pas être modifié.</small>
+                </div>
               </div>
-              
-              <button type="submit" class="btn btn-primary">
-                <i class="bi bi-save me-1"></i> Save Changes
-              </button>
+              <div class="mb-3 row">
+                <label for="phone" class="col-sm-3 col-form-label">Téléphone</label>
+                <div class="col-sm-9">
+                  <input type="tel" class="form-control" id="phone" v-model="editableUser.phone">
+                </div>
+              </div>
+              <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">Enregistrer les Modifications</button>
+              </div>
             </form>
           </div>
         </div>
-        
-        <div class="card shadow mb-4">
-          <div class="card-header py-3">
-            <h5 class="m-0 font-weight-bold text-primary">Change Password</h5>
+
+        <!-- Change Password Section -->
+        <div class="card shadow-sm mt-4">
+          <div class="card-header bg-fadaa-light-blue">
+            <h5 class="mb-0 text-fadaa-blue">Changer le Mot de Passe</h5>
           </div>
           <div class="card-body">
             <form @submit.prevent="changePassword">
               <div class="mb-3">
-                <label class="form-label">Current Password</label>
-                <input v-model="password.current" type="password" class="form-control" required>
+                <label for="currentPassword" class="form-label">Mot de Passe Actuel</label>
+                <input type="password" class="form-control" id="currentPassword" v-model="passwordForm.currentPassword" required>
               </div>
-              
               <div class="mb-3">
-                <label class="form-label">New Password</label>
-                <input v-model="password.new" type="password" class="form-control" required>
+                <label for="newPassword" class="form-label">Nouveau Mot de Passe</label>
+                <input type="password" class="form-control" id="newPassword" v-model="passwordForm.newPassword" required>
               </div>
-              
               <div class="mb-3">
-                <label class="form-label">Confirm New Password</label>
-                <input v-model="password.confirm" type="password" class="form-control" required>
+                <label for="confirmPassword" class="form-label">Confirmer le Nouveau Mot de Passe</label>
+                <input type="password" class="form-control" id="confirmPassword" v-model="passwordForm.confirmPassword" required>
               </div>
-              
-              <button type="submit" class="btn btn-primary">
-                <i class="bi bi-key me-1"></i> Change Password
-              </button>
+              <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">Changer le Mot de Passe</button>
+              </div>
             </form>
           </div>
         </div>
@@ -89,75 +89,117 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
 
-const user = ref({
-  firstName: authStore.user?.firstName || '',
-  lastName: authStore.user?.lastName || '',
-  email: authStore.user?.email || '',
-  phone: authStore.user?.phone || '',
-  avatar: authStore.user?.avatar || null
+const user = computed(() => authStore.user || { firstName: '', lastName: '', email: '', phone: '', role: '', profilePictureUrl: '' });
+
+const editableUser = reactive({
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
 });
 
-const password = ref({
-  current: '',
-  new: '',
-  confirm: ''
+const passwordForm = reactive({
+  currentPassword: '',
+  newPassword: '',
+  confirmPassword: '',
 });
 
-const handleFileUpload = (event) => {
+const selectedFile = ref(null);
+const profileImageUrl = ref('/logo.png'); // Default placeholder image
+
+onMounted(() => {
+  if (user.value) {
+    editableUser.firstName = user.value.firstName;
+    editableUser.lastName = user.value.lastName;
+    editableUser.email = user.value.email;
+    editableUser.phone = user.value.phone;
+    if (user.value.profilePictureUrl) {
+        profileImageUrl.value = user.value.profilePictureUrl;
+    }
+  }
+});
+
+const onFileChange = (event) => {
   const file = event.target.files[0];
   if (file) {
+    selectedFile.value = file;
+    // Preview image
     const reader = new FileReader();
     reader.onload = (e) => {
-      user.value.avatar = e.target.result;
+      profileImageUrl.value = e.target.result;
     };
     reader.readAsDataURL(file);
   }
 };
 
-const removeAvatar = () => {
-  user.value.avatar = null;
+const uploadProfilePicture = async () => {
+  if (!selectedFile.value) {
+    alert('Veuillez sélectionner un fichier.');
+    return;
+  }
+  // Placeholder for actual upload logic
+  console.log('Uploading picture:', selectedFile.value.name);
+  // Simulate API call
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Assume success and update store/user object if backend updates it
+  // For now, we've already updated profileImageUrl for preview
+  // authStore.updateUserProfilePicture(newImageUrl); // Example if store handles it
+  alert('Photo de profil mise à jour (simulation).');
+  selectedFile.value = null; // Reset file input
 };
 
 const updateProfile = async () => {
-  try {
-    // Call API to update profile
-    await authStore.updateProfile(user.value);
-    alert('Profile updated successfully!');
-  } catch (error) {
-    console.error('Error updating profile:', error);
-    alert('Failed to update profile');
-  }
+  // Placeholder for actual profile update logic
+  console.log('Updating profile with:', editableUser);
+  // Simulate API call
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  // authStore.updateUser(editableUser); // Example if store handles it
+  alert('Profil mis à jour avec succès (simulation).');
 };
 
 const changePassword = async () => {
-  if (password.value.new !== password.value.confirm) {
-    alert('New passwords do not match!');
+  if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+    alert('Les nouveaux mots de passe ne correspondent pas.');
     return;
   }
-  
-  try {
-    // Call API to change password
-    await authStore.changePassword({
-      currentPassword: password.value.current,
-      newPassword: password.value.new
-    });
-    alert('Password changed successfully!');
-    password.value = { current: '', new: '', confirm: '' };
-  } catch (error) {
-    console.error('Error changing password:', error);
-    alert('Failed to change password');
+  if (passwordForm.newPassword.length < 6) { // Example validation
+      alert('Le nouveau mot de passe doit comporter au moins 6 caractères.');
+      return;
   }
+  // Placeholder for actual password change logic
+  console.log('Changing password...');
+  // Simulate API call
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  // const success = await authStore.changePassword(passwordForm.currentPassword, passwordForm.newPassword);
+  // if (success) {
+  //   alert('Mot de passe changé avec succès.');
+  // } else {
+  //   alert('Échec du changement de mot de passe. Vérifiez votre mot de passe actuel.');
+  // }
+  alert('Mot de passe changé avec succès (simulation).');
+  passwordForm.currentPassword = '';
+  passwordForm.newPassword = '';
+  passwordForm.confirmPassword = '';
 };
+
 </script>
 
 <style scoped>
-/* Add component-specific styles here */
-.container {
-  padding-top: 20px;
+.text-fadaa-blue {
+  color: var(--fadaa-blue);
+}
+.text-fadaa-orange {
+  color: var(--fadaa-orange);
+}
+.bg-fadaa-light-blue {
+  background-color: var(--fadaa-light-blue);
+}
+.card-header h5 {
+    color: var(--fadaa-blue);
 }
 </style>

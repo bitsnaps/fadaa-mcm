@@ -16,8 +16,6 @@ import SystemSettings from './views/SystemSettings.vue'; // Added SystemSettings
 import ManageNotifications from './views/ManageNotifications.vue'; // Added ManageNotifications import
 import Tasks from './views/Tasks.vue'; // Added Tasks import
 import Navbar from './components/Navbar.vue';
-// Note: InvestorDashboard route was missing, ensure it's added if needed or remove if not used.
-// For now, assuming it's used based on the import.
 
 const routes = [
   {
