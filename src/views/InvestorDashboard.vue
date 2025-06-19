@@ -7,7 +7,7 @@ import { formatCurrency } from '@/helpers/utils.js';
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler);
 
 const chartFilter = ref('monthly'); // monthly, bi-yearly, yearly
-const tableFilter = ref('yearly'); // Default to yearly to show all initially
+const tableFilter = ref('monthly'); // Default to yearly to show all initially
 
 // Yearly data (represents all current investments)
 const yearlyInvestments = ref([
@@ -294,9 +294,9 @@ watch(chartFilter, (newFilter) => {
       </div>
     </div>
 
-    <!-- Section 2: Revenue Evolution Line Chart (TODO: Add filters: Montly, Bi-Yearly, Yearly)-->
+    <!-- Section 2: Revenue Evolution Line Chart -->
     <div class="row mb-4">
-      <div class="col-6">
+      <div class="col-md-6">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
             <div class="d-flex justify-content-between align-items-center">
@@ -345,7 +345,7 @@ watch(chartFilter, (newFilter) => {
         </div>
       </div>
 
-      <div class="col-6">
+      <div class="col-md-6">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
             <div class="d-flex justify-content-between align-items-center">
@@ -383,7 +383,7 @@ watch(chartFilter, (newFilter) => {
       </div>
     </div>
 
-    <!-- Section: Profit Share History -->
+    <!-- Section 4: Profit Share History -->
     <div class="row mb-4">
       <div class="col-12">
         <div class="card shadow-sm">
@@ -416,7 +416,7 @@ watch(chartFilter, (newFilter) => {
       </div>
     </div>
 
-    <!-- Section: Documents -->
+    <!-- Section 5: Documents -->
     <div class="row mb-4">
       <div class="col-12">
         <div class="card shadow-sm">
@@ -435,15 +435,15 @@ watch(chartFilter, (newFilter) => {
       </div>
     </div>
 
-    <!-- Section 4: Call to Action -->
+    <!-- Section 6: Call to Action -->
     <div class="row mb-4">
       <div class="col-12 text-center">
         <div class="card shadow-sm">
           <div class="card-body">
             <h5 class="card-title">Prêt à Étendre Votre Impact ?</h5>
             <p class="card-text">Explorez de nouvelles opportunités d'investissement ou demandez l'ouverture d'une nouvelle agence.</p>
-            <button class="btn btn-fadaa-blue btn-lg me-2"><i class="bi bi-folder-plus me-2"></i>Demander une Nouvelle Agence</button>
-            <button class="btn btn-outline-fadaa-blue btn-lg"><i class="bi bi-piggy-bank me-2"></i>Investir Davantage</button>
+            <button class="btn btn-success btn-lg me-2 mb-2"><i class="bi bi-folder-plus me-2"></i>Demander une Nouvelle Agence</button>
+            <button class="btn btn-outline-success btn-lg mb-2"><i class="bi bi-currency-dollar me-2"></i>Investir Davantage</button>
           </div>
         </div>
       </div>
