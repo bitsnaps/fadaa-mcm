@@ -38,6 +38,18 @@
             Gestion Clients
           </router-link>
         </li>
+        <li class="nav-item" v-if="userRole === 'admin'">
+          <router-link to="/manage-coworking-offices" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-buildings-fill me-2"></i>
+            Gestion Bureaux Coworking
+          </router-link>
+        </li>
+        <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+          <router-link to="/documents-contracts-management" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-file-earmark-zip-fill me-2"></i>
+            Gestion Documents & Contrats
+          </router-link>
+        </li>
         <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
           <router-link to="/add-client" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-person-plus-fill me-2"></i>

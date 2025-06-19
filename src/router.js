@@ -18,6 +18,9 @@ import Tasks from './views/Tasks.vue'; // Added Tasks import
 import ManageBranches from './views/ManageBranches.vue'; // Import ManageBranches
 import ManageServiceCategories from './views/ManageServiceCategories.vue'; // Import ManageServiceCategories
 import ManageClientServices from './views/ManageClientServices.vue'; // Import ManageClientServices
+import ManageOffices from './views/ManageOffices.vue';
+import InvestmentDetails from './views/InvestmentDetails.vue';
+import DocumentsManagement from './views/DocumentsManagement.vue';
 import Navbar from './components/Navbar.vue';
 
 const routes = [
@@ -134,6 +137,24 @@ const routes = [
     path: '/manage-client-services',
     name: 'ManageClientServices',
     components: { default: ManageClientServices, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+  },
+  {
+    path: '/manage-coworking-offices',
+    name: 'ManageOffices',
+    components: { default: ManageOffices, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin'] }
+  },
+  {
+    path: '/investment-details/:id',
+    name: 'InvestmentDetails',
+    components: { default: InvestmentDetails, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin', 'investor'] }
+  },
+  {
+    path: '/documents-contracts-management',
+    name: 'DocumentsManagement',
+    components: { default: DocumentsManagement, header: Navbar },
     meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
   }
 ];
