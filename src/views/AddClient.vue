@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { apiClient } from '@/services/ApiClient';
 import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();

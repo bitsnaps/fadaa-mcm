@@ -1,9 +1,25 @@
-// Global axios instance
-import axios from 'axios'
+import axios from 'axios';
+import { useAuthStore } from '../stores/auth';
 
-export const apiClient = axios.create({
-    baseURL: '/api',
-    headers: {
-        'Content-Type': 'application/json'
-    }
+const apiClient = axios.create({
+  baseURL: '/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
+
+apiClient.interceptors.request.use(
+  (config) => {
+    const authStore = useAuthStore();
+    const token = authStore.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+export default apiClient;

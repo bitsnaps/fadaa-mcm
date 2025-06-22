@@ -31,23 +31,55 @@ const error = ref('');
 const router = useRouter();
 const authStore = useAuthStore();
 
-const handleLogin = () => {
-  // Mock login logic
-  if (email.value === 'admin@fadaa.dz' && password.value === 'admin') {
-    authStore.login('admin');
-    router.push('/admin-dashboard');
-  } else if (email.value === 'investor@fadaa.dz' && password.value === 'investor') {
-    authStore.login('investor');
-    router.push('/investor-dashboard');
-  } else if (email.value === 'assistant@fadaa.dz' && password.value === 'assistant') {
-    authStore.login('assistant');
-    router.push('/assistant-dashboard');
-  } else if (email.value === 'client@fadaa.dz' && password.value === 'client') {
-    authStore.login('client');
-    router.push('/client-portal');
-  } else {
+const handleLogin = async () => {
+  if (!email.value || !password.value) {
+    error.value = 'Please enter both email and password.';
+    return;
+  }
+
+  try {
+    // Mock API call - replace with actual API call
+    // const response = await apiClient.post('/login', { email: email.value, password: password.value });
+    // const { role, token } = response.data;
+
+    // Mock response for demonstration
+    let role, token;
+    if (email.value === 'admin@fadaa.dz' && password.value === 'admin') {
+      role = 'admin';
+      token = 'fake-admin-token';
+    } else if (email.value === 'investor@fadaa.dz' && password.value === 'investor') {
+      role = 'investor';
+      token = 'fake-investor-token';
+    } else if (email.value === 'assistant@fadaa.dz' && password.value === 'assistant') {
+      role = 'assistant';
+      token = 'fake-assistant-token';
+    } else if (email.value === 'client@fadaa.dz' && password.value === 'client') {
+      role = 'client';
+      token = 'fake-client-token';
+    } else {
+      throw new Error('Invalid credentials');
+    }
+
+    authStore.login(role, token);
+
+    switch (role) {
+      case 'admin':
+        router.push('/admin-dashboard');
+        break;
+      case 'assistant':
+        router.push('/assistant-dashboard');
+        break;
+      case 'investor':
+        router.push('/investor-dashboard');
+        break;
+      case 'client':
+        router.push('/client-portal');
+        break;
+      default:
+        router.push('/login');
+    }
+  } catch (err) {
     error.value = 'Invalid credentials. Please try again.';
-    // No need to manually clear localStorage, store action handles it if necessary
   }
 };
 </script>
