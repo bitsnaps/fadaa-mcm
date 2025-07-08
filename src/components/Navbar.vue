@@ -4,6 +4,7 @@ import { computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useSidebarStore } from '@/stores/sidebar';
+import { useI18n } from 'vue-i18n';
 import { 
   BNavbar, 
   BNavbarBrand, 
@@ -35,6 +36,12 @@ const showSidebar = computed(() => {
 
 const isSidebarCollapsed = computed(() => sidebarStore.isCollapsed );
 
+const { locale } = useI18n();
+
+const setLocale = (lang) => {
+  locale.value = lang;
+};
+
 const handleLogout = () => {
   authStore.logout();
   router.push('/login');
@@ -61,6 +68,10 @@ const handleLogout = () => {
 
     <BCollapse id="nav-collapse" is-nav>
       <BNavbarNav class="ms-auto align-items-center">
+        <BNavItemDropdown text="Language" right>
+          <BDropdownItem @click="setLocale('en')">English</BDropdownItem>
+          <BDropdownItem @click="setLocale('fr')">Français</BDropdownItem>
+        </BNavItemDropdown>
         <BNavItem v-if="!isAuthenticated" :to="{ path: '/login' }" :active="$route.path === '/login'" link-classes="nav-link">
           Login
         </BNavItem>        

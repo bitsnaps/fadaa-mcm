@@ -5,73 +5,73 @@
         <li class="nav-item" v-if="userRole === 'admin'">
           <router-link to="/admin-dashboard" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-shield-lock-fill me-2"></i>
-            Dashboard admin
+            {{ $t('sidebar.adminDashboard') }}
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'admin'">
           <router-link to="/manage-users" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-people-fill me-2"></i>
-            Gestion Utilisateurs
+            {{ $t('sidebar.manageUsers') }}
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'admin'">
           <router-link to="/manage-branches" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-building-gear me-2"></i>
-            Gestion Agences
+            {{ $t('sidebar.manageBranches') }}
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'admin'">
           <router-link to="/manage-service-categories" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-tags-fill me-2"></i>
-            Gestion Catégories Services
+            {{ $t('sidebar.manageServiceCategories') }}
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'assistant'">
           <router-link to="/assistant-dashboard" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-person-workspace me-2"></i>
-            Dashboard Assistant
+            {{ $t('sidebar.assistantDashboard') }}
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant' ">
           <router-link to="/manage-clients" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-person-lines-fill me-2"></i>
-            Gestion Clients
-          </router-link>
-        </li>
-        <li class="nav-item" v-if="userRole === 'admin'">
-          <router-link to="/manage-coworking-offices" class="nav-link" active-class="active-fadaa">
-            <i class="bi bi-buildings-fill me-2"></i>
-            Gestion Bureaux Coworking
-          </router-link>
-        </li>
-        <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
-          <router-link to="/documents-contracts-management" class="nav-link" active-class="active-fadaa">
-            <i class="bi bi-file-earmark-zip-fill me-2"></i>
-            Gestion Documents & Contrats
+            {{ $t('sidebar.manageClients') }}
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
           <router-link to="/add-client" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-person-plus-fill me-2"></i>
-            Ajouter Client
+            {{ $t('sidebar.addClient') }}
+          </router-link>
+        </li>
+        <li class="nav-item" v-if="userRole === 'admin'">
+          <router-link to="/manage-coworking-offices" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-buildings-fill me-2"></i>
+            {{ $t('sidebar.manageCoworkingOffices') }}
+          </router-link>
+        </li>
+        <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+          <router-link to="/documents-contracts-management" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-file-earmark-zip-fill me-2"></i>
+            {{ $t('sidebar.documentsContractsManagement') }}
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
           <router-link to="/manage-client-services" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-hdd-stack-fill me-2"></i>
-            Gestion Services Client
+            {{ $t('sidebar.manageClientServices') }}
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'admin'">
           <router-link to="/system-settings" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-gear-fill me-2"></i>
-            Paramètres Système
+            {{ $t('sidebar.systemSettings') }}
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'assistant'">
           <router-link to="/tasks" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-list-task me-2"></i>
-            Tâches
+            {{ $t('sidebar.tasks') }}
           </router-link>
         </li>
 
@@ -79,19 +79,19 @@
         <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
           <router-link to="/investment-tracking" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-graph-up me-2"></i>
-            Suivi des Investissements
+            {{ $t('sidebar.investmentTracking') }}
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
           <router-link to="/financial-reporting" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-file-earmark-medical me-2"></i>
-            Rapports Financiers
+            {{ $t('sidebar.financialReporting') }}
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
           <router-link to="/compliance-management" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-shield-check me-2"></i>
-            Gestion Conformité
+            {{ $t('sidebar.complianceManagement') }}
           </router-link>
         </li>
 
@@ -100,7 +100,7 @@
       </ul>
 
       <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase" v-if="userRole === 'admin'">
-        <span>Rapports</span>
+        <span>{{ $t('sidebar.reports') }}</span>
         <a class="link-secondary" href="#" aria-label="Add a new report">
           <i class="bi bi-plus-circle"></i>
         </a>
@@ -109,13 +109,13 @@
         <li class="nav-item">
           <a class="nav-link" href="#">
             <i class="bi bi-file-earmark-text me-2"></i>
-            Rapport Mensuel
+            {{ $t('sidebar.monthlyReport') }}
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">
             <i class="bi bi-file-earmark-bar-graph me-2"></i>
-            Rapport Annuel
+            {{ $t('sidebar.annualReport') }}
           </a>
         </li>
       </ul>
@@ -137,87 +137,52 @@ const isCollapsed = computed(() => sidebarStore.isCollapsed);
 </script>
 
 <style scoped>
+/*
+ * Sidebar
+ */
+
 .sidebar {
   position: fixed;
-  top: 56px; /* Match navbar height */
+  top: 0;
   bottom: 0;
   left: 0;
-  z-index: 100; /* Behind the navbar */
-  padding: 0; /* Remove padding, handled by sidebar-sticky */
+  z-index: 100;
+  padding: 48px 0 0; /* Height of navbar */
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-  background-color: var(--fadaa-light-blue); /* FADAA Light Blue */
-  transition: transform 0.3s ease, width 0.3s ease;
-  width: 16.666667%; /* Same as col-md-2 */
+  transition: all 0.3s ease;
 }
 
 .sidebar.collapsed {
-  transform: translateX(-100%);
-}
-
-@media (max-width: 767.98px) {
-  .sidebar {
-    top: 56px;
-    z-index: 1030; /* Ensure it's above content when collapsed on mobile */
-    width: 100%; /* Full width on mobile */
-  }
-  
-  .sidebar.collapsed {
-    display: none;
-  }
-}
-
-@media (min-width: 992px) {
-  .sidebar {
-    width: 16.666667%; /* Same as col-lg-2 */
-  }
+  margin-left: -160px; /* Adjust based on desired collapsed width */
 }
 
 .sidebar-sticky {
-  padding-top: 1rem; /* Add some padding at the top of the scrollable area */
-  height: calc(100vh - 56px); /* Full height minus navbar */
+  height: calc(100vh - 48px);
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
 }
 
 .sidebar .nav-link {
   font-weight: 500;
-  color: var(--fadaa-blue); /* FADAA Blue for text */
-  padding: 0.75rem 1rem;
+  color: var(--fadaa-dark-blue);
 }
 
-.sidebar .nav-link i {
-  color: var(--fadaa-orange); /* FADAA Orange for icons */
-  width: 20px; /* Ensure icons align nicely */
-  text-align: center;
+.sidebar .nav-link .feather {
+  margin-right: 4px;
+  color: #727272;
 }
 
 .sidebar .nav-link.active-fadaa {
-  color: var(--fadaa-orange); /* FADAA Orange for active link text */
-  background-color: var(--fadaa-blue); /* FADAA Blue for active link background */
-}
-
-.sidebar .nav-link.active-fadaa i {
-  color: var(--fadaa-orange); /* Keep icon orange or change if needed */
-}
-
-.sidebar .nav-link:hover {
   color: var(--fadaa-orange);
-  background-color: rgba(0, 51, 102, 0.1); /* Lighter FADAA Blue for hover */
 }
 
-.sidebar .nav-link:hover i {
-  color: var(--fadaa-orange);
+.sidebar .nav-link:hover .feather,
+.sidebar .nav-link.active-fadaa .feather {
+  color: inherit;
 }
 
 .sidebar-heading {
   font-size: .75rem;
   text-transform: uppercase;
-  padding: 0.5rem 1rem;
-  color: var(--fadaa-blue);
-  margin-top: 1rem;
-}
-
-.sidebar-heading .link-secondary i {
-  color: var(--fadaa-orange);
 }
 </style>

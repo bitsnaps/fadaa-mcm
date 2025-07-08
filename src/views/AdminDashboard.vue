@@ -1,13 +1,13 @@
 <template>
   <div class="dashboard-container container-fluid">
-    <h2 class="mb-4">Admin Dashboard</h2>
+    <h2 class="mb-4">{{ $t('dashboard.title') }}</h2>
 
     <!-- Section 1: Major KPIs -->
     <div class="row gy-4 mb-4">
       <div class="col-md-4">
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-people-fill me-2 text-fadaa-orange"></i>Nombre de Clients</h5>
+            <h5 class="card-title"><i class="bi bi-people-fill me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.clients') }}</h5>
             <p class="card-text fs-4 fw-bold">1,250</p>
           </div>
         </div>
@@ -15,7 +15,7 @@
       <div class="col-md-4">
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-cash-coin me-2 text-fadaa-orange"></i>Revenu Mensuel</h5>
+            <h5 class="card-title"><i class="bi bi-cash-coin me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.monthlyRevenue') }}</h5>
             <p class="card-text fs-4 fw-bold">{{ formatCurrency(75000) }}</p>
           </div>
         </div>
@@ -23,7 +23,7 @@
       <div class="col-md-4">
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-graph-up-arrow me-2 text-fadaa-orange"></i>Net Mensuel</h5>
+            <h5 class="card-title"><i class="bi bi-graph-up-arrow me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.monthlyNet') }}</h5>
             <p class="card-text fs-4 fw-bold">{{ formatCurrency(25000) }}</p>
           </div>
         </div>
@@ -35,7 +35,7 @@
       <div class="col-lg-6">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-yellow">
-            <h5 class="mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>Ventes Mensuelles (Total vs. Net)</h5>
+            <h5 class="mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>{{ $t('dashboard.charts.monthlySales') }}</h5>
           </div>
           <div class="card-body">
             <Bar :data="chartData" :options="chartOptions" style="height: 300px;" />
@@ -47,18 +47,18 @@
       <div class="col-lg-6">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-yellow">
-            <h5 class="mb-0"><i class="bi bi-bell-fill me-2"></i>Notifications</h5>
+            <h5 class="mb-0"><i class="bi bi-bell-fill me-2"></i>{{ $t('dashboard.notifications.title') }}</h5>
           </div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
               <li class="list-group-item list-group-item-danger d-flex align-items-center">
-                <i class="bi bi-exclamation-octagon-fill me-2 fs-4"></i> Contrat XYZ sur le point d'expirer (Urgent)
+                <i class="bi bi-exclamation-octagon-fill me-2 fs-4"></i> {{ $t('dashboard.notifications.urgentContract') }}
               </li>
               <li class="list-group-item list-group-item-warning d-flex align-items-center">
-                <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i> Demande d'approbation en attente (Avertissement)
+                <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i> {{ $t('dashboard.notifications.pendingApproval') }}
               </li>
               <li class="list-group-item list-group-item-info d-flex align-items-center">
-                <i class="bi bi-info-circle-fill me-2 fs-4"></i> Maintenance système prévue (Normal)
+                <i class="bi bi-info-circle-fill me-2 fs-4"></i> {{ $t('dashboard.notifications.systemMaintenance') }}
               </li>
             </ul>
           </div>
@@ -71,14 +71,14 @@
       <div class="col-md-6">
         <div class="card shadow-sm h-100">
           <div class="card-header bg-fadaa-yellow">
-            <h5 class="mb-0"><i class="bi bi-list-task me-2"></i>Activités Récentes (Clients)</h5>
+            <h5 class="mb-0"><i class="bi bi-list-task me-2"></i>{{ $t('dashboard.recentActivities.title') }}</h5>
           </div>
           <div class="card-body">
             <ul class="list-unstyled">
-              <li class="mb-2"><i class="bi bi-person-check-fill text-success me-2"></i>Nouveau client "Alpha Corp" ajouté.</li>
-              <li class="mb-2"><i class="bi bi-file-earmark-text-fill text-primary me-2"></i>Contrat pour "Beta Ltd" mis à jour.</li>
-              <li class="mb-2"><i class="bi bi-chat-dots-fill text-info me-2"></i>Communication enregistrée avec "Gamma Inc".</li>
-              <li class="mb-2"><i class="bi bi-calendar-event-fill text-fadaa-orange me-2"></i>Rappel : Suivi avec "Delta Co" demain.</li>
+              <li class="mb-2"><i class="bi bi-person-check-fill text-success me-2"></i>{{ $t('dashboard.recentActivities.newClient') }}</li>
+              <li class="mb-2"><i class="bi bi-file-earmark-text-fill text-primary me-2"></i>{{ $t('dashboard.recentActivities.contractUpdate') }}</li>
+              <li class="mb-2"><i class="bi bi-chat-dots-fill text-info me-2"></i>{{ $t('dashboard.recentActivities.communicationLog') }}</li>
+              <li class="mb-2"><i class="bi bi-calendar-event-fill text-fadaa-orange me-2"></i>{{ $t('dashboard.recentActivities.followUpReminder') }}</li>
             </ul>
           </div>
         </div>
@@ -86,21 +86,21 @@
       <div class="col-md-6">
         <div class="card shadow-sm h-100">
           <div class="card-header bg-fadaa-yellow">
-            <h5 class="mb-0"><i class="bi bi-person-workspace me-2"></i>Performance des Assistants</h5>
+            <h5 class="mb-0"><i class="bi bi-person-workspace me-2"></i>{{ $t('dashboard.assistantPerformance.title') }}</h5>
           </div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
               <li class="list-group-item d-flex justify-content-between align-items-center">
-                Assistant 1
-                <span class="badge bg-success rounded-pill">Excellent</span>
+                {{ $t('dashboard.assistantPerformance.assistant1') }}
+                <span class="badge bg-success rounded-pill">{{ $t('dashboard.assistantPerformance.statusExcellent') }}</span>
               </li>
               <li class="list-group-item d-flex justify-content-between align-items-center">
-                Assistant 2
-                <span class="badge bg-primary rounded-pill">Bon</span>
+                {{ $t('dashboard.assistantPerformance.assistant2') }}
+                <span class="badge bg-primary rounded-pill">{{ $t('dashboard.assistantPerformance.statusGood') }}</span>
               </li>
               <li class="list-group-item d-flex justify-content-between align-items-center">
-                Assistant 3
-                <span class="badge bg-warning text-dark rounded-pill">À améliorer</span>
+                {{ $t('dashboard.assistantPerformance.assistant3') }}
+                <span class="badge bg-warning text-dark rounded-pill">{{ $t('dashboard.assistantPerformance.statusNeedsImprovement') }}</span>
               </li>
             </ul>
           </div>
@@ -111,25 +111,25 @@
     <!-- Existing Office List Table (Kept for now, clarify if removal needed) -->
     <div class="card shadow-sm mb-4">
       <div class="card-header bg-fadaa-yellow">
-        <h5 class="mb-0"><i class="bi bi-building me-2"></i>Liste des Bureaux par Branche</h5>
+        <h5 class="mb-0"><i class="bi bi-building me-2"></i>{{ $t('dashboard.officeList.title') }}</h5>
       </div>
       <div class="card-body">
         <div class="mb-3">
-          <input type="text" class="form-control" placeholder="Rechercher des bureaux..." v-model="searchTerm" @input="filterOffices">
+          <input type="text" class="form-control" :placeholder="$t('dashboard.officeList.searchPlaceholder')" v-model="searchTerm" @input="filterOffices">
         </div>
         <div class="table-responsive">
           <table class="table table-striped table-hover">
             <thead class="table-dark">
               <tr>
-                <th @click="sortBy('id')" class="cursor-pointer">ID <i :class="sortIcon('id')"></i></th>
-                <th @click="sortBy('branch')" class="cursor-pointer">Branche <i :class="sortIcon('branch')"></i></th>
-                <th @click="sortBy('space')" class="cursor-pointer">Espace (m²) <i :class="sortIcon('space')"></i></th>
-                <th @click="sortBy('status')" class="cursor-pointer">Statut <i :class="sortIcon('status')"></i></th>
+                <th @click="sortBy('id')" class="cursor-pointer">{{ $t('dashboard.officeList.table.id') }} <i :class="sortIcon('id')"></i></th>
+                <th @click="sortBy('branch')" class="cursor-pointer">{{ $t('dashboard.officeList.table.branch') }} <i :class="sortIcon('branch')"></i></th>
+                <th @click="sortBy('space')" class="cursor-pointer">{{ $t('dashboard.officeList.table.space') }} <i :class="sortIcon('space')"></i></th>
+                <th @click="sortBy('status')" class="cursor-pointer">{{ $t('dashboard.officeList.table.status') }} <i :class="sortIcon('status')"></i></th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="paginatedOffices.length === 0">
-                <td colspan="4" class="text-center">Aucun bureau trouvé.</td>
+                <td colspan="4" class="text-center">{{ $t('dashboard.officeList.noOffices') }}</td>
               </tr>
               <tr v-for="office in paginatedOffices" :key="office.id">
                 <td>{{ office.id }}</td>
@@ -143,13 +143,13 @@
         <nav aria-label="Office list navigation" v-if="totalPages > 1">
           <ul class="pagination justify-content-center">
             <li class="page-item" :class="{ disabled: currentPage === 1 }">
-              <a class="page-link" href="#" @click.prevent="prevPage">Précédent</a>
+              <a class="page-link" href="#" @click.prevent="prevPage">{{ $t('dashboard.officeList.pagination.previous') }}</a>
             </li>
             <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: currentPage === page }">
               <a class="page-link" href="#" @click.prevent="currentPage = page">{{ page }}</a>
             </li>
             <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-              <a class="page-link" href="#" @click.prevent="nextPage">Suivant</a>
+              <a class="page-link" href="#" @click.prevent="nextPage">{{ $t('dashboard.officeList.pagination.next') }}</a>
             </li>
           </ul>
         </nav>
@@ -159,12 +159,12 @@
     <!-- Existing Data Export Section (Kept for now, clarify if removal needed) -->
     <div class="card shadow-sm">
       <div class="card-header bg-fadaa-yellow">
-        <h5 class="mb-0"><i class="bi bi-download me-2"></i>Exportation de Données</h5>
+        <h5 class="mb-0"><i class="bi bi-download me-2"></i>{{ $t('dashboard.dataExport.title') }}</h5>
       </div>
       <div class="card-body text-center">
-        <button @click="exportData('excel')" class="btn btn-fadaa-orange me-2"><i class="bi bi-file-earmark-excel-fill me-1"></i>Excel</button>
-        <button @click="exportData('csv')" class="btn btn-fadaa-orange me-2"><i class="bi bi-filetype-csv me-1"></i>CSV</button>
-        <button @click="exportData('pdf')" class="btn btn-fadaa-orange"><i class="bi bi-file-earmark-pdf-fill me-1"></i>PDF</button>
+        <button @click="exportData('excel')" class="btn btn-fadaa-orange me-2"><i class="bi bi-file-earmark-excel-fill me-1"></i>{{ $t('dashboard.dataExport.excel') }}</button>
+        <button @click="exportData('csv')" class="btn btn-fadaa-orange me-2"><i class="bi bi-filetype-csv me-1"></i>{{ $t('dashboard.dataExport.csv') }}</button>
+        <button @click="exportData('pdf')" class="btn btn-fadaa-orange"><i class="bi bi-file-earmark-pdf-fill me-1"></i>{{ $t('dashboard.dataExport.pdf') }}</button>
       </div>
     </div>
   </div>

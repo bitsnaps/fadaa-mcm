@@ -1,0 +1,76 @@
+{
+  "dashboard": {
+    "title": "Tableau de Bord Administrateur",
+    "kpis": {
+      "clients": "Nombre de Clients",
+      "monthlyRevenue": "Revenu Mensuel",
+      "monthlyNet": "Net Mensuel"
+    },
+    "charts": {
+      "monthlySales": "Ventes Mensuelles (Total vs. Net)"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "urgentContract": "Contrat XYZ sur le point d'expirer (Urgent)",
+      "pendingApproval": "Demande d'approbation en attente (Avertissement)",
+      "systemMaintenance": "Maintenance système prévue (Normal)"
+    },
+    "recentActivities": {
+      "title": "Activités Récentes (Clients)",
+      "newClient": "Nouveau client \"Alpha Corp\" ajouté.",
+      "contractUpdate": "Contrat pour \"Beta Ltd\" mis à jour.",
+      "communicationLog": "Communication enregistrée avec \"Gamma Inc\".",
+      "followUpReminder": "Rappel : Suivi avec \"Delta Co\" demain."
+    },
+    "assistantPerformance": {
+      "title": "Performance des Assistants",
+      "assistant1": "Assistant 1",
+      "statusExcellent": "Excellent",
+      "assistant2": "Assistant 2",
+      "statusGood": "Bon",
+      "assistant3": "Assistant 3",
+      "statusNeedsImprovement": "À améliorer"
+    },
+    "officeList": {
+      "title": "Liste des Bureaux par Branche",
+      "searchPlaceholder": "Rechercher des bureaux...",
+      "table": {
+        "id": "ID",
+        "branch": "Branche",
+        "space": "Espace (m²)",
+        "status": "Statut"
+      },
+      "noOffices": "Aucun bureau trouvé.",
+      "pagination": {
+        "previous": "Précédent",
+        "next": "Suivant"
+      }
+    },
+    "dataExport": {
+      "title": "Exportation de Données",
+      "excel": "Excel",
+      "csv": "CSV",
+      "pdf": "PDF"
+    }
+  },
+  "sidebar": {
+    "adminDashboard": "Tableau de Bord Administrateur",
+    "manageUsers": "Gestion Utilisateurs",
+    "manageBranches": "Gestion Agences",
+    "manageServiceCategories": "Gestion Catégories Services",
+    "assistantDashboard": "Tableau de Bord Assistant",
+    "manageClients": "Gestion Clients",
+    "manageCoworkingOffices": "Gestion Bureaux Coworking",
+    "documentsContractsManagement": "Gestion Documents & Contrats",
+    "addClient": "Ajouter Client",
+    "manageClientServices": "Gestion Services Client",
+    "systemSettings": "Paramètres Système",
+    "tasks": "Tâches",
+    "investmentTracking": "Suivi des Investissements",
+    "financialReporting": "Rapports Financiers",
+    "complianceManagement": "Gestion Conformité",
+    "reports": "Rapports",
+    "monthlyReport": "Rapport Mensuel",
+    "annualReport": "Rapport Annuel"
+  }
+}

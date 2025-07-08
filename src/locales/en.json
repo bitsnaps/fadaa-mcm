@@ -1,0 +1,76 @@
+{
+  "dashboard": {
+    "title": "Admin Dashboard",
+    "kpis": {
+      "clients": "Number of Clients",
+      "monthlyRevenue": "Monthly Revenue",
+      "monthlyNet": "Monthly Net"
+    },
+    "charts": {
+      "monthlySales": "Monthly Sales (Total vs. Net)"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "urgentContract": "Contract XYZ about to expire (Urgent)",
+      "pendingApproval": "Pending approval request (Warning)",
+      "systemMaintenance": "Scheduled system maintenance (Normal)"
+    },
+    "recentActivities": {
+      "title": "Recent Activities (Clients)",
+      "newClient": "New client \"Alpha Corp\" added.",
+      "contractUpdate": "Contract for \"Beta Ltd\" updated.",
+      "communicationLog": "Communication logged with \"Gamma Inc\".",
+      "followUpReminder": "Reminder: Follow up with \"Delta Co\" tomorrow."
+    },
+    "assistantPerformance": {
+      "title": "Assistant Performance",
+      "assistant1": "Assistant 1",
+      "statusExcellent": "Excellent",
+      "assistant2": "Assistant 2",
+      "statusGood": "Good",
+      "assistant3": "Assistant 3",
+      "statusNeedsImprovement": "Needs Improvement"
+    },
+    "officeList": {
+      "title": "Office List by Branch",
+      "searchPlaceholder": "Search offices...",
+      "table": {
+        "id": "ID",
+        "branch": "Branch",
+        "space": "Space (m²)",
+        "status": "Status"
+      },
+      "noOffices": "No offices found.",
+      "pagination": {
+        "previous": "Previous",
+        "next": "Next"
+      }
+    },
+    "dataExport": {
+      "title": "Data Export",
+      "excel": "Excel",
+      "csv": "CSV",
+      "pdf": "PDF"
+    }
+  },
+  "sidebar": {
+    "adminDashboard": "Admin Dashboard",
+    "manageUsers": "User Management",
+    "manageBranches": "Branch Management",
+    "manageServiceCategories": "Service Categories Management",
+    "assistantDashboard": "Assistant Dashboard",
+    "manageClients": "Client Management",
+    "manageCoworkingOffices": "Coworking Office Management",
+    "documentsContractsManagement": "Documents & Contracts Management",
+    "addClient": "Add Client",
+    "manageClientServices": "Client Services Management",
+    "systemSettings": "System Settings",
+    "tasks": "Tasks",
+    "investmentTracking": "Investment Tracking",
+    "financialReporting": "Financial Reporting",
+    "complianceManagement": "Compliance Management",
+    "reports": "Reports",
+    "monthlyReport": "Monthly Report",
+    "annualReport": "Annual Report"
+  }
+}
