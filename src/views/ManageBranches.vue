@@ -1,33 +1,33 @@
 <template>
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="text-fadaa-blue">Gestion des Agences</h2>
+      <h2 class="text-fadaa-blue">{{ $t('manageBranches.title') }}</h2>
       <button class="btn btn-primary" @click="showAddBranchModal = true">
-        <i class="bi bi-plus-circle me-2"></i>Ajouter une Agence
+        <i class="bi bi-plus-circle me-2"></i>{{ $t('manageBranches.addBranch') }}
       </button>
     </div>
 
     <!-- Branches Table -->
     <div class="card shadow-sm">
       <div class="card-header bg-fadaa-light-blue">
-        <h5 class="mb-0 text-fadaa-blue">Liste des Agences</h5>
+        <h5 class="mb-0 text-fadaa-blue">{{ $t('manageBranches.branchList') }}</h5>
       </div>
       <div class="card-body">
         <div class="table-responsive">
           <table class="table table-hover">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Nom de l'Agence</th>
-                <th>Localisation</th>
-                <th>Date de Création</th>
-                <th>Statut</th>
-                <th>Actions</th>
+                <th>{{ $t('manageBranches.id') }}</th>
+                <th>{{ $t('manageBranches.branchName') }}</th>
+                <th>{{ $t('manageBranches.location') }}</th>
+                <th>{{ $t('manageBranches.createdAt') }}</th>
+                <th>{{ $t('manageBranches.status') }}</th>
+                <th>{{ $t('manageBranches.actions') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="branches.length === 0">
-                <td colspan="6" class="text-center">Aucune agence trouvée.</td>
+                <td colspan="6" class="text-center">{{ $t('manageBranches.noBranchesFound') }}</td>
               </tr>
               <tr v-for="branch in branches" :key="branch.id">
                 <td>{{ branch.id }}</td>
@@ -36,7 +36,7 @@
                 <td>{{ formatDate(branch.createdAt) }}</td>
                 <td>
                   <span :class="`badge bg-${branch.status === 'active' ? 'success' : 'secondary'}`">
-                    {{ branch.status === 'active' ? 'Active' : 'Inactive' }}
+                    {{ branch.status === 'active' ? $t('manageBranches.active') : $t('manageBranches.inactive') }}
                   </span>
                 </td>
                 <td>
@@ -59,29 +59,29 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title text-fadaa-blue">{{ editingBranch ? 'Modifier l\'Agence' : 'Ajouter une Agence' }}</h5>
+            <h5 class="modal-title text-fadaa-blue">{{ editingBranch ? $t('manageBranches.editBranch') : $t('manageBranches.addBranchTitle') }}</h5>
             <button type="button" class="btn-close" @click="closeModal"></button>
           </div>
           <div class="modal-body">
             <form @submit.prevent="saveBranch">
               <div class="mb-3">
-                <label for="branchName" class="form-label">Nom de l'Agence</label>
+                <label for="branchName" class="form-label">{{ $t('manageBranches.branchName') }}</label>
                 <input type="text" class="form-control" id="branchName" v-model="branchForm.name" required>
               </div>
               <div class="mb-3">
-                <label for="branchLocation" class="form-label">Localisation</label>
+                <label for="branchLocation" class="form-label">{{ $t('manageBranches.location') }}</label>
                 <input type="text" class="form-control" id="branchLocation" v-model="branchForm.location" required>
               </div>
               <div class="mb-3" v-if="editingBranch">
-                <label for="branchStatus" class="form-label">Statut</label>
+                <label for="branchStatus" class="form-label">{{ $t('manageBranches.status') }}</label>
                 <select class="form-select" id="branchStatus" v-model="branchForm.status">
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                  <option value="active">{{ $t('manageBranches.active') }}</option>
+                  <option value="inactive">{{ $t('manageBranches.inactive') }}</option>
                 </select>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" @click="closeModal">Annuler</button>
-                <button type="submit" class="btn btn-primary">{{ editingBranch ? 'Enregistrer' : 'Ajouter' }}</button>
+                <button type="button" class="btn btn-secondary" @click="closeModal">{{ $t('manageBranches.cancel') }}</button>
+                <button type="submit" class="btn btn-primary">{{ editingBranch ? $t('manageBranches.save') : $t('manageBranches.add') }}</button>
               </div>
             </form>
           </div>
@@ -94,6 +94,9 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const branches = ref([]);
 const showAddBranchModal = ref(false);
@@ -126,7 +129,7 @@ const saveBranch = async () => {
     if (index !== -1) {
       branches.value[index] = { ...branches.value[index], ...branchForm };
     }
-    alert('Agence modifiée avec succès!');
+    alert(t('manageBranches.branchUpdatedSuccess'));
   } else {
     // Add new branch
     const newBranch = {
@@ -136,7 +139,7 @@ const saveBranch = async () => {
       status: 'active', // New branches are active by default from form, or set here
     };
     branches.value.push(newBranch);
-    alert('Agence ajoutée avec succès!');
+    alert(t('manageBranches.branchAddedSuccess'));
   }
   closeModal();
   fetchBranches(); // Refresh list
@@ -152,11 +155,11 @@ const editBranch = (branch) => {
 };
 
 const deleteBranch = async (branchId) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette agence ?')) {
+  if (confirm(t('manageBranches.confirmDeleteMessage'))) {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));
     branches.value = branches.value.filter(b => b.id !== branchId);
-    alert('Agence supprimée avec succès!');
+    alert(t('manageBranches.branchDeletedSuccess'));
   }
 };
 

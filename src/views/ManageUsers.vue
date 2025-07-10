@@ -1,29 +1,29 @@
 <template>
   <div class="manage-users-container container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Gestion des Utilisateurs</h2>
+      <h2>{{ $t('manageUsers.title') }}</h2>
       <button class="btn btn-fadaa-primary" @click="showAddUserModal = true">
-        <i class="bi bi-plus-circle-fill me-2"></i>Ajouter un Utilisateur
+        <i class="bi bi-plus-circle-fill me-2"></i>{{ $t('manageUsers.addUser') }}
       </button>
     </div>
 
     <!-- User Table -->
     <div class="card shadow-sm">
       <div class="card-header bg-fadaa-light-blue">
-        <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Liste des Utilisateurs</h5>
+        <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>{{ $t('manageUsers.userList') }}</h5>
       </div>
       <div class="card-body">
         <div class="table-responsive">
           <table class="table table-hover align-middle">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Rôle</th>
-                <th>Statut</th>
-                <th>Date de Création</th>
-                <th>Actions</th>
+                <th>{{ $t('manageUsers.id') }}</th>
+                <th>{{ $t('manageUsers.name') }}</th>
+                <th>{{ $t('manageUsers.email') }}</th>
+                <th>{{ $t('manageUsers.role') }}</th>
+                <th>{{ $t('manageUsers.status') }}</th>
+                <th>{{ $t('manageUsers.createdAt') }}</th>
+                <th>{{ $t('manageUsers.actions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -31,8 +31,8 @@
                 <td>{{ user.id }}</td>
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
-                <td><span :class="`badge bg-${getRoleClass(user.role)}`">{{ user.role }}</span></td>
-                <td><span :class="`badge bg-${user.status === 'Actif' ? 'success' : 'secondary'}`">{{ user.status }}</span></td>
+                <td><span :class="`badge bg-${getRoleClass(user.role)}`">{{ $t(`manageUsers.roles.${user.role.toLowerCase()}`) }}</span></td>
+                <td><span :class="`badge bg-${user.status === 'Actif' ? 'success' : 'secondary'}`">{{ user.status === 'Actif' ? $t('manageUsers.active') : $t('manageUsers.inactive') }}</span></td>
                 <td>{{ user.createdAt }}</td>
                 <td>
                   <button class="btn btn-sm btn-outline-primary me-2" @click="editUser(user)">
@@ -44,7 +44,7 @@
                 </td>
               </tr>
               <tr v-if="!users.length">
-                <td colspan="7" class="text-center text-muted">Aucun utilisateur trouvé.</td>
+                <td colspan="7" class="text-center text-muted">{{ $t('manageUsers.noUsersFound') }}</td>
               </tr>
             </tbody>
           </table>
@@ -57,42 +57,42 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ editingUser ? 'Modifier Utilisateur' : 'Ajouter Utilisateur' }}</h5>
+            <h5 class="modal-title">{{ editingUser ? $t('manageUsers.editUser') : $t('manageUsers.addUserTitle') }}</h5>
             <button type="button" class="btn-close" @click="closeModal"></button>
           </div>
           <div class="modal-body">
             <form @submit.prevent="saveUser">
               <div class="mb-3">
-                <label for="userName" class="form-label">Nom Complet</label>
+                <label for="userName" class="form-label">{{ $t('manageUsers.fullName') }}</label>
                 <input type="text" class="form-control" id="userName" v-model="currentUser.name" required>
               </div>
               <div class="mb-3">
-                <label for="userEmail" class="form-label">Email</label>
+                <label for="userEmail" class="form-label">{{ $t('manageUsers.email') }}</label>
                 <input type="email" class="form-control" id="userEmail" v-model="currentUser.email" required>
               </div>
               <div class="mb-3">
-                <label for="userRole" class="form-label">Rôle</label>
+                <label for="userRole" class="form-label">{{ $t('manageUsers.role') }}</label>
                 <select class="form-select" id="userRole" v-model="currentUser.role" required>
-                  <option value="admin">Admin</option>
-                  <option value="assistant">Assistant</option>
-                  <option value="investor">Investisseur</option>
-                  <option value="client">Client</option>
+                  <option value="admin">{{ $t('manageUsers.roles.admin') }}</option>
+                  <option value="assistant">{{ $t('manageUsers.roles.assistant') }}</option>
+                  <option value="investor">{{ $t('manageUsers.roles.investor') }}</option>
+                  <option value="client">{{ $t('manageUsers.roles.client') }}</option>
                 </select>
               </div>
               <div class="mb-3" v-if="!editingUser">
-                <label for="userPassword" class="form-label">Mot de passe</label>
+                <label for="userPassword" class="form-label">{{ $t('manageUsers.password') }}</label>
                 <input type="password" class="form-control" id="userPassword" v-model="currentUser.password" :required="!editingUser">
               </div>
                <div class="mb-3">
-                <label for="userStatus" class="form-label">Statut</label>
+                <label for="userStatus" class="form-label">{{ $t('manageUsers.status') }}</label>
                 <select class="form-select" id="userStatus" v-model="currentUser.status" required>
-                  <option value="Actif">Actif</option>
-                  <option value="Inactif">Inactif</option>
+                  <option value="Actif">{{ $t('manageUsers.active') }}</option>
+                  <option value="Inactif">{{ $t('manageUsers.inactive') }}</option>
                 </select>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" @click="closeModal">Annuler</button>
-                <button type="submit" class="btn btn-fadaa-primary">{{ editingUser ? 'Enregistrer' : 'Ajouter' }}</button>
+                <button type="button" class="btn btn-secondary" @click="closeModal">{{ $t('manageUsers.cancel') }}</button>
+                <button type="submit" class="btn btn-fadaa-primary">{{ editingUser ? $t('manageUsers.save') : $t('manageUsers.add') }}</button>
               </div>
             </form>
           </div>
@@ -105,15 +105,15 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Confirmer la Suppression</h5>
+            <h5 class="modal-title">{{ $t('manageUsers.confirmDeleteTitle') }}</h5>
             <button type="button" class="btn-close" @click="userToDelete = null"></button>
           </div>
           <div class="modal-body">
-            <p>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong>{{ userToDelete.name }}</strong> ? Cette action est irréversible.</p>
+            <p>{{ $t('manageUsers.confirmDeleteMessage', { userName: userToDelete.name }) }}</p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="userToDelete = null">Annuler</button>
-            <button type="button" class="btn btn-danger" @click="deleteUser">Supprimer</button>
+            <button type="button" class="btn btn-secondary" @click="userToDelete = null">{{ $t('manageUsers.cancel') }}</button>
+            <button type="button" class="btn btn-danger" @click="deleteUser">{{ $t('manageUsers.delete') }}</button>
           </div>
         </div>
       </div>
@@ -124,12 +124,15 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const users = ref([
   { id: 'U001', name: 'Alice Admin', email: 'alice.admin@fadaa.com', role: 'Admin', status: 'Actif', createdAt: '01/01/2023' },
   { id: 'U002', name: 'Bob Assistant', email: 'bob.assistant@fadaa.com', role: 'Assistant', status: 'Actif', createdAt: '15/02/2023' },
   { id: 'U003', name: 'Charlie Client', email: 'charlie.client@example.com', role: 'Client', status: 'Actif', createdAt: '01/03/2023' },
-  { id: 'U004', name: 'Diana Investor', email: 'diana.investor@example.com', role: 'Investisseur', status: 'Inactif', createdAt: '10/04/2023' },
+  { id: 'U004', name: 'Diana Investor', email: 'diana.investor@example.com', role: 'Investor', status: 'Inactif', createdAt: '10/04/2023' },
 ]);
 
 const showAddUserModal = ref(false);
@@ -150,7 +153,7 @@ const getRoleClass = (role) => {
   switch (role.toLowerCase()) {
     case 'admin': return 'danger';
     case 'assistant': return 'warning text-dark';
-    case 'investisseur': return 'info text-dark';
+    case 'investor': return 'info text-dark';
     case 'client': return 'success';
     default: return 'secondary';
   }
@@ -175,7 +178,7 @@ const saveUser = () => {
     if (index !== -1) {
       users.value[index] = { ...currentUser.value, id: editingUser.value.id };
     }
-    alert('Utilisateur mis à jour avec succès (simulation).');
+    alert(t('manageUsers.userUpdatedSuccess'));
   } else {
     // Simulate add
     const newUser = {
@@ -184,7 +187,7 @@ const saveUser = () => {
       createdAt: new Date().toLocaleDateString('fr-FR'),
     };
     users.value.unshift(newUser);
-    alert('Utilisateur ajouté avec succès (simulation).');
+    alert(t('manageUsers.userAddedSuccess'));
   }
   closeModal();
 };
@@ -196,7 +199,7 @@ const confirmDeleteUser = (user) => {
 const deleteUser = () => {
   if (userToDelete.value) {
     users.value = users.value.filter(u => u.id !== userToDelete.value.id);
-    alert(`Utilisateur ${userToDelete.value.name} supprimé avec succès (simulation).`);
+    alert(t('manageUsers.userDeletedSuccess', { userName: userToDelete.value.name }));
     userToDelete.value = null;
   }
 };
