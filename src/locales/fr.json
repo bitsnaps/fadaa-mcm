@@ -239,6 +239,31 @@
       "addError": "Échec de l'ajout du client."
     }
   },
+  "documents": {
+    "title": "Documents et Contrats",
+    "uploadNewDocument": "Télécharger un Nouveau Document",
+    "searchPlaceholder": "Rechercher par nom, type ou statut...",
+    "tableHeaders": {
+      "name": "Nom",
+      "type": "Type",
+      "status": "Statut",
+      "uploadDate": "Date de Téléchargement",
+      "expiryDate": "Date d'Expiration",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Actif",
+      "archived": "Archivé",
+      "expired": "Expiré",
+      "contract": "Contrat",
+      "document": "Document"
+    },
+    "noDocumentsFound": "Aucun document trouvé.",
+    "view": "Voir",
+    "download": "Télécharger",
+    "archive": "Archiver",
+    "notApplicable": "N/A"
+  },
   "offices": {
     "manageOffices": "Gérer les Bureaux de Coworking",
     "addNewOffice": "Ajouter un Nouveau Bureau",

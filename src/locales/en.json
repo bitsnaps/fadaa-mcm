@@ -239,6 +239,31 @@
       "addError": "Failed to add client."
     }
   },
+  "documents": {
+    "title": "Documents and Contracts",
+    "uploadNewDocument": "Upload New Document",
+    "searchPlaceholder": "Search by name, type, or status...",
+    "tableHeaders": {
+      "name": "Name",
+      "type": "Type",
+      "status": "Status",
+      "uploadDate": "Upload Date",
+      "expiryDate": "Expiry Date",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "archived": "Archived",
+      "expired": "Expired",
+      "contract": "Contract",
+      "document": "Document"
+    },
+    "noDocumentsFound": "No documents found.",
+    "view": "View",
+    "download": "Download",
+    "archive": "Archive",
+    "notApplicable": "N/A"
+  },
   "offices": {
     "manageOffices": "Manage Coworking Offices",
     "addNewOffice": "Add New Office",

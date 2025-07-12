@@ -1,5 +1,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const documents = ref([]);
 const searchTerm = ref('');
@@ -9,24 +12,24 @@ const mockDocuments = [
   {
     id: 'doc001',
     name: 'Client Agreement - Tech Corp',
-    type: 'Contract',
-    status: 'Active',
+    type: t('documents.status.contract'),
+    status: t('documents.status.active'),
     uploadDate: '2023-01-20',
     expiryDate: '2024-01-20',
   },
   {
     id: 'doc002',
     name: 'NDA - Innovate LLC',
-    type: 'Document',
-    status: 'Archived',
+    type: t('documents.status.document'),
+    status: t('documents.status.archived'),
     uploadDate: '2022-11-15',
     expiryDate: null,
   },
   {
     id: 'doc003',
     name: 'Lease Agreement - Downtown Office',
-    type: 'Contract',
-    status: 'Expired',
+    type: t('documents.status.contract'),
+    status: t('documents.status.expired'),
     uploadDate: '2021-03-01',
     expiryDate: '2023-03-01',
   },
@@ -72,9 +75,9 @@ const archiveDocument = (docId) => {
 <template>
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Documents and Contracts</h2>
+      <h2>{{ t('documents.title') }}</h2>
       <button class="btn btn-primary">
-        <i class="bi bi-upload me-2"></i>Upload New Document
+        <i class="bi bi-upload me-2"></i>{{ t('documents.uploadNewDocument') }}
       </button>
     </div>
 
@@ -83,7 +86,7 @@ const archiveDocument = (docId) => {
         type="text" 
         class="form-control" 
         v-model="searchTerm" 
-        placeholder="Search by name, type, or status..."
+        :placeholder="t('documents.searchPlaceholder')"
       />
     </div>
 
@@ -91,12 +94,12 @@ const archiveDocument = (docId) => {
       <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Type</th>
-            <th scope="col">Status</th>
-            <th scope="col">Upload Date</th>
-            <th scope="col">Expiry Date</th>
-            <th scope="col">Actions</th>
+            <th scope="col">{{ t('documents.tableHeaders.name') }}</th>
+            <th scope="col">{{ t('documents.tableHeaders.type') }}</th>
+            <th scope="col">{{ t('documents.tableHeaders.status') }}</th>
+            <th scope="col">{{ t('documents.tableHeaders.uploadDate') }}</th>
+            <th scope="col">{{ t('documents.tableHeaders.expiryDate') }}</th>
+            <th scope="col">{{ t('documents.tableHeaders.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -105,23 +108,23 @@ const archiveDocument = (docId) => {
             <td>{{ doc.type }}</td>
             <td>
               <span 
-                :class="['badge', 
-                         doc.status === 'Active' ? 'bg-success' : 
-                         doc.status === 'Archived' ? 'bg-secondary' : 
+                :class="['badge',
+                         doc.status === t('documents.status.active') ? 'bg-success' :
+                         doc.status === t('documents.status.archived') ? 'bg-secondary' :
                          'bg-danger']">
                 {{ doc.status }}
               </span>
             </td>
             <td>{{ doc.uploadDate }}</td>
-            <td>{{ doc.expiryDate || 'N/A' }}</td>
+            <td>{{ doc.expiryDate || t('documents.notApplicable') }}</td>
             <td>
-              <button @click="viewDocument(doc.id)" class="btn btn-sm btn-outline-info me-1" title="View">
+              <button @click="viewDocument(doc.id)" class="btn btn-sm btn-outline-info me-1" :title="t('documents.view')">
                 <i class="bi bi-eye"></i>
               </button>
-              <button @click="downloadDocument(doc.id)" class="btn btn-sm btn-outline-primary me-1" title="Download">
+              <button @click="downloadDocument(doc.id)" class="btn btn-sm btn-outline-primary me-1" :title="t('documents.download')">
                 <i class="bi bi-download"></i>
               </button>
-              <button v-if="doc.status === 'Active'" @click="archiveDocument(doc.id)" class="btn btn-sm btn-outline-warning" title="Archive">
+              <button v-if="doc.status === t('documents.status.active')" @click="archiveDocument(doc.id)" class="btn btn-sm btn-outline-warning" :title="t('documents.archive')">
                 <i class="bi bi-archive"></i>
               </button>
             </td>
@@ -130,7 +133,7 @@ const archiveDocument = (docId) => {
       </table>
     </div>
     <div v-else class="alert alert-info text-center" role="alert">
-      No documents found.
+      {{ t('documents.noDocumentsFound') }}
     </div>
   </div>
 </template>
