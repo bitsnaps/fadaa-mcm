@@ -301,5 +301,36 @@
       "printer": "Imprimante",
       "privateRestroom": "Toilettes Privées"
     }
+  },
+  "systemSettings": {
+    "title": "Paramètres Système",
+    "generalSettings": {
+      "title": "Paramètres Généraux",
+      "siteName": "Nom du Site",
+      "siteLogo": "Logo du Site (URL)",
+      "defaultTheme": "Thème par Défaut",
+      "themeOptions": {
+        "light": "Clair",
+        "dark": "Sombre"
+      },
+      "saveButton": "Enregistrer",
+      "alert": "Paramètres généraux enregistrés ! (Simulation)"
+    },
+    "emailSettings": {
+      "title": "Paramètres Email",
+      "smtpHost": "Hôte SMTP",
+      "smtpPort": "Port SMTP",
+      "smtpUser": "Utilisateur SMTP",
+      "smtpPassword": "Mot de Passe SMTP",
+      "saveButton": "Enregistrer",
+      "alert": "Paramètres email enregistrés ! (Simulation)"
+    },
+    "apiKeys": {
+      "title": "Clés API",
+      "googleMaps": "Clé API Google Maps",
+      "openAI": "Clé API OpenAI",
+      "saveButton": "Enregistrer",
+      "alert": "Clés API enregistrées ! (Simulation)"
+    }
   }
 }

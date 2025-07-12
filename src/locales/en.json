@@ -301,5 +301,36 @@
       "printer": "Printer",
       "privateRestroom": "Private Restroom"
     }
+  },
+  "systemSettings": {
+    "title": "System Settings",
+    "generalSettings": {
+      "title": "General Settings",
+      "siteName": "Site Name",
+      "siteLogo": "Site Logo (URL)",
+      "defaultTheme": "Default Theme",
+      "themeOptions": {
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "saveButton": "Save",
+      "alert": "General settings saved! (Simulation)"
+    },
+    "emailSettings": {
+      "title": "Email Settings",
+      "smtpHost": "SMTP Host",
+      "smtpPort": "SMTP Port",
+      "smtpUser": "SMTP User",
+      "smtpPassword": "SMTP Password",
+      "saveButton": "Save",
+      "alert": "Email settings saved! (Simulation)"
+    },
+    "apiKeys": {
+      "title": "API Keys",
+      "googleMaps": "Google Maps API Key",
+      "openAI": "OpenAI API Key",
+      "saveButton": "Save",
+      "alert": "API keys saved! (Simulation)"
+    }
   }
 }
