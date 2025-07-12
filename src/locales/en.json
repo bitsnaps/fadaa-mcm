@@ -130,5 +130,26 @@
     "branchUpdatedSuccess": "Branch updated successfully!",
     "branchAddedSuccess": "Branch added successfully!",
     "branchDeletedSuccess": "Branch deleted successfully!"
+  },
+  "manageServiceCategories": {
+    "title": "Manage Service Categories",
+    "description": "Admins can define categories for services offered to clients.",
+    "addNewCategory": "Add New Category",
+    "loadingCategories": "Loading categories...",
+    "noServiceCategoriesFound": "No service categories found.",
+    "categoryName": "Category Name",
+    "descriptionHeader": "Description",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "addEditModalTitle": "{mode} Service Category",
+    "addMode": "Add New",
+    "editMode": "Edit",
+    "categoryNameLabel": "Category Name",
+    "descriptionLabel": "Description",
+    "close": "Close",
+    "add": "Add",
+    "saveChanges": "Save Changes",
+    "confirmDelete": "Are you sure you want to delete this service category?"
   }
 }

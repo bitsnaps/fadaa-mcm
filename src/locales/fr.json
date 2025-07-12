@@ -130,5 +130,26 @@
     "branchUpdatedSuccess": "Agence modifiée avec succès!",
     "branchAddedSuccess": "Agence ajoutée avec succès!",
     "branchDeletedSuccess": "Agence supprimée avec succès!"
+  },
+  "manageServiceCategories": {
+    "title": "Gérer les catégories de services",
+    "description": "Les administrateurs peuvent définir des catégories pour les services offerts aux clients.",
+    "addNewCategory": "Ajouter une nouvelle catégorie",
+    "loadingCategories": "Chargement des catégories...",
+    "noServiceCategoriesFound": "Aucune catégorie de service trouvée.",
+    "categoryName": "Nom de la catégorie",
+    "descriptionHeader": "Description",
+    "actions": "Actions",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "addEditModalTitle": "{mode} une catégorie de service",
+    "addMode": "Ajouter",
+    "editMode": "Modifier",
+    "categoryNameLabel": "Nom de la catégorie",
+    "descriptionLabel": "Description",
+    "close": "Fermer",
+    "add": "Ajouter",
+    "saveChanges": "Enregistrer les modifications",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette catégorie de service ?"
   }
 }

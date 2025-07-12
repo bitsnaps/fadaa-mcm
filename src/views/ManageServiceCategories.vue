@@ -1,11 +1,11 @@
 <template>
   <div class="container mt-4">
-    <h2>Manage Service Categories</h2>
-    <p class="text-muted">Admins can define categories for services offered to clients.</p>
+    <h2>{{ $t('manageServiceCategories.title') }}</h2>
+    <p class="text-muted">{{ $t('manageServiceCategories.description') }}</p>
 
     <div class="mb-3">
       <button class="btn btn-primary" @click="openAddModal">
-        <i class="bi bi-plus-circle me-2"></i>Add New Category
+        <i class="bi bi-plus-circle me-2"></i>{{ $t('manageServiceCategories.addNewCategory') }}
       </button>
     </div>
 
@@ -14,17 +14,17 @@
         <thead class="table-fadaa-primary">
           <tr>
             <th scope="col">#</th>
-            <th scope="col">Category Name</th>
-            <th scope="col">Description</th>
-            <th scope="col">Actions</th>
+            <th scope="col">{{ $t('manageServiceCategories.categoryName') }}</th>
+            <th scope="col">{{ $t('manageServiceCategories.descriptionHeader') }}</th>
+            <th scope="col">{{ $t('manageServiceCategories.actions') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="loadingCategories">
-            <td colspan="4" class="text-center">Loading categories...</td>
+            <td colspan="4" class="text-center">{{ $t('manageServiceCategories.loadingCategories') }}</td>
           </tr>
           <tr v-else-if="serviceCategories.length === 0">
-            <td colspan="4" class="text-center">No service categories found.</td>
+            <td colspan="4" class="text-center">{{ $t('manageServiceCategories.noServiceCategoriesFound') }}</td>
           </tr>
           <tr v-for="(category, index) in serviceCategories" :key="category.id">
             <td>{{ index + 1 }}</td>
@@ -32,10 +32,10 @@
             <td>{{ category.description }}</td>
             <td>
               <button class="btn btn-sm btn-outline-fadaa-primary me-2" @click="openEditModal(category)">
-                <i class="bi bi-pencil-square"></i> Edit
+                <i class="bi bi-pencil-square"></i> {{ $t('manageServiceCategories.edit') }}
               </button>
               <button class="btn btn-sm btn-outline-danger" @click="confirmDeleteCategory(category.id)">
-                <i class="bi bi-trash"></i> Delete
+                <i class="bi bi-trash"></i> {{ $t('manageServiceCategories.delete') }}
               </button>
             </td>
           </tr>
@@ -48,22 +48,22 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="categoryModalLabel">{{ modalMode === 'add' ? 'Add New' : 'Edit' }} Service Category</h5>
+            <h5 class="modal-title" id="categoryModalLabel">{{ $t('manageServiceCategories.addEditModalTitle', { mode: modalMode === 'add' ? $t('manageServiceCategories.addMode') : $t('manageServiceCategories.editMode') }) }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form @submit.prevent="handleSaveCategory">
               <div class="mb-3">
-                <label for="categoryName" class="form-label">Category Name <span class="text-danger">*</span></label>
+                <label for="categoryName" class="form-label">{{ $t('manageServiceCategories.categoryNameLabel') }} <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="categoryName" v-model="currentCategory.name" required>
               </div>
               <div class="mb-3">
-                <label for="categoryDescription" class="form-label">Description</label>
+                <label for="categoryDescription" class="form-label">{{ $t('manageServiceCategories.descriptionLabel') }}</label>
                 <textarea class="form-control" id="categoryDescription" v-model="currentCategory.description" rows="3"></textarea>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">{{ modalMode === 'add' ? 'Add' : 'Save Changes' }}</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('manageServiceCategories.close') }}</button>
+                <button type="submit" class="btn btn-primary">{{ modalMode === 'add' ? $t('manageServiceCategories.add') : $t('manageServiceCategories.saveChanges') }}</button>
               </div>
             </form>
           </div>
@@ -77,6 +77,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { Modal } from 'bootstrap';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 // import { useAuthStore } from '@/stores/auth'; // If needed for API calls
 // import apiClient from '@/services/ApiClient'; // Placeholder for API calls
 
@@ -143,7 +146,7 @@ const handleSaveCategory = async () => {
 };
 
 const confirmDeleteCategory = (categoryId) => {
-  if (confirm('Are you sure you want to delete this service category?')) {
+  if (confirm(t('manageServiceCategories.confirmDelete'))) {
     // Placeholder: Replace with actual API call
     console.log('Deleting category with id:', categoryId);
     serviceCategories.value = serviceCategories.value.filter(c => c.id !== categoryId);
