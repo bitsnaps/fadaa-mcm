@@ -2,6 +2,9 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import * as bootstrap from 'bootstrap'; // Import bootstrap for modal
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const router = useRouter();
 
@@ -103,9 +106,9 @@ const manageClientServices = (clientId) => {
 <template>
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Manage Clients</h2>
+      <h2>{{ $t('manageClients.title') }}</h2>
       <router-link to="/add-client" class="btn btn-primary">
-        <i class="bi bi-plus-circle me-2"></i>Add New Client
+        <i class="bi bi-plus-circle me-2"></i>{{ $t('manageClients.addNewClient') }}
       </router-link>
     </div>
 
@@ -114,7 +117,7 @@ const manageClientServices = (clientId) => {
         type="text" 
         class="form-control" 
         v-model="searchTerm" 
-        placeholder="Search clients by name, email, phone, or status..."
+        :placeholder="$t('manageClients.searchPlaceholder')"
       />
     </div>
 
@@ -122,12 +125,12 @@ const manageClientServices = (clientId) => {
       <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
-            <th scope="col">#ID</th>
-            <th scope="col">Full Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Phone</th>
-            <th scope="col">Status</th>
-            <th scope="col">Actions</th>
+            <th scope="col">{{ $t('manageClients.idHeader') }}</th>
+            <th scope="col">{{ $t('manageClients.fullNameHeader') }}</th>
+            <th scope="col">{{ $t('manageClients.emailHeader') }}</th>
+            <th scope="col">{{ $t('manageClients.phoneHeader') }}</th>
+            <th scope="col">{{ $t('manageClients.statusHeader') }}</th>
+            <th scope="col">{{ $t('manageClients.actionsHeader') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -142,17 +145,17 @@ const manageClientServices = (clientId) => {
                          client.status === 'Active' ? 'bg-success' : 
                          client.status === 'Inactive' ? 'bg-secondary' : 
                          'bg-warning text-dark']">
-                {{ client.status }}
+                {{ client.status === 'Active' ? $t('manageClients.statusActive') : client.status === 'Inactive' ? $t('manageClients.statusInactive') : $t('manageClients.statusPending') }}
               </span>
             </td>
             <td>
-              <button @click="viewClientDetails(client.id)" class="btn btn-sm btn-outline-info me-1" title="View Details">
+              <button @click="viewClientDetails(client.id)" class="btn btn-sm btn-outline-info me-1" :title="$t('manageClients.viewDetails')">
                 <i class="bi bi-eye"></i>
               </button>
-              <button @click="editClient(client.id)" class="btn btn-sm btn-outline-warning me-1" title="Edit Client">
+              <button @click="editClient(client.id)" class="btn btn-sm btn-outline-warning me-1" :title="$t('manageClients.editClient')">
                 <i class="bi bi-pencil-square"></i>
               </button>
-              <button @click="manageClientServices(client.id)" class="btn btn-sm btn-outline-primary" title="Manage Services">
+              <button @click="manageClientServices(client.id)" class="btn btn-sm btn-outline-primary" :title="$t('manageClients.manageServices')">
                 <i class="bi bi-gear"></i>
               </button>
             </td>
@@ -162,10 +165,10 @@ const manageClientServices = (clientId) => {
     </div>
     <div v-else class="alert alert-info text-center" role="alert">
       <div v-if="searchTerm && filteredClients.length === 0">
-        No clients found matching your search criteria "<strong>{{ searchTerm }}</strong>".
+        {{ $t('manageClients.noClientsFoundSearch', { searchTerm: searchTerm }) }}
       </div>
       <div v-else>
-        No clients available. <router-link to="/add-client">Add a new client</router-link> to get started.
+        {{ $t('manageClients.noClientsAvailable') }} <router-link to="/add-client">{{ $t('manageClients.addClientLink') }}</router-link> to get started.
       </div>
     </div>
 
@@ -174,36 +177,36 @@ const manageClientServices = (clientId) => {
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="viewClientDetailsModalLabel">Client Details: {{ selectedClient?.fullName }}</h5>
+            <h5 class="modal-title" id="viewClientDetailsModalLabel">{{ $t('manageClients.clientDetailsTitle', { fullName: selectedClient?.fullName }) }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body" v-if="selectedClient">
             <div class="row">
               <div class="col-md-6">
-                <p><strong>ID:</strong> {{ selectedClient.id }}</p>
-                <p><strong>Full Name:</strong> {{ selectedClient.fullName }}</p>
-                <p><strong>Email:</strong> {{ selectedClient.email }}</p>
-                <p><strong>Phone:</strong> {{ selectedClient.phone }}</p>
+                <p><strong>{{ $t('manageClients.detailsId') }}</strong> {{ selectedClient.id }}</p>
+                <p><strong>{{ $t('manageClients.detailsFullName') }}</strong> {{ selectedClient.fullName }}</p>
+                <p><strong>{{ $t('manageClients.detailsEmail') }}</strong> {{ selectedClient.email }}</p>
+                <p><strong>{{ $t('manageClients.detailsPhone') }}</strong> {{ selectedClient.phone }}</p>
               </div>
               <div class="col-md-6">
-                <p><strong>Status:</strong> 
+                <p><strong>{{ $t('manageClients.detailsStatus') }}</strong> 
                   <span 
                     :class="['badge', 
                              selectedClient.status === 'Active' ? 'bg-success' : 
                              selectedClient.status === 'Inactive' ? 'bg-secondary' : 
                              'bg-warning text-dark']">
-                    {{ selectedClient.status }}
+                    {{ selectedClient.status === 'Active' ? $t('manageClients.statusActive') : selectedClient.status === 'Inactive' ? $t('manageClients.statusInactive') : $t('manageClients.statusPending') }}
                   </span>
                 </p>
-                <p><strong>Address:</strong> {{ selectedClient.address }}</p>
-                <p><strong>Registration Date:</strong> {{ selectedClient.registrationDate }}</p>
-                <p><strong>Client Type:</strong> {{ selectedClient.type }}</p>
+                <p><strong>{{ $t('manageClients.detailsAddress') }}</strong> {{ selectedClient.address }}</p>
+                <p><strong>{{ $t('manageClients.detailsRegistrationDate') }}</strong> {{ selectedClient.registrationDate }}</p>
+                <p><strong>{{ $t('manageClients.detailsClientType') }}</strong> {{ selectedClient.type }}</p>
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-warning" @click="editClient(selectedClient.id); viewClientModal.hide();">Edit Client</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('manageClients.close') }}</button>
+            <button type="button" class="btn btn-warning" @click="editClient(selectedClient.id); viewClientModal.hide();">{{ $t('manageClients.editClient') }}</button>
           </div>
         </div>
       </div>

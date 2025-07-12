@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const router = useRouter();
 const route = useRoute();
@@ -32,8 +35,8 @@ const client = ref({
   status: 'Active', // Default status
 });
 
-const pageTitle = computed(() => clientId.value ? 'Edit Client' : 'Add New Client');
-const submitButtonText = computed(() => clientId.value ? 'Update Client' : 'Add Client');
+const pageTitle = computed(() => clientId.value ? t('addClient.editTitle') : t('addClient.addTitle'));
+const submitButtonText = computed(() => clientId.value ? t('addClient.submitButtonUpdate') : t('addClient.submitButtonAdd'));
 
 // Mock data for demonstration as API for single client fetch is not defined
 const mockClients = [
@@ -101,13 +104,13 @@ onMounted(async () => {
         const { fullName, ...formData } = existingClient;
         client.value = { ...formData, name: fullName || existingClient.name }; 
       } else {
-        console.error('Client not found for editing');
-        alert('Client data not found. Redirecting to client list.');
+        console.error(t('addClient.messages.clientNotFound'));
+        alert(t('addClient.messages.clientNotFound'));
         router.push('/manage-clients');
       }
     } catch (error) {
-      console.error('Error fetching client details:', error);
-      alert('Failed to load client data for editing.');
+      console.error(t('addClient.messages.fetchError'), error);
+      alert(t('addClient.messages.loadError'));
       router.push('/manage-clients');
     }
   }
@@ -119,17 +122,17 @@ const submitForm = async () => {
       // Update existing client
       // const response = await apiClient.put(`/clients/${clientId.value}`, client.value);
       console.log('Client updated:', client.value); // Mocking API call
-      alert('Client updated successfully!');
+      alert(t('addClient.messages.updateSuccess'));
     } else {
       // Add new client
       // const response = await apiClient.post('/clients', client.value);
       console.log('Client added:', client.value); // Mocking API call
-      alert('Client added successfully!');
+      alert(t('addClient.messages.addSuccess'));
     }
     router.push('/manage-clients');
   } catch (error) {
-    console.error(`Error ${clientId.value ? 'updating' : 'adding'} client:`, error);
-    alert(`Failed to ${clientId.value ? 'update' : 'add'} client.`);
+    console.error(`${t('addClient.messages.fetchError')} ${clientId.value ? t('addClient.messages.updateError') : t('addClient.messages.addError')}:`, error);
+    alert(`${clientId.value ? t('addClient.messages.updateError') : t('addClient.messages.addError')}`);
   }
 };
 
@@ -146,130 +149,130 @@ const handleFileUpload = (event) => {
       <h2>{{ pageTitle }}</h2>
       <form @submit.prevent="submitForm">
         <div class="mb-3">
-          <label for="clientName" class="form-label">Client Name</label>
+          <label for="clientName" class="form-label">{{ t('addClient.form.clientName') }}</label>
           <input type="text" class="form-control" id="clientName" v-model="client.name" required>
         </div>
         <div class="mb-3">
-          <label for="clientEmail" class="form-label">Email</label>
+          <label for="clientEmail" class="form-label">{{ t('addClient.form.email') }}</label>
           <input type="email" class="form-control" id="clientEmail" v-model="client.email" required>
         </div>
         <div class="mb-3">
-          <label for="clientPhone" class="form-label">Phone</label>
+          <label for="clientPhone" class="form-label">{{ t('addClient.form.phone') }}</label>
           <input type="tel" class="form-control" id="clientPhone" v-model="client.phone">
         </div>
         <div class="mb-3">
-          <label for="clientAddress" class="form-label">Address</label>
+          <label for="clientAddress" class="form-label">{{ t('addClient.form.address') }}</label>
           <input type="text" class="form-control" id="clientAddress" v-model="client.address">
         </div>
         <div class="row mb-3">
           <div class="col-md-6">
-            <label for="clientCity" class="form-label">City</label>
+            <label for="clientCity" class="form-label">{{ t('addClient.form.city') }}</label>
             <input type="text" class="form-control" id="clientCity" v-model="client.city">
           </div>
           <div class="col-md-6">
-            <label for="clientCountry" class="form-label">Country</label>
+            <label for="clientCountry" class="form-label">{{ t('addClient.form.country') }}</label>
             <input type="text" class="form-control" id="clientCountry" v-model="client.country">
           </div>
         </div>
         <div class="row mb-3">
           <div class="col-md-6">
-            <label for="clientType" class="form-label">Client Type</label>
+            <label for="clientType" class="form-label">{{ t('addClient.form.clientType') }}</label>
             <select class="form-select" id="clientType" v-model="client.clientType">
-              <option value="">Select Type</option>
-              <option value="Individual">Individual</option>
-              <option value="Company">Company</option>
+              <option value="">{{ t('addClient.form.selectType') }}</option>
+              <option value="Individual">{{ t('addClient.form.individual') }}</option>
+              <option value="Company">{{ t('addClient.form.company') }}</option>
             </select>
           </div>
           <div class="col-md-6">
-            <label for="serviceType" class="form-label">Service Type</label>
+            <label for="serviceType" class="form-label">{{ t('addClient.form.serviceType') }}</label>
             <select class="form-select" id="serviceType" v-model="client.serviceType">
-              <option value="">Select Service</option>
-              <option value="Domiciliation">Domiciliation</option>
-              <option value="Office Rental">Office Rental</option>
-              <option value="Coworking">Coworking</option>
-              <option value="Meeting Room">Meeting Room</option>
+              <option value="">{{ t('addClient.form.selectService') }}</option>
+              <option value="Domiciliation">{{ t('addClient.form.domiciliation') }}</option>
+              <option value="Office Rental">{{ t('addClient.form.officeRental') }}</option>
+              <option value="Coworking">{{ t('addClient.form.coworking') }}</option>
+              <option value="Meeting Room">{{ t('addClient.form.meetingRoom') }}</option>
             </select>
           </div>
         </div>
         <div class="row mb-3">
           <div class="col-md-4">
-            <label for="idType" class="form-label">ID Type</label>
+            <label for="idType" class="form-label">{{ t('addClient.form.idType') }}</label>
             <select class="form-select" id="idType" v-model="client.idType">
-              <option value="">Select ID Type</option>
-              <option value="National ID">National ID</option>
-              <option value="Passport">Passport</option>
-              <option value="Trade Register">Trade Register (RC)</option>
+              <option value="">{{ t('addClient.form.selectIdType') }}</option>
+              <option value="National ID">{{ t('addClient.form.nationalId') }}</option>
+              <option value="Passport">{{ t('addClient.form.passport') }}</option>
+              <option value="Trade Register">{{ t('addClient.form.tradeRegister') }}</option>
             </select>
           </div>
           <div class="col-md-4">
-            <label for="idNumber" class="form-label">ID Number</label>
+            <label for="idNumber" class="form-label">{{ t('addClient.form.idNumber') }}</label>
             <input type="text" class="form-control" id="idNumber" v-model="client.idNumber">
           </div>
           <div class="col-md-4">
-            <label for="idExpiryDate" class="form-label">ID Expiry Date</label>
+            <label for="idExpiryDate" class="form-label">{{ t('addClient.form.idExpiryDate') }}</label>
             <input type="date" class="form-control" id="idExpiryDate" v-model="client.idExpiryDate">
           </div>
         </div>
         <div class="row mb-3">
           <div class="col-md-4">
-            <label for="taxId" class="form-label">Tax ID (NIF)</label>
+            <label for="taxId" class="form-label">{{ t('addClient.form.taxId') }}</label>
             <input type="text" class="form-control" id="taxId" v-model="client.taxId">
           </div>
           <div class="col-md-4">
-            <label for="nis" class="form-label">NIS (for Companies)</label>
+            <label for="nis" class="form-label">{{ t('addClient.form.nis') }}</label>
             <input type="text" class="form-control" id="nis" v-model="client.nis">
           </div>
           <div class="col-md-4">
-            <label for="rcNumber" class="form-label">RC Number (for Companies)</label>
+            <label for="rcNumber" class="form-label">{{ t('addClient.form.rcNumber') }}</label>
             <input type="text" class="form-control" id="rcNumber" v-model="client.rcNumber">
           </div>
         </div>
-        <h5 class="mt-4">Contact Person</h5>
+        <h5 class="mt-4">{{ t('addClient.form.contactPerson') }}</h5>
         <div class="row mb-3">
           <div class="col-md-4">
-            <label for="contactPersonName" class="form-label">Name</label>
+            <label for="contactPersonName" class="form-label">{{ t('addClient.form.name') }}</label>
             <input type="text" class="form-control" id="contactPersonName" v-model="client.contactPersonName">
           </div>
           <div class="col-md-4">
-            <label for="contactPersonEmail" class="form-label">Email</label>
+            <label for="contactPersonEmail" class="form-label">{{ t('addClient.form.email') }}</label>
             <input type="email" class="form-control" id="contactPersonEmail" v-model="client.contactPersonEmail">
           </div>
           <div class="col-md-4">
-            <label for="contactPersonPhone" class="form-label">Phone</label>
+            <label for="contactPersonPhone" class="form-label">{{ t('addClient.form.phone') }}</label>
             <input type="tel" class="form-control" id="contactPersonPhone" v-model="client.contactPersonPhone">
           </div>
         </div>
-        <h5 class="mt-4">Contract Details</h5>
+        <h5 class="mt-4">{{ t('addClient.form.contractDetails') }}</h5>
         <div class="row mb-3">
           <div class="col-md-4">
-            <label for="contractStartDate" class="form-label">Contract Start Date</label>
+            <label for="contractStartDate" class="form-label">{{ t('addClient.form.contractStartDate') }}</label>
             <input type="date" class="form-control" id="contractStartDate" v-model="client.contractStartDate">
           </div>
           <div class="col-md-4">
-            <label for="contractEndDate" class="form-label">Contract End Date</label>
+            <label for="contractEndDate" class="form-label">{{ t('addClient.form.contractEndDate') }}</label>
             <input type="date" class="form-control" id="contractEndDate" v-model="client.contractEndDate">
           </div>
           <div class="col-md-4">
-            <label for="paymentTerms" class="form-label">Payment Terms</label>
+            <label for="paymentTerms" class="form-label">{{ t('addClient.form.paymentTerms') }}</label>
             <select class="form-select" id="paymentTerms" v-model="client.paymentTerms">
-              <option value="">Select Terms</option>
-              <option value="Monthly">Monthly</option>
-              <option value="Quarterly">Quarterly</option>
-              <option value="Annually">Annually</option>
+              <option value="">{{ t('addClient.form.selectTerms') }}</option>
+              <option value="Monthly">{{ t('addClient.form.monthly') }}</option>
+              <option value="Quarterly">{{ t('addClient.form.quarterly') }}</option>
+              <option value="Annually">{{ t('addClient.form.annually') }}</option>
             </select>
           </div>
         </div>
         <div class="mb-3">
-          <label for="officeId" class="form-label">Assign Office (ID)</label>
+          <label for="officeId" class="form-label">{{ t('addClient.form.assignOffice') }}</label>
           <input type="number" class="form-control" id="officeId" v-model.number="client.officeId">
           <!-- TODO: Implement office selection dropdown/modal based on availability -->
         </div>
         <div class="mb-3">
-          <label for="attachments" class="form-label">Attachments</label>
+          <label for="attachments" class="form-label">{{ t('addClient.form.attachments') }}</label>
           <input type="file" class="form-control" id="attachments" @change="handleFileUpload" multiple>
         </div>
         <button type="submit" class="btn btn-primary me-2">{{ submitButtonText }}</button>
-        <router-link to="/manage-clients" class="btn btn-secondary">Cancel</router-link>
+        <router-link to="/manage-clients" class="btn btn-secondary">{{ t('addClient.form.cancel') }}</router-link>
       </form>
     </div>
   </template>
