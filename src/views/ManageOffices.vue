@@ -2,8 +2,10 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import * as bootstrap from 'bootstrap';
+import { useI18n } from 'vue-i18n';
 
 const router = useRouter();
+const { t } = useI18n();
 
 const offices = ref([]);
 const searchTerm = ref('');
@@ -16,25 +18,25 @@ const mockOffices = [
     id: 'off001',
     name: 'Modern Office Suite',
     branch: 'Downtown Branch',
-    status: 'Available',
+    status: t('offices.status.available'),
     capacity: 10,
-    amenities: ['Wi-Fi', 'Coffee', 'Meeting Room'],
+    amenities: [t('offices.details.amenities.wifi'), t('offices.details.amenities.coffee'), t('offices.details.amenities.meetingRoom')],
   },
   {
     id: 'off002',
     name: 'Creative Studio',
     branch: 'Tech Park Branch',
-    status: 'Occupied',
+    status: t('offices.status.occupied'),
     capacity: 5,
-    amenities: ['Wi-Fi', 'Whiteboard'],
+    amenities: [t('offices.details.amenities.wifi'), t('offices.details.amenities.whiteboard')],
   },
   {
     id: 'off003',
     name: 'Executive Office',
     branch: 'Downtown Branch',
-    status: 'Maintenance',
+    status: t('offices.status.maintenance'),
     capacity: 2,
-    amenities: ['Wi-Fi', 'Printer', 'Private Restroom'],
+    amenities: [t('offices.details.amenities.wifi'), t('offices.details.amenities.printer'), t('offices.details.amenities.privateRestroom')],
   },
 ];
 
@@ -91,9 +93,9 @@ const changeOfficeStatus = (officeId, newStatus) => {
 <template>
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Manage Coworking Offices</h2>
+      <h2>{{ t('offices.manageOffices') }}</h2>
       <button class="btn btn-primary">
-        <i class="bi bi-plus-circle me-2"></i>Add New Office
+        <i class="bi bi-plus-circle me-2"></i>{{ t('offices.addNewOffice') }}
       </button>
     </div>
 
@@ -102,7 +104,7 @@ const changeOfficeStatus = (officeId, newStatus) => {
         type="text" 
         class="form-control" 
         v-model="searchTerm" 
-        placeholder="Search offices by name, branch, or status..."
+        :placeholder="t('offices.searchPlaceholder')"
       />
     </div>
 
@@ -110,12 +112,12 @@ const changeOfficeStatus = (officeId, newStatus) => {
       <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
-            <th scope="col">#ID</th>
-            <th scope="col">Name</th>
-            <th scope="col">Branch</th>
-            <th scope="col">Status</th>
-            <th scope="col">Capacity</th>
-            <th scope="col">Actions</th>
+            <th scope="col">{{ t('offices.tableHeaders.id') }}</th>
+            <th scope="col">{{ t('offices.tableHeaders.name') }}</th>
+            <th scope="col">{{ t('offices.tableHeaders.branch') }}</th>
+            <th scope="col">{{ t('offices.tableHeaders.status') }}</th>
+            <th scope="col">{{ t('offices.tableHeaders.capacity') }}</th>
+            <th scope="col">{{ t('offices.tableHeaders.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -125,22 +127,22 @@ const changeOfficeStatus = (officeId, newStatus) => {
             <td>{{ office.branch }}</td>
             <td>
               <span 
-                :class="['badge', 
-                         office.status === 'Available' ? 'bg-success' : 
-                         office.status === 'Occupied' ? 'bg-secondary' : 
+                :class="['badge',
+                         office.status === t('offices.status.available') ? 'bg-success' :
+                         office.status === t('offices.status.occupied') ? 'bg-secondary' :
                          'bg-warning text-dark']">
                 {{ office.status }}
               </span>
             </td>
             <td>{{ office.capacity }}</td>
             <td>
-              <button @click="viewOfficeDetails(office.id)" class="btn btn-sm btn-outline-info me-1" title="View Details">
+              <button @click="viewOfficeDetails(office.id)" class="btn btn-sm btn-outline-info me-1" :title="t('offices.viewDetails')">
                 <i class="bi bi-eye"></i>
               </button>
-              <button @click="editOffice(office.id)" class="btn btn-sm btn-outline-warning me-1" title="Edit Office">
+              <button @click="editOffice(office.id)" class="btn btn-sm btn-outline-warning me-1" :title="t('offices.editOffice')">
                 <i class="bi bi-pencil-square"></i>
               </button>
-              <button @click="deleteOffice(office.id)" class="btn btn-sm btn-outline-danger" title="Delete Office">
+              <button @click="deleteOffice(office.id)" class="btn btn-sm btn-outline-danger" :title="t('offices.deleteOffice')">
                 <i class="bi bi-trash"></i>
               </button>
             </td>
@@ -149,7 +151,7 @@ const changeOfficeStatus = (officeId, newStatus) => {
       </table>
     </div>
     <div v-else class="alert alert-info text-center" role="alert">
-      No offices found.
+      {{ t('offices.noOfficesFound') }}
     </div>
 
     <!-- View Office Details Modal -->
@@ -157,16 +159,16 @@ const changeOfficeStatus = (officeId, newStatus) => {
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="viewOfficeDetailsModalLabel">Office Details: {{ selectedOffice?.name }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h5 class="modal-title" id="viewOfficeDetailsModalLabel">{{ t('offices.officeDetails') }}: {{ selectedOffice?.name }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" :aria-label="t('close')"></button>
           </div>
           <div class="modal-body" v-if="selectedOffice">
-            <p><strong>ID:</strong> {{ selectedOffice.id }}</p>
-            <p><strong>Name:</strong> {{ selectedOffice.name }}</p>
-            <p><strong>Branch:</strong> {{ selectedOffice.branch }}</p>
-            <p><strong>Status:</strong> {{ selectedOffice.status }}</p>
-            <p><strong>Capacity:</strong> {{ selectedOffice.capacity }} people</p>
-            <p><strong>Amenities:</strong> {{ selectedOffice.amenities.join(', ') }}</p>
+            <p><strong>{{ t('offices.details.id') }}:</strong> {{ selectedOffice.id }}</p>
+            <p><strong>{{ t('offices.details.name') }}:</strong> {{ selectedOffice.name }}</p>
+            <p><strong>{{ t('offices.details.branch') }}:</strong> {{ selectedOffice.branch }}</p>
+            <p><strong>{{ t('offices.details.status') }}:</strong> {{ selectedOffice.status }}</p>
+            <p><strong>{{ t('offices.details.capacity') }}:</strong> {{ selectedOffice.capacity }} {{ t('people') }}</p>
+            <p><strong>{{ t('offices.details.amenities') }}:</strong> {{ selectedOffice.amenities.join(', ') }}</p>
           </div>
         </div>
       </div>

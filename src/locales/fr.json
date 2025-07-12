@@ -198,6 +198,7 @@
       "selectType": "Sélectionner le type",
       "individual": "Particulier",
       "company": "Entreprise",
+      "people": "personnes",
       "serviceType": "Type de service",
       "selectService": "Sélectionner le service",
       "domiciliation": "Domiciliation",
@@ -236,6 +237,44 @@
       "addSuccess": "Client ajouté avec succès !",
       "updateError": "Échec de la mise à jour du client.",
       "addError": "Échec de l'ajout du client."
+    }
+  },
+  "offices": {
+    "manageOffices": "Gérer les Bureaux de Coworking",
+    "addNewOffice": "Ajouter un Nouveau Bureau",
+    "searchPlaceholder": "Rechercher des bureaux par nom, agence ou statut...",
+    "tableHeaders": {
+      "id": "#ID",
+      "name": "Nom",
+      "branch": "Agence",
+      "status": "Statut",
+      "capacity": "Capacité",
+      "actions": "Actions"
+    },
+    "status": {
+      "available": "Disponible",
+      "occupied": "Occupé",
+      "maintenance": "Maintenance"
+    },
+    "noOfficesFound": "Aucun bureau trouvé.",
+    "viewDetails": "Voir les Détails",
+    "editOffice": "Modifier le Bureau",
+    "deleteOffice": "Supprimer le Bureau",
+    "officeDetails": "Détails du Bureau",
+    "details": {
+      "id": "ID",
+      "name": "Nom",
+      "branch": "Agence",
+      "status": "Statut",
+      "capacity": "Capacité",
+      "amenities": "Commodités"
+    },
+    "amenities": {
+      "wifi": "Wi-Fi",
+      "coffee": "Café",
+      "meetingRoom": "Salle de Réunion",
+      "printer": "Imprimante",
+      "privateRestroom": "Toilettes Privées"
     }
   }
 }

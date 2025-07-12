@@ -198,6 +198,7 @@
       "selectType": "Select Type",
       "individual": "Individual",
       "company": "Company",
+      "people": "people",
       "serviceType": "Service Type",
       "selectService": "Select Service",
       "domiciliation": "Domiciliation",
@@ -236,6 +237,44 @@
       "addSuccess": "Client added successfully!",
       "updateError": "Failed to update client.",
       "addError": "Failed to add client."
+    }
+  },
+  "offices": {
+    "manageOffices": "Manage Coworking Offices",
+    "addNewOffice": "Add New Office",
+    "searchPlaceholder": "Search offices by name, branch, or status...",
+    "tableHeaders": {
+      "id": "#ID",
+      "name": "Name",
+      "branch": "Branch",
+      "status": "Status",
+      "capacity": "Capacity",
+      "actions": "Actions"
+    },
+    "status": {
+      "available": "Available",
+      "occupied": "Occupied",
+      "maintenance": "Maintenance"
+    },
+    "noOfficesFound": "No offices found.",
+    "viewDetails": "View Details",
+    "editOffice": "Edit Office",
+    "deleteOffice": "Delete Office",
+    "officeDetails": "Office Details",
+    "details": {
+      "id": "ID",
+      "name": "Name",
+      "branch": "Branch",
+      "status": "Status",
+      "capacity": "Capacity",
+      "amenities": "Amenities"
+    },
+    "amenities": {
+      "wifi": "Wi-Fi",
+      "coffee": "Coffee",
+      "meetingRoom": "Meeting Room",
+      "printer": "Printer",
+      "privateRestroom": "Private Restroom"
     }
   }
 }
