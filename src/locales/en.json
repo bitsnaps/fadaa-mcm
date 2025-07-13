@@ -73,6 +73,58 @@
     "monthlyReport": "Monthly Report",
     "annualReport": "Annual Report"
   },
+  "investmentTracking": {
+    "title": "Investment Tracking",
+    "summary": {
+      "title": "Investment Summary",
+      "totalInvested": "Total Amount Invested",
+      "totalProfitShare": "Profit Share Received (Total)",
+      "overallROI": "Overall ROI (Blended)",
+      "activeInvestments": "Active Investments",
+      "agencies": "Agencies",
+      "nextPayout": "Next Payout"
+    },
+    "breakdown": {
+      "title": "Per-Branch Investment Breakdown",
+      "filter": "Filter by branch",
+      "allBranches": "All branches",
+      "branchName": "Branch Name",
+      "yourInvestment": "Your Investment",
+      "yourStake": "Your Stake (%)",
+      "contractStart": "Contract Start",
+      "contractEnd": "Contract End",
+      "branchNetProfit": "Branch Net Profit (Period)",
+      "yourProfitShare": "Your Profit Share (Period)",
+      "status": "Status",
+      "daysRemaining": "days remaining"
+    },
+    "charts": {
+      "yourProfitShareOverTime": "Your Profit Share Over Time",
+      "profitShareChartPlaceholder": "Profit share chart coming soon.",
+      "branchNetProfitTrend": "Branch Net Profit Trend",
+      "netProfitTrendChartPlaceholder": "Net profit trend chart coming soon."
+    },
+    "payoutHistory": {
+      "title": "Payout History (Profit Share)",
+      "export": "Export",
+      "payoutDate": "Payout Date",
+      "branch": "Branch",
+      "amountPaid": "Amount Paid",
+      "transactionId": "Transaction ID"
+    },
+    "documents": {
+      "title": "Document Access",
+      "download": "Download",
+      "investmentContract": "Investment Contract",
+      "performanceReportQ2": "Q2 2024 Performance Report",
+      "allBranches": "All branches"
+    },
+    "statuses": {
+      "active": "Active",
+      "expiringsoon": "Expiring Soon",
+      "expired": "Expired"
+    }
+  },
   "manageUsers": {
     "title": "User Management",
     "addUser": "Add User",
@@ -397,5 +449,82 @@
     "selectClientAndService": "Please select a client and a service category.",
     "noServicesYet": "This client has no active services.",
     "noClientSelected": "Please select a client to view and manage their services."
+  },
+  "financialReporting": {
+    "title": "Financial Reporting",
+    "customReport": {
+      "title": "Custom Report",
+      "reportType": "Report Type",
+      "types": {
+        "profit_loss": "Profit & Loss",
+        "balance_sheet": "Balance Sheet",
+        "cash_flow": "Cash Flow",
+        "expense_details": "Expense Details"
+      },
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "format": "Format",
+      "generate": "Generate Report",
+      "generatingMessage": "Report ({type}) for the period from {startDate} to {endDate} in {format} format generated successfully (simulation)."
+    },
+    "revenueVsExpenses": {
+      "title": "Revenue vs. Expenses",
+      "quarterly": "Quarterly",
+      "yearly": "Yearly",
+      "loading": "Loading chart data...",
+      "chartTitleQuarterly": "Revenue vs. Expenses (Quarterly)",
+      "chartTitleYearly": "Revenue vs. Expenses (Yearly)",
+      "amount": "Amount",
+      "amountInThousands": "Amount (k)",
+      "amountInMillions": "Amount (M)",
+      "revenue": "Revenue",
+      "expenses": "Expenses"
+    },
+    "expenseBreakdown": {
+      "title": "Expense Breakdown (Yearly)",
+      "chartTitle": "Expense Breakdown by Category (Yearly)",
+      "summaryTitle": "Expense Summary",
+      "categories": {
+        "rent": "Rent",
+        "salaries": "Salaries",
+        "marketing": "Marketing",
+        "supplies": "Supplies",
+        "utilities": "Utilities",
+        "other": "Other"
+      }
+    }
+  },
+  "complianceManagement": {
+    "title": "Compliance Management",
+    "overview": {
+      "overallStatus": "Overall Status",
+      "compliant": "Compliant",
+      "lastChecked": "Last checked",
+      "activeDocuments": "Active Documents",
+      "policiesAndProcedures": "Policies and procedures",
+      "activeAlerts": "Active Alerts",
+      "needsAttention": "Requiring attention"
+    },
+    "upcomingDeadlines": {
+      "title": "Upcoming Deadlines",
+      "task": "Task",
+      "description": "Description",
+      "dueDate": "Due Date",
+      "priority": "Priority",
+      "priorities": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "noDeadlines": "No upcoming deadlines."
+    },
+    "recentActivities": {
+      "title": "Recent Compliance Activities",
+      "noActivities": "No recent activities.",
+      "statuses": {
+        "completed": "Completed",
+        "in_progress": "In Progress"
+      }
+    }
   }
 }

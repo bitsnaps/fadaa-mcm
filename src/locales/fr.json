@@ -73,6 +73,58 @@
     "monthlyReport": "Rapport Mensuel",
     "annualReport": "Rapport Annuel"
   },
+  "investmentTracking": {
+    "title": "Suivi des Investissements",
+    "summary": {
+      "title": "Résumé des Investissements",
+      "totalInvested": "Montant Total Investi",
+      "totalProfitShare": "Part de Bénéfice Reçue (Total)",
+      "overallROI": "ROI Global (Mixte)",
+      "activeInvestments": "Investissements Actifs",
+      "agencies": "Agences",
+      "nextPayout": "Prochain Paiement"
+    },
+    "breakdown": {
+      "title": "Détail des Investissements par Agence",
+      "filter": "Filtrer par agence",
+      "allBranches": "Toutes les agences",
+      "branchName": "Nom de l'Agence",
+      "yourInvestment": "Votre Investissement",
+      "yourStake": "Votre Participation (%)",
+      "contractStart": "Début Contrat",
+      "contractEnd": "Fin Contrat",
+      "branchNetProfit": "Bénéfice Net Agence (Période)",
+      "yourProfitShare": "Votre Part de Bénéfice (Période)",
+      "status": "Statut",
+      "daysRemaining": "jours restants"
+    },
+    "charts": {
+      "yourProfitShareOverTime": "Votre Part de Bénéfice au Fil du Temps",
+      "profitShareChartPlaceholder": "Graphique de la part de bénéfice à venir.",
+      "branchNetProfitTrend": "Tendance Bénéfice Net Agence",
+      "netProfitTrendChartPlaceholder": "Graphique de tendance du bénéfice net à venir."
+    },
+    "payoutHistory": {
+      "title": "Historique des Paiements (Part de Bénéfice)",
+      "export": "Exporter",
+      "payoutDate": "Date de Paiement",
+      "branch": "Agence",
+      "amountPaid": "Montant Payé",
+      "transactionId": "ID Transaction"
+    },
+    "documents": {
+      "title": "Accès aux Documents",
+      "download": "Télécharger",
+      "investmentContract": "Contrat d'investissement",
+      "performanceReportQ2": "Rapport Performance Q2 2024",
+      "allBranches": "Toutes les agences"
+    },
+    "statuses": {
+      "active": "Actif",
+      "expiringsoon": "Expire Bientôt",
+      "expired": "Expiré"
+    }
+  },
   "manageUsers": {
     "title": "Gestion des Utilisateurs",
     "addUser": "Ajouter un Utilisateur",
@@ -396,5 +448,82 @@
     "removeSuccess": "Service supprimé avec succès (maquette).",
     "confirmRemove": "Êtes-vous sûr de vouloir supprimer ce service du client ?",
     "selectClientAndService": "Veuillez sélectionner un client et une catégorie de service."
+  },
+  "financialReporting": {
+    "title": "Rapports Financiers",
+    "customReport": {
+      "title": "Rapport Personnalisé",
+      "reportType": "Type de Rapport",
+      "types": {
+        "profit_loss": "Compte de Résultat",
+        "balance_sheet": "Bilan",
+        "cash_flow": "Flux de Trésorerie",
+        "expense_details": "Détail des Dépenses"
+      },
+      "startDate": "Date de Début",
+      "endDate": "Date de Fin",
+      "format": "Format",
+      "generate": "Générer le Rapport",
+      "generatingMessage": "Rapport ({type}) pour la période du {startDate} au {endDate} au format {format} généré avec succès (simulation)."
+    },
+    "revenueVsExpenses": {
+      "title": "Revenus vs. Dépenses",
+      "quarterly": "Trimestriel",
+      "yearly": "Annuel",
+      "loading": "Chargement des données du graphique...",
+      "chartTitleQuarterly": "Revenus vs. Dépenses (Trimestriel)",
+      "chartTitleYearly": "Revenus vs. Dépenses (Annuel)",
+      "amount": "Montant",
+      "amountInThousands": "Montant (k)",
+      "amountInMillions": "Montant (M)",
+      "revenue": "Revenus",
+      "expenses": "Dépenses"
+    },
+    "expenseBreakdown": {
+      "title": "Répartition des Dépenses (Annuel)",
+      "chartTitle": "Répartition des Dépenses par Catégorie (Annuel)",
+      "summaryTitle": "Sommaire des Dépenses",
+      "categories": {
+        "rent": "Loyer",
+        "salaries": "Salaires",
+        "marketing": "Marketing",
+        "supplies": "Fournitures",
+        "utilities": "Services Publics",
+        "other": "Autres"
+      }
+    }
+  },
+  "complianceManagement": {
+    "title": "Gestion de la Conformité",
+    "overview": {
+      "overallStatus": "Statut Global",
+      "compliant": "Conforme",
+      "lastChecked": "Dernière vérification",
+      "activeDocuments": "Documents Actifs",
+      "policiesAndProcedures": "Politiques et procédures",
+      "activeAlerts": "Alertes Actives",
+      "needsAttention": "Nécessitant une attention"
+    },
+    "upcomingDeadlines": {
+      "title": "Échéances à Venir",
+      "task": "Tâche",
+      "description": "Description",
+      "dueDate": "Date d'Échéance",
+      "priority": "Priorité",
+      "priorities": {
+        "high": "Haute",
+        "medium": "Moyenne",
+        "low": "Basse"
+      },
+      "noDeadlines": "Aucune échéance à venir."
+    },
+    "recentActivities": {
+      "title": "Activités de Conformité Récentes",
+      "noActivities": "Aucune activité récente.",
+      "statuses": {
+        "completed": "Complété",
+        "in_progress": "En cours"
+      }
+    }
   }
 }

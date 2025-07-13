@@ -1,36 +1,36 @@
 <template>
   <div class="financial-reporting-container container-fluid">
-    <h2 class="mb-4">Rapports Financiers</h2>
+    <h2 class="mb-4">{{ $t('financialReporting.title') }}</h2>
 
     <!-- Section 0: Customizable Report Generation -->
     <div class="row mb-5">
       <div class="col-12">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-primary">
-            <h5 class="mb-0 text-white"><i class="bi bi-file-earmark-settings-fill me-2"></i>Rapport Personnalisé</h5>
+            <h5 class="mb-0 text-white"><i class="bi bi-file-earmark-settings-fill me-2"></i>{{ $t('financialReporting.customReport.title') }}</h5>
           </div>
           <div class="card-body">
             <form @submit.prevent="generateReport">
               <div class="row g-3">
                 <div class="col-md-3">
-                  <label for="reportType" class="form-label">Type de Rapport</label>
+                  <label for="reportType" class="form-label">{{ $t('financialReporting.customReport.reportType') }}</label>
                   <select id="reportType" class="form-select" v-model="reportConfig.type">
-                    <option value="profit_loss">Compte de Résultat</option>
-                    <option value="balance_sheet">Bilan</option>
-                    <option value="cash_flow">Flux de Trésorerie</option>
-                    <option value="expense_details">Détail des Dépenses</option>
+                    <option value="profit_loss">{{ $t('financialReporting.customReport.types.profit_loss') }}</option>
+                    <option value="balance_sheet">{{ $t('financialReporting.customReport.types.balance_sheet') }}</option>
+                    <option value="cash_flow">{{ $t('financialReporting.customReport.types.cash_flow') }}</option>
+                    <option value="expense_details">{{ $t('financialReporting.customReport.types.expense_details') }}</option>
                   </select>
                 </div>
                 <div class="col-md-3">
-                  <label for="dateRangeStart" class="form-label">Date de Début</label>
+                  <label for="dateRangeStart" class="form-label">{{ $t('financialReporting.customReport.startDate') }}</label>
                   <input type="date" id="dateRangeStart" class="form-control" v-model="reportConfig.startDate">
                 </div>
                 <div class="col-md-3">
-                  <label for="dateRangeEnd" class="form-label">Date de Fin</label>
+                  <label for="dateRangeEnd" class="form-label">{{ $t('financialReporting.customReport.endDate') }}</label>
                   <input type="date" id="dateRangeEnd" class="form-control" v-model="reportConfig.endDate">
                 </div>
                 <div class="col-md-3">
-                  <label for="reportFormat" class="form-label">Format</label>
+                  <label for="reportFormat" class="form-label">{{ $t('financialReporting.customReport.format') }}</label>
                   <select id="reportFormat" class="form-select" v-model="reportConfig.format">
                     <option value="pdf">PDF</option>
                     <option value="csv">CSV</option>
@@ -39,7 +39,7 @@
                 </div>
               </div>
               <div class="mt-3 text-end">
-                <button type="submit" class="btn btn-fadaa-primary"><i class="bi bi-download me-2"></i>Générer le Rapport</button>
+                <button type="submit" class="btn btn-fadaa-primary"><i class="bi bi-download me-2"></i>{{ $t('financialReporting.customReport.generate') }}</button>
               </div>
             </form>
             <div v-if="reportGeneratedMessage" class="alert alert-success mt-3" role="alert">
@@ -56,16 +56,16 @@
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
             <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>Revenus vs. Dépenses</h5>
+              <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>{{ $t('financialReporting.revenueVsExpenses.title') }}</h5>
               <div class="btn-group btn-group-sm" role="group">
-                <button type="button" class="btn btn-outline-primary" @click="setRevExpFilter('quarterly')" :class="{ active: revExpFilter === 'quarterly' }">Trimestriel</button>
-                <button type="button" class="btn btn-outline-primary" @click="setRevExpFilter('yearly')" :class="{ active: revExpFilter === 'yearly' }">Annuel</button>
+                <button type="button" class="btn btn-outline-primary" @click="setRevExpFilter('quarterly')" :class="{ active: revExpFilter === 'quarterly' }">{{ $t('financialReporting.revenueVsExpenses.quarterly') }}</button>
+                <button type="button" class="btn btn-outline-primary" @click="setRevExpFilter('yearly')" :class="{ active: revExpFilter === 'yearly' }">{{ $t('financialReporting.revenueVsExpenses.yearly') }}</button>
               </div>
             </div>
           </div>
           <div class="card-body">
             <Line id="revenue-expense-chart" v-if="revenueExpenseChartData.datasets.length" :data="revenueExpenseChartData" :options="lineChartOptions" />
-            <p v-else class="text-center text-muted">Chargement des données du graphique...</p>
+            <p v-else class="text-center text-muted">{{ $t('financialReporting.revenueVsExpenses.loading') }}</p>
           </div>
         </div>
       </div>
@@ -76,18 +76,18 @@
       <div class="col-lg-7">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
-            <h5 class="mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>Répartition des Dépenses (Annuel)</h5>
+            <h5 class="mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>{{ $t('financialReporting.expenseBreakdown.title') }}</h5>
           </div>
           <div class="card-body">
             <Bar id="expense-barchart" v-if="expenseBreakdownChartData.datasets? expenseBreakdownChartData.datasets.length:false" :data="expenseBreakdownChartData" :options="barChartOptions" />
-            <p v-else class="text-center text-muted">Chargement des données du graphique...</p>
+            <p v-else class="text-center text-muted">{{ $t('financialReporting.revenueVsExpenses.loading') }}</p>
           </div>
         </div>
       </div>
       <div class="col-lg-5">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
-            <h5 class="mb-0"><i class="bi bi-wallet2 me-2"></i>Sommaire des Dépenses</h5>
+            <h5 class="mb-0"><i class="bi bi-wallet2 me-2"></i>{{ $t('financialReporting.expenseBreakdown.summaryTitle') }}</h5>
           </div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
@@ -106,14 +106,16 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { Line, Bar } from 'vue-chartjs';
 import {
   Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler
 } from 'chart.js';
-import { formatCurrency/*, getPreferredLanguage*/ } from '@/helpers/utils.js';
+import { formatCurrency } from '@/helpers/utils.js';
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler);
 
+const { t } = useI18n();
 const revExpFilter = ref('quarterly'); // quarterly, yearly
 
 // --- Report Generation Config ---
@@ -128,7 +130,12 @@ const reportGeneratedMessage = ref('');
 const generateReport = () => {
   // Simulate report generation
   console.log('Generating report with config:', reportConfig.value);
-  reportGeneratedMessage.value = `Rapport (${reportConfig.value.type}) pour la période du ${reportConfig.value.startDate} au ${reportConfig.value.endDate} au format ${reportConfig.value.format.toUpperCase()} généré avec succès (simulation).`;
+  reportGeneratedMessage.value = t('financialReporting.customReport.generatingMessage', {
+    type: t(`financialReporting.customReport.types.${reportConfig.value.type}`),
+    startDate: reportConfig.value.startDate,
+    endDate: reportConfig.value.endDate,
+    format: reportConfig.value.format.toUpperCase(),
+  });
   // In a real app, this would trigger an API call and file download
   setTimeout(() => {
     reportGeneratedMessage.value = '';
@@ -136,11 +143,11 @@ const generateReport = () => {
 };
 
 // --- Revenue vs. Expenses Data ---
-const quarterlyRevExpData = {
+const quarterlyRevExpData = computed(() => ({
   labels: ['T1 2023', 'T2 2023', 'T3 2023', 'T4 2023', 'T1 2024'],
   datasets: [
     {
-      label: 'Revenus (k)',
+      label: t('financialReporting.revenueVsExpenses.revenue') + ' (k)',
       borderColor: '#0D6EFD', // FADAA Blue
       backgroundColor: 'rgba(13, 110, 253, 0.1)',
       tension: 0.3,
@@ -148,7 +155,7 @@ const quarterlyRevExpData = {
       data: [300, 320, 350, 380, 400],
     },
     {
-      label: 'Dépenses (k)',
+      label: t('financialReporting.revenueVsExpenses.expenses') + ' (k)',
       borderColor: '#DC3545', // Bootstrap Danger Red
       backgroundColor: 'rgba(220, 53, 69, 0.1)',
       tension: 0.3,
@@ -156,13 +163,13 @@ const quarterlyRevExpData = {
       data: [200, 210, 220, 230, 240],
     },
   ],
-};
+}));
 
-const yearlyRevExpData = {
+const yearlyRevExpData = computed(() => ({
   labels: ['2022', '2023', '2024 (Proj.)'],
   datasets: [
     {
-      label: 'Revenus (M)',
+      label: t('financialReporting.revenueVsExpenses.revenue') + ' (M)',
       borderColor: '#0D6EFD',
       backgroundColor: 'rgba(13, 110, 253, 0.1)',
       tension: 0.3,
@@ -170,7 +177,7 @@ const yearlyRevExpData = {
       data: [1.2, 1.5, 1.8],
     },
     {
-      label: 'Dépenses (M)',
+      label: t('financialReporting.revenueVsExpenses.expenses') + ' (M)',
       borderColor: '#DC3545',
       backgroundColor: 'rgba(220, 53, 69, 0.1)',
       tension: 0.3,
@@ -178,7 +185,7 @@ const yearlyRevExpData = {
       data: [0.8, 0.9, 1.0],
     },
   ],
-};
+}));
 
 const revenueExpenseChartData = ref({ labels: [], datasets: [] });
 
@@ -187,11 +194,11 @@ const lineChartOptions = ref({
   maintainAspectRatio: false,
   plugins: {
     legend: { display: true, position: 'top' },
-    title: { display: true, text: 'Revenus vs. Dépenses', font: { size: 16 } },
+    title: { display: true, text: t('financialReporting.revenueVsExpenses.title'), font: { size: 16 } },
     tooltip: { mode: 'index', intersect: false },
   },
   scales: {
-    y: { beginAtZero: true, title: { display: true, text: 'Montant' } },
+    y: { beginAtZero: true, title: { display: true, text: t('financialReporting.revenueVsExpenses.amount') } },
     x: { grid: { display: false } },
   },
 });
@@ -202,32 +209,35 @@ const setRevExpFilter = (filter) => {
 
 watch(revExpFilter, (newFilter) => {
   if (newFilter === 'quarterly') {
-    revenueExpenseChartData.value = quarterlyRevExpData;
-    lineChartOptions.value.plugins.title.text = 'Revenus vs. Dépenses (Trimestriel)';
-    lineChartOptions.value.scales.y.title.text = 'Montant (k )';
+    revenueExpenseChartData.value = quarterlyRevExpData.value;
+    lineChartOptions.value.plugins.title.text = t('financialReporting.revenueVsExpenses.chartTitleQuarterly');
+    lineChartOptions.value.scales.y.title.text = t('financialReporting.revenueVsExpenses.amountInThousands');
   } else if (newFilter === 'yearly') {
-    revenueExpenseChartData.value = yearlyRevExpData;
-    lineChartOptions.value.plugins.title.text = 'Revenus vs. Dépenses (Annuel)';
-    lineChartOptions.value.scales.y.title.text = 'Montant (M)';
+    revenueExpenseChartData.value = yearlyRevExpData.value;
+    lineChartOptions.value.plugins.title.text = t('financialReporting.revenueVsExpenses.chartTitleYearly');
+    lineChartOptions.value.scales.y.title.text = t('financialReporting.revenueVsExpenses.amountInMillions');
   }
 }, { immediate: true });
 
 // --- Expense Breakdown Data ---
-const expenseCategories = ['Loyer', 'Salaires', 'Marketing', 'Fournitures', 'Services Publics', 'Autres'];
+// const expenseCategories = computed(() => Object.values(t('financialReporting.expenseBreakdown.categories', { returnObjects: true })));
+const expenseCategories = ref(['Loyer', 'Salaires', 'Marketing', 'Fournitures', 'Services Publics', 'Autres']);
+
 const expenseColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
 
-const expenseBreakdownChartData = ref({
-  labels: expenseCategories,
+const expenseBreakdownChartData = computed(() => ({
+  labels: expenseCategories.value,
   datasets: [
     {
-      label: 'Dépenses Annuelles (k)',
+      label: t('financialReporting.expenseBreakdown.chartTitle'),
       backgroundColor: expenseColors,
-      borderColor: expenseColors.map(color => color.replace(')', ', 0.7)').replace('rgb', 'rgba')), // slightly darker border
+      borderColor: expenseColors.map(color => color.replace(')', ', 0.7)').replace('rgb', 'rgba')),
       borderWidth: 1,
       data: [500, 800, 200, 150, 100, 50], // Example data
     },
   ],
-});
+}));
+
 
 const barChartOptions = ref({
   responsive: true,
@@ -235,31 +245,31 @@ const barChartOptions = ref({
   indexAxis: 'y', // Horizontal bar chart
   plugins: {
     legend: { display: false }, // Legend can be redundant if labels are clear
-    title: { display: true, text: 'Répartition des Dépenses par Catégorie (Annuel)', font: { size: 16 } },
+    title: { display: true, text: t('financialReporting.expenseBreakdown.chartTitle'), font: { size: 16 } },
     tooltip: { mode: 'index', intersect: false },
   },
   scales: {
-    x: { beginAtZero: true, title: { display: true, text: 'Montant (k)' } },
+    x: { beginAtZero: true, title: { display: true, text: t('financialReporting.revenueVsExpenses.amountInThousands') } },
     y: { grid: { display: false } },
   },
 });
 
 const expenseSummary = computed(() => {
-  return expenseCategories.map((category, index) => ({
+  return expenseCategories.value.map((category, index) => ({
     category,
-    amount: expenseBreakdownChartData.value.datasets?expenseBreakdownChartData.value.datasets[0].data[index]:0,//.toLocaleString(getPreferredLanguage()),
-    icon: getCategoryIcon(category),
+    amount: expenseBreakdownChartData.value.datasets ? expenseBreakdownChartData.value.datasets[0].data[index] : 0,
+    icon: getCategoryIcon(Object.keys(t('financialReporting.expenseBreakdown.categories', { returnObjects: true }))[index]),
     color: expenseColors[index]
   }));
 });
 
-const getCategoryIcon = (category) => {
-  switch (category) {
-    case 'Loyer': return 'bi-building';
-    case 'Salaires': return 'bi-people-fill';
-    case 'Marketing': return 'bi-megaphone-fill';
-    case 'Fournitures': return 'bi-box-seam';
-    case 'Services Publics': return 'bi-lightbulb-fill';
+const getCategoryIcon = (categoryKey) => {
+  switch (categoryKey) {
+    case 'rent': return 'bi-building';
+    case 'salaries': return 'bi-people-fill';
+    case 'marketing': return 'bi-megaphone-fill';
+    case 'supplies': return 'bi-box-seam';
+    case 'utilities': return 'bi-lightbulb-fill';
     default: return 'bi-cash-coin';
   }
 };
