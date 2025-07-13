@@ -1,58 +1,59 @@
 <template>
   <div class="container mt-4">
-    <h2>Manage Client Services</h2>
-    <p class="text-muted">Assistants can assign and manage services for specific clients.</p>
+    <h2 class="mb-4">{{ $t('clientServices.title') }}</h2>
+    <p class="text-muted mb-4">{{ $t('clientServices.description') }}</p>
 
     <!-- Client Selection -->
     <div class="row mb-4">
       <div class="col-md-6">
-        <label for="clientSelect" class="form-label">Select Client</label>
-        <select class="form-select" id="clientSelect" v-model="selectedClientId" @change="loadClientServices">
-          <option value="" disabled>-- Select a Client --</option>
-          <option v-for="client in clients" :key="client.id" :value="client.id">
-            {{ client.firstName }} {{ client.lastName }} ({{ client.companyName }})
-          </option>
-        </select>
+        <label for="clientSearch" class="form-label">{{ $t('clientServices.selectClient') }}</label>
+        <input class="form-control" list="client-datalist" id="clientSearch" :placeholder="$t('clientServices.searchClientPlaceholder')" @input="handleClientSearch" @change="loadClientServices" v-model="clientSearch">
+        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" @click="resetClientSearch">
+          <i class="bi bi-x-lg"></i>
+        </button>
+        <datalist id="client-datalist">
+          <option v-for="client in clients" :key="client.id" :data-value="client.id" :value="`${client.firstName} ${client.lastName} (${client.companyName})`"></option>
+        </datalist>
       </div>
     </div>
 
     <div v-if="selectedClientId && !loadingClientData">
-      <h4>Services for {{ selectedClientName }}</h4>
+      <h4 class="mb-3">{{ $t('clientServices.servicesFor') }} {{ selectedClientName }}</h4>
       
       <!-- Add Service Section -->
       <div class="card mb-4 shadow-sm">
         <div class="card-header bg-fadaa-light-blue">
-          <h5 class="mb-0">Add New Service</h5>
+          <h5 class="mb-0">{{ $t('clientServices.addNewService') }}</h5>
         </div>
         <div class="card-body">
           <form @submit.prevent="handleAddServiceToClient">
             <div class="row">
               <div class="col-md-4 mb-3">
-                <label for="serviceCategorySelect" class="form-label">Service Category <span class="text-danger">*</span></label>
+                <label for="serviceCategorySelect" class="form-label">{{ $t('clientServices.serviceCategory') }} <span class="text-danger">*</span></label>
                 <select class="form-select" id="serviceCategorySelect" v-model="newService.categoryId" required>
-                  <option value="" disabled>-- Select Category --</option>
+                  <option value="" disabled>{{ $t('clientServices.selectCategoryPlaceholder') }}</option>
                   <option v-for="category in availableServiceCategories" :key="category.id" :value="category.id">
                     {{ category.name }}
                   </option>
                 </select>
               </div>
               <div class="col-md-3 mb-3">
-                <label for="paymentType" class="form-label">Payment Type <span class="text-danger">*</span></label>
+                <label for="paymentType" class="form-label">{{ $t('clientServices.paymentType') }} <span class="text-danger">*</span></label>
                 <select class="form-select" id="paymentType" v-model="newService.paymentType" required>
-                  <option value="recurrent">Recurrent</option>
-                  <option value="one-shot">One-Shot</option>
+                  <option value="recurrent">{{ $t('clientServices.recurrent') }}</option>
+                  <option value="one-shot">{{ $t('clientServices.oneShot') }}</option>
                 </select>
               </div>
               <div class="col-md-3 mb-3">
-                <label for="servicePrice" class="form-label">Price (DZD) <span class="text-danger">*</span></label>
+                <label for="servicePrice" class="form-label">{{ $t('clientServices.price') }} <span class="text-danger">*</span></label>
                 <input type="number" class="form-control" id="servicePrice" v-model.number="newService.price" min="0" required>
               </div>
               <div class="col-md-2 d-flex align-items-end mb-3">
-                <button type="submit" class="btn btn-primary btn-fadaa-primary w-100">Add Service</button>
+                <button type="submit" class="btn btn-primary btn-fadaa-primary w-100">{{ $t('clientServices.addService') }}</button>
               </div>
             </div>
              <div class="mb-3">
-                <label for="serviceNotes" class="form-label">Notes</label>
+                <label for="serviceNotes" class="form-label">{{ $t('clientServices.notes') }}</label>
                 <textarea class="form-control" id="serviceNotes" v-model="newService.notes" rows="2"></textarea>
               </div>
           </form>
@@ -60,23 +61,23 @@
       </div>
 
       <!-- Current Client Services Table -->
-      <h5>Current Services</h5>
+      <h5>{{ $t('clientServices.currentServices') }}</h5>
       <div class="table-responsive">
         <table class="table table-hover align-middle">
           <thead class="table-fadaa-primary">
             <tr>
-              <th scope="col">Service Name</th>
-              <th scope="col">Category</th>
-              <th scope="col">Payment Type</th>
-              <th scope="col">Price (DZD)</th>
-              <th scope="col">Status</th>
-              <th scope="col">Notes</th>
-              <th scope="col">Actions</th>
+              <th scope="col">Service</th>
+              <th scope="col">{{ $t('clientServices.serviceCategory') }}</th>
+              <th scope="col">{{ $t('clientServices.paymentType') }}</th>
+              <th scope="col">{{ $t('clientServices.price') }}</th>
+              <th scope="col">{{ $t('clientServices.status') }}</th>
+              <th scope="col">{{ $t('clientServices.notes') }}</th>
+              <th scope="col">{{ $t('clientServices.actions') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="clientServices.length === 0">
-              <td colspan="7" class="text-center">This client has no active services.</td>
+              <td colspan="7" class="text-center">{{ $t('clientServices.noServicesYet') }}</td>
             </tr>
             <tr v-for="service in clientServices" :key="service.id">
               <td>{{ getCategoryName(service.categoryId) }}</td> <!-- Assuming service name is category name for now -->
@@ -87,7 +88,7 @@
               <td>{{ service.notes }}</td>
               <td>
                 <button class="btn btn-sm btn-outline-danger" @click="confirmRemoveService(service.id)">
-                  <i class="bi bi-trash"></i> Remove
+                  <i class="bi bi-trash"></i> {{ $t('clientServices.remove') }}
                 </button>
                 <!-- Add edit/toggle active status later if needed -->
               </td>
@@ -96,15 +97,21 @@
         </table>
       </div>
     </div>
-    <div v-else-if="loadingClientData" class="text-center mt-5">
+
+    <!-- Initial state message -->
+    <div v-if="!selectedClientId && !loadingClientData" class="text-center mt-5">
+      <i class="bi bi-people-fill"></i>
+      <p class="text-muted mt-2">{{ $t('clientServices.noClientSelected') }}</p>
+    </div>
+
+    <!-- Loading spinner -->
+    <div v-if="loadingClientData" class="text-center mt-5">
       <div class="spinner-border text-fadaa-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+        <span class="visually-hidden">{{ $t('clientServices.loading') }}</span>
       </div>
-      <p>Loading client data...</p>
+      <p class="mt-2 text-fadaa-primary">{{ $t('clientServices.loadingClientData') }}</p>
     </div>
-     <div v-else class="alert alert-info mt-4" role="alert">
-      Please select a client to view and manage their services.
-    </div>
+
 
   </div>
 </template>
@@ -117,6 +124,7 @@ import { ref, onMounted, computed } from 'vue';
 // const authStore = useAuthStore();
 
 const clients = ref([]);
+const clientSearch = ref('');
 const selectedClientId = ref('');
 const clientServices = ref([]);
 const availableServiceCategories = ref([]);
@@ -158,6 +166,7 @@ const fetchServiceCategories = async () => {
 };
 
 const loadClientServices = async () => {
+  selectedClientId.value = clients.value.find(c => clientSearch.value.toLowerCase().includes(c.companyName.toLowerCase())).id;
   if (!selectedClientId.value) {
     clientServices.value = [];
     return;
@@ -189,7 +198,7 @@ const getCategoryName = (categoryId) => {
 
 const handleAddServiceToClient = async () => {
   if (!selectedClientId.value || !newService.value.categoryId) {
-    alert('Please select a client and a service category.');
+    console.log('Please select a client and a service category.');
     return;
   }
   console.log('Adding service to client:', selectedClientId.value, newService.value);
@@ -202,7 +211,7 @@ const handleAddServiceToClient = async () => {
   clientServices.value.push(serviceToAdd);
   // Reset form
   newService.value = { categoryId: '', paymentType: 'recurrent', price: 0, notes: '' };
-  alert('Service added successfully (mock).');
+  console.log('Service added successfully (mock).');
 };
 
 const confirmRemoveService = (serviceId) => {
@@ -210,9 +219,15 @@ const confirmRemoveService = (serviceId) => {
     console.log('Removing service ID:', serviceId, 'from client ID:', selectedClientId.value);
     // Placeholder: API call to remove service
     clientServices.value = clientServices.value.filter(s => s.id !== serviceId);
-    alert('Service removed successfully (mock).');
+    console.log('Service removed successfully (mock).');
   }
 };
+
+const resetClientSearch = () => {
+  clientSearch.value = '';
+  selectedClientId.value = '';
+  clientServices.value = [];
+}
 
 onMounted(() => {
   fetchClients();
