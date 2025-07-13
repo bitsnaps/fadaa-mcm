@@ -1,3 +1,15 @@
+<script setup>
+import { computed } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { useSidebarStore } from '@/stores/sidebar';
+
+const authStore = useAuthStore();
+const sidebarStore = useSidebarStore();
+
+const userRole = computed(() => authStore.userRole);
+const isCollapsed = computed(() => sidebarStore.isCollapsed);
+</script>
+
 <template>
   <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-fadaa-light-blue sidebar" :class="{ 'collapsed': isCollapsed }">
     <div class="position-sticky pt-3 sidebar-sticky">
@@ -124,18 +136,6 @@
   </nav>
 </template>
 
-<script setup>
-import { computed } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import { useSidebarStore } from '@/stores/sidebar';
-
-const authStore = useAuthStore();
-const sidebarStore = useSidebarStore();
-
-const userRole = computed(() => authStore.userRole);
-const isCollapsed = computed(() => sidebarStore.isCollapsed);
-</script>
-
 <style scoped>
 /*
  * Sidebar
@@ -153,7 +153,9 @@ const isCollapsed = computed(() => sidebarStore.isCollapsed);
 }
 
 .sidebar.collapsed {
-  margin-left: -160px; /* Adjust based on desired collapsed width */
+  /* Adjust based on desired collapsed width */
+  /*margin-left: -160px; */
+  width: 0;
 }
 
 .sidebar-sticky {
