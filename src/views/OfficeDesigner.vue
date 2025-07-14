@@ -5,24 +5,24 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Create New Branch Design</h5>
+                    <h5 class="modal-title">{{ $t('officeDesigner.setupModal.title') }}</h5>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Branch Name</label>
-                        <input type="text" class="form-control" v-model="setup.branchName" placeholder="e.g., Downtown Hub">
+                        <label class="form-label">{{ $t('officeDesigner.setupModal.branchName') }}</label>
+                        <input type="text" class="form-control" v-model="setup.branchName" :placeholder="$t('officeDesigner.setupModal.branchNamePlaceholder')">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Number of Floors</label>
+                        <label class="form-label">{{ $t('officeDesigner.setupModal.numFloors') }}</label>
                         <input type="number" class="form-control" v-model.number="setup.numFloors" min="1" max="10">
                     </div>
                     <div v-for="i in setup.numFloors" :key="i">
-                        <label class="form-label">Floor {{ i }} Name</label>
-                        <input type="text" class="form-control mb-2" v-model="setup.floorNames[i-1]" :placeholder="`e.g., Ground Floor`">
+                        <label class="form-label">{{ $t('officeDesigner.setupModal.floorName', { floorNum: i }) }}</label>
+                        <input type="text" class="form-control mb-2" v-model="setup.floorNames[i-1]" :placeholder="$t('officeDesigner.setupModal.floorNamePlaceholder')">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" @click="initializeProject">Start Designing</button>
+                    <button type="button" class="btn btn-primary" @click="initializeProject">{{ $t('officeDesigner.setupModal.startDesigning') }}</button>
                 </div>
             </div>
         </div>
@@ -32,14 +32,14 @@
     <div class="modal fade" id="editNameModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header"><h5 class="modal-title">Edit Office Name</h5></div>
+                <div class="modal-header"><h5 class="modal-title">{{ $t('officeDesigner.editNameModal.title') }}</h5></div>
                 <div class="modal-body">
-                    <label class="form-label">New Name</label>
+                    <label class="form-label">{{ $t('officeDesigner.editNameModal.newName') }}</label>
                     <input type="text" class="form-control" v-model="editingName" @keyup.enter="saveOfficeName">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" @click="saveOfficeName">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('officeDesigner.editNameModal.cancel') }}</button>
+                    <button type="button" class="btn btn-primary" @click="saveOfficeName">{{ $t('officeDesigner.editNameModal.save') }}</button>
                 </div>
             </div>
         </div>
@@ -62,10 +62,10 @@
     <div v-if="projectInitialized" class="control-panel">
         <div class="mb-4">
             <h4 class="mb-0">{{ branchName }}</h4>
-            <small class="text-muted">Floor Plan Designer</small>
+            <small class="text-muted">{{ $t('officeDesigner.main.title') }}</small>
         </div>
 
-        <h5 class="mb-3">Floors</h5>
+        <h5 class="mb-3">{{ $t('officeDesigner.main.floors') }}</h5>
         <ul class="nav nav-pills flex-column mb-3">
             <li v-for="(floor, index) in floors" :key="floor.id" class="nav-item mb-1">
                 <a href="#" class="nav-link d-flex justify-content-between align-items-center" :class="{ active: currentFloorIndex === index }" @click="switchFloor(index)">
@@ -74,27 +74,27 @@
                 </a>
             </li>
         </ul>
-        <button class="btn btn-sm btn-outline-secondary mb-4" @click="addFloor">Add New Floor</button>
+        <button class="btn btn-sm btn-outline-secondary mb-4" @click="addFloor">{{ $t('officeDesigner.main.addFloor') }}</button>
 
-        <h5 class="mb-3">Tools</h5>
+        <h5 class="mb-3">{{ $t('officeDesigner.main.tools') }}</h5>
         <div class="d-grid gap-2 mb-4">
-            <button class="btn btn-primary" @click="addOffice('rectangle')"><i class="bi bi-plus-square-fill me-2"></i>Add Office</button>
-            <button class="btn btn-info" @click="addOffice('circle')"><i class="bi bi-plus-circle-fill me-2"></i>Add Desk</button>
+            <button class="btn btn-primary" @click="addOffice('rectangle')"><i class="bi bi-plus-square-fill me-2"></i>{{ $t('officeDesigner.main.addOffice') }}</button>
+            <button class="btn btn-info" @click="addOffice('circle')"><i class="bi bi-plus-circle-fill me-2"></i>{{ $t('officeDesigner.main.addDesk') }}</button>
         </div>
 
         <div v-if="selectedOfficeIds.length > 0" class="flex-grow-1">
-            <h5 class="mb-3">Selection ({{ selectedOfficeIds.length }} item<span v-if="selectedOfficeIds.length > 1">s</span>)</h5>
+            <h5 class="mb-3">{{ $t('officeDesigner.main.selection', { count: selectedOfficeIds.length }) }}</h5>
             
             <div class="mb-3">
-                <label class="form-label">Shape</label>
+                <label class="form-label">{{ $t('officeDesigner.main.shape') }}</label>
                 <select class="form-select" @change="changeSelected('shape', $event.target.value)">
-                    <option value="rectangle">Rectangle</option>
-                    <option value="circle">Circle</option>
+                    <option value="rectangle">{{ $t('officeDesigner.main.rectangle') }}</option>
+                    <option value="circle">{{ $t('officeDesigner.main.circle') }}</option>
                 </select>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Color</label>
+                <label class="form-label">{{ $t('officeDesigner.main.color') }}</label>
                 <div class="d-flex flex-wrap gap-2">
                     <button v-for="color in bootstrapColors" :key="color" :class="`btn bg-${color}`" @click="changeSelected('colorClass', `bg-${color}`)"></button>
                     <input type="color" class="form-control form-control-color" @input="changeSelected('customColor', $event.target.value)">
@@ -102,20 +102,20 @@
             </div>
 
             <div class="d-grid gap-2 mt-auto">
-                <button v-if="selectedOfficeIds.length === 1" class="btn btn-outline-secondary" @click="openEditNameModal"><i class="bi bi-pencil-fill me-2"></i>Rename</button>
-                <button class="btn btn-outline-secondary" @click="duplicateSelected"><i class="bi bi-copy me-2"></i>Duplicate</button>
-                <button class="btn btn-outline-danger" @click="deleteSelected"><i class="bi bi-trash-fill me-2"></i>Delete Selected</button>
+                <button v-if="selectedOfficeIds.length === 1" class="btn btn-outline-secondary" @click="openEditNameModal"><i class="bi bi-pencil-fill me-2"></i>{{ $t('officeDesigner.main.rename') }}</button>
+                <button class="btn btn-outline-secondary" @click="duplicateSelected"><i class="bi bi-copy me-2"></i>{{ $t('officeDesigner.main.duplicate') }}</button>
+                <button class="btn btn-outline-danger" @click="deleteSelected"><i class="bi bi-trash-fill me-2"></i>{{ $t('officeDesigner.main.delete') }}</button>
             </div>
         </div>
-        <div v-else class="text-muted text-center mt-5">Select an office to see its properties.</div>
+        <div v-else class="text-muted text-center mt-5">{{ $t('officeDesigner.main.noSelection') }}</div>
         
         <div class="mt-auto pt-3 border-top">
             <button class="btn btn-success w-100 mb-2" @click="saveDesign" :disabled="isSaving">
                 <span v-if="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                 <i v-else class="bi bi-cloud-arrow-up-fill me-2"></i>
-                {{ isSaving ? 'Saving...' : 'Save Design' }}
+                {{ isSaving ? $t('officeDesigner.main.saving') : $t('officeDesigner.main.saveDesign') }}
             </button>
-            <button class="btn btn-outline-danger w-100" @click="clearDesign"><i class="bi bi-arrow-counterclockwise me-2"></i>Reset & Start New</button>
+            <button class="btn btn-outline-danger w-100" @click="clearDesign"><i class="bi bi-arrow-counterclockwise me-2"></i>{{ $t('officeDesigner.main.resetDesign') }}</button>
         </div>
     </div>
   </div>
@@ -125,6 +125,9 @@
 import { ref, reactive, onMounted, onUnmounted, nextTick, computed, watch } from 'vue';
 import interact from 'interactjs';
 import { Modal } from 'bootstrap';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 // State
 const projectInitialized = ref(false);
@@ -171,7 +174,7 @@ const switchFloor = (index) => {
 };
 
 const addFloor = () => {
-    const newFloorName = prompt("Enter new floor name:", `Floor ${floors.value.length + 1}`);
+    const newFloorName = prompt(t('officeDesigner.main.newFloorPrompt'), `Floor ${floors.value.length + 1}`);
     if (newFloorName) {
         floors.value.push({ id: Date.now(), name: newFloorName, offices: [] });
         switchFloor(floors.value.length - 1);
@@ -179,7 +182,7 @@ const addFloor = () => {
 };
 
 const deleteFloor = (index) => {
-    if (confirm(`Are you sure you want to delete floor "${floors.value[index].name}"?`)) {
+    if (confirm(t('officeDesigner.main.deleteFloorConfirm', { floorName: floors.value[index].name }))) {
         floors.value.splice(index, 1);
         if (currentFloorIndex.value >= floors.value.length) {
             currentFloorIndex.value = Math.max(0, floors.value.length - 1);
@@ -268,7 +271,7 @@ const saveDesign = async () => {
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     isSaving.value = false;
-    alert('Design saved successfully!');
+    alert(t('officeDesigner.main.designSaved'));
 };
 
 const loadDesign = () => {
@@ -292,7 +295,7 @@ const loadDesign = () => {
 };
 
 const clearDesign = () => {
-    if (confirm('Are you sure you want to clear the saved design and start over?')) {
+    if (confirm(t('officeDesigner.main.confirmReset'))) {
         localStorage.removeItem('officeDesign');
         window.location.reload();
     }

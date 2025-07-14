@@ -527,5 +527,46 @@
         "in_progress": "In Progress"
       }
     }
+  },
+  "officeDesigner": {
+    "setupModal": {
+      "title": "Create New Branch Design",
+      "branchName": "Branch Name",
+      "branchNamePlaceholder": "e.g., Downtown Hub",
+      "numFloors": "Number of Floors",
+      "floorName": "Floor {floorNum} Name",
+      "floorNamePlaceholder": "e.g., Ground Floor",
+      "startDesigning": "Start Designing"
+    },
+    "editNameModal": {
+      "title": "Edit Office Name",
+      "newName": "New Name",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "main": {
+      "title": "Floor Plan Designer",
+      "floors": "Floors",
+      "addFloor": "Add New Floor",
+      "tools": "Tools",
+      "addOffice": "Add Office",
+      "addDesk": "Add Desk",
+      "selection": "Selection ({count} item(s))",
+      "shape": "Shape",
+      "rectangle": "Rectangle",
+      "circle": "Circle",
+      "color": "Color",
+      "rename": "Rename",
+      "duplicate": "Duplicate",
+      "delete": "Delete Selected",
+      "noSelection": "Select an office to see its properties.",
+      "saveDesign": "Save Design",
+      "saving": "Saving...",
+      "resetDesign": "Reset & Start New",
+      "confirmReset": "Are you sure you want to clear the saved design and start over?",
+      "designSaved": "Design saved successfully!",
+      "newFloorPrompt": "Enter new floor name:",
+      "deleteFloorConfirm": "Are you sure you want to delete floor \"{floorName}\"?"
+    }
   }
 }

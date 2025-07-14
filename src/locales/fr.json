@@ -526,5 +526,46 @@
         "in_progress": "En cours"
       }
     }
+  },
+  "officeDesigner": {
+    "setupModal": {
+      "title": "Créer un Nouveau Design de Succursale",
+      "branchName": "Nom de la Succursale",
+      "branchNamePlaceholder": "ex., Centre-ville",
+      "numFloors": "Nombre d'étages",
+      "floorName": "Nom de l'étage {floorNum}",
+      "floorNamePlaceholder": "ex., Rez-de-chaussée",
+      "startDesigning": "Commencer la Conception"
+    },
+    "editNameModal": {
+      "title": "Modifier le Nom du Bureau",
+      "newName": "Nouveau Nom",
+      "cancel": "Annuler",
+      "save": "Enregistrer"
+    },
+    "main": {
+      "title": "Concepteur de Plan d'étage",
+      "floors": "Étages",
+      "addFloor": "Ajouter un Étage",
+      "tools": "Outils",
+      "addOffice": "Ajouter un Bureau",
+      "addDesk": "Ajouter un Poste de Travail",
+      "selection": "Sélection ({count} élément(s))",
+      "shape": "Forme",
+      "rectangle": "Rectangle",
+      "circle": "Cercle",
+      "color": "Couleur",
+      "rename": "Renommer",
+      "duplicate": "Dupliquer",
+      "delete": "Supprimer la Sélection",
+      "noSelection": "Sélectionnez un bureau pour voir ses propriétés.",
+      "saveDesign": "Enregistrer le Design",
+      "saving": "Enregistrement...",
+      "resetDesign": "Réinitialiser & Commencer",
+      "confirmReset": "Êtes-vous sûr de vouloir effacer le design sauvegardé et recommencer ?",
+      "designSaved": "Design enregistré avec succès !",
+      "newFloorPrompt": "Entrez le nom du nouvel étage :",
+      "deleteFloorConfirm": "Êtes-vous sûr de vouloir supprimer l'étage \"{floorName}\" ?"
+    }
   }
 }
