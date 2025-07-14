@@ -578,5 +578,54 @@
       "newFloorPrompt": "Enter new floor name:",
       "deleteFloorConfirm": "Are you sure you want to delete floor \"{floorName}\"?"
     }
+  },
+  "userProfile": {
+    "title": "My Profile",
+    "uploadPicture": "Upload Picture",
+    "personalInformation": "Personal Information",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "emailCannotBeChanged": "Email cannot be changed.",
+    "phone": "Phone",
+    "saveChanges": "Save Changes",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "alerts": {
+      "selectFile": "Please select a file.",
+      "pictureUpdated": "Profile picture updated (simulation).",
+      "profileUpdated": "Profile updated successfully (simulation).",
+      "passwordsDoNotMatch": "The new passwords do not match.",
+      "passwordTooShort": "The new password must be at least 6 characters long.",
+      "passwordChanged": "Password changed successfully (simulation)."
+    }
+  },
+  "userSettings": {
+    "title": "User Settings",
+    "preferences": {
+      "title": "Preferences",
+      "language": "Language",
+      "languageDesc": "Choose your preferred language for the application interface.",
+      "theme": "Theme",
+      "themeDesc": "Select a light or dark theme for the application."
+    },
+    "languages": {
+      "en": "English",
+      "fr": "French"
+    },
+    "themes": {
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "notifications": {
+      "title": "Notification Preferences",
+      "desc": "Manage how you receive notifications from the system.",
+      "email": "Email Notifications",
+      "push": "Push Notifications (via browser)"
+    },
+    "saveChanges": "Save Changes",
+    "saving": "Saving..."
   }
 }

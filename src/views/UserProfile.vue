@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-5">
-    <h1 class="mb-4 text-fadaa-blue">Mon Profil</h1>
+    <h1 class="mb-4 text-fadaa-blue">{{ $t('userProfile.title') }}</h1>
 
     <div class="row">
       <!-- Profile Picture Section -->
@@ -12,7 +12,7 @@
             <p class="text-muted">{{ user.role }}</p>
             <input type="file" class="form-control form-control-sm mt-3" @change="onFileChange" accept="image/*">
             <button class="btn btn-sm btn-primary mt-2" @click="uploadProfilePicture" :disabled="!selectedFile">
-              Télécharger Photo
+              {{ $t('userProfile.uploadPicture') }}
             </button>
           </div>
         </div>
@@ -22,37 +22,37 @@
       <div class="col-md-8 mb-4">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
-            <h5 class="mb-0 text-fadaa-blue">Informations Personnelles</h5>
+            <h5 class="mb-0 text-fadaa-blue">{{ $t('userProfile.personalInformation') }}</h5>
           </div>
           <div class="card-body">
             <form @submit.prevent="updateProfile">
               <div class="mb-3 row">
-                <label for="firstName" class="col-sm-3 col-form-label">Prénom</label>
+                <label for="firstName" class="col-sm-3 col-form-label">{{ $t('userProfile.firstName') }}</label>
                 <div class="col-sm-9">
                   <input type="text" class="form-control" id="firstName" v-model="editableUser.firstName">
                 </div>
               </div>
               <div class="mb-3 row">
-                <label for="lastName" class="col-sm-3 col-form-label">Nom</label>
+                <label for="lastName" class="col-sm-3 col-form-label">{{ $t('userProfile.lastName') }}</label>
                 <div class="col-sm-9">
                   <input type="text" class="form-control" id="lastName" v-model="editableUser.lastName">
                 </div>
               </div>
               <div class="mb-3 row">
-                <label for="email" class="col-sm-3 col-form-label">Email</label>
+                <label for="email" class="col-sm-3 col-form-label">{{ $t('userProfile.email') }}</label>
                 <div class="col-sm-9">
                   <input type="email" class="form-control" id="email" v-model="editableUser.email" readonly>
-                   <small class="form-text text-muted">L'email ne peut pas être modifié.</small>
+                   <small class="form-text text-muted">{{ $t('userProfile.emailCannotBeChanged') }}</small>
                 </div>
               </div>
               <div class="mb-3 row">
-                <label for="phone" class="col-sm-3 col-form-label">Téléphone</label>
+                <label for="phone" class="col-sm-3 col-form-label">{{ $t('userProfile.phone') }}</label>
                 <div class="col-sm-9">
                   <input type="tel" class="form-control" id="phone" v-model="editableUser.phone">
                 </div>
               </div>
               <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-primary">Enregistrer les Modifications</button>
+                <button type="submit" class="btn btn-primary">{{ $t('userProfile.saveChanges') }}</button>
               </div>
             </form>
           </div>
@@ -61,24 +61,24 @@
         <!-- Change Password Section -->
         <div class="card shadow-sm mt-4">
           <div class="card-header bg-fadaa-light-blue">
-            <h5 class="mb-0 text-fadaa-blue">Changer le Mot de Passe</h5>
+            <h5 class="mb-0 text-fadaa-blue">{{ $t('userProfile.changePassword') }}</h5>
           </div>
           <div class="card-body">
             <form @submit.prevent="changePassword">
               <div class="mb-3">
-                <label for="currentPassword" class="form-label">Mot de Passe Actuel</label>
+                <label for="currentPassword" class="form-label">{{ $t('userProfile.currentPassword') }}</label>
                 <input type="password" class="form-control" id="currentPassword" v-model="passwordForm.currentPassword" required>
               </div>
               <div class="mb-3">
-                <label for="newPassword" class="form-label">Nouveau Mot de Passe</label>
+                <label for="newPassword" class="form-label">{{ $t('userProfile.newPassword') }}</label>
                 <input type="password" class="form-control" id="newPassword" v-model="passwordForm.newPassword" required>
               </div>
               <div class="mb-3">
-                <label for="confirmPassword" class="form-label">Confirmer le Nouveau Mot de Passe</label>
+                <label for="confirmPassword" class="form-label">{{ $t('userProfile.confirmNewPassword') }}</label>
                 <input type="password" class="form-control" id="confirmPassword" v-model="passwordForm.confirmPassword" required>
               </div>
               <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-primary">Changer le Mot de Passe</button>
+                <button type="submit" class="btn btn-primary">{{ $t('userProfile.changePassword') }}</button>
               </div>
             </form>
           </div>
@@ -91,7 +91,9 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const authStore = useAuthStore();
 
 const user = computed(() => authStore.user || { firstName: '', lastName: '', email: '', phone: '', role: '', profilePictureUrl: '' });
@@ -139,7 +141,7 @@ const onFileChange = (event) => {
 
 const uploadProfilePicture = async () => {
   if (!selectedFile.value) {
-    alert('Veuillez sélectionner un fichier.');
+    alert(t('userProfile.alerts.selectFile'));
     return;
   }
   // Placeholder for actual upload logic
@@ -149,7 +151,7 @@ const uploadProfilePicture = async () => {
   // Assume success and update store/user object if backend updates it
   // For now, we've already updated profileImageUrl for preview
   // authStore.updateUserProfilePicture(newImageUrl); // Example if store handles it
-  alert('Photo de profil mise à jour (simulation).');
+  alert(t('userProfile.alerts.pictureUpdated'));
   selectedFile.value = null; // Reset file input
 };
 
@@ -159,16 +161,16 @@ const updateProfile = async () => {
   // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 1000));
   // authStore.updateUser(editableUser); // Example if store handles it
-  alert('Profil mis à jour avec succès (simulation).');
+  alert(t('userProfile.alerts.profileUpdated'));
 };
 
 const changePassword = async () => {
   if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-    alert('Les nouveaux mots de passe ne correspondent pas.');
+    alert(t('userProfile.alerts.passwordsDoNotMatch'));
     return;
   }
   if (passwordForm.newPassword.length < 6) { // Example validation
-      alert('Le nouveau mot de passe doit comporter au moins 6 caractères.');
+      alert(t('userProfile.alerts.passwordTooShort'));
       return;
   }
   // Placeholder for actual password change logic
@@ -181,7 +183,7 @@ const changePassword = async () => {
   // } else {
   //   alert('Échec du changement de mot de passe. Vérifiez votre mot de passe actuel.');
   // }
-  alert('Mot de passe changé avec succès (simulation).');
+  alert(t('userProfile.alerts.passwordChanged'));
   passwordForm.currentPassword = '';
   passwordForm.newPassword = '';
   passwordForm.confirmPassword = '';

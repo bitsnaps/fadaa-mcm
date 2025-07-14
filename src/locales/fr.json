@@ -577,5 +577,54 @@
       "newFloorPrompt": "Entrez le nom du nouvel étage :",
       "deleteFloorConfirm": "Êtes-vous sûr de vouloir supprimer l'étage \"{floorName}\" ?"
     }
+  },
+  "userProfile": {
+    "title": "Mon Profil",
+    "uploadPicture": "Télécharger Photo",
+    "personalInformation": "Informations Personnelles",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Email",
+    "emailCannotBeChanged": "L'email ne peut pas être modifié.",
+    "phone": "Téléphone",
+    "saveChanges": "Enregistrer les Modifications",
+    "changePassword": "Changer le Mot de Passe",
+    "currentPassword": "Mot de Passe Actuel",
+    "newPassword": "Nouveau Mot de Passe",
+    "confirmNewPassword": "Confirmer le Nouveau Mot de Passe",
+    "alerts": {
+      "selectFile": "Veuillez sélectionner un fichier.",
+      "pictureUpdated": "Photo de profil mise à jour (simulation).",
+      "profileUpdated": "Profil mis à jour avec succès (simulation).",
+      "passwordsDoNotMatch": "Les nouveaux mots de passe ne correspondent pas.",
+      "passwordTooShort": "Le nouveau mot de passe doit comporter au moins 6 caractères.",
+      "passwordChanged": "Mot de passe changé avec succès (simulation)."
+    }
+  },
+  "userSettings": {
+    "title": "Paramètres de l'utilisateur",
+    "preferences": {
+      "title": "Préférences",
+      "language": "Langue",
+      "languageDesc": "Choisissez votre langue préférée pour l'interface de l'application.",
+      "theme": "Thème",
+      "themeDesc": "Sélectionnez un thème clair ou sombre pour l'application."
+    },
+    "languages": {
+      "en": "Anglais",
+      "fr": "Français"
+    },
+    "themes": {
+      "light": "Clair",
+      "dark": "Sombre"
+    },
+    "notifications": {
+      "title": "Préférences de notification",
+      "desc": "Gérez la manière dont vous recevez les notifications du système.",
+      "email": "Notifications par e-mail",
+      "push": "Notifications push (via le navigateur)"
+    },
+    "saveChanges": "Enregistrer les modifications",
+    "saving": "Enregistrement..."
   }
 }
