@@ -21,6 +21,7 @@ import ManageClientServices from './views/ManageClientServices.vue'; // Import M
 import ManageOffices from './views/ManageOffices.vue';
 import InvestmentDetails from './views/InvestmentDetails.vue';
 import DocumentsManagement from './views/DocumentsManagement.vue';
+import OfficeDesigner from './views/OfficeDesigner.vue';
 import Navbar from './components/Navbar.vue';
 
 const routes = [
@@ -156,6 +157,12 @@ const routes = [
     name: 'DocumentsManagement',
     components: { default: DocumentsManagement, header: Navbar },
     meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+  },
+  {
+    path: '/office-designer',
+    name: 'OfficeDesigner',
+    components: { default: OfficeDesigner, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin'] }
   }
 ];
 

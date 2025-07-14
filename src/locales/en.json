@@ -71,7 +71,8 @@
     "complianceManagement": "Compliance Management",
     "reports": "Reports",
     "monthlyReport": "Monthly Report",
-    "annualReport": "Annual Report"
+    "annualReport": "Annual Report",
+    "officeDesigner": "Office Designer"
   },
   "investmentTracking": {
     "title": "Investment Tracking",
