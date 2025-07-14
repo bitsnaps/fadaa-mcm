@@ -29,9 +29,16 @@ module.exports = (sequelize) => {
       defaultValue: true,
     },
     preferences: {
-      type: DataTypes.JSON,
+      type: DataTypes.TEXT,
       allowNull: true,
       note: 'Stores user-specific settings like theme, language, etc.',
+      get() {
+        const value = this.getDataValue('preferences');
+        return value ? JSON.parse(value) : null;
+      },
+      set(value) {
+        this.setDataValue('preferences', value ? JSON.stringify(value) : null);
+      },
     },
   }, {
     tableName: 'users',

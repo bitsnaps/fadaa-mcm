@@ -5,19 +5,37 @@ const { cors } = require('hono/cors');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const models = require('./models');
 
 const app = new Hono();
 
+// Password hashing function
+const hashPassword = (password) => {
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+    return `${salt}:${hash}`;
+};
+
+// Password verification function
+const verifyPassword = (password, storedHash) => {
+    if (!storedHash) {
+        return false;
+    }
+    const [salt, hash] = storedHash.split(':');
+    const hashToVerify = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+    return hash === hashToVerify;
+};
+
 app.get('/api', async (c) => {
-    return c.json({message: 'ok'});
-})
+    return c.json({message: 'ready'});
+});
 
-app.post('/api/signup', async (c) => {
+app.post('/api/users', async (c) => {
     try {
-        const { email, password, first_name, last_name } = await c.req.json();
+        const { first_name, last_name, email, password, role_id, branch_id, is_active, preferences } = await c.req.json();
 
-        if (!email || !password) {
-            return c.json({ success: false, message: 'Email and password are required' }, 400);
+        if (!email || !password || !first_name || !last_name || !role_id) {
+            return c.json({ success: false, message: 'Missing required fields' }, 400);
         }
 
         const existingUser = await models.User.findOne({ where: { email } });
@@ -26,19 +44,21 @@ app.post('/api/signup', async (c) => {
         }
 
         const newUser = await models.User.create({
+            first_name,
+            last_name,
             email,
-            passwordHash: hashPassword(password),
-            first_name: first_name,
-            last_name: last_name,
-            isAdmin: false,
-            isVerified: false
+            password_hash: hashPassword(password),
+            role_id,
+            branch_id,
+            is_active,
+            preferences
         });
-        console.log('User signed up:', email);
-        return c.json({ success: true, message: 'Signup successful', userId: newUser.id });
+
+        console.log('User created:', email);
+        return c.json({ success: true, message: 'User created successfully', userId: newUser.id });
     } catch (error) {
-        console.error('Signup error:', error);
-        return c.json({ success: false, message: 'An error occurred during signup' }, 500);
-        // return c.json({ success: false, message: error.message }, 500);
+        console.error('User creation error:', error);
+        return c.json({ success: false, message: 'An error occurred during user creation' }, 500);
     }
 });
 
@@ -60,15 +80,8 @@ app.post('/api/login', async (c) => {
           return c.json({ success: false, message: 'Invalid username or password' }, 401);
       }
 
-      if (!user.isAdmin){
-        // Check if the user's email is verified
-        if (!user.isVerified) {
-          return c.json({ success: false, message: 'Please verify your email before logging in.', errorCode: 'EMAIL_NOT_VERIFIED' }, 403);
-        }
-      }
-
       // Generate JWT
-      const token = jwt.sign({ id: user.id, email: user.email, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ id: user.id, email: user.email, role_id: user.role_id, branch_id: user.branch_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
       
       console.log('User logged in:', email);
       return c.json({
@@ -80,9 +93,10 @@ app.post('/api/login', async (c) => {
             first_name: user.first_name,
             last_name: user.last_name,
             email: user.email,
-            isVerified: user.isVerified,
-            isAdmin: user.isAdmin,
-            isActive: user.isActive
+            is_active: user.is_active,
+            role_id: user.role_id,
+            branch_id: user.branch_id,
+            preferences: user.preferences
         }
     });
   } catch (error) {

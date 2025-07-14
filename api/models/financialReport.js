@@ -24,8 +24,15 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
     content: {
-      type: DataTypes.JSON,
+      type: DataTypes.TEXT,
       note: 'Can store structured data of the report',
+      get() {
+        const value = this.getDataValue('content');
+        return value ? JSON.parse(value) : null;
+      },
+      set(value) {
+        this.setDataValue('content', value ? JSON.stringify(value) : null);
+      },
     },
     file_path: {
       type: DataTypes.STRING(255),

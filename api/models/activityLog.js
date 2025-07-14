@@ -18,7 +18,14 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
     },
     details: {
-      type: DataTypes.JSON,
+      type: DataTypes.TEXT,
+      get() {
+        const value = this.getDataValue('details');
+        return value ? JSON.parse(value) : null;
+      },
+      set(value) {
+        this.setDataValue('details', value ? JSON.stringify(value) : null);
+      },
     },
   }, {
     tableName: 'activity_logs',
