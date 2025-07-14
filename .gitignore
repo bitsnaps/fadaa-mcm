@@ -27,6 +27,8 @@ dist-ssr
 
 # var env
 .env
+api/.env
+api/.env.*
 
 # docs
 docs/
