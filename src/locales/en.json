@@ -72,7 +72,8 @@
     "reports": "Reports",
     "monthlyReport": "Monthly Report",
     "annualReport": "Annual Report",
-    "officeDesigner": "Office Designer"
+    "officeDesigner": "Office Designer",
+    "activityLog": "Activity Log"
   },
   "investmentTracking": {
     "title": "Investment Tracking",
@@ -416,6 +417,15 @@
       "openAI": "OpenAI API Key",
       "saveButton": "Save",
       "alert": "API keys saved! (Simulation)"
+    },
+    "activityLog": {
+      "title": "Activity Log",
+      "description": "Browse and filter system-wide user activities.",
+      "noActivities": "No activities found.",
+      "action": "Action",
+      "user": "User",
+      "target": "Target",
+      "date": "Date"
     }
   },
   "clientServices": {

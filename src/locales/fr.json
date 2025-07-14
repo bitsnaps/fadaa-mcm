@@ -72,7 +72,8 @@
     "reports": "Rapports",
     "monthlyReport": "Rapport Mensuel",
     "annualReport": "Rapport Annuel",
-    "officeDesigner": "Concepteur d'Office"
+    "officeDesigner": "Concepteur d'Office",
+    "activityLog": "Journal d'Activité"
   },
   "investmentTracking": {
     "title": "Suivi des Investissements",
@@ -419,6 +420,15 @@
       "openAI": "Clé API OpenAI",
       "saveButton": "Enregistrer",
       "alert": "Clés API enregistrées ! (Simulation)"
+    },
+    "activityLog": {
+      "title": "Journal d'Activité",
+      "description": "Parcourez et filtrez les activités des utilisateurs à l'échelle du système.",
+      "noActivities": "Aucune activité trouvée.",
+      "action": "Action",
+      "user": "Utilisateur",
+      "target": "Cible",
+      "date": "Date"
     }
   },
   "clientServices": {
