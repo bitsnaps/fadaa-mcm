@@ -46,7 +46,7 @@ const {
 } = db;
 
 // User associations
-User.belongsTo(Role, { foreignKey: 'role_id' });
+User.belongsTo(Role, { as: 'role', foreignKey: 'role_id' });
 Role.hasMany(User, { foreignKey: 'role_id' });
 
 User.belongsTo(Branch, { foreignKey: 'branch_id' });

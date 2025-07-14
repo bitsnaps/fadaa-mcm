@@ -9,6 +9,15 @@ const models = require('./models');
 
 const app = new Hono();
 
+// Add CORS middleware (for Dev)
+app.use('/*', cors({
+    origin: ['https://www.fadaa.dz','http://localhost:5173', 'http://127.0.0.1:5173'],
+    allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization', 'x-csrf-token'],
+    // This means the browser will expose these headers when it makes requests to your API
+    credentials: true
+  }));
+
 // Password hashing function
 const hashPassword = (password) => {
     const salt = crypto.randomBytes(16).toString('hex');
@@ -30,6 +39,9 @@ app.get('/api', async (c) => {
     return c.json({message: 'ready'});
 });
 
+//curl -X POST http://localhost:3000/api/users \
+// -H "Content-Type: application/json" \
+// -d '{ "first_name": "Admin", "last_name": "User", "email": "admin@fadaa.dz", "password": "...", "role_id": 1, "branch_id": 1, "is_active": true }'
 app.post('/api/users', async (c) => {
     try {
         const { first_name, last_name, email, password, role_id, branch_id, is_active, preferences } = await c.req.json();
@@ -70,13 +82,16 @@ app.post('/api/login', async (c) => {
           return c.json({ success: false, message: 'Email and password are required' }, 400);
       }
 
-      const user = await models.User.findOne({ where: { email } });
+      const user = await models.User.findOne({
+          where: { email },
+          include: [{ model: models.Role, as: 'role' }]
+      });
 
       if (!user) {
           return c.json({ success: false, message: 'Invalid username or password' }, 401);
       }
 
-      if (!verifyPassword(password, user.passwordHash)) {
+      if (!verifyPassword(password, user.password_hash)) {
           return c.json({ success: false, message: 'Invalid username or password' }, 401);
       }
 
@@ -88,22 +103,15 @@ app.post('/api/login', async (c) => {
         success: true,
         message: 'Login successful',
         token: token,
-        user: {
-            id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
-            is_active: user.is_active,
-            role_id: user.role_id,
-            branch_id: user.branch_id,
-            preferences: user.preferences
-        }
+        user: user
     });
   } catch (error) {
       console.error('Login error:', error);
       return c.json({ success: false, message: 'An error occurred during login' }, 500);
   }
 });
+
+
 
 
 serve(app, (info) => {

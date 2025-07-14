@@ -24,6 +24,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import apiClient from '@/services/ApiClient';
 
 const email = ref('');
 const password = ref('');
@@ -32,55 +33,40 @@ const router = useRouter();
 const authStore = useAuthStore();
 
 const handleLogin = async () => {
-  if (!email.value || !password.value) {
-    error.value = 'Please enter both email and password.';
-    return;
-  }
-
-  try {
-    // Mock API call - replace with actual API call
-    // const response = await apiClient.post('/login', { email: email.value, password: password.value });
-    // const { role, token } = response.data;
-
-    // Mock response for demonstration
-    let role, token;
-    if (email.value === 'admin@fadaa.dz' && password.value === 'admin') {
-      role = 'admin';
-      token = 'fake-admin-token';
-    } else if (email.value === 'investor@fadaa.dz' && password.value === 'investor') {
-      role = 'investor';
-      token = 'fake-investor-token';
-    } else if (email.value === 'assistant@fadaa.dz' && password.value === 'assistant') {
-      role = 'assistant';
-      token = 'fake-assistant-token';
-    } else if (email.value === 'client@fadaa.dz' && password.value === 'client') {
-      role = 'client';
-      token = 'fake-client-token';
-    } else {
-      throw new Error('Invalid credentials');
+    if (!email.value || !password.value) {
+        error.value = 'Please enter both email and password.';
+        return;
     }
 
-    authStore.login(role, token);
+    try {
+        const response = await apiClient.post('/login', {
+            email: email.value,
+            password: password.value,
+        });
 
-    switch (role) {
-      case 'admin':
-        router.push('/admin-dashboard');
-        break;
-      case 'assistant':
-        router.push('/assistant-dashboard');
-        break;
-      case 'investor':
-        router.push('/investor-dashboard');
-        break;
-      case 'client':
-        router.push('/client-portal');
-        break;
-      default:
-        router.push('/login');
+        const { user, token } = response.data;
+        authStore.login(user, token);
+
+        switch (authStore.userRole) {
+            case 'admin':
+                router.push('/admin-dashboard');
+                break;
+            case 'assistant':
+                router.push('/assistant-dashboard');
+                break;
+            case 'investor':
+                router.push('/investor-dashboard');
+                break;
+            case 'client':
+                router.push('/client-portal');
+                break;
+            default:
+                router.push('/login');
+        }
+    } catch (err) {
+        console.error(err);
+        error.value = err.response?.data?.message || 'Invalid credentials. Please try again.';
     }
-  } catch (err) {
-    error.value = 'Invalid credentials. Please try again.';
-  }
 };
 </script>
 
