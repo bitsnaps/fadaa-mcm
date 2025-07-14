@@ -110,7 +110,12 @@
         <div v-else class="text-muted text-center mt-5">Select an office to see its properties.</div>
         
         <div class="mt-auto pt-3 border-top">
-            <button class="btn btn-success w-100" @click="saveToJson"><i class="bi bi-download me-2"></i>Save Design as JSON</button>
+            <button class="btn btn-success w-100 mb-2" @click="saveDesign" :disabled="isSaving">
+                <span v-if="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <i v-else class="bi bi-cloud-arrow-up-fill me-2"></i>
+                {{ isSaving ? 'Saving...' : 'Save Design' }}
+            </button>
+            <button class="btn btn-outline-danger w-100" @click="clearDesign"><i class="bi bi-arrow-counterclockwise me-2"></i>Reset & Start New</button>
         </div>
     </div>
   </div>
@@ -129,6 +134,7 @@ const currentFloorIndex = ref(0);
 const selectedOfficeIds = ref([]);
 const isShiftPressed = ref(false);
 const editingName = ref('');
+const isSaving = ref(false);
 
 let setupModal, editNameModal;
 const setup = reactive({ branchName: 'My Coworking Space', numFloors: 1, floorNames: ['Ground Floor'] });
@@ -250,16 +256,46 @@ const deleteSelected = () => {
     selectedOfficeIds.value = [];
 };
 
-const saveToJson = () => {
-    const dataStr = JSON.stringify({
+const saveDesign = async () => {
+    isSaving.value = true;
+    const designData = {
         branchName: branchName.value,
         floors: floors.value
-    }, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', `${branchName.value.replace(/\s+/g, '_')}_layout.json`);
-    linkElement.click();
+    };
+    localStorage.setItem('officeDesign', JSON.stringify(designData));
+
+    // Mock API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    isSaving.value = false;
+    alert('Design saved successfully!');
+};
+
+const loadDesign = () => {
+    const savedDesign = localStorage.getItem('officeDesign');
+    if (savedDesign) {
+        try {
+            const designData = JSON.parse(savedDesign);
+            if (designData && designData.branchName && designData.floors) {
+                branchName.value = designData.branchName;
+                floors.value = designData.floors;
+                projectInitialized.value = true;
+                nextTick(initInteract);
+                return true;
+            }
+        } catch (e) {
+            console.error("Failed to parse saved design:", e);
+            localStorage.removeItem('officeDesign'); // Clear corrupted data
+        }
+    }
+    return false;
+};
+
+const clearDesign = () => {
+    if (confirm('Are you sure you want to clear the saved design and start over?')) {
+        localStorage.removeItem('officeDesign');
+        window.location.reload();
+    }
 };
 
 const initInteract = () => {
@@ -332,17 +368,23 @@ const initInteract = () => {
 
 // Lifecycle and Event Listeners
 onMounted(() => {
-    setupModal = new Modal(document.getElementById('setupModal'));
     editNameModal = new Modal(document.getElementById('editNameModal'));
-    setupModal.show();
+
+    if (!loadDesign()) {
+        setupModal = new Modal(document.getElementById('setupModal'));
+        setupModal.show();
+    }
     
     const handleKeyDown = (e) => { if (e.key === 'Shift') isShiftPressed.value = true; };
     const handleKeyUp = (e) => { if (e.key === 'Shift') isShiftPressed.value = false; };
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    
     onUnmounted(() => {
         window.removeEventListener('keydown', handleKeyDown);
         window.removeEventListener('keyup', handleKeyUp);
+        if (setupModal) setupModal.dispose();
+        if (editNameModal) editNameModal.dispose();
     });
 });
 
