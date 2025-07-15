@@ -732,7 +732,9 @@
     "loginButton": "Login",
     "error": {
       "missingCredentials": "Please enter both email and password.",
-      "invalidCredentials": "Invalid credentials. Please try again."
+      "invalidCredentials": "Invalid credentials. Please try again.",
+      "backendError": "An error occurred: {message}",
+      "unknown": "An unknown error occurred. Please try again later."
     }
   },
   "investorDashboard": {

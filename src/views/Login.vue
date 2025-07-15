@@ -66,8 +66,14 @@ const handleLogin = async () => {
                 router.push('/login');
         }
     } catch (err) {
-        console.error(err);
-        error.value = err.response?.data?.message || t('login.error.invalidCredentials');
+        console.error(err.message);
+        if (err.response?.status === 401) {
+        error.value = t('login.error.invalidCredentials');
+        } else if (err.response?.data?.message) {
+            error.value = t('login.error.backendError', { message: err.response.data.message });
+        } else {
+            error.value = t('login.error.unknown');
+        }
     }
 };
 </script>
