@@ -1,26 +1,31 @@
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useSidebarStore } from '@/stores/sidebar';
 import { useI18n } from 'vue-i18n';
-import { 
-  BNavbar, 
-  BNavbarBrand, 
-  BNavbarToggle, 
-  BCollapse, 
-  BNavbarNav, 
-  BNavItem, 
-  BNavItemDropdown, 
-  BDropdownItem, 
-  BImg 
+import { getNotifications, markNotificationsAsRead } from '@/services/notificationService';
+import {
+  BNavbar,
+  BNavbarBrand,
+  BNavbarToggle,
+  BCollapse,
+  BNavbarNav,
+  BNavItem,
+  BNavItemDropdown,
+  BDropdownItem,
+  BImg
 } from 'bootstrap-vue-next';
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 const sidebarStore = useSidebarStore();
+
+const notifications = ref([]);
+const unreadCount = computed(() => notifications.value.filter(n => !n.is_read).length);
+
 
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const userRole = computed(() => authStore.userRole);
@@ -46,6 +51,36 @@ const handleLogout = () => {
   authStore.logout();
   router.push('/login');
 };
+const fetchNotifications = async () => {
+  try {
+    const response = await getNotifications();
+    if (response.data.success) {
+      notifications.value = response.data.notifications;
+    }
+  } catch (error) {
+    console.error('Failed to fetch notifications:', error);
+  }
+};
+
+const handleNotificationDropdownClick = async () => {
+  const unreadIds = notifications.value.filter(n => !n.is_read).map(n => n.id);
+  if (unreadIds.length > 0) {
+    try {
+      await markNotificationsAsRead(unreadIds);
+      // Refresh notifications to update read status
+      fetchNotifications();
+    } catch (error) {
+      console.error('Failed to mark notifications as read:', error);
+    }
+  }
+};
+
+
+onMounted(() => {
+  if (isAuthenticated.value) {
+    fetchNotifications();
+  }
+});
 </script>
 
 <template>
@@ -76,13 +111,15 @@ const handleLogout = () => {
           {{ t('navbar.login') }}
         </BNavItem>
         <template v-else>
-          <BNavItemDropdown id="notificationDropdown" right menu-class="dropdown-menu-end">
+          <BNavItemDropdown id="notificationDropdown" right menu-class="dropdown-menu-end" @show="handleNotificationDropdownClick">
             <template #button-content>
               <i class="bi bi-bell-fill"></i>
-              <span class="badge rounded-pill bg-danger">3</span> <!-- Mock notification count -->
+              <span v-if="unreadCount > 0" class="badge rounded-pill bg-danger">{{ unreadCount }}</span>
             </template>
-            <BDropdownItem href="#">{{ t('navbar.notifications.mock1') }}</BDropdownItem>
-            <BDropdownItem href="#">{{ t('navbar.notifications.mock2') }}</BDropdownItem>
+            <BDropdownItem v-for="notification in notifications" :key="notification.id" href="#">
+              {{ notification.message }}
+            </BDropdownItem>
+            <BDropdownItem v-if="notifications.length === 0" disabled>{{ t('navbar.notifications.noNewNotifications') }}</BDropdownItem>
             <BDropdownItem divider />
             <BDropdownItem href="/manage-notifications">{{ t('navbar.notifications.viewAll') }}</BDropdownItem>
           </BNavItemDropdown>

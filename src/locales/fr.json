@@ -693,6 +693,7 @@
       "title": "Notifications",
       "mock1": "Notification 1",
       "mock2": "Notification 2",
+      "noNewNotifications": "Aucune nouvelle notification",
       "viewAll": "Voir toutes les notifications"
     },
     "user": {
