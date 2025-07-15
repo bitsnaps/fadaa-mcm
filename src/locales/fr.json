@@ -75,6 +75,63 @@
     "officeDesigner": "Concepteur d'Office",
     "activityLog": "Journal d'Activité"
   },
+  "monthlyReport": {
+    "title": "Rapport Mensuel",
+    "filters": {
+      "title": "Filtres",
+      "month": "Mois",
+      "year": "Année",
+      "client": "Client",
+      "branch": "Agence",
+      "allClients": "Tous les clients",
+      "allBranches": "Toutes les agences",
+      "generate": "Générer le rapport"
+    },
+    "report": {
+      "title": "Résumé mensuel",
+      "downloadCsv": "Télécharger CSV",
+      "downloadXlsx": "Télécharger XLSX"
+    },
+    "table": {
+      "metric": "Métrique",
+      "value": "Valeur",
+      "change": "Changement par rapport au mois dernier",
+      "revenue": "Revenu total",
+      "newClients": "Nouveaux clients",
+      "contractsSigned": "Contrats signés",
+      "occupancyRate": "Taux d'occupation"
+    }
+  },
+  "annualReport": {
+    "title": "Rapport Annuel",
+    "filters": {
+      "title": "Filtres",
+      "year": "Année",
+      "branch": "Agence",
+      "allBranches": "Toutes les agences",
+      "generate": "Générer le rapport"
+    },
+    "report": {
+      "title": "Résumé financier annuel",
+      "downloadCsv": "Télécharger CSV",
+      "downloadXlsx": "Télécharger XLSX"
+    },
+    "chart": {
+      "financialSummary": "Résumé financier",
+      "revenue": "Revenus",
+      "expenses": "Dépenses",
+      "profit": "Bénéfice"
+    },
+    "summary": {
+      "title": "Indicateurs clés",
+      "totalRevenue": "Revenu total",
+      "totalExpenses": "Dépenses totales",
+      "netProfit": "Bénéfice net",
+      "newClients": "Nouveaux clients",
+      "contractsSigned": "Contrats signés",
+      "avgOccupancy": "Occupation moyenne"
+    }
+  },
   "investmentTracking": {
     "title": "Suivi des Investissements",
     "summary": {

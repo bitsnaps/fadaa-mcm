@@ -75,6 +75,63 @@
     "officeDesigner": "Office Designer",
     "activityLog": "Activity Log"
   },
+  "monthlyReport": {
+    "title": "Monthly Report",
+    "filters": {
+      "title": "Filters",
+      "month": "Month",
+      "year": "Year",
+      "client": "Client",
+      "branch": "Branch",
+      "allClients": "All Clients",
+      "allBranches": "All Branches",
+      "generate": "Generate Report"
+    },
+    "report": {
+      "title": "Monthly Summary",
+      "downloadCsv": "Download CSV",
+      "downloadXlsx": "Download XLSX"
+    },
+    "table": {
+      "metric": "Metric",
+      "value": "Value",
+      "change": "Change vs. Last Month",
+      "revenue": "Total Revenue",
+      "newClients": "New Clients",
+      "contractsSigned": "Contracts Signed",
+      "occupancyRate": "Occupancy Rate"
+    }
+  },
+  "annualReport": {
+    "title": "Annual Report",
+    "filters": {
+      "title": "Filters",
+      "year": "Year",
+      "branch": "Branch",
+      "allBranches": "All Branches",
+      "generate": "Generate Report"
+    },
+    "report": {
+      "title": "Annual Financial Summary",
+      "downloadCsv": "Download CSV",
+      "downloadXlsx": "Download XLSX"
+    },
+    "chart": {
+      "financialSummary": "Financial Summary",
+      "revenue": "Revenue",
+      "expenses": "Expenses",
+      "profit": "Profit"
+    },
+    "summary": {
+      "title": "Key Metrics",
+      "totalRevenue": "Total Revenue",
+      "totalExpenses": "Total Expenses",
+      "netProfit": "Net Profit",
+      "newClients": "New Clients",
+      "contractsSigned": "Contracts Signed",
+      "avgOccupancy": "Average Occupancy"
+    }
+  },
   "investmentTracking": {
     "title": "Investment Tracking",
     "summary": {
