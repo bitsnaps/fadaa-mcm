@@ -425,6 +425,33 @@
     "download": "Télécharger",
     "archive": "Archiver",
     "notApplicable": "N/A"
+,
+  "contracts": {
+    "title": "Gestion des Contrats",
+    "addNewContract": "Ajouter un Nouveau Contrat",
+    "searchPlaceholder": "Rechercher par client, bureau, ou statut...",
+    "tableHeaders": {
+      "client": "Client",
+      "office": "Bureau",
+      "status": "Statut",
+      "startDate": "Date de Début",
+      "endDate": "Date de Fin",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Actif",
+      "pending": "En attente",
+      "expired": "Expiré",
+      "terminated": "Résilié"
+    },
+    "viewContract": "Voir le Contrat",
+    "downloadContract": "Télécharger le Contrat",
+    "archiveContract": "Archiver le Contrat",
+    "noContractsFound": "Aucun contrat trouvé."
+  },
+  "addContract": {
+    "submitButtonAdd": "Ajouter le Contrat"
+  }
   },
   "offices": {
     "manageOffices": "Gérer les Bureaux de Coworking",

@@ -33,3 +33,23 @@ apiClient.interceptors.request.use(
 );
 
 export default apiClient;
+
+export function getContracts() {
+    return apiClient.get('/contracts');
+}
+
+export function getClientsList() {
+    return apiClient.get('/clients-list');
+}
+
+export function getAvailableOffices() {
+    return apiClient.get('/offices-available');
+}
+
+export function addContract(formData) {
+    return apiClient.post('/contracts', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+}

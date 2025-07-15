@@ -15,6 +15,7 @@
     "bootstrap-vue-next": "^0.30.0",
     "bootswatch": "^5.3.6",
     "chart.js": "^4.4.9",
+    "date-fns": "^4.1.0",
     "interactjs": "^1.10.27",
     "pinia": "^3.0.2",
     "vue": "^3.5.13",

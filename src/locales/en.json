@@ -422,6 +422,30 @@
     "download": "Download",
     "archive": "Archive",
     "notApplicable": "N/A"
+,
+  "contracts": {
+    "title": "Contract Management",
+    "addNewContract": "Add New Contract",
+    "searchPlaceholder": "Search by client, office, or status...",
+    "tableHeaders": {
+      "client": "Client",
+      "office": "Office",
+      "status": "Status",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "pending": "Pending",
+      "expired": "Expired",
+      "terminated": "Terminated"
+    },
+    "viewContract": "View Contract",
+    "downloadContract": "Download Contract",
+    "archiveContract": "Archive Contract",
+    "noContractsFound": "No contracts found."
+  }
   },
   "offices": {
     "manageOffices": "Manage Coworking Offices",
@@ -815,6 +839,10 @@
         "biYearlyLabel": "Bi-Yearly Revenue",
         "yearlyLabel": "Annual Revenue",
         "revenue": "Revenue (in k)"
+,
+    "addContract": {
+        "submitButtonAdd": "Add Contract"
+    }
     },
     "statuses":{
       "active": "Active",

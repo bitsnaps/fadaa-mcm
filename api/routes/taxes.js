@@ -1,0 +1,89 @@
+const { Hono } = require('hono');
+const models = require('../models');
+const { authMiddleware, adminMiddleware } = require('../middleware/auth');
+
+const taxApp = new Hono();
+taxApp.use('*', authMiddleware, adminMiddleware); // Protect all tax routes
+
+// GET /api/taxes - Get all taxes
+taxApp.get('/', async (c) => {
+    try {
+        const taxes = await models.Tax.findAll();
+        return c.json({ success: true, taxes });
+    } catch (error) {
+        console.error('Error fetching taxes:', error);
+        return c.json({ success: false, message: 'Failed to fetch taxes' }, 500);
+    }
+});
+
+// POST /api/taxes - Create a new tax
+taxApp.post('/', async (c) => {
+    try {
+        const { name, rate, description } = await c.req.json();
+        if (!name || !rate) {
+            return c.json({ success: false, message: 'Name and rate are required' }, 400);
+        }
+        const newTax = await models.Tax.create({ name, rate, description });
+        return c.json({ success: true, message: 'Tax created successfully', tax: newTax }, 201);
+    } catch (error) {
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            return c.json({ success: false, message: 'A tax with this name already exists' }, 409);
+        }
+        console.error('Error creating tax:', error);
+        return c.json({ success: false, message: 'Failed to create tax' }, 500);
+    }
+});
+
+// GET /api/taxes/:id - Get a single tax
+taxApp.get('/:id', async (c) => {
+    try {
+        const { id } = c.req.param();
+        const tax = await models.Tax.findByPk(id);
+        if (tax) {
+            return c.json({ success: true, tax });
+        }
+        return c.json({ success: false, message: 'Tax not found' }, 404);
+    } catch (error) {
+        console.error('Error fetching tax:', error);
+        return c.json({ success: false, message: 'Failed to fetch tax' }, 500);
+    }
+});
+
+// PUT /api/taxes/:id - Update a tax
+taxApp.put('/:id', async (c) => {
+    try {
+        const { id } = c.req.param();
+        const { name, rate, description } = await c.req.json();
+        const tax = await models.Tax.findByPk(id);
+        if (!tax) {
+            return c.json({ success: false, message: 'Tax not found' }, 404);
+        }
+        await tax.update({ name, rate, description });
+        return c.json({ success: true, message: 'Tax updated successfully', tax });
+    } catch (error) {
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            return c.json({ success: false, message: 'A tax with this name already exists' }, 409);
+        }
+        console.error('Error updating tax:', error);
+        return c.json({ success: false, message: 'Failed to update tax' }, 500);
+    }
+});
+
+// DELETE /api/taxes/:id - Delete a tax
+taxApp.delete('/:id', async (c) => {
+    try {
+        const { id } = c.req.param();
+        const tax = await models.Tax.findByPk(id);
+        if (!tax) {
+            return c.json({ success: false, message: 'Tax not found' }, 404);
+        }
+        
+        await tax.destroy(); // This will soft-delete
+        return c.json({ success: true, message: 'Tax deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting tax:', error);
+        return c.json({ success: false, message: 'Failed to delete tax' }, 500);
+    }
+});
+
+module.exports = taxApp;
