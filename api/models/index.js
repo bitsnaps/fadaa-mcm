@@ -42,7 +42,7 @@ const {
   User, Role, Branch, Client, Office, Contract, ServiceCategory,
   ClientService, Document, Task, Notification, FinancialReport,
   ComplianceReport, Investment, ClientInvestment, OfficeDesign,
-  SystemSetting, ActivityLog
+  SystemSetting, ActivityLog, Tax
 } = db;
 
 // User associations

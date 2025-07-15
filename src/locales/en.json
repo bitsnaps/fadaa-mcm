@@ -73,7 +73,23 @@
     "monthlyReport": "Monthly Report",
     "annualReport": "Annual Report",
     "officeDesigner": "Office Designer",
-    "activityLog": "Activity Log"
+    "activityLog": "Activity Log",
+    "manageTaxes": "Tax Management"
+  },
+  "manageTaxes": {
+    "title": "Tax Management",
+    "addTax": "Add Tax",
+    "editTax": "Edit Tax",
+    "createTax": "Create Tax",
+    "name": "Name",
+    "rate": "Rate",
+    "description": "Description",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "confirmDeleteTax": "Are you sure you want to delete this tax?"
   },
   "monthlyReport": {
     "title": "Monthly Report",

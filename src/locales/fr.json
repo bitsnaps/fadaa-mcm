@@ -73,7 +73,23 @@
     "monthlyReport": "Rapport Mensuel",
     "annualReport": "Rapport Annuel",
     "officeDesigner": "Concepteur d'Office",
-    "activityLog": "Journal d'Activité"
+    "activityLog": "Journal d'Activité",
+    "manageTaxes": "Gestion des Taxes"
+  },
+  "manageTaxes": {
+    "title": "Gestion des Taxes",
+    "addTax": "Ajouter une Taxe",
+    "editTax": "Modifier la Taxe",
+    "createTax": "Créer une Taxe",
+    "name": "Nom",
+    "rate": "Taux",
+    "description": "Description",
+    "actions": "Actions",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "confirmDeleteTax": "Êtes-vous sûr de vouloir supprimer cette taxe ?"
   },
   "monthlyReport": {
     "title": "Rapport Mensuel",
