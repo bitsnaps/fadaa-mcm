@@ -733,5 +733,73 @@
       "missingCredentials": "Veuillez saisir l'e-mail et le mot de passe.",
       "invalidCredentials": "Identifiants invalides. Veuillez réessayer."
     }
+  },
+    "investorDashboard": {
+    "title": "Tableau de Bord Investisseur",
+    "kpis": {
+      "roi": "Retour sur Investissement",
+      "totalRevenue": "Revenu Total (Annuel)",
+      "activeClients": "Nombre de Clients Actifs"
+    },
+    "investmentDetails": {
+      "title": "Détails des Investissements",
+      "monthly": "Mensuel",
+      "bi-yearly": "Semestriel",
+      "yearly": "Annuel",
+      "table": {
+        "branch": "Agence",
+        "revenue": "Revenu",
+        "share": "Taux",
+        "clients": "Clients",
+        "status": "Statut"
+      },
+      "noData": "Aucune donnée disponible pour cette période."
+    },
+    "revenueEvolution": {
+      "title": "Évolution des Revenus",
+      "monthly": "Mensuel",
+      "bi-yearly": "Semestriel",
+      "yearly": "Annuel"
+    },
+    "recentActivities": {
+      "title": "Activités Récentes des Agences",
+      "activity1": "Nouvelle agence \"Staoueli\" ouverte avec succès. ROI initial: 12%.",
+      "activity2": "Investissement supplémentaire de 50k dans l'agence \"Cheraga\".",
+      "activity3": "Performance de l'agence \"Birkhadem\" en hausse de 5% ce trimestre.",
+      "activity4": "Recrutement de 3 nouveaux gestionnaires pour l'expansion régionale."
+    },
+    "profitShareHistory": {
+      "title": "Historique des parts de bénéfices",
+      "table": {
+        "date": "Date",
+        "branch": "Agence",
+        "amountReceived": "Montant Reçu",
+        "period": "Période Concernée"
+      }
+    },
+    "documents": {
+      "title": "Documents",
+      "download": "Télécharger"
+    },
+    "cta": {
+      "title": "Prêt à Étendre Votre Impact ?",
+      "description": "Explorez de nouvelles opportunités d'investissement ou demandez l'ouverture d'une nouvelle agence.",
+      "requestBranch": "Demander une Nouvelle Agence",
+      "investMore": "Investir Davantage"
+    },
+     "chart": {
+        "title": "Évolution des Revenus",
+        "monthlyTitle": "Évolution des Revenus Mensuels",
+        "biYearlyTitle": "Évolution des Revenus Semestriels",
+        "yearlyTitle": "Évolution des Revenus Annuels",
+        "monthlyLabel": "Revenus Mensuels",
+        "biYearlyLabel": "Revenus Semestriels",
+        "yearlyLabel": "Revenus Annuels",
+        "revenue": "Revenus (en k)"
+    },
+    "statuses":{
+      "active": "Actif",
+      "pending": "En attente"
+    }
   }
 }

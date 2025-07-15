@@ -1,10 +1,13 @@
-
 <script setup>
 import { ref, computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { Line } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler } from 'chart.js';
 import { formatCurrency } from '@/helpers/utils.js';
+
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler);
+
+const { t, locale } = useI18n();
 
 const chartFilter = ref('monthly'); // monthly, bi-yearly, yearly
 const tableFilter = ref('monthly'); // Default to yearly to show all initially
@@ -19,7 +22,7 @@ const yearlyInvestments = ref([
     NbrOfClients: 200,
     contractStartDate: '01/01/2023',
     contractEndDate: '31/12/2025',
-    status: 'Actif',
+    status: 'active',
   },
   {
     id: 2,
@@ -29,7 +32,7 @@ const yearlyInvestments = ref([
     NbrOfClients: 200,
     contractStartDate: '01/06/2022',
     contractEndDate: '31/05/2025',
-    status: 'Actif',
+    status: 'active',
   },
   {
     id: 3,
@@ -39,7 +42,7 @@ const yearlyInvestments = ref([
     NbrOfClients: 450,
     contractStartDate: '01/03/2024',
     contractEndDate: '28/02/2027',
-    status: 'En attente',
+    status: 'pending',
   },
 ]);
 
@@ -51,7 +54,7 @@ const monthlyInvestments = ref([
     amount: 12500, // Monthly revenue portion
     sharePercentage: 10,
     NbrOfClients: 195, // Client count might fluctuate slightly
-    status: 'Actif',
+    status: 'active',
   },
   {
     id: 2,
@@ -59,9 +62,9 @@ const monthlyInvestments = ref([
     amount: 8300,
     sharePercentage: 8,
     NbrOfClients: 198,
-    status: 'Actif',
+    status: 'active',
   },
-  // Birkhadem might not have monthly data if 'En attente'
+  // Birkhadem might not have monthly data if 'pending'
 ]);
 
 // Sample Bi-Yearly Data (e.g., for the current or a specific semester)
@@ -72,7 +75,7 @@ const biYearlyInvestments = ref([
     amount: 75000, // Bi-yearly revenue portion
     sharePercentage: 10,
     NbrOfClients: 200,
-    status: 'Actif',
+    status: 'active',
   },
   {
     id: 2,
@@ -80,7 +83,7 @@ const biYearlyInvestments = ref([
     amount: 50000,
     sharePercentage: 8,
     NbrOfClients: 200,
-    status: 'Actif',
+    status: 'active',
   },
   {
     id: 3,
@@ -88,26 +91,9 @@ const biYearlyInvestments = ref([
     amount: 37500, // Assuming it becomes active or has projected data for semester
     sharePercentage: 12,
     NbrOfClients: 450,
-    status: 'En attente',
+    status: 'pending',
   },
 ]);
-
-// The 'investments' ref is no longer directly used by the table, 
-// but can be kept if it serves other purposes or as a reference to the full yearly data.
-// For clarity, we can consider it equivalent to yearlyInvestments for now.
-const investments = ref(yearlyInvestments.value);
-
-const filteredInvestmentDetails = computed(() => {
-  switch (tableFilter.value) {
-    case 'monthly':
-      return monthlyInvestments.value;
-    case 'bi-yearly':
-      return biYearlyInvestments.value;
-    case 'yearly':
-    default:
-      return yearlyInvestments.value;
-  }
-});
 
 const profitShares = ref([
   {
@@ -136,7 +122,7 @@ const profitShares = ref([
 const documents = ref([
   {
     id: 1,
-    name: 'Contrat d\'investissement - Staoueli.pdf',
+    name: "Contrat d'investissement - Staoueli.pdf",
     url: '#',
     icon: 'bi-file-earmark-pdf-fill text-danger',
   },
@@ -154,26 +140,43 @@ const documents = ref([
   },
 ]);
 
+const filteredInvestmentDetails = computed(() => {
+  switch (tableFilter.value) {
+    case 'monthly':
+      return monthlyInvestments.value;
+    case 'bi-yearly':
+      return biYearlyInvestments.value;
+    case 'yearly':
+    default:
+      return yearlyInvestments.value;
+  }
+});
 
-const monthlyData = {
-  labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+const monthLabels = computed(() => (
+    locale.value === 'fr' 
+    ? ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
+    : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+));
+
+const monthlyData = computed(() => ({
+  labels: monthLabels.value,
   datasets: [
     {
-      label: 'Revenus Mensuels',
-      borderColor: '#0D6EFD', // FADAA Blue from Bootstrap
+      label: t('investorDashboard.chart.monthlyLabel'),
+      borderColor: '#0D6EFD',
       backgroundColor: 'rgba(13, 110, 253, 0.1)',
       tension: 0.4,
       fill: true,
       data: [120, 150, 130, 160, 180, 170, 190, 210, 200, 220, 240, 230],
     },
   ],
-};
+}));
 
-const biYearlyData = {
+const biYearlyData = computed(() => ({
   labels: ['S1-2023', 'S2-2023', 'S1-2024', 'S2-2024'],
   datasets: [
     {
-      label: 'Revenus Semestriels',
+      label: t('investorDashboard.chart.biYearlyLabel'),
       borderColor: '#0D6EFD',
       backgroundColor: 'rgba(13, 110, 253, 0.1)',
       tension: 0.4,
@@ -181,13 +184,13 @@ const biYearlyData = {
       data: [800, 950, 1100, 1250],
     },
   ],
-};
+}));
 
-const yearlyData = {
+const yearlyData = computed(() => ({
   labels: ['2022', '2023', '2024', '2025 (Proj.)'],
   datasets: [
     {
-      label: 'Revenus Annuels',
+      label: t('investorDashboard.chart.yearlyLabel'),
       borderColor: '#0D6EFD',
       backgroundColor: 'rgba(13, 110, 253, 0.1)',
       tension: 0.4,
@@ -195,11 +198,11 @@ const yearlyData = {
       data: [1500, 1750, 2350, 2800],
     },
   ],
-};
+}));
 
-const chartData = ref(monthlyData);
+const chartData = ref(monthlyData.value);
 
-const chartOptions = ref({
+const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -209,7 +212,7 @@ const chartOptions = ref({
     },
     title: {
       display: true,
-      text: 'Évolution des Revenus',
+      text: t('investorDashboard.chart.title'),
       font: {
         size: 16
       }
@@ -224,7 +227,7 @@ const chartOptions = ref({
       beginAtZero: true,
       title: {
         display: true,
-        text: 'Revenus (en k)'
+        text: t('investorDashboard.chart.revenue')
       }
     },
     x: {
@@ -233,7 +236,7 @@ const chartOptions = ref({
         }
     }
   }
-});
+}));
 
 const setChartFilter = (filter) => {
   chartFilter.value = filter;
@@ -244,34 +247,42 @@ const setTableFilter = (filter) => {
 };
 
 watch(chartFilter, (newFilter) => {
+  const options = chartOptions.value;
   switch (newFilter) {
     case 'monthly':
-      chartData.value = monthlyData;
-      chartOptions.value.plugins.title.text = 'Évolution des Revenus Mensuels';
+      chartData.value = monthlyData.value;
+      options.plugins.title.text = t('investorDashboard.chart.monthlyTitle');
       break;
     case 'bi-yearly':
-      chartData.value = biYearlyData;
-      chartOptions.value.plugins.title.text = 'Évolution des Revenus Semestriels';
+      chartData.value = biYearlyData.value;
+      options.plugins.title.text = t('investorDashboard.chart.biYearlyTitle');
       break;
     case 'yearly':
-      chartData.value = yearlyData;
-      chartOptions.value.plugins.title.text = 'Évolution des Revenus Annuels';
+      chartData.value = yearlyData.value;
+      options.plugins.title.text = t('investorDashboard.chart.yearlyTitle');
       break;
   }
+}, { immediate: true });
+
+watch(locale, () => {
+    // Re-run the filter watcher to update titles
+    const currentFilter = chartFilter.value;
+    chartFilter.value = '';
+    chartFilter.value = currentFilter;
 });
 
 </script>
 
 <template>
   <div class="dashboard-container container-fluid">
-    <h2 class="mb-4">Tableau de Bord Investisseur</h2>
+    <h2 class="mb-4">{{ $t('investorDashboard.title') }}</h2>
 
     <!-- Section 1: Major KPIs -->
     <div class="row gy-4 mb-4">
       <div class="col-md-4">
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-graph-up me-2 text-fadaa-blue"></i>Retour sur Investissement</h5>
+            <h5 class="card-title"><i class="bi bi-graph-up me-2 text-fadaa-blue"></i>{{ $t('investorDashboard.kpis.roi') }}</h5>
             <p class="card-text fs-4 fw-bold">15.2%</p>
           </div>
         </div>
@@ -279,7 +290,7 @@ watch(chartFilter, (newFilter) => {
       <div class="col-md-4">
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-currency-euro me-2 text-fadaa-blue"></i>Revenu Total (Annuel)</h5>
+            <h5 class="card-title"><i class="bi bi-currency-euro me-2 text-fadaa-blue"></i>{{ $t('investorDashboard.kpis.totalRevenue') }}</h5>
             <p class="card-text fs-4 fw-bold"> {{ formatCurrency(1250000)}}</p>
           </div>
         </div>
@@ -287,7 +298,7 @@ watch(chartFilter, (newFilter) => {
       <div class="col-md-4">
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-people-fill me-2 text-fadaa-blue"></i>Nombre de Clients Actifs</h5>
+            <h5 class="card-title"><i class="bi bi-people-fill me-2 text-fadaa-blue"></i>{{ $t('investorDashboard.kpis.activeClients') }}</h5>
             <p class="card-text fs-4 fw-bold">850</p>
           </div>
         </div>
@@ -300,11 +311,11 @@ watch(chartFilter, (newFilter) => {
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
             <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0"><i class="bi bi-briefcase-fill me-2"></i>Détails des Investissements</h5>
+              <h5 class="mb-0"><i class="bi bi-briefcase-fill me-2"></i>{{ $t('investorDashboard.investmentDetails.title') }}</h5>
               <div class="btn-group btn-group-sm" role="group" aria-label="Table Filters">
-                <button type="button" class="btn btn-outline-primary" @click="setTableFilter('monthly')" :class="{ active: tableFilter === 'monthly' }">Mensuel</button>
-                <button type="button" class="btn btn-outline-primary" @click="setTableFilter('bi-yearly')" :class="{ active: tableFilter === 'bi-yearly' }">Semestriel</button>
-                <button type="button" class="btn btn-outline-primary" @click="setTableFilter('yearly')" :class="{ active: tableFilter === 'yearly' }">Annuel</button>
+                <button type="button" class="btn btn-outline-primary" @click="setTableFilter('monthly')" :class="{ active: tableFilter === 'monthly' }">{{ $t('investorDashboard.investmentDetails.monthly') }}</button>
+                <button type="button" class="btn btn-outline-primary" @click="setTableFilter('bi-yearly')" :class="{ active: tableFilter === 'bi-yearly' }">{{ $t('investorDashboard.investmentDetails.bi-yearly') }}</button>
+                <button type="button" class="btn btn-outline-primary" @click="setTableFilter('yearly')" :class="{ active: tableFilter === 'yearly' }">{{ $t('investorDashboard.investmentDetails.yearly') }}</button>
               </div>
             </div>
           </div>
@@ -313,32 +324,25 @@ watch(chartFilter, (newFilter) => {
               <table class="table table-hover">
                 <thead>
                   <tr>
-                    <th>Agence</th>
-                    <th>Revenue</th>
-                    <th>Taux</th>
-                    <th>Clients</th>
-                    <th>Statut</th>
+                    <th>{{ $t('investorDashboard.investmentDetails.table.branch') }}</th>
+                    <th>{{ $t('investorDashboard.investmentDetails.table.revenue') }}</th>
+                    <th>{{ $t('investorDashboard.investmentDetails.table.share') }}</th>
+                    <th>{{ $t('investorDashboard.investmentDetails.table.clients') }}</th>
+                    <th>{{ $t('investorDashboard.investmentDetails.table.status') }}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-if="filteredInvestmentDetails.length === 0">
-                    <td colspan="5" class="text-center">Aucune donnée disponible pour cette période.</td>
+                    <td colspan="5" class="text-center">{{ $t('investorDashboard.investmentDetails.noData') }}</td>
                   </tr>
                   <tr v-for="investment in filteredInvestmentDetails" :key="investment.id">
                     <td>{{ investment.branchName }}</td>
                     <td>{{ formatCurrency(investment.amount) }} </td>
                     <td>{{ investment.sharePercentage }}%</td>
                     <td>{{ investment.NbrOfClients }}</td>
-                    <td><span :class="`badge bg-${investment.status === 'Actif' ? 'success' : 'warning'}`">{{ investment.status }}</span></td>
+                    <td><span :class="`badge bg-${investment.status === 'active' ? 'success' : 'warning'}`">{{ $t(`investorDashboard.statuses.${investment.status}`) }}</span></td>
                   </tr>
                 </tbody>
-                <!-- <tfoot>
-                  <tr>
-                    <td colspan="5" class="text-center">
-                      <button class="btn btn-sm btn-primary">Voir plus</button>
-                    </td>
-                  </tr>
-                </tfoot> -->
               </table>
             </div>
           </div>
@@ -349,11 +353,11 @@ watch(chartFilter, (newFilter) => {
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
             <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Évolution des Revenus</h5>
+              <h5 class="mb-0"><i class="bi bi-activity me-2"></i>{{ $t('investorDashboard.revenueEvolution.title') }}</h5>
               <div class="btn-group btn-group-sm" role="group" aria-label="Chart Filters">
-                <button type="button" class="btn btn-outline-primary" @click="setChartFilter('monthly')" :class="{ active: chartFilter === 'monthly' }">Mensuel</button>
-                <button type="button" class="btn btn-outline-primary" @click="setChartFilter('bi-yearly')" :class="{ active: chartFilter === 'bi-yearly' }">Semestriel</button>
-                <button type="button" class="btn btn-outline-primary" @click="setChartFilter('yearly')" :class="{ active: chartFilter === 'yearly' }">Annuel</button>
+                <button type="button" class="btn btn-outline-primary" @click="setChartFilter('monthly')" :class="{ active: chartFilter === 'monthly' }">{{ $t('investorDashboard.revenueEvolution.monthly') }}</button>
+                <button type="button" class="btn btn-outline-primary" @click="setChartFilter('bi-yearly')" :class="{ active: chartFilter === 'bi-yearly' }">{{ $t('investorDashboard.revenueEvolution.bi-yearly') }}</button>
+                <button type="button" class="btn btn-outline-primary" @click="setChartFilter('yearly')" :class="{ active: chartFilter === 'yearly' }">{{ $t('investorDashboard.revenueEvolution.yearly') }}</button>
               </div>
             </div>
           </div>
@@ -369,14 +373,14 @@ watch(chartFilter, (newFilter) => {
       <div class="col-12">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
-            <h5 class="mb-0"><i class="bi bi-list-stars me-2"></i>Activités Récentes des Agences</h5>
+            <h5 class="mb-0"><i class="bi bi-list-stars me-2"></i>{{ $t('investorDashboard.recentActivities.title') }}</h5>
           </div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
-              <li class="list-group-item"><i class="bi bi-building-add text-success me-2"></i>Nouvelle agence "Staoueli" ouverte avec succès. ROI initial: 12%.</li>
-              <li class="list-group-item"><i class="bi bi-cash-stack text-primary me-2"></i>Investissement supplémentaire de 50k dans l'agence "Cheraga".</li>
-              <li class="list-group-item"><i class="bi bi-graph-up-arrow text-info me-2"></i>Performance de l'agence "Birkhadem" en hausse de 5% ce trimestre.</li>
-              <li class="list-group-item"><i class="bi bi-person-plus-fill text-fadaa-orange me-2"></i>Recrutement de 3 nouveaux gestionnaires pour l'expansion régionale.</li>
+              <li class="list-group-item"><i class="bi bi-building-add text-success me-2"></i>{{ $t('investorDashboard.recentActivities.activity1') }}</li>
+              <li class="list-group-item"><i class="bi bi-cash-stack text-primary me-2"></i>{{ $t('investorDashboard.recentActivities.activity2') }}</li>
+              <li class="list-group-item"><i class="bi bi-graph-up-arrow text-info me-2"></i>{{ $t('investorDashboard.recentActivities.activity3') }}</li>
+              <li class="list-group-item"><i class="bi bi-person-plus-fill text-fadaa-orange me-2"></i>{{ $t('investorDashboard.recentActivities.activity4') }}</li>
             </ul>
           </div>
         </div>
@@ -388,17 +392,17 @@ watch(chartFilter, (newFilter) => {
       <div class="col-12">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
-            <h5 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>Historique des Parts de Bénéfices</h5>
+            <h5 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>{{ $t('investorDashboard.profitShareHistory.title') }}</h5>
           </div>
           <div class="card-body">
             <div class="table-responsive">
               <table class="table table-hover">
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    <th>Agence</th>
-                    <th>Montant Reçu</th>
-                    <th>Période Concernée</th>
+                    <th>{{ $t('investorDashboard.profitShareHistory.table.date') }}</th>
+                    <th>{{ $t('investorDashboard.profitShareHistory.table.branch') }}</th>
+                    <th>{{ $t('investorDashboard.profitShareHistory.table.amountReceived') }}</th>
+                    <th>{{ $t('investorDashboard.profitShareHistory.table.period') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -421,13 +425,13 @@ watch(chartFilter, (newFilter) => {
       <div class="col-12">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
-            <h5 class="mb-0"><i class="bi bi-file-earmark-text-fill me-2"></i>Documents</h5>
+            <h5 class="mb-0"><i class="bi bi-file-earmark-text-fill me-2"></i>{{ $t('investorDashboard.documents.title') }}</h5>
           </div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
               <li v-for="doc in documents" :key="doc.id" class="list-group-item d-flex justify-content-between align-items-center">
                 <span><i :class="`bi ${doc.icon} me-2`"></i>{{ doc.name }}</span>
-                <a :href="doc.url" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-download me-1"></i> Télécharger</a>
+                <a :href="doc.url" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-download me-1"></i> {{ $t('investorDashboard.documents.download') }}</a>
               </li>
             </ul>
           </div>
@@ -440,10 +444,10 @@ watch(chartFilter, (newFilter) => {
       <div class="col-12 text-center">
         <div class="card shadow-sm">
           <div class="card-body">
-            <h5 class="card-title">Prêt à Étendre Votre Impact ?</h5>
-            <p class="card-text">Explorez de nouvelles opportunités d'investissement ou demandez l'ouverture d'une nouvelle agence.</p>
-            <button class="btn btn-success btn-lg me-2 mb-2"><i class="bi bi-folder-plus me-2"></i>Demander une Nouvelle Agence</button>
-            <button class="btn btn-outline-success btn-lg mb-2"><i class="bi bi-currency-dollar me-2"></i>Investir Davantage</button>
+            <h5 class="card-title">{{ $t('investorDashboard.cta.title') }}</h5>
+            <p class="card-text">{{ $t('investorDashboard.cta.description') }}</p>
+            <button class="btn btn-success btn-lg me-2 mb-2"><i class="bi bi-folder-plus me-2"></i>{{ $t('investorDashboard.cta.requestBranch') }}</button>
+            <button class="btn btn-outline-success btn-lg mb-2"><i class="bi bi-currency-dollar me-2"></i>{{ $t('investorDashboard.cta.investMore') }}</button>
           </div>
         </div>
       </div>

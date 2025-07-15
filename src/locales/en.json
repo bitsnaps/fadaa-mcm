@@ -734,5 +734,73 @@
       "missingCredentials": "Please enter both email and password.",
       "invalidCredentials": "Invalid credentials. Please try again."
     }
+  },
+  "investorDashboard": {
+    "title": "Investor Dashboard",
+    "kpis": {
+      "roi": "Return on Investment",
+      "totalRevenue": "Total Revenue (Annual)",
+      "activeClients": "Number of Active Clients"
+    },
+    "investmentDetails": {
+      "title": "Investment Details",
+      "monthly": "Monthly",
+      "bi-yearly": "Bi-Yearly",
+      "yearly": "Yearly",
+      "table": {
+        "branch": "Branch",
+        "revenue": "Revenue",
+        "share": "Share",
+        "clients": "Clients",
+        "status": "Status"
+      },
+      "noData": "No data available for this period."
+    },
+    "revenueEvolution": {
+      "title": "Revenue Evolution",
+      "monthly": "Monthly",
+      "bi-yearly": "Bi-Yearly",
+      "yearly": "Yearly"
+    },
+    "recentActivities": {
+      "title": "Recent Branch Activities",
+      "activity1": "New branch \"Staoueli\" successfully opened. Initial ROI: 12%.",
+      "activity2": "Additional investment of 50k in the \"Cheraga\" branch.",
+      "activity3": "Performance of the \"Birkhadem\" branch up by 5% this quarter.",
+      "activity4": "Recruitment of 3 new managers for regional expansion."
+    },
+    "profitShareHistory": {
+      "title": "Profit Share History",
+      "table": {
+        "date": "Date",
+        "branch": "Branch",
+        "amountReceived": "Amount Received",
+        "period": "Concerned Period"
+      }
+    },
+    "documents": {
+      "title": "Documents",
+      "download": "Download"
+    },
+    "cta": {
+      "title": "Ready to Expand Your Impact?",
+      "description": "Explore new investment opportunities or request the opening of a new branch.",
+      "requestBranch": "Request a New Branch",
+      "investMore": "Invest More"
+    },
+    "chart": {
+        "title": "Revenue Evolution",
+        "monthlyTitle": "Monthly Revenue Evolution",
+        "biYearlyTitle": "Bi-Yearly Revenue Evolution",
+        "yearlyTitle": "Annual Revenue Evolution",
+        "monthlyLabel": "Monthly Revenue",
+        "biYearlyLabel": "Bi-Yearly Revenue",
+        "yearlyLabel": "Annual Revenue",
+        "revenue": "Revenue (in k)"
+    },
+    "statuses":{
+      "active": "Active",
+      "pending": "Pending"
+    }
   }
 }
