@@ -22,6 +22,8 @@ import ManageOffices from './views/ManageOffices.vue';
 import InvestmentDetails from './views/InvestmentDetails.vue';
 import DocumentsManagement from './views/DocumentsManagement.vue';
 import OfficeDesigner from './views/OfficeDesigner.vue';
+import MonthlyReport from './views/MonthlyReport.vue';
+import AnnualReport from './views/AnnualReport.vue';
 import Navbar from './components/Navbar.vue';
 
 const routes = [
@@ -163,7 +165,19 @@ const routes = [
     name: 'OfficeDesigner',
     components: { default: OfficeDesigner, header: Navbar },
     meta: { requiresAuth: true, roles: ['admin'] }
-  }
+  },
+  {
+    path: '/monthly-report',
+    name: 'MonthlyReport',
+    components: { default: MonthlyReport, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin'] }
+  },
+  {
+    path: '/annual-report',
+    name: 'AnnualReport',
+    components: { default: AnnualReport, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin'] }
+  },
 ];
 
 const router = createRouter({

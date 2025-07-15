@@ -119,22 +119,22 @@ const isCollapsed = computed(() => sidebarStore.isCollapsed);
 
       <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase" v-if="userRole === 'admin'">
         <span>{{ $t('sidebar.reports') }}</span>
-        <a class="link-secondary" href="#" aria-label="Add a new report">
+        <!-- <a class="link-secondary" href="#" aria-label="Add a new report">
           <i class="bi bi-plus-circle"></i>
-        </a>
+        </a> -->
       </h6>
       <ul class="nav flex-column mb-2" v-if="userRole === 'admin'">
         <li class="nav-item">
-          <a class="nav-link" href="#">
+          <router-link to="/monthly-report" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-file-earmark-text me-2"></i>
             {{ $t('sidebar.monthlyReport') }}
-          </a>
+          </router-link>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">
+          <router-link to="/annual-report" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-file-earmark-bar-graph me-2"></i>
             {{ $t('sidebar.annualReport') }}
-          </a>
+          </router-link>
         </li>
       </ul>
 
