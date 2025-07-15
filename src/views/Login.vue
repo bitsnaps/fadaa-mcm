@@ -2,17 +2,17 @@
   <div class="login-container d-flex justify-content-center align-items-center vh-100">
     <div class="card p-4 shadow" style="width: 100%; max-width: 400px;">
       <div class="card-body">
-        <h2 class="card-title text-center mb-4">Login</h2>
+        <h2 class="card-title text-center mb-4">{{ t('login.title') }}</h2>
         <form @submit.prevent="handleLogin">
           <div class="mb-3">
-            <label for="email" class="form-label">Email address</label>
-            <input type="email" class="form-control" id="email" v-model="email" required placeholder="name@example.com">
+            <label for="email" class="form-label">{{ t('login.emailLabel') }}</label>
+            <input type="email" class="form-control" id="email" v-model="email" required :placeholder="t('login.emailPlaceholder')">
           </div>
           <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" v-model="password" required placeholder="Password">
+            <label for="password" class="form-label">{{ t('login.passwordLabel') }}</label>
+            <input type="password" class="form-control" id="password" v-model="password" required :placeholder="t('login.passwordPlaceholder')">
           </div>
-          <button type="submit" class="btn btn-fadaa-primary w-100">Login <i class="bi bi-box-arrow-in-right"></i></button>
+          <button type="submit" class="btn btn-fadaa-primary w-100">{{ t('login.loginButton') }} <i class="bi bi-box-arrow-in-right"></i></button>
         </form>
         <p v-if="error" class="text-danger text-center mt-3">{{ error }}</p>
       </div>
@@ -25,7 +25,9 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import apiClient from '@/services/ApiClient';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const email = ref('');
 const password = ref('');
 const error = ref('');
@@ -34,7 +36,7 @@ const authStore = useAuthStore();
 
 const handleLogin = async () => {
     if (!email.value || !password.value) {
-        error.value = 'Please enter both email and password.';
+        error.value = t('login.error.missingCredentials');
         return;
     }
 
@@ -65,7 +67,7 @@ const handleLogin = async () => {
         }
     } catch (err) {
         console.error(err);
-        error.value = err.response?.data?.message || 'Invalid credentials. Please try again.';
+        error.value = err.response?.data?.message || t('login.error.invalidCredentials');
     }
 };
 </script>

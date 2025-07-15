@@ -683,5 +683,34 @@
     },
     "saveChanges": "Enregistrer les modifications",
     "saving": "Enregistrement..."
+  },
+  "navbar": {
+    "language": "Langue",
+    "english": "Anglais",
+    "french": "Français",
+    "login": "Connexion",
+    "notifications": {
+      "title": "Notifications",
+      "mock1": "Notification 1",
+      "mock2": "Notification 2",
+      "viewAll": "Voir toutes les notifications"
+    },
+    "user": {
+      "profile": "Profil",
+      "settings": "Paramètres",
+      "logout": "Déconnexion"
+    }
+  },
+  "login": {
+    "title": "Connexion",
+    "emailLabel": "Adresse e-mail",
+    "emailPlaceholder": "Votre email",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Votre mot de passe",
+    "loginButton": "Se connecter",
+    "error": {
+      "missingCredentials": "Veuillez saisir l'e-mail et le mot de passe.",
+      "invalidCredentials": "Identifiants invalides. Veuillez réessayer."
+    }
   }
 }

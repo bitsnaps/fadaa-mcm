@@ -36,7 +36,7 @@ const showSidebar = computed(() => {
 
 const isSidebarCollapsed = computed(() => sidebarStore.isCollapsed );
 
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 
 const setLocale = (lang) => {
   locale.value = lang;
@@ -56,7 +56,7 @@ const handleLogout = () => {
     </BNavbarBrand>
 
     <!-- Sidebar Toggle Button -->
-    <BButton v-if="showSidebar" 
+    <BButton v-if="showSidebar"
             @click="toggleSidebar"
             class="sidebar-toggle"
             variant="fadaa-orange"
@@ -68,34 +68,34 @@ const handleLogout = () => {
 
     <BCollapse id="nav-collapse" is-nav>
       <BNavbarNav class="ms-auto align-items-center">
-        <BNavItemDropdown text="Language" right>
-          <BDropdownItem @click="setLocale('en')">English</BDropdownItem>
-          <BDropdownItem @click="setLocale('fr')">Français</BDropdownItem>
+        <BNavItemDropdown :text="t('navbar.language')" right>
+          <BDropdownItem @click="setLocale('en')">{{ t('navbar.english') }}</BDropdownItem>
+          <BDropdownItem @click="setLocale('fr')">{{ t('navbar.french') }}</BDropdownItem>
         </BNavItemDropdown>
-        <BNavItem v-if="!isAuthenticated" :to="{ path: '/login' }" :active="$route.path === '/login'" link-classes="nav-link">
-          Login
-        </BNavItem>        
+        <BNavItem v-show="!route.path.endsWith('/login')" v-if="!isAuthenticated" :to="{ path: '/login' }" :active="$route.path === '/login'" link-classes="nav-link">
+          {{ t('navbar.login') }}
+        </BNavItem>
         <template v-else>
           <BNavItemDropdown id="notificationDropdown" right menu-class="dropdown-menu-end">
             <template #button-content>
               <i class="bi bi-bell-fill"></i>
               <span class="badge rounded-pill bg-danger">3</span> <!-- Mock notification count -->
             </template>
-            <BDropdownItem href="#">Notification 1</BDropdownItem>
-            <BDropdownItem href="#">Notification 2</BDropdownItem>
+            <BDropdownItem href="#">{{ t('navbar.notifications.mock1') }}</BDropdownItem>
+            <BDropdownItem href="#">{{ t('navbar.notifications.mock2') }}</BDropdownItem>
             <BDropdownItem divider />
-            <BDropdownItem href="/manage-notifications">View all notifications</BDropdownItem>
+            <BDropdownItem href="/manage-notifications">{{ t('navbar.notifications.viewAll') }}</BDropdownItem>
           </BNavItemDropdown>
 
           <BNavItemDropdown id="userProfileDropdown" right menu-class="dropdown-menu-end">
             <template #button-content>
               <i class="bi bi-person-circle me-1"></i> {{ userRole }}
             </template>
-            <BDropdownItem :to="{ path: '/profile' }"><i class="bi bi-person-fill me-2"></i>Profile</BDropdownItem>
-            <BDropdownItem :to="{ path: '/settings' }"><i class="bi bi-gear-fill me-2"></i>Settings</BDropdownItem>
+            <BDropdownItem :to="{ path: '/profile' }"><i class="bi bi-person-fill me-2"></i>{{ t('navbar.user.profile') }}</BDropdownItem>
+            <BDropdownItem :to="{ path: '/settings' }"><i class="bi bi-gear-fill me-2"></i>{{ t('navbar.user.settings') }}</BDropdownItem>
             <!-- <BDropdownItem v-if="userRole === 'admin' || userRole === 'assistant'" :to="{ path: '/manage-notifications' }"><i class="bi bi-bell-slash-fill me-2"></i>Gérer les Notifications</BDropdownItem> -->
             <BDropdownItem divider />
-            <BDropdownItem @click.prevent="handleLogout"><i class="bi bi-box-arrow-right me-2"></i>Logout</BDropdownItem>
+            <BDropdownItem @click.prevent="handleLogout"><i class="bi bi-box-arrow-right me-2"></i>{{ t('navbar.user.logout') }}</BDropdownItem>
           </BNavItemDropdown>
         </template>
       </BNavbarNav>

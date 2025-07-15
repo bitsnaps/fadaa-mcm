@@ -684,5 +684,34 @@
     },
     "saveChanges": "Save Changes",
     "saving": "Saving..."
+  },
+  "navbar": {
+    "language": "Language",
+    "english": "English",
+    "french": "Français",
+    "login": "Login",
+    "notifications": {
+      "title": "Notifications",
+      "mock1": "Notification 1",
+      "mock2": "Notification 2",
+      "viewAll": "View all notifications"
+    },
+    "user": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "logout": "Logout"
+    }
+  },
+  "login": {
+    "title": "Login",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "Your email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Your assword",
+    "loginButton": "Login",
+    "error": {
+      "missingCredentials": "Please enter both email and password.",
+      "invalidCredentials": "Invalid credentials. Please try again."
+    }
   }
 }
