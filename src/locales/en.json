@@ -443,7 +443,27 @@
       "meetingRoom": "Meeting Room",
       "printer": "Printer",
       "privateRestroom": "Private Restroom"
-    }
+    },
+    "addEditOfficeModal": {
+      "addTitle": "Add New Office",
+      "editTitle": "Edit Office",
+      "officeName": "Office Name",
+      "branch": "Branch",
+      "capacity": "Capacity",
+      "amenities": "Amenities",
+      "status": "Status",
+      "close": "Close",
+      "save": "Save Changes",
+      "add": "Add Office"
+    },
+    "confirmDeleteOffice": {
+      "title": "Confirm Deletion",
+      "message": "Are you sure you want to delete the office \"{officeName}\"?",
+      "delete": "Delete"
+    },
+    "officeAddedSuccess": "Office added successfully.",
+    "officeUpdatedSuccess": "Office updated successfully.",
+    "officeDeletedSuccess": "Office deleted successfully."
   },
   "systemSettings": {
     "title": "System Settings",

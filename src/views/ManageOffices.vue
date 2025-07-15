@@ -11,6 +11,17 @@ const offices = ref([]);
 const searchTerm = ref('');
 const selectedOffice = ref(null);
 let viewOfficeModal = null;
+let addEditOfficeModal = null;
+
+const isEditMode = ref(false);
+const officeForm = ref({
+  id: null,
+  name: '',
+  branch: '',
+  capacity: 0,
+  amenities: [],
+  status: '',
+});
 
 // Mock office data - replace with API call
 const mockOffices = [
@@ -42,15 +53,19 @@ const mockOffices = [
 
 const fetchOffices = () => {
   setTimeout(() => {
-    offices.value = mockOffices;
+    offices.value = mockOffices.map(o => ({...o})); // Create copies to avoid direct mutation
   }, 500);
 };
 
 onMounted(() => {
   fetchOffices();
-  const modalElement = document.getElementById('viewOfficeDetailsModal');
-  if (modalElement) {
-    viewOfficeModal = new bootstrap.Modal(modalElement);
+  const viewModalEl = document.getElementById('viewOfficeDetailsModal');
+  if (viewModalEl) {
+    viewOfficeModal = new bootstrap.Modal(viewModalEl);
+  }
+  const addEditModalEl = document.getElementById('addEditOfficeModal');
+  if (addEditModalEl) {
+    addEditOfficeModal = new bootstrap.Modal(addEditModalEl);
   }
 });
 
@@ -72,14 +87,44 @@ const viewOfficeDetails = (officeId) => {
   }
 };
 
-const editOffice = (officeId) => {
-  // Placeholder for edit functionality
-  console.log('Edit office:', officeId);
+const openAddOfficeModal = () => {
+  isEditMode.value = false;
+  officeForm.value = { id: null, name: '', branch: '', capacity: 1, amenities: [], status: t('offices.status.available') };
+  addEditOfficeModal.show();
 };
 
+const openEditOfficeModal = (office) => {
+  isEditMode.value = true;
+  officeForm.value = { ...office };
+  addEditOfficeModal.show();
+};
+
+const saveOffice = () => {
+  if (isEditMode.value) {
+    // Edit existing office
+    const index = offices.value.findIndex(o => o.id === officeForm.value.id);
+    if (index !== -1) {
+      offices.value[index] = { ...officeForm.value };
+    }
+  } else {
+    // Add new office
+    const newOffice = {
+      ...officeForm.value,
+      id: `off${String(Date.now()).slice(-3)}${offices.value.length + 1}`,
+    };
+    offices.value.unshift(newOffice);
+  }
+  addEditOfficeModal.hide();
+};
+
+
 const deleteOffice = (officeId) => {
-  // Placeholder for delete functionality
-  console.log('Delete office:', officeId);
+  if (confirm(t('offices.confirmDeleteOffice.message', { officeName: offices.value.find(o => o.id === officeId)?.name }))) {
+    const index = offices.value.findIndex(o => o.id === officeId);
+    if (index !== -1) {
+      offices.value.splice(index, 1);
+    }
+  }
 };
 
 const changeOfficeStatus = (officeId, newStatus) => {
@@ -94,16 +139,16 @@ const changeOfficeStatus = (officeId, newStatus) => {
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2>{{ t('offices.manageOffices') }}</h2>
-      <button class="btn btn-primary">
+      <button class="btn btn-primary" @click="openAddOfficeModal">
         <i class="bi bi-plus-circle me-2"></i>{{ t('offices.addNewOffice') }}
       </button>
     </div>
 
     <div class="mb-3">
-      <input 
-        type="text" 
-        class="form-control" 
-        v-model="searchTerm" 
+      <input
+        type="text"
+        class="form-control"
+        v-model="searchTerm"
         :placeholder="t('offices.searchPlaceholder')"
       />
     </div>
@@ -126,7 +171,7 @@ const changeOfficeStatus = (officeId, newStatus) => {
             <td>{{ office.name }}</td>
             <td>{{ office.branch }}</td>
             <td>
-              <span 
+              <span
                 :class="['badge',
                          office.status === t('offices.status.available') ? 'bg-success' :
                          office.status === t('offices.status.occupied') ? 'bg-secondary' :
@@ -139,7 +184,7 @@ const changeOfficeStatus = (officeId, newStatus) => {
               <button @click="viewOfficeDetails(office.id)" class="btn btn-sm btn-outline-info me-1" :title="t('offices.viewDetails')">
                 <i class="bi bi-eye"></i>
               </button>
-              <button @click="editOffice(office.id)" class="btn btn-sm btn-outline-warning me-1" :title="t('offices.editOffice')">
+              <button @click="openEditOfficeModal(office)" class="btn btn-sm btn-outline-warning me-1" :title="t('offices.editOffice')">
                 <i class="bi bi-pencil-square"></i>
               </button>
               <button @click="deleteOffice(office.id)" class="btn btn-sm btn-outline-danger" :title="t('offices.deleteOffice')">
@@ -160,7 +205,7 @@ const changeOfficeStatus = (officeId, newStatus) => {
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="viewOfficeDetailsModalLabel">{{ t('offices.officeDetails') }}: {{ selectedOffice?.name }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" :aria-label="t('close')"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" :aria-label="t('offices.addEditOfficeModal.close')"></button>
           </div>
           <div class="modal-body" v-if="selectedOffice">
             <p><strong>{{ t('offices.details.id') }}:</strong> {{ selectedOffice.id }}</p>
@@ -173,6 +218,56 @@ const changeOfficeStatus = (officeId, newStatus) => {
         </div>
       </div>
     </div>
+        <!-- Add/Edit Office Modal -->
+    <div class="modal fade" id="addEditOfficeModal" tabindex="-1" aria-labelledby="addEditOfficeModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addEditOfficeModalLabel">
+              {{ isEditMode ? t('offices.addEditOfficeModal.editTitle') : t('offices.addEditOfficeModal.addTitle') }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" :aria-label="t('offices.addEditOfficeModal.close')"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="saveOffice">
+              <div class="mb-3">
+                <label for="officeName" class="form-label">{{ t('offices.addEditOfficeModal.officeName') }}</label>
+                <input type="text" class="form-control" id="officeName" v-model="officeForm.name" required>
+              </div>
+              <div class="mb-3">
+                <label for="officeBranch" class="form-label">{{ t('offices.addEditOfficeModal.branch') }}</label>
+                <input type="text" class="form-control" id="officeBranch" v-model="officeForm.branch" required>
+              </div>
+              <div class="mb-3">
+                <label for="officeCapacity" class="form-label">{{ t('offices.addEditOfficeModal.capacity') }}</label>
+                <input type="number" class="form-control" id="officeCapacity" v-model.number="officeForm.capacity" min="1" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">{{ t('offices.addEditOfficeModal.status') }}</label>
+                <select class="form-select" v-model="officeForm.status">
+                  <option :value="t('offices.status.available')">{{ t('offices.status.available') }}</option>
+                  <option :value="t('offices.status.occupied')">{{ t('offices.status.occupied') }}</option>
+                  <option :value="t('offices.status.maintenance')">{{ t('offices.status.maintenance') }}</option>
+                </select>
+              </div>
+               <!-- Simple text input for amenities for now -->
+              <div class="mb-3">
+                <label for="officeAmenities" class="form-label">{{ t('offices.addEditOfficeModal.amenities') }}</label>
+                <input type="text" class="form-control" id="officeAmenities" v-model="officeForm.amenities" :placeholder="t('offices.amenities.wifi') + ', ' + t('offices.amenities.coffee')">
+                 <small class="form-text text-muted">Comma-separated values.</small>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('offices.addEditOfficeModal.close') }}</button>
+            <button type="button" class="btn btn-primary" @click="saveOffice">
+              {{ isEditMode ? t('offices.addEditOfficeModal.save') : t('offices.addEditOfficeModal.add') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 

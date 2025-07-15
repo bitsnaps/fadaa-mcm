@@ -446,7 +446,27 @@
       "meetingRoom": "Salle de Réunion",
       "printer": "Imprimante",
       "privateRestroom": "Toilettes Privées"
-    }
+    },
+    "addEditOfficeModal": {
+      "addTitle": "Ajouter un Nouveau Bureau",
+      "editTitle": "Modifier le Bureau",
+      "officeName": "Nom du Bureau",
+      "branch": "Agence",
+      "capacity": "Capacité",
+      "amenities": "Commodités",
+      "status": "Statut",
+      "close": "Fermer",
+      "save": "Enregistrer les Modifications",
+      "add": "Ajouter le Bureau"
+    },
+    "confirmDeleteOffice": {
+      "title": "Confirmer la Suppression",
+      "message": "Êtes-vous sûr de vouloir supprimer le bureau \"{officeName}\" ?",
+      "delete": "Supprimer"
+    },
+    "officeAddedSuccess": "Bureau ajouté avec succès.",
+    "officeUpdatedSuccess": "Bureau mis à jour avec succès.",
+    "officeDeletedSuccess": "Bureau supprimé avec succès."
   },
   "systemSettings": {
     "title": "Paramètres Système",
