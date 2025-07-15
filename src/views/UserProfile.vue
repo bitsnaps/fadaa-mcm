@@ -1,92 +1,3 @@
-<template>
-  <div class="container mt-5">
-    <h1 class="mb-4 text-fadaa-blue">{{ $t('userProfile.title') }}</h1>
-
-    <div class="row">
-      <!-- Profile Picture Section -->
-      <div class="col-md-4 mb-4">
-        <div class="card shadow-sm">
-          <div class="card-body text-center">
-            <img :src="profileImageUrl" alt="Photo de profil" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-            <h5 class="card-title text-fadaa-orange">{{ user.firstName }} {{ user.lastName }}</h5>
-            <p class="text-muted">{{ user.role }}</p>
-            <input type="file" class="form-control form-control-sm mt-3" @change="onFileChange" accept="image/*">
-            <button class="btn btn-sm btn-primary mt-2" @click="uploadProfilePicture" :disabled="!selectedFile">
-              {{ $t('userProfile.uploadPicture') }}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Personal Information Section -->
-      <div class="col-md-8 mb-4">
-        <div class="card shadow-sm">
-          <div class="card-header bg-fadaa-light-blue">
-            <h5 class="mb-0 text-fadaa-blue">{{ $t('userProfile.personalInformation') }}</h5>
-          </div>
-          <div class="card-body">
-            <form @submit.prevent="updateProfile">
-              <div class="mb-3 row">
-                <label for="firstName" class="col-sm-3 col-form-label">{{ $t('userProfile.firstName') }}</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" id="firstName" v-model="editableUser.firstName">
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="lastName" class="col-sm-3 col-form-label">{{ $t('userProfile.lastName') }}</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" id="lastName" v-model="editableUser.lastName">
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="email" class="col-sm-3 col-form-label">{{ $t('userProfile.email') }}</label>
-                <div class="col-sm-9">
-                  <input type="email" class="form-control" id="email" v-model="editableUser.email" readonly>
-                   <small class="form-text text-muted">{{ $t('userProfile.emailCannotBeChanged') }}</small>
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="phone" class="col-sm-3 col-form-label">{{ $t('userProfile.phone') }}</label>
-                <div class="col-sm-9">
-                  <input type="tel" class="form-control" id="phone" v-model="editableUser.phone">
-                </div>
-              </div>
-              <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-primary">{{ $t('userProfile.saveChanges') }}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-
-        <!-- Change Password Section -->
-        <div class="card shadow-sm mt-4">
-          <div class="card-header bg-fadaa-light-blue">
-            <h5 class="mb-0 text-fadaa-blue">{{ $t('userProfile.changePassword') }}</h5>
-          </div>
-          <div class="card-body">
-            <form @submit.prevent="changePassword">
-              <div class="mb-3">
-                <label for="currentPassword" class="form-label">{{ $t('userProfile.currentPassword') }}</label>
-                <input type="password" class="form-control" id="currentPassword" v-model="passwordForm.currentPassword" required>
-              </div>
-              <div class="mb-3">
-                <label for="newPassword" class="form-label">{{ $t('userProfile.newPassword') }}</label>
-                <input type="password" class="form-control" id="newPassword" v-model="passwordForm.newPassword" required>
-              </div>
-              <div class="mb-3">
-                <label for="confirmPassword" class="form-label">{{ $t('userProfile.confirmNewPassword') }}</label>
-                <input type="password" class="form-control" id="confirmPassword" v-model="passwordForm.confirmPassword" required>
-              </div>
-              <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-primary">{{ $t('userProfile.changePassword') }}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
@@ -190,6 +101,96 @@ const changePassword = async () => {
 };
 
 </script>
+
+<template>
+  <div class="container mt-5">
+    <h1 class="mb-4 text-fadaa-blue">{{ $t('userProfile.title') }}</h1>
+
+    <div class="row">
+      <!-- Profile Picture Section -->
+      <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-body text-center">
+            <img :src="profileImageUrl" alt="Photo de profil" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+            <h5 class="card-title text-fadaa-orange">{{ user.firstName }} {{ user.lastName }}</h5>
+            <p class="text-muted">{{ user.role.name }}</p>
+            <input type="file" class="form-control form-control-sm mt-3" @change="onFileChange" accept="image/*">
+            <button class="btn btn-sm btn-primary mt-2" @click="uploadProfilePicture" :disabled="!selectedFile">
+              {{ $t('userProfile.uploadPicture') }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Personal Information Section -->
+      <div class="col-md-8 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-fadaa-light-blue">
+            <h5 class="mb-0 text-fadaa-blue">{{ $t('userProfile.personalInformation') }}</h5>
+          </div>
+          <div class="card-body">
+            <form @submit.prevent="updateProfile">
+              <div class="mb-3 row">
+                <label for="firstName" class="col-sm-3 col-form-label">{{ $t('userProfile.firstName') }}</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="firstName" v-model="editableUser.firstName">
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label for="lastName" class="col-sm-3 col-form-label">{{ $t('userProfile.lastName') }}</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="lastName" v-model="editableUser.lastName">
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label for="email" class="col-sm-3 col-form-label">{{ $t('userProfile.email') }}</label>
+                <div class="col-sm-9">
+                  <input type="email" class="form-control" id="email" v-model="editableUser.email" readonly>
+                   <small class="form-text text-muted">{{ $t('userProfile.emailCannotBeChanged') }}</small>
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label for="phone" class="col-sm-3 col-form-label">{{ $t('userProfile.phone') }}</label>
+                <div class="col-sm-9">
+                  <input type="tel" class="form-control" id="phone" v-model="editableUser.phone">
+                </div>
+              </div>
+              <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">{{ $t('userProfile.saveChanges') }}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Change Password Section -->
+        <div class="card shadow-sm mt-4">
+          <div class="card-header bg-fadaa-light-blue">
+            <h5 class="mb-0 text-fadaa-blue">{{ $t('userProfile.changePassword') }}</h5>
+          </div>
+          <div class="card-body">
+            <form @submit.prevent="changePassword">
+              <div class="mb-3">
+                <label for="currentPassword" class="form-label">{{ $t('userProfile.currentPassword') }}</label>
+                <input type="password" class="form-control" id="currentPassword" v-model="passwordForm.currentPassword" required>
+              </div>
+              <div class="mb-3">
+                <label for="newPassword" class="form-label">{{ $t('userProfile.newPassword') }}</label>
+                <input type="password" class="form-control" id="newPassword" v-model="passwordForm.newPassword" required>
+              </div>
+              <div class="mb-3">
+                <label for="confirmPassword" class="form-label">{{ $t('userProfile.confirmNewPassword') }}</label>
+                <input type="password" class="form-control" id="confirmPassword" v-model="passwordForm.confirmPassword" required>
+              </div>
+              <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">{{ $t('userProfile.changePassword') }}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .text-fadaa-blue {

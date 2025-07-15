@@ -51,7 +51,7 @@ const handleLogout = () => {
 <template>
   <BNavbar toggleable="lg" variant="fadaa-blue" class="fixed-top navbar-dark">
     <BNavbarBrand href="/" class="d-flex align-items-center">
-      <BImg src="/src/public/logo.png" alt="FADAA Logo" width="30" height="30" class="d-inline-block align-text-top me-2 rounded-circle" />
+      <BImg src="/public/logo.png" alt="FADAA Logo" width="30" height="30" class="d-inline-block align-text-top me-2 rounded-circle" />
       FADAA-MCM
     </BNavbarBrand>
 
