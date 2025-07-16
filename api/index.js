@@ -9,6 +9,8 @@ const userApp = require('./routes/users');
 const notificationApp = require('./routes/notifications');
 const miscApp = require('./routes/misc');
 const branchesApp = require('./routes/branches');
+const serviceCategoriesApp = require('./routes/serviceCategories');
+const clientsApp = require('./routes/clients');
 const authApp = require('./routes/auth');
 const documentApp = require('./routes/documents');
 const clientServicesApp = require('./routes/clientServices');
@@ -32,6 +34,8 @@ app.route('/api/notifications', notificationApp);
 app.route('/api/documents', documentApp);
 app.route('/api/client-services', clientServicesApp);
 app.route('/api/branches', branchesApp);
+app.route('/api/service-categories', serviceCategoriesApp);
+app.route('/api/clients', clientsApp);
 app.route('/api/misc', miscApp);
 
 // --- Static File Serving ---

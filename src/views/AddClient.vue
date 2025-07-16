@@ -2,138 +2,91 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import apiClient from '@/services/ApiClient';
 
 const { t } = useI18n();
-
 const router = useRouter();
 const route = useRoute();
 const clientId = ref(route.params.clientId || null);
 
 const client = ref({
-  name: '',
+  company_name: '',
+  first_name: '',
+  last_name: '',
   email: '',
-  phone: '',
+  phone_number: '',
   address: '',
-  city: '',
-  country: '',
-  clientType: '', // e.g., 'Individual', 'Company'
-  serviceType: '', // e.g., 'Domiciliation', 'Office Rental'
-  idType: '', // e.g., 'National ID', 'Passport', 'Trade Register'
-  idNumber: '',
-  idExpiryDate: '',
-  taxId: '', // NIF
-  nis: '', // NIS for companies
-  rcNumber: '', // RC Number for companies
-  contactPersonName: '',
-  contactPersonEmail: '',
-  contactPersonPhone: '',
-  contractStartDate: '',
-  contractEndDate: '',
-  paymentTerms: '', // e.g., 'Monthly', 'Quarterly', 'Annually'
-  officeId: null, // To be linked with office booking
-  attachments: [], // For file uploads
-  status: 'Active', // Default status
+  status: 'Active',
+  client_type: '',
+  service_type: '',
+  id_type: '',
+  id_number: '',
+  id_expiry_date: '',
+  tax_id: '',
+  nis: '',
+  rc_number: '',
+  contact_person_name: '',
+  contact_person_email: '',
+  contact_person_phone: '',
+  contract_start_date: '',
+  contract_end_date: '',
+  payment_terms: '',
+  office_id: null,
 });
 
 const pageTitle = computed(() => clientId.value ? t('addClient.editTitle') : t('addClient.addTitle'));
 const submitButtonText = computed(() => clientId.value ? t('addClient.submitButtonUpdate') : t('addClient.submitButtonAdd'));
+const validationErrors = ref({});
 
-// Mock data for demonstration as API for single client fetch is not defined
-const mockClients = [
-  {
-    id: 'cli001',
-    name: 'Ali Kara',
-    email: 'john.doe@example.com',
-    phone: '555-1234',
-    address: '123 Main St',
-    city: 'Anytown',
-    country: 'USA',
-    clientType: 'Individual',
-    serviceType: 'Domiciliation',
-    idType: 'Passport',
-    idNumber: 'X1234567',
-    idExpiryDate: '2028-12-31',
-    taxId: 'NIF12345',
-    nis: '',
-    rcNumber: '',
-    contactPersonName: 'Ali Kara',
-    contactPersonEmail: 'john.doe@example.com',
-    contactPersonPhone: '555-1234',
-    contractStartDate: '2023-01-15',
-    contractEndDate: '2024-01-14',
-    paymentTerms: 'Monthly',
-    officeId: 101,
-    status: 'Active',
-  },
-  {
-    id: 'cli002',
-    name: 'Said Bentamer Inc.',
-    email: 'jane.smith@example.com',
-    phone: '555-5678',
-    address: '456 Oak Ave',
-    city: 'Otherville',
-    country: 'USA',
-    clientType: 'Company',
-    serviceType: 'Office Rental',
-    idType: 'Trade Register',
-    idNumber: 'RC98765',
-    idExpiryDate: '2025-06-30',
-    taxId: 'NIF67890',
-    nis: 'NIS54321',
-    rcNumber: 'RC98765',
-    contactPersonName: 'Said Bentamer',
-    contactPersonEmail: 'jane.smith@example.com',
-    contactPersonPhone: '555-5678',
-    contractStartDate: '2022-11-30',
-    contractEndDate: '2023-11-29',
-    paymentTerms: 'Annually',
-    officeId: 205,
-    status: 'Inactive',
-  },
-];
+const validateForm = () => {
+    const errors = {};
+    if (!client.value.company_name) errors.company_name = 'Company name is required.';
+    if (!client.value.first_name) errors.first_name = 'First name is required.';
+    if (!client.value.last_name) errors.last_name = 'Last name is required.';
+    if (!client.value.email) errors.email = 'Email is required.';
+    
+    validationErrors.value = errors;
+    return Object.keys(errors).length === 0;
+};
 
 onMounted(async () => {
   if (clientId.value) {
     try {
-      // In a real app, you would fetch this from an API: `/clients/${clientId.value}`
-      // const response = await apiClient.get(`/clients/${clientId.value}`);
-      // client.value = response.data;
-      const existingClient = mockClients.find(c => c.id === clientId.value);
-      if (existingClient) {
-        // Map fullName from mock to name for the form
-        const { fullName, ...formData } = existingClient;
-        client.value = { ...formData, name: fullName || existingClient.name }; 
-      } else {
-        console.error(t('addClient.messages.clientNotFound'));
-        alert(t('addClient.messages.clientNotFound'));
-        router.push('/manage-clients');
-      }
+        const response = await apiClient.get(`/clients/${clientId.value}`);
+        if(response.data.success) {
+            client.value = response.data.data;
+        } else {
+            console.error(t('addClient.messages.clientNotFound'));
+            router.push('/manage-clients');
+        }
     } catch (error) {
       console.error(t('addClient.messages.fetchError'), error);
-      alert(t('addClient.messages.loadError'));
       router.push('/manage-clients');
     }
   }
 });
 
 const submitForm = async () => {
-  try {
-    if (clientId.value) {
-      // Update existing client
-      // const response = await apiClient.put(`/clients/${clientId.value}`, client.value);
-      console.log('Client updated:', client.value); // Mocking API call
-      alert(t('addClient.messages.updateSuccess'));
-    } else {
-      // Add new client
-      // const response = await apiClient.post('/clients', client.value);
-      console.log('Client added:', client.value); // Mocking API call
-      alert(t('addClient.messages.addSuccess'));
+    if (!validateForm()) {
+        return;
     }
-    router.push('/manage-clients');
-  } catch (error) {
-    console.error(`${t('addClient.messages.fetchError')} ${clientId.value ? t('addClient.messages.updateError') : t('addClient.messages.addError')}:`, error);
-    alert(`${clientId.value ? t('addClient.messages.updateError') : t('addClient.messages.addError')}`);
-  }
+    try {
+        if (clientId.value) {
+            await apiClient.put(`/clients/${clientId.value}`, client.value);
+            console.log(t('addClient.messages.updateSuccess'));
+        } else {
+            await apiClient.post('/clients', client.value);
+            console.log(t('addClient.messages.addSuccess'));
+        }
+        router.push('/manage-clients');
+    } catch (error) {
+        console.error(`${clientId.value ? 'Update' : 'Add'} client error:`, error);
+        if (error.response && error.response.data && error.response.data.message) {
+            // Display backend validation errors
+            // This is a simple implementation; a more robust solution would map errors to fields
+            alert(`Error: ${error.response.data.message}`);
+        }
+    }
 };
 
 const handleFileUpload = (event) => {
@@ -149,16 +102,33 @@ const handleFileUpload = (event) => {
       <h2>{{ pageTitle }}</h2>
       <form @submit.prevent="submitForm">
         <div class="mb-3">
-          <label for="clientName" class="form-label">{{ t('addClient.form.clientName') }}</label>
-          <input type="text" class="form-control" id="clientName" v-model="client.name" required>
+          <label for="companyName" class="form-label">{{ t('addClient.form.clientName') }} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" :class="{'is-invalid': validationErrors.company_name}" id="companyName" v-model="client.company_name">
+          <div v-if="validationErrors.company_name" class="invalid-feedback">{{ validationErrors.company_name }}</div>
         </div>
+        
+        <h5 class="mt-4">{{ t('addClient.form.contactPerson') }}</h5>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="firstName" class="form-label">{{ t('userProfile.firstName') }} <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" :class="{'is-invalid': validationErrors.first_name}" id="firstName" v-model="client.first_name">
+                <div v-if="validationErrors.first_name" class="invalid-feedback">{{ validationErrors.first_name }}</div>
+            </div>
+            <div class="col-md-6">
+                <label for="lastName" class="form-label">{{ t('userProfile.lastName') }} <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" :class="{'is-invalid': validationErrors.last_name}" id="lastName" v-model="client.last_name">
+                <div v-if="validationErrors.last_name" class="invalid-feedback">{{ validationErrors.last_name }}</div>
+            </div>
+        </div>
+
         <div class="mb-3">
-          <label for="clientEmail" class="form-label">{{ t('addClient.form.email') }}</label>
-          <input type="email" class="form-control" id="clientEmail" v-model="client.email" required>
+          <label for="clientEmail" class="form-label">{{ t('addClient.form.email') }} <span class="text-danger">*</span></label>
+          <input type="email" class="form-control" :class="{'is-invalid': validationErrors.email}" id="clientEmail" v-model="client.email">
+          <div v-if="validationErrors.email" class="invalid-feedback">{{ validationErrors.email }}</div>
         </div>
         <div class="mb-3">
           <label for="clientPhone" class="form-label">{{ t('addClient.form.phone') }}</label>
-          <input type="tel" class="form-control" id="clientPhone" v-model="client.phone">
+          <input type="tel" class="form-control" id="clientPhone" v-model="client.phone_number">
         </div>
         <div class="mb-3">
           <label for="clientAddress" class="form-label">{{ t('addClient.form.address') }}</label>
@@ -166,18 +136,8 @@ const handleFileUpload = (event) => {
         </div>
         <div class="row mb-3">
           <div class="col-md-6">
-            <label for="clientCity" class="form-label">{{ t('addClient.form.city') }}</label>
-            <input type="text" class="form-control" id="clientCity" v-model="client.city">
-          </div>
-          <div class="col-md-6">
-            <label for="clientCountry" class="form-label">{{ t('addClient.form.country') }}</label>
-            <input type="text" class="form-control" id="clientCountry" v-model="client.country">
-          </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-6">
             <label for="clientType" class="form-label">{{ t('addClient.form.clientType') }}</label>
-            <select class="form-select" id="clientType" v-model="client.clientType">
+            <select class="form-select" id="clientType" v-model="client.client_type">
               <option value="">{{ t('addClient.form.selectType') }}</option>
               <option value="Individual">{{ t('addClient.form.individual') }}</option>
               <option value="Company">{{ t('addClient.form.company') }}</option>
@@ -185,7 +145,7 @@ const handleFileUpload = (event) => {
           </div>
           <div class="col-md-6">
             <label for="serviceType" class="form-label">{{ t('addClient.form.serviceType') }}</label>
-            <select class="form-select" id="serviceType" v-model="client.serviceType">
+            <select class="form-select" id="serviceType" v-model="client.service_type">
               <option value="">{{ t('addClient.form.selectService') }}</option>
               <option value="Domiciliation">{{ t('addClient.form.domiciliation') }}</option>
               <option value="Office Rental">{{ t('addClient.form.officeRental') }}</option>
@@ -197,7 +157,7 @@ const handleFileUpload = (event) => {
         <div class="row mb-3">
           <div class="col-md-4">
             <label for="idType" class="form-label">{{ t('addClient.form.idType') }}</label>
-            <select class="form-select" id="idType" v-model="client.idType">
+            <select class="form-select" id="idType" v-model="client.id_type">
               <option value="">{{ t('addClient.form.selectIdType') }}</option>
               <option value="National ID">{{ t('addClient.form.nationalId') }}</option>
               <option value="Passport">{{ t('addClient.form.passport') }}</option>
@@ -206,17 +166,17 @@ const handleFileUpload = (event) => {
           </div>
           <div class="col-md-4">
             <label for="idNumber" class="form-label">{{ t('addClient.form.idNumber') }}</label>
-            <input type="text" class="form-control" id="idNumber" v-model="client.idNumber">
+            <input type="text" class="form-control" id="idNumber" v-model="client.id_number">
           </div>
           <div class="col-md-4">
             <label for="idExpiryDate" class="form-label">{{ t('addClient.form.idExpiryDate') }}</label>
-            <input type="date" class="form-control" id="idExpiryDate" v-model="client.idExpiryDate">
+            <input type="date" class="form-control" id="idExpiryDate" v-model="client.id_expiry_date">
           </div>
         </div>
         <div class="row mb-3">
           <div class="col-md-4">
             <label for="taxId" class="form-label">{{ t('addClient.form.taxId') }}</label>
-            <input type="text" class="form-control" id="taxId" v-model="client.taxId">
+            <input type="text" class="form-control" id="taxId" v-model="client.tax_id">
           </div>
           <div class="col-md-4">
             <label for="nis" class="form-label">{{ t('addClient.form.nis') }}</label>
@@ -224,37 +184,37 @@ const handleFileUpload = (event) => {
           </div>
           <div class="col-md-4">
             <label for="rcNumber" class="form-label">{{ t('addClient.form.rcNumber') }}</label>
-            <input type="text" class="form-control" id="rcNumber" v-model="client.rcNumber">
+            <input type="text" class="form-control" id="rcNumber" v-model="client.rc_number">
           </div>
         </div>
         <h5 class="mt-4">{{ t('addClient.form.contactPerson') }}</h5>
         <div class="row mb-3">
           <div class="col-md-4">
             <label for="contactPersonName" class="form-label">{{ t('addClient.form.name') }}</label>
-            <input type="text" class="form-control" id="contactPersonName" v-model="client.contactPersonName">
+            <input type="text" class="form-control" id="contactPersonName" v-model="client.contact_person_name">
           </div>
           <div class="col-md-4">
             <label for="contactPersonEmail" class="form-label">{{ t('addClient.form.email') }}</label>
-            <input type="email" class="form-control" id="contactPersonEmail" v-model="client.contactPersonEmail">
+            <input type="email" class="form-control" id="contactPersonEmail" v-model="client.contact_person_email">
           </div>
           <div class="col-md-4">
             <label for="contactPersonPhone" class="form-label">{{ t('addClient.form.phone') }}</label>
-            <input type="tel" class="form-control" id="contactPersonPhone" v-model="client.contactPersonPhone">
+            <input type="tel" class="form-control" id="contactPersonPhone" v-model="client.contact_person_phone">
           </div>
         </div>
         <h5 class="mt-4">{{ t('addClient.form.contractDetails') }}</h5>
         <div class="row mb-3">
           <div class="col-md-4">
             <label for="contractStartDate" class="form-label">{{ t('addClient.form.contractStartDate') }}</label>
-            <input type="date" class="form-control" id="contractStartDate" v-model="client.contractStartDate">
+            <input type="date" class="form-control" id="contractStartDate" v-model="client.contract_start_date">
           </div>
           <div class="col-md-4">
             <label for="contractEndDate" class="form-label">{{ t('addClient.form.contractEndDate') }}</label>
-            <input type="date" class="form-control" id="contractEndDate" v-model="client.contractEndDate">
+            <input type="date" class="form-control" id="contractEndDate" v-model="client.contract_end_date">
           </div>
           <div class="col-md-4">
             <label for="paymentTerms" class="form-label">{{ t('addClient.form.paymentTerms') }}</label>
-            <select class="form-select" id="paymentTerms" v-model="client.paymentTerms">
+            <select class="form-select" id="paymentTerms" v-model="client.payment_terms">
               <option value="">{{ t('addClient.form.selectTerms') }}</option>
               <option value="Monthly">{{ t('addClient.form.monthly') }}</option>
               <option value="Quarterly">{{ t('addClient.form.quarterly') }}</option>
@@ -264,7 +224,7 @@ const handleFileUpload = (event) => {
         </div>
         <div class="mb-3">
           <label for="officeId" class="form-label">{{ t('addClient.form.assignOffice') }}</label>
-          <input type="number" class="form-control" id="officeId" v-model.number="client.officeId">
+          <input type="number" class="form-control" id="officeId" v-model.number="client.office_id">
           <!-- TODO: Implement office selection dropdown/modal based on availability -->
         </div>
         <div class="mb-3">

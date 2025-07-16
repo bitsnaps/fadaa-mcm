@@ -78,79 +78,71 @@
 import { ref, onMounted } from 'vue';
 import { Modal } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
+import apiClient from '@/services/ApiClient';
 
 const { t } = useI18n();
-// import { useAuthStore } from '@/stores/auth'; // If needed for API calls
-// import apiClient from '@/services/ApiClient'; // Placeholder for API calls
-
-// const authStore = useAuthStore();
-
 const serviceCategories = ref([]);
 const loadingCategories = ref(false);
-const modalMode = ref('add'); // 'add' or 'edit'
-const currentCategory = ref({
-  id: null,
-  name: '',
-  description: ''
-});
+const modalMode = ref('add');
+const currentCategory = ref({ id: null, name: '', description: '' });
 let categoryModal = null;
 
 const fetchServiceCategories = async () => {
   loadingCategories.value = true;
-  // Placeholder: Replace with actual API call
-  console.log('Fetching service categories...');
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-  serviceCategories.value = [
-    { id: 1, name: 'Equipment Rental', description: 'Rental of office equipment like projectors, screens, etc.' },
-    { id: 2, name: 'Cleaning Services', description: 'Regular or one-time office cleaning.' },
-    { id: 3, name: 'Utilities', description: 'Services like internet, electricity, water.' },
-    { id: 4, name: 'Catering & Refreshments', description: 'Coffee, tea, snacks, or full catering for meetings.' }
-  ];
-  loadingCategories.value = false;
+  try {
+    const response = await apiClient.get('/service-categories');
+    if (response.data.success) {
+      serviceCategories.value = response.data.data;
+    }
+  } catch (error) {
+    console.error('Failed to fetch service categories:', error);
+  } finally {
+    loadingCategories.value = false;
+  }
 };
 
 onMounted(() => {
   fetchServiceCategories();
-  categoryModal = new Modal(document.getElementById('categoryModal'));
+  const modalElement = document.getElementById('categoryModal');
+  if (modalElement) {
+      categoryModal = new Modal(modalElement);
+  }
 });
 
 const openAddModal = () => {
   modalMode.value = 'add';
   currentCategory.value = { id: null, name: '', description: '' };
-  categoryModal.show();
+  if(categoryModal) categoryModal.show();
 };
 
 const openEditModal = (category) => {
   modalMode.value = 'edit';
   currentCategory.value = { ...category };
-  categoryModal.show();
+  if(categoryModal) categoryModal.show();
 };
 
 const handleSaveCategory = async () => {
-  // Placeholder: Replace with actual API call
-  if (modalMode.value === 'add') {
-    console.log('Adding new category:', currentCategory.value);
-    // Simulate API call
-    const newId = Math.max(0, ...serviceCategories.value.map(c => c.id)) + 1;
-    serviceCategories.value.push({ ...currentCategory.value, id: newId });
-  } else {
-    console.log('Updating category:', currentCategory.value);
-    // Simulate API call
-    const index = serviceCategories.value.findIndex(c => c.id === currentCategory.value.id);
-    if (index !== -1) {
-      serviceCategories.value[index] = { ...currentCategory.value };
+  try {
+    if (modalMode.value === 'add') {
+      await apiClient.post('/service-categories', currentCategory.value);
+    } else {
+      await apiClient.put(`/service-categories/${currentCategory.value.id}`, currentCategory.value);
     }
+    if(categoryModal) categoryModal.hide();
+    fetchServiceCategories();
+  } catch (error) {
+    console.error(`Failed to ${modalMode.value} category:`, error);
   }
-  categoryModal.hide();
-  // Optionally, re-fetch categories or update local list
 };
 
-const confirmDeleteCategory = (categoryId) => {
+const confirmDeleteCategory = async (categoryId) => {
   if (confirm(t('manageServiceCategories.confirmDelete'))) {
-    // Placeholder: Replace with actual API call
-    console.log('Deleting category with id:', categoryId);
-    serviceCategories.value = serviceCategories.value.filter(c => c.id !== categoryId);
-    // Optionally, show a success message
+    try {
+      await apiClient.delete(`/service-categories/${categoryId}`);
+      fetchServiceCategories();
+    } catch (error) {
+      console.error('Failed to delete category:', error);
+    }
   }
 };
 

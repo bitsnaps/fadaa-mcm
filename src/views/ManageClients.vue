@@ -1,11 +1,12 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import * as bootstrap from 'bootstrap'; // Import bootstrap for modal
+import * as bootstrap from 'bootstrap';
 import { useI18n } from 'vue-i18n';
+import apiClient from '@/services/ApiClient';
+import { formatDate } from '@/helpers/utils';
 
 const { t } = useI18n();
-
 const router = useRouter();
 
 const clients = ref([]);
@@ -13,60 +14,19 @@ const searchTerm = ref('');
 const selectedClient = ref(null);
 let viewClientModal = null;
 
-// Mock client data - replace with API call
-const mockClients = [
-  {
-    id: 'cli001',
-    fullName: 'Ali Kara',
-    email: 'ali.kara@example.com',
-    phone: '555-1234',
-    status: 'Active',
-    address: '123 Main St, Anytown, USA',
-    registrationDate: '2023-01-15',
-    type: 'Individual',
-  },
-  {
-    id: 'cli002',
-    fullName: 'Said Bentamer',
-    email: 'said.bentamer@example.com',
-    phone: '555-5678',
-    status: 'Inactive',
-    address: '456 Oak Ave, Otherville, USA',
-    registrationDate: '2022-11-30',
-    type: 'Corporate',
-  },
-  {
-    id: 'cli003',
-    fullName: 'Amine Rabeh',
-    email: 'amine.rabeh@example.com',
-    phone: '555-8765',
-    status: 'Active',
-    address: '789 Pine Ln, Sometown, USA',
-    registrationDate: '2023-03-01',
-    type: 'Individual',
-  },
-  {
-    id: 'cli004',
-    fullName: 'Lakhdar Djemaa',
-    email: 'lakhdar.djemaa@example.com',
-    phone: '555-4321',
-    status: 'Pending',
-    address: '101 Maple Dr, Yourtown, USA',
-    registrationDate: '2023-05-20',
-    type: 'Corporate',
-  },
-];
-
-const fetchClients = () => {
-  // Simulate API call
-  setTimeout(() => {
-    clients.value = mockClients;
-  }, 500);
+const fetchClients = async () => {
+  try {
+    const response = await apiClient.get('/clients');
+    if (response.data.success) {
+      clients.value = response.data.data;
+    }
+  } catch (error) {
+    console.error("Failed to fetch clients:", error);
+  }
 };
 
 onMounted(() => {
   fetchClients();
-  // Initialize modal instance
   const modalElement = document.getElementById('viewClientDetailsModal');
   if (modalElement) {
     viewClientModal = new bootstrap.Modal(modalElement);
@@ -77,16 +37,19 @@ const filteredClients = computed(() => {
   if (!searchTerm.value) {
     return clients.value;
   }
+  const lowerSearchTerm = searchTerm.value.toLowerCase();
   return clients.value.filter(client =>
-    client.fullName.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-    client.phone.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-    client.status.toLowerCase().includes(searchTerm.value.toLowerCase())
+    (client.company_name && client.company_name.toLowerCase().includes(lowerSearchTerm)) ||
+    (client.first_name && client.first_name.toLowerCase().includes(lowerSearchTerm)) ||
+    (client.last_name && client.last_name.toLowerCase().includes(lowerSearchTerm)) ||
+    (client.email && client.email.toLowerCase().includes(lowerSearchTerm)) ||
+    (client.phone_number && client.phone_number.toLowerCase().includes(lowerSearchTerm)) ||
+    (client.status && client.status.toLowerCase().includes(lowerSearchTerm))
   );
 });
 
-const viewClientDetails = (clientId) => {
-  selectedClient.value = clients.value.find(c => c.id === clientId);
+const viewClientDetails = (client) => {
+  selectedClient.value = client;
   if (selectedClient.value && viewClientModal) {
     viewClientModal.show();
   }
@@ -99,6 +62,17 @@ const editClient = (clientId) => {
 const manageClientServices = (clientId) => {
   console.log('Manage services for client:', clientId);
   router.push({ name: 'ManageClientServices', query: { clientId } });
+};
+
+const deleteClient = async (clientId) => {
+    if(confirm(t('manageClients.confirmDelete'))) {
+        try {
+            await apiClient.delete(`/clients/${clientId}`);
+            fetchClients();
+        } catch (error) {
+            console.error('Failed to delete client:', error);
+        }
+    }
 };
 
 </script>
@@ -126,7 +100,7 @@ const manageClientServices = (clientId) => {
         <thead class="table-light">
           <tr>
             <th scope="col">{{ $t('manageClients.idHeader') }}</th>
-            <th scope="col">{{ $t('manageClients.fullNameHeader') }}</th>
+            <th scope="col">{{ $t('manageClients.companyName') }}</th>
             <th scope="col">{{ $t('manageClients.emailHeader') }}</th>
             <th scope="col">{{ $t('manageClients.phoneHeader') }}</th>
             <th scope="col">{{ $t('manageClients.statusHeader') }}</th>
@@ -136,9 +110,9 @@ const manageClientServices = (clientId) => {
         <tbody>
           <tr v-for="client in filteredClients" :key="client.id">
             <td>{{ client.id }}</td>
-            <td>{{ client.fullName }}</td>
+            <td>{{ client.company_name }}</td>
             <td>{{ client.email }}</td>
-            <td>{{ client.phone }}</td>
+            <td>{{ client.phone_number }}</td>
             <td>
               <span 
                 :class="['badge', 
@@ -149,15 +123,18 @@ const manageClientServices = (clientId) => {
               </span>
             </td>
             <td>
-              <button @click="viewClientDetails(client.id)" class="btn btn-sm btn-outline-info me-1" :title="$t('manageClients.viewDetails')">
+              <button @click="viewClientDetails(client)" class="btn btn-sm btn-outline-info me-1" :title="$t('manageClients.viewDetails')">
                 <i class="bi bi-eye"></i>
               </button>
               <button @click="editClient(client.id)" class="btn btn-sm btn-outline-warning me-1" :title="$t('manageClients.editClient')">
                 <i class="bi bi-pencil-square"></i>
               </button>
               <button @click="manageClientServices(client.id)" class="btn btn-sm btn-outline-primary" :title="$t('manageClients.manageServices')">
-                <i class="bi bi-gear"></i>
-              </button>
+               <i class="bi bi-gear"></i>
+             </button>
+             <button @click="deleteClient(client.id)" class="btn btn-sm btn-outline-danger" :title="$t('manageClients.deleteClient')">
+               <i class="bi bi-trash"></i>
+             </button>
             </td>
           </tr>
         </tbody>
@@ -177,30 +154,30 @@ const manageClientServices = (clientId) => {
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="viewClientDetailsModalLabel">{{ $t('manageClients.clientDetailsTitle', { fullName: selectedClient?.fullName }) }}</h5>
+            <h5 class="modal-title" id="viewClientDetailsModalLabel">{{ $t('manageClients.clientDetailsTitle', { companyName: selectedClient?.company_name }) }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body" v-if="selectedClient">
             <div class="row">
               <div class="col-md-6">
                 <p><strong>{{ $t('manageClients.detailsId') }}</strong> {{ selectedClient.id }}</p>
-                <p><strong>{{ $t('manageClients.detailsFullName') }}</strong> {{ selectedClient.fullName }}</p>
+                <p><strong>{{ $t('manageClients.companyName') }}</strong> {{ selectedClient.company_name }}</p>
+                <p><strong>{{ $t('manageClients.contactName') }}</strong> {{ selectedClient.first_name }} {{ selectedClient.last_name }}</p>
                 <p><strong>{{ $t('manageClients.detailsEmail') }}</strong> {{ selectedClient.email }}</p>
-                <p><strong>{{ $t('manageClients.detailsPhone') }}</strong> {{ selectedClient.phone }}</p>
+                <p><strong>{{ $t('manageClients.detailsPhone') }}</strong> {{ selectedClient.phone_number }}</p>
               </div>
               <div class="col-md-6">
-                <p><strong>{{ $t('manageClients.detailsStatus') }}</strong> 
-                  <span 
-                    :class="['badge', 
-                             selectedClient.status === 'Active' ? 'bg-success' : 
-                             selectedClient.status === 'Inactive' ? 'bg-secondary' : 
+                <p><strong>{{ $t('manageClients.detailsStatus') }}</strong>
+                  <span
+                    :class="['badge',
+                             selectedClient.status === 'Active' ? 'bg-success' :
+                             selectedClient.status === 'Inactive' ? 'bg-secondary' :
                              'bg-warning text-dark']">
-                    {{ selectedClient.status === 'Active' ? $t('manageClients.statusActive') : selectedClient.status === 'Inactive' ? $t('manageClients.statusInactive') : $t('manageClients.statusPending') }}
+                    {{ $t(`manageClients.statuses.${selectedClient.status.toLowerCase()}`) }}
                   </span>
                 </p>
                 <p><strong>{{ $t('manageClients.detailsAddress') }}</strong> {{ selectedClient.address }}</p>
-                <p><strong>{{ $t('manageClients.detailsRegistrationDate') }}</strong> {{ selectedClient.registrationDate }}</p>
-                <p><strong>{{ $t('manageClients.detailsClientType') }}</strong> {{ selectedClient.type }}</p>
+                <p><strong>{{ $t('manageClients.detailsRegistrationDate') }}</strong> {{ formatDate(selectedClient.created_at) }}</p>
               </div>
             </div>
           </div>

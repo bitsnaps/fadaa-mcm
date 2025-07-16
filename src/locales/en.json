@@ -291,6 +291,7 @@
     "searchPlaceholder": "Search clients by name, email, phone, or status...",
     "idHeader": "#ID",
     "fullNameHeader": "Full Name",
+    "companyName": "Company Name",
     "emailHeader": "Email",
     "phoneHeader": "Phone",
     "statusHeader": "Status",
@@ -300,20 +301,28 @@
     "statusPending": "Pending",
     "viewDetails": "View Details",
     "editClient": "Edit Client",
+    "deleteClient": "Delete Client",
+    "confirmDelete": "Are you sure you want to delete this client?",
     "manageServices": "Manage Services",
     "noClientsFoundSearch": "No clients found matching your search criteria \"{searchTerm}\".",
     "noClientsAvailable": "No clients available.",
     "addClientLink": "Add a new client",
-    "clientDetailsTitle": "Client Details: {fullName}",
+    "clientDetailsTitle": "Client Details: {companyName}",
     "detailsId": "ID:",
     "detailsFullName": "Full Name:",
+    "contactName": "Contact Name",
     "detailsEmail": "Email:",
     "detailsPhone": "Phone:",
     "detailsStatus": "Status:",
     "detailsAddress": "Address:",
     "detailsRegistrationDate": "Registration Date:",
     "detailsClientType": "Client Type:",
-    "close": "Close"
+    "close": "Close",
+    "statuses": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "lead": "Lead"
+    }
   },
   "addClient": {
     "addTitle": "Add New Client",
