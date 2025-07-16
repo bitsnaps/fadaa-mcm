@@ -28,8 +28,9 @@ import apiClient from '@/services/ApiClient';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
-const email = ref('');
-const password = ref('');
+const email = ref(import.meta.env.DEV?import.meta.env.VITE_DEFAULT_USER:'');
+const password = ref(import.meta.env.DEV?import.meta.env.VITE_DEFAULT_PASSWORD:'');
+
 const error = ref('');
 const router = useRouter();
 const authStore = useAuthStore();

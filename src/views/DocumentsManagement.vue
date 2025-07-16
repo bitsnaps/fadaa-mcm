@@ -1,114 +1,101 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getContracts, getClientsList, getAvailableOffices, addContract } from '@/services/ApiClient';
+import { getDocuments, getClientsList, getInvestmentsList, addDocument } from '@/services/ApiClient';
+import { useAuthStore } from '@/stores/auth';
 import { Modal } from 'bootstrap';
 import { format } from 'date-fns';
 
 const { t } = useI18n();
+const authStore = useAuthStore();
 
-const contracts = ref([]);
+const documents = ref([]);
 const searchTerm = ref('');
 const isLoading = ref(true);
 const isSubmitting = ref(false);
 
-// Modal state
-const addContractModal = ref(null);
-const newContract = ref({
+const addDocumentModal = ref(null);
+const newDocument = ref({
   client_id: null,
-  office_id: null,
-  start_date: '',
-  end_date: '',
-  monthly_rate: '',
+  investment_id: null,
+  title: '',
+  type: 'Other',
   document: null
 });
 const clients = ref([]);
-const offices = ref([]);
+const investments = ref([]);
 
-
-const fetchContracts = async () => {
+const fetchDocuments = async () => {
   try {
     isLoading.value = true;
-    const response = await getContracts();
+    const response = await getDocuments();
     if (response.data.success) {
-      contracts.value = response.data.contracts;
+      documents.value = response.data.documents;
     } else {
-      console.error('Failed to fetch contracts:', response.data.message);
+      console.error('Failed to fetch documents:', response.data.message);
     }
   } catch (error) {
-    console.error('An error occurred while fetching contracts:', error);
+    console.error('An error occurred while fetching documents:', error);
   } finally {
     isLoading.value = false;
   }
 };
 
 onMounted(() => {
-  fetchContracts();
+  fetchDocuments();
 });
 
-const filteredContracts = computed(() => {
+const filteredDocuments = computed(() => {
   if (!searchTerm.value) {
-    return contracts.value;
+    return documents.value;
   }
-  return contracts.value.filter(contract =>
-    (contract.Client?.company_name.toLowerCase() || '').includes(searchTerm.value.toLowerCase()) ||
-    (contract.Office?.name.toLowerCase() || '').includes(searchTerm.value.toLowerCase()) ||
-    contract.status.toLowerCase().includes(searchTerm.value.toLowerCase())
+  return documents.value.filter(doc =>
+    (doc.title.toLowerCase() || '').includes(searchTerm.value.toLowerCase()) ||
+    (doc.type.toLowerCase() || '').includes(searchTerm.value.toLowerCase()) ||
+    (doc.Client?.company_name.toLowerCase() || '').includes(searchTerm.value.toLowerCase())
   );
 });
 
 const formatDate = (date) => {
-  if (!date) return t('documents.notApplicable');
+  if (!date) return 'N/A';
   return format(new Date(date), 'yyyy-MM-dd');
 };
 
 const viewDocument = (docUrl) => {
-  if(docUrl) {
+  if (docUrl) {
     window.open(docUrl, '_blank');
   } else {
     console.log('No document URL to view.');
   }
-
 };
 
 const downloadDocument = (docUrl) => {
-    if(docUrl) {
-        const link = document.createElement('a');
-        link.href = docUrl;
-        link.setAttribute('download', '');
-        link.setAttribute('target', '_blank'); // Open in a new tab
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    } else {
-        console.log('No document URL to download.');
-    }
-};
-
-const archiveContract = async (contractId) => {
-  // This would ideally call an API to update the status
-  const contract = contracts.value.find(c => c.id === contractId);
-  if (contract) {
-    console.log(`Archiving contract ${contractId} - API call needed`);
-    // Example: await ApiClient.updateContractStatus(contractId, 'Archived');
-    // For now, just update locally
-    contract.status = 'Terminated'; // or 'Expired' / 'Archived' depending on logic
+  if (docUrl) {
+    const link = document.createElement('a');
+    link.href = docUrl;
+    link.setAttribute('download', '');
+    link.setAttribute('target', '_blank');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } else {
+    console.log('No document URL to download.');
   }
 };
 
-const openAddContractModal = async () => {
+const openAddDocumentModal = async () => {
   try {
-    const [clientsResponse, officesResponse] = await Promise.all([
+    const [clientsResponse, investmentsResponse] = await Promise.all([
       getClientsList(),
-      getAvailableOffices()
+      getInvestmentsList()
     ]);
     if (clientsResponse.data.success) {
       clients.value = clientsResponse.data.clients;
     }
-    if (officesResponse.data.success) {
-        offices.value = officesResponse.data.offices;
+    if (investmentsResponse.data.success) {
+      investments.value = investmentsResponse.data.investments;
     }
-    const modalInstance = Modal.getOrCreateInstance(addContractModal.value);
+    const modalInstance = Modal.getOrCreateInstance(addDocumentModal.value);
     modalInstance.show();
   } catch (error) {
     console.error('Error fetching data for modal:', error);
@@ -116,45 +103,46 @@ const openAddContractModal = async () => {
 };
 
 const handleFileChange = (event) => {
-  newContract.value.document = event.target.files[0];
+  newDocument.value.document = event.target.files[0];
 };
 
-const submitNewContract = async () => {
+const submitNewDocument = async () => {
   isSubmitting.value = true;
   const formData = new FormData();
-  Object.keys(newContract.value).forEach(key => {
-    if (newContract.value[key]) {
-      formData.append(key, newContract.value[key]);
+  
+  // Add user id to the form data
+  formData.append('uploaded_by_user_id', authStore.user.id);
+
+  Object.keys(newDocument.value).forEach(key => {
+    if (newDocument.value[key]) {
+      formData.append(key, newDocument.value[key]);
     }
   });
 
   try {
-    const response = await addContract(formData);
+    const response = await addDocument(formData);
     if (response.data.success) {
-      const modalInstance = Modal.getInstance(addContractModal.value);
+      const modalInstance = Modal.getInstance(addDocumentModal.value);
       modalInstance.hide();
-      fetchContracts(); // Refresh the list
-       // Reset form
-       newContract.value = { client_id: null, office_id: null, start_date: '', end_date: '', monthly_rate: '', document: null };
+      fetchDocuments(); // Refresh the list
+      newDocument.value = { client_id: null, investment_id: null, title: '', type: 'Other', document: null };
     } else {
-      alert('Failed to add contract: ' + response.data.message);
+      alert('Failed to add document: ' + response.data.message);
     }
   } catch (error) {
-    console.error('Error submitting new contract:', error);
-    alert('An error occurred while adding the contract.');
+    console.error('Error submitting new document:', error);
+    alert('An error occurred while adding the document.');
   } finally {
     isSubmitting.value = false;
   }
 };
 </script>
-
 <template>
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <!-- Changed title to reflect contract management -->
-      <h2>{{ t('contracts.title') }}</h2>
-      <button class="btn btn-primary" @click="openAddContractModal">
-        <i class="bi bi-plus-lg me-2"></i>{{ t('contracts.addNewContract') }}
+      <h2>{{ t('documents.title') }}</h2>
+      <button class="btn btn-primary" @click="openAddDocumentModal">
+        <i class="bi bi-plus-lg me-2"></i>{{ t('documents.uploadNewDocument') }}
       </button>
     </div>
 
@@ -163,7 +151,7 @@ const submitNewContract = async () => {
         type="text"
         class="form-control"
         v-model="searchTerm"
-        :placeholder="t('contracts.searchPlaceholder')"
+        :placeholder="t('documents.searchPlaceholder')"
       />
     </div>
 
@@ -173,44 +161,29 @@ const submitNewContract = async () => {
         </div>
     </div>
 
-    <div v-else-if="filteredContracts.length > 0" class="table-responsive">
+    <div v-else-if="filteredDocuments.length > 0" class="table-responsive">
       <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
-            <th scope="col">{{ t('contracts.tableHeaders.client') }}</th>
-            <th scope="col">{{ t('contracts.tableHeaders.office') }}</th>
-            <th scope="col">{{ t('contracts.tableHeaders.status') }}</th>
-            <th scope="col">{{ t('contracts.tableHeaders.startDate') }}</th>
-            <th scope="col">{{ t('contracts.tableHeaders.endDate') }}</th>
-            <th scope="col" class="text-center">{{ t('contracts.tableHeaders.actions') }}</th>
+            <th scope="col">{{ t('documents.tableHeaders.name') }}</th>
+            <th scope="col">{{ t('documents.tableHeaders.client') }}</th>
+            <th scope="col">{{ t('documents.tableHeaders.type') }}</th>
+            <th scope="col">{{ t('documents.tableHeaders.uploadDate') }}</th>
+            <th scope="col" class="text-center">{{ t('documents.tableHeaders.actions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="contract in filteredContracts" :key="contract.id">
-            <td>{{ contract.Client?.company_name || 'N/A' }}</td>
-            <td>{{ contract.Office?.name || 'N/A' }}</td>
-            <td>
-              <span
-                :class="['badge', {
-                  'bg-success': contract.status === 'Active',
-                  'bg-warning text-dark': contract.status === 'Pending',
-                  'bg-danger': contract.status === 'Expired',
-                  'bg-secondary': contract.status === 'Terminated'
-                }]">
-                {{ t(`contracts.status.${contract.status.toLowerCase()}`) }}
-              </span>
-            </td>
-            <td>{{ formatDate(contract.start_date) }}</td>
-            <td>{{ formatDate(contract.end_date) }}</td>
+          <tr v-for="doc in filteredDocuments" :key="doc.id">
+            <td>{{ doc.title }}</td>
+            <td>{{ doc.Client?.company_name || 'N/A' }}</td>
+            <td>{{ doc.type }}</td>
+            <td>{{ formatDate(doc.created_at) }}</td>
             <td class="text-center">
-              <button @click="viewDocument(contract.document_url)" :disabled="!contract.document_url" class="btn btn-sm btn-outline-info me-1" :title="t('contracts.viewContract')">
+              <button @click="viewDocument(doc.file_path)" :disabled="!doc.file_path" class="btn btn-sm btn-outline-info me-1" :title="t('documents.view')">
                 <i class="bi bi-eye"></i>
               </button>
-              <button @click="downloadDocument(contract.document_url)" :disabled="!contract.document_url" class="btn btn-sm btn-outline-primary me-1" :title="t('contracts.downloadContract')">
+              <button @click="downloadDocument(doc.file_path)" :disabled="!doc.file_path" class="btn btn-sm btn-outline-primary me-1" :title="t('documents.download')">
                 <i class="bi bi-download"></i>
-              </button>
-              <button v-if="contract.status === 'Active'" @click="archiveContract(contract.id)" class="btn btn-sm btn-outline-warning" :title="t('contracts.archiveContract')">
-                <i class="bi bi-archive"></i>
               </button>
             </td>
           </tr>
@@ -218,64 +191,61 @@ const submitNewContract = async () => {
       </table>
     </div>
     <div v-else class="alert alert-info text-center" role="alert">
-      {{ t('contracts.noContractsFound') }}
+      {{ t('documents.noDocumentsFound') }}
     </div>
 
-    <!-- Add/Edit Modal -->
-    <div class="modal fade" ref="addContractModal" tabindex="-1" aria-labelledby="addContractModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addContractModalLabel">{{ t('contracts.addNewContract') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form @submit.prevent="submitNewContract">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="client" class="form-label">{{ t('contracts.tableHeaders.client') }}</label>
-                                <select id="client" class="form-select" v-model="newContract.client_id" required>
-                                    <option :value="null" disabled>-- Select Client --</option>
-                                    <option v-for="client in clients" :key="client.id" :value="client.id">{{ client.company_name }}</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="office" class="form-label">{{ t('contracts.tableHeaders.office') }}</label>
-                                <select id="office" class="form-select" v-model="newContract.office_id" required>
-                                    <option :value="null" disabled>-- Select Office --</option>
-                                    <option v-for="office in offices" :key="office.id" :value="office.id">{{ office.name }}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="start_date" class="form-label">{{ t('contracts.tableHeaders.startDate') }}</label>
-                                <input type="date" id="start_date" class="form-control" v-model="newContract.start_date" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="end_date" class="form-label">{{ t('contracts.tableHeaders.endDate') }}</label>
-                                <input type="date" id="end_date" class="form-control" v-model="newContract.end_date" required>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="monthly_rate" class="form-label">{{ t('addClient.form.paymentTerms') }}</label>
-                            <input type="number" id="monthly_rate" class="form-control" v-model="newContract.monthly_rate" placeholder="e.g., 50000" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="document" class="form-label">{{ t('addClient.form.attachments') }}</label>
-                            <input type="file" id="document" class="form-control" @change="handleFileChange">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('manageUsers.cancel') }}</button>
-                    <button type="button" class="btn btn-primary" @click="submitNewContract" :disabled="isSubmitting">
-                        <span v-if="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                        {{ isSubmitting ? 'Submitting...' : t('addClient.submitButtonAdd') }}
-                    </button>
-                </div>
-            </div>
+    <!-- Add Document Modal -->
+    <div class="modal fade" ref="addDocumentModal" tabindex="-1" aria-labelledby="addDocumentModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addDocumentModalLabel">{{ t('documents.uploadNewDocument') }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="submitNewDocument">
+              <div class="mb-3">
+                <label for="doc-title" class="form-label">{{ t('documents.tableHeaders.name') }}</label>
+                <input type="text" id="doc-title" class="form-control" v-model="newDocument.title" required>
+              </div>
+              <div class="mb-3">
+                <label for="doc-client" class="form-label">{{ t('documents.tableHeaders.client') }}</label>
+                <select id="doc-client" class="form-select" v-model="newDocument.client_id" required>
+                  <option :value="null" disabled>-- Select Client --</option>
+                  <option v-for="client in clients" :key="client.id" :value="client.id">{{ client.company_name }}</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="doc-investment" class="form-label">Investment</label>
+                <select id="doc-investment" class="form-select" v-model="newDocument.investment_id">
+                  <option :value="null">-- Select Investment (Optional) --</option>
+                  <option v-for="investment in investments" :key="investment.id" :value="investment.id">{{ investment.name }}</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="doc-type" class="form-label">{{ t('documents.tableHeaders.type') }}</label>
+                <select id="doc-type" class="form-select" v-model="newDocument.type" required>
+                  <option>Contract</option>
+                  <option>Report</option>
+                  <option>Identification</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="document-file" class="form-label">{{ t('addClient.form.attachments') }}</label>
+                <input type="file" id="document-file" class="form-control" @change="handleFileChange" required>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('manageUsers.cancel') }}</button>
+            <button type="button" class="btn btn-primary" @click="submitNewDocument" :disabled="isSubmitting">
+              <span v-if="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              {{ isSubmitting ? 'Submitting...' : t('addClient.submitButtonAdd') }}
+            </button>
+          </div>
         </div>
+      </div>
     </div>
   </div>
 </template>

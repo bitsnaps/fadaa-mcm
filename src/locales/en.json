@@ -367,62 +367,20 @@
     }
   },
   "documents": {
-    "title": "Documents and Contracts",
+    "title": "Documents Management",
     "uploadNewDocument": "Upload New Document",
-    "searchPlaceholder": "Search by name, type, or status...",
+    "searchPlaceholder": "Search by name, type, or client...",
     "tableHeaders": {
       "name": "Name",
+      "client": "Client",
       "type": "Type",
-      "status": "Status",
       "uploadDate": "Upload Date",
-      "expiryDate": "Expiry Date",
       "actions": "Actions"
     },
-    "status": {
-      "active": "Active",
-      "archived": "Archived",
-      "expired": "Expired",
-      "contract": "Contract",
-    "document": "Document"
-  },
-  "clientServices": {
-    "title": "Manage Client Services",
-    "description": "Assistants can assign and manage services for specific clients.",
-    "selectClient": "Select Client",
-    "selectClientPlaceholder": "-- Select a Client --",
-    "searchClientPlaceholder": "Search for a client by name or company...",
-    "servicesFor": "Services for",
-    "addNewService": "Add New Service",
-    "serviceCategory": "Service Category",
-    "selectCategoryPlaceholder": "-- Select Category --",
-    "paymentType": "Payment Type",
-    "recurrent": "Recurrent",
-    "oneShot": "One-Shot",
-    "price": "Price (DZD)",
-    "notes": "Notes",
-    "addService": "Add Service",
-    "currentServices": "Current Services",
-    "serviceName": "Service Name",
-    "category": "Category",
-    "status": "Status",
-    "actions": "Actions",
-    "noServices": "This client has no active services.",
-    "active": "Active",
-    "inactive": "Inactive",
-    "remove": "Remove",
-    "loadingClientData": "Loading client data...",
-    "selectClientPrompt": "Please select a client to view and manage their services.",
-    "addSuccess": "Service added successfully (mock).",
-    "removeSuccess": "Service removed successfully (mock).",
-    "confirmRemove": "Are you sure you want to remove this service from the client?",
-    "errorClientCategory": "Please select a client and a service category."
-  },
     "noDocumentsFound": "No documents found.",
     "view": "View",
-    "download": "Download",
-    "archive": "Archive",
-    "notApplicable": "N/A"
-,
+    "download": "Download"
+  },
   "contracts": {
     "title": "Contract Management",
     "addNewContract": "Add New Contract",
@@ -445,7 +403,6 @@
     "downloadContract": "Download Contract",
     "archiveContract": "Archive Contract",
     "noContractsFound": "No contracts found."
-  }
   },
   "offices": {
     "manageOffices": "Manage Coworking Offices",

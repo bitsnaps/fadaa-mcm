@@ -367,65 +367,20 @@
     }
   },
   "documents": {
-    "title": "Documents et Contrats",
+    "title": "Gestion des Documents",
     "uploadNewDocument": "Télécharger un Nouveau Document",
-    "searchPlaceholder": "Rechercher par nom, type ou statut...",
+    "searchPlaceholder": "Rechercher par nom, type ou client...",
     "tableHeaders": {
       "name": "Nom",
+      "client": "Client",
       "type": "Type",
-      "status": "Statut",
       "uploadDate": "Date de Téléchargement",
-      "expiryDate": "Date d'Expiration",
       "actions": "Actions"
     },
-    "status": {
-      "active": "Actif",
-      "archived": "Archivé",
-      "expired": "Expiré",
-      "contract": "Contrat",
-    "document": "Document"
-  },
-  "clientServices": {
-    "title": "Gérer les Services Client",
-    "description": "Les assistants peuvent assigner et gérer les services pour des clients spécifiques.",
-    "selectClient": "Sélectionner un Client",
-    "selectClientPlaceholder": "-- Sélectionnez un Client --",
-    "searchClientPlaceholder": "Rechercher un client par nom ou entreprise...",
-    "servicesFor": "Services pour",
-    "addNewService": "Ajouter un Nouveau Service",
-    "serviceCategory": "Catégorie de Service",
-    "selectCategoryPlaceholder": "-- Sélectionnez une Catégorie --",
-    "paymentType": "Type de Paiement",
-    "recurrent": "Récurrent",
-    "oneShot": "Unique",
-    "price": "Prix (DZD)",
-    "notes": "Notes",
-    "addService": "Ajouter le Service",
-    "currentServices": "Services Actuels",
-    "serviceName": "Nom du Service",
-    "category": "Catégorie",
-    "status": "Statut",
-    "actions": "Actions",
-    "noServices": "Ce client n'a aucun service actif.",
-    "active": "Actif",
-    "inactive": "Inactif",
-    "remove": "Supprimer",
-    "loading": "Chargement...",
-    "loadingClientData": "Chargement des données du client...",
-    "selectClientPrompt": "Veuillez sélectionner un client pour voir et gérer ses services.",
-    "addSuccess": "Service ajouté avec succès (simulation).",
-    "removeSuccess": "Service supprimé avec succès (simulation).",
-    "confirmRemove": "Êtes-vous sûr de vouloir supprimer ce service du client ?",
-    "errorClientCategory": "Veuillez sélectionner un client et une catégorie de service.",
-    "noServicesYet": "Ce client n'a aucun service pour le moment.",
-    "noClientSelected": "Veuillez sélectionner un client pour voir et gérer ses services."
-  },
     "noDocumentsFound": "Aucun document trouvé.",
     "view": "Voir",
-    "download": "Télécharger",
-    "archive": "Archiver",
-    "notApplicable": "N/A"
-,
+    "download": "Télécharger"
+  },
   "contracts": {
     "title": "Gestion des Contrats",
     "addNewContract": "Ajouter un Nouveau Contrat",
@@ -448,10 +403,6 @@
     "downloadContract": "Télécharger le Contrat",
     "archiveContract": "Archiver le Contrat",
     "noContractsFound": "Aucun contrat trouvé."
-  },
-  "addContract": {
-    "submitButtonAdd": "Ajouter le Contrat"
-  }
   },
   "offices": {
     "manageOffices": "Gérer les Bureaux de Coworking",

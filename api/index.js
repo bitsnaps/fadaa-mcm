@@ -9,6 +9,7 @@ const userApp = require('./routes/users');
 const notificationApp = require('./routes/notifications');
 const miscApp = require('./routes/misc');
 const authApp = require('./routes/auth');
+const documentApp = require('./routes/documents');
 
 const app = new Hono();
 
@@ -27,10 +28,12 @@ app.route('/api/users', userApp);
 app.route('/api/taxes', taxApp);
 app.route('/api/contracts', contractApp);
 app.route('/api/notifications', notificationApp);
+app.route('/api/documents', documentApp);
 
 // --- Static File Serving ---
 // Serve the uploaded contract files
 app.use('/uploads/contracts/*', serveStatic({ root: './public' }));
+app.use('/uploads/documents/*', serveStatic({ root: './public' }));
 
 serve(app, (info) => {
   console.log(`Listening on http://localhost:${info.port}`);

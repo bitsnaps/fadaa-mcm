@@ -53,3 +53,19 @@ export function addContract(formData) {
         }
     });
 }
+
+export const getDocuments = () => {
+    return apiClient.get('/documents');
+};
+
+export const addDocument = (formData) => {
+    return apiClient.post('/documents', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+};
+
+export const getInvestmentsList = () => {
+    return apiClient.get('/investments-list');
+};

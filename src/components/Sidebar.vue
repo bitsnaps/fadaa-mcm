@@ -69,9 +69,15 @@ const isCollapsed = computed(() => sidebarStore.isCollapsed);
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
-          <router-link to="/documents-contracts-management" class="nav-link" active-class="active-fadaa">
+          <router-link to="/contracts-management" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-file-earmark-text-fill me-2"></i>
+            {{ $t('contracts.title') }}
+          </router-link>
+        </li>
+        <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+          <router-link to="/documents-management" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-file-earmark-zip-fill me-2"></i>
-            {{ $t('sidebar.documentsContractsManagement') }}
+            {{ $t('documents.title') }}
           </router-link>
         </li>
         <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">

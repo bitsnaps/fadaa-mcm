@@ -75,11 +75,11 @@ ClientService.belongsTo(Contract, { foreignKey: 'contract_id' });
 Contract.hasMany(ClientService, { foreignKey: 'contract_id' });
 
 // Document associations
-Document.belongsTo(Client, { foreignKey: 'client_id', as: 'client' });
+Document.belongsTo(Client, { foreignKey: 'client_id' });
 Client.hasMany(Document, { foreignKey: 'client_id' });
 Document.belongsTo(Investment, { foreignKey: 'investment_id' });
 Investment.hasMany(Document, { foreignKey: 'investment_id' });
-Document.belongsTo(User, { foreignKey: 'uploaded_by_user_id', as: 'uploaded_by' });
+Document.belongsTo(User, { as: 'uploaded_by', foreignKey: 'uploaded_by_user_id' });
 User.hasMany(Document, { foreignKey: 'uploaded_by_user_id' });
 
 // Task associations

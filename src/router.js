@@ -20,6 +20,7 @@ import ManageServiceCategories from './views/ManageServiceCategories.vue'; // Im
 import ManageClientServices from './views/ManageClientServices.vue'; // Import ManageClientServices
 import ManageOffices from './views/ManageOffices.vue';
 import InvestmentDetails from './views/InvestmentDetails.vue';
+import ContractsManagement from './views/ContractsManagement.vue';
 import DocumentsManagement from './views/DocumentsManagement.vue';
 import OfficeDesigner from './views/OfficeDesigner.vue';
 import MonthlyReport from './views/MonthlyReport.vue';
@@ -156,7 +157,13 @@ const routes = [
     meta: { requiresAuth: true, roles: ['admin', 'investor'] }
   },
   {
-    path: '/documents-contracts-management',
+    path: '/contracts-management',
+    name: 'ContractsManagement',
+    components: { default: ContractsManagement, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+  },
+  {
+    path: '/documents-management',
     name: 'DocumentsManagement',
     components: { default: DocumentsManagement, header: Navbar },
     meta: { requiresAuth: true, roles: ['admin', 'assistant'] }

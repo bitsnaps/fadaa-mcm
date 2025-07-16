@@ -33,9 +33,22 @@ miscApp.get('/offices-available', authMiddleware, async (c) => {
     }
 });
 
+// GET /api/investments-list - Get a simplified list of investments for dropdowns
+miscApp.get('/investments-list', authMiddleware, async (c) => {
+    try {
+        const investments = await models.Investment.findAll({
+            attributes: ['id', 'name'],
+            order: [['name', 'ASC']]
+        });
+        return c.json({ success: true, investments });
+    } catch (error) {
+        console.error('Error fetching investment list:', error);
+        return c.json({ success: false, message: 'Failed to fetch investment list' }, 500);
+    }
+});
+
 miscApp.get('/', async (c) => {
     return c.json({message: 'ready'});
 });
-
 
 module.exports = miscApp;
