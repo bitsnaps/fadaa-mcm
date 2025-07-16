@@ -33,7 +33,7 @@
                 <td>{{ branch.id }}</td>
                 <td>{{ branch.name }}</td>
                 <td>{{ branch.location }}</td>
-                <td>{{ formatDate(branch.createdAt) }}</td>
+                <td>{{ formatDate(branch.created_at) }}</td>
                 <td>
                   <span :class="`badge bg-${branch.status === 'active' ? 'success' : 'secondary'}`">
                     {{ branch.status === 'active' ? $t('manageBranches.active') : $t('manageBranches.inactive') }}
@@ -95,88 +95,74 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import apiClient from '@/services/ApiClient';
+import { formatDate } from '@/helpers/utils';
 
 const { t } = useI18n();
 
 const branches = ref([]);
 const showAddBranchModal = ref(false);
-const editingBranch = ref(null); // Holds the branch object being edited
+const editingBranch = ref(null);
 
 const branchForm = reactive({
   id: null,
   name: '',
   location: '',
-  status: 'active', // Default status for new branches
+  status: 'active',
 });
 
-// Placeholder for API calls - replace with actual API service
 const fetchBranches = async () => {
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 500));
-  branches.value = [
-    { id: 1, name: 'Agence Centrale', location: 'Alger Centre', createdAt: new Date().toISOString(), status: 'active' },
-    { id: 2, name: 'Agence Ouest', location: 'Oran', createdAt: new Date(Date.now() - 86400000 * 30).toISOString(), status: 'active' }, // 30 days ago
-    { id: 3, name: 'Agence Est', location: 'Constantine', createdAt: new Date(Date.now() - 86400000 * 60).toISOString(), status: 'inactive' }, // 60 days ago
-  ];
+  try {
+    const response = await apiClient.get('/branches');
+    if (response.data.success) {
+      branches.value = response.data.data;
+    }
+  } catch (error) {
+    console.error('Failed to fetch branches:', error);
+    console.log('Error fetching branches.');
+  }
 };
 
 const saveBranch = async () => {
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 500));
-  if (editingBranch.value) {
-    // Update existing branch
-    const index = branches.value.findIndex(b => b.id === editingBranch.value.id);
-    if (index !== -1) {
-      branches.value[index] = { ...branches.value[index], ...branchForm };
+  try {
+    if (editingBranch.value) {
+      await apiClient.put(`/branches/${editingBranch.value.id}`, branchForm);
+      console.log(t('manageBranches.branchUpdatedSuccess'));
+    } else {
+      await apiClient.post('/branches', branchForm);
+      console.log(t('manageBranches.branchAddedSuccess'));
     }
-    alert(t('manageBranches.branchUpdatedSuccess'));
-  } else {
-    // Add new branch
-    const newBranch = {
-      id: Date.now(), // Simple ID generation for demo
-      ...branchForm,
-      createdAt: new Date().toISOString(),
-      status: 'active', // New branches are active by default from form, or set here
-    };
-    branches.value.push(newBranch);
-    alert(t('manageBranches.branchAddedSuccess'));
+    closeModal();
+    fetchBranches();
+  } catch (error) {
+    console.error('Failed to save branch:', error);
+    console.log('Error saving branch.');
   }
-  closeModal();
-  fetchBranches(); // Refresh list
 };
 
 const editBranch = (branch) => {
-  editingBranch.value = { ...branch };
-  branchForm.id = branch.id;
-  branchForm.name = branch.name;
-  branchForm.location = branch.location;
-  branchForm.status = branch.status;
-  showAddBranchModal.value = true; // Open modal in edit mode
+  editingBranch.value = branch;
+  Object.assign(branchForm, branch);
+  showAddBranchModal.value = true;
 };
 
 const deleteBranch = async (branchId) => {
   if (confirm(t('manageBranches.confirmDeleteMessage'))) {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-    branches.value = branches.value.filter(b => b.id !== branchId);
-    alert(t('manageBranches.branchDeletedSuccess'));
+    try {
+      await apiClient.delete(`/branches/${branchId}`);
+      console.log(t('manageBranches.branchDeletedSuccess'));
+      fetchBranches();
+    } catch (error) {
+      console.error('Failed to delete branch:', error);
+      console.log('Error deleting branch.');
+    }
   }
 };
 
 const closeModal = () => {
   showAddBranchModal.value = false;
   editingBranch.value = null;
-  // Reset form
-  branchForm.id = null;
-  branchForm.name = '';
-  branchForm.location = '';
-  branchForm.status = 'active';
-};
-
-const formatDate = (dateString) => {
-  if (!dateString) return '';
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  return new Date(dateString).toLocaleDateString('fr-FR', options);
+  Object.assign(branchForm, { id: null, name: '', location: '', status: 'active' });
 };
 
 onMounted(() => {
