@@ -429,7 +429,8 @@
       "branch": "Branch",
       "status": "Status",
       "capacity": "Capacity",
-      "actions": "Actions"
+      "actions": "Actions",
+      "type": "Type"
     },
     "status": {
       "available": "Available",

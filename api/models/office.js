@@ -29,6 +29,10 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       note: 'Link to the visual representation in Office Designer',
     },
+    amenities: {
+        type: DataTypes.TEXT,
+        note: 'Comma-separated list of amenities'
+    }
   }, {
     tableName: 'offices',
     timestamps: false,

@@ -60,7 +60,7 @@ Client.belongsTo(Office, { as: 'office', foreignKey: 'office_id' });
 Office.hasMany(Client, { as: 'clients', foreignKey: 'office_id' });
 
 // Office associations
-Office.belongsTo(Branch, { foreignKey: 'branch_id' });
+Office.belongsTo(Branch, { as: 'branch', foreignKey: 'branch_id' });
 Branch.hasMany(Office, { foreignKey: 'branch_id' });
 
 // Contract associations
