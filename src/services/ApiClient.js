@@ -39,11 +39,11 @@ export function getContracts() {
 }
 
 export function getClientsList() {
-    return apiClient.get('/clients-list');
+    return apiClient.get('/clients');
 }
 
 export function getAvailableOffices() {
-    return apiClient.get('/offices-available');
+    return apiClient.get('/offices');
 }
 
 export function addContract(formData) {
@@ -67,5 +67,5 @@ export const addDocument = (formData) => {
 };
 
 export const getInvestmentsList = () => {
-    return apiClient.get('/investments-list');
+    return apiClient.get('/investments');
 };

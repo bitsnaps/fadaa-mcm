@@ -23,7 +23,6 @@ app.use('/*', cors({
 }));
 
 // Route registration
-app.route('/api', miscApp);
 app.route('/api', authApp);
 app.route('/api/users', userApp);
 app.route('/api/taxes', taxApp);
@@ -31,6 +30,7 @@ app.route('/api/contracts', contractApp);
 app.route('/api/notifications', notificationApp);
 app.route('/api/documents', documentApp);
 app.route('/api/client-services', clientServicesApp);
+app.route('/api/misc', miscApp);
 
 // --- Static File Serving ---
 // Serve the uploaded contract files

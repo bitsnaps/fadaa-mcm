@@ -18,7 +18,7 @@
             <thead>
               <tr>
                 <th>{{ $t('manageUsers.id') }}</th>
-                <th>{{ $t('manageUsers.name') }}</th>
+                <th>{{ $t('manageUsers.fullName') }}</th>
                 <th>{{ $t('manageUsers.email') }}</th>
                 <th>{{ $t('manageUsers.role') }}</th>
                 <th>{{ $t('manageUsers.status') }}</th>
@@ -29,11 +29,11 @@
             <tbody>
               <tr v-for="user in users" :key="user.id">
                 <td>{{ user.id }}</td>
-                <td>{{ user.name }}</td>
+                <td>{{ user.first_name }} {{ user.last_name }}</td>
                 <td>{{ user.email }}</td>
-                <td><span :class="`badge bg-${getRoleClass(user.role)}`">{{ $t(`manageUsers.roles.${user.role.toLowerCase()}`) }}</span></td>
-                <td><span :class="`badge bg-${user.status === 'Actif' ? 'success' : 'secondary'}`">{{ user.status === 'Actif' ? $t('manageUsers.active') : $t('manageUsers.inactive') }}</span></td>
-                <td>{{ user.createdAt }}</td>
+                <td><span :class="`badge bg-${getRoleClass(user.role.name)}`">{{ user.role.name }}</span></td>
+                <td><span :class="`badge bg-${user.is_active ? 'success' : 'secondary'}`">{{ user.is_active ? $t('manageUsers.active') : $t('manageUsers.inactive') }}</span></td>
+                <td>{{ formatDate(user.created_at) }}</td>
                 <td>
                   <button class="btn btn-sm btn-outline-primary me-2" @click="editUser(user)">
                     <i class="bi bi-pencil-fill"></i>
@@ -63,32 +63,46 @@
           <div class="modal-body">
             <form @submit.prevent="saveUser">
               <div class="mb-3">
-                <label for="userName" class="form-label">{{ $t('manageUsers.fullName') }}</label>
-                <input type="text" class="form-control" id="userName" v-model="currentUser.name" required>
-              </div>
-              <div class="mb-3">
-                <label for="userEmail" class="form-label">{{ $t('manageUsers.email') }}</label>
-                <input type="email" class="form-control" id="userEmail" v-model="currentUser.email" required>
-              </div>
-              <div class="mb-3">
-                <label for="userRole" class="form-label">{{ $t('manageUsers.role') }}</label>
-                <select class="form-select" id="userRole" v-model="currentUser.role" required>
-                  <option value="admin">{{ $t('manageUsers.roles.admin') }}</option>
-                  <option value="assistant">{{ $t('manageUsers.roles.assistant') }}</option>
-                  <option value="investor">{{ $t('manageUsers.roles.investor') }}</option>
-                  <option value="client">{{ $t('manageUsers.roles.client') }}</option>
-                </select>
-              </div>
-              <div class="mb-3" v-if="!editingUser">
-                <label for="userPassword" class="form-label">{{ $t('manageUsers.password') }}</label>
-                <input type="password" class="form-control" id="userPassword" v-model="currentUser.password" :required="!editingUser">
-              </div>
-               <div class="mb-3">
-                <label for="userStatus" class="form-label">{{ $t('manageUsers.status') }}</label>
-                <select class="form-select" id="userStatus" v-model="currentUser.status" required>
-                  <option value="Actif">{{ $t('manageUsers.active') }}</option>
-                  <option value="Inactif">{{ $t('manageUsers.inactive') }}</option>
-                </select>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="userFirstName" class="form-label">{{ $t('manageUsers.firstName') }}</label>
+                    <input type="text" class="form-control" id="userFirstName" v-model="currentUser.first_name" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="userLastName" class="form-label">{{ $t('manageUsers.lastName') }}</label>
+                    <input type="text" class="form-control" id="userLastName" v-model="currentUser.last_name" required>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="userEmail" class="form-label">{{ $t('manageUsers.emailAddress') }}</label>
+                  <input type="email" class="form-control" id="userEmail" v-model="currentUser.email" required>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="userRole" class="form-label">{{ $t('manageUsers.role') }}</label>
+                    <select class="form-select" id="userRole" v-model="currentUser.role_id" required>
+                      <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="userBranch" class="form-label">{{ $t('manageUsers.branch') }}</label>
+                    <select class="form-select" id="userBranch" v-model="currentUser.branch_id">
+                      <option :value="null">{{ $t('manageUsers.noBranch') }}</option>
+                      <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="mb-3" v-if="!editingUser">
+                  <label for="userPassword" class="form-label">{{ $t('manageUsers.password') }}</label>
+                  <input type="password" class="form-control" id="userPassword" v-model="currentUser.password" :required="!editingUser">
+                </div>
+                <div class="mb-3">
+                  <label for="userStatus" class="form-label">{{ $t('manageUsers.status') }}</label>
+                  <select class="form-select" id="userStatus" v-model="currentUser.is_active" required>
+                    <option :value="true">{{ $t('manageUsers.active') }}</option>
+                    <option :value="false">{{ $t('manageUsers.inactive') }}</option>
+                  </select>
+                </div>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" @click="closeModal">{{ $t('manageUsers.cancel') }}</button>
@@ -109,7 +123,7 @@
             <button type="button" class="btn-close" @click="userToDelete = null"></button>
           </div>
           <div class="modal-body">
-            <p>{{ $t('manageUsers.confirmDeleteMessage', { userName: userToDelete.name }) }}</p>
+            <p>{{ $t('manageUsers.confirmDeleteMessage', { userName: `${userToDelete.first_name} ${userToDelete.last_name}` }) }}</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" @click="userToDelete = null">{{ $t('manageUsers.cancel') }}</button>
@@ -123,34 +137,76 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import apiClient from '@/services/ApiClient';
+import { formatDate } from '@/helpers/utils';
 
 const { t } = useI18n();
 
-const users = ref([
-  { id: 'U001', name: 'Alice Admin', email: 'alice.admin@fadaa.com', role: 'Admin', status: 'Actif', createdAt: '01/01/2023' },
-  { id: 'U002', name: 'Bob Assistant', email: 'bob.assistant@fadaa.com', role: 'Assistant', status: 'Actif', createdAt: '15/02/2023' },
-  { id: 'U003', name: 'Charlie Client', email: 'charlie.client@example.com', role: 'Client', status: 'Actif', createdAt: '01/03/2023' },
-  { id: 'U004', name: 'Diana Investor', email: 'diana.investor@example.com', role: 'Investor', status: 'Inactif', createdAt: '10/04/2023' },
-]);
-
+const users = ref([]);
+const roles = ref([]);
+const branches = ref([]);
 const showAddUserModal = ref(false);
-const editingUser = ref(null); // Stores the user object being edited
-const userToDelete = ref(null); // Stores the user object to be deleted
+const editingUser = ref(null);
+const userToDelete = ref(null);
 
 const defaultUser = {
-  name: '',
+  first_name: '',
+  last_name: '',
   email: '',
-  role: 'client',
+  role_id: null,
+  branch_id: null,
   password: '',
-  status: 'Actif'
+  is_active: true,
 };
 
 const currentUser = ref({ ...defaultUser });
 
-const getRoleClass = (role) => {
-  switch (role.toLowerCase()) {
+const fetchUsers = async () => {
+  try {
+    const response = await apiClient.get('/users');
+    if (response.data.success) {
+      users.value = response.data.data;
+    }
+  } catch (error) {
+    console.error('Failed to fetch users:', error);
+    //
+  }
+};
+
+const fetchRoles = async () => {
+  try {
+    const response = await apiClient.get('/misc/roles');
+    if (response.data.success) {
+      roles.value = response.data.roles;
+    }
+  } catch (error) {
+    console.error('Failed to fetch roles:', error);
+  }
+};
+
+const fetchBranches = async () => {
+  try {
+    const response = await apiClient.get('/misc/branches');
+    if (response.data.success) {
+      branches.value = response.data.branches;
+    }
+  } catch (error) {
+    console.error('Failed to fetch branches:', error);
+  }
+};
+
+onMounted(() => {
+  fetchUsers();
+  fetchRoles();
+  fetchBranches();
+});
+
+
+const getRoleClass = (roleName) => {
+    if (!roleName) return 'secondary';
+  switch (roleName.toLowerCase()) {
     case 'admin': return 'danger';
     case 'assistant': return 'warning text-dark';
     case 'investor': return 'info text-dark';
@@ -162,45 +218,55 @@ const getRoleClass = (role) => {
 const closeModal = () => {
   showAddUserModal.value = false;
   editingUser.value = null;
-  currentUser.value = { ...defaultUser }; // Reset form
+  currentUser.value = { ...defaultUser };
 };
 
 const editUser = (user) => {
   editingUser.value = user;
-  currentUser.value = { ...user }; // Populate form with user data
-  // Password field is not shown/editable directly for existing users for security
+  currentUser.value = {
+    ...user,
+    role_id: user.role.id,
+    branch_id: user.branch ? user.branch.id : null,
+   };
+  showAddUserModal.value = true;
 };
 
-const saveUser = () => {
-  if (editingUser.value) {
-    // Simulate update
-    const index = users.value.findIndex(u => u.id === editingUser.value.id);
-    if (index !== -1) {
-      users.value[index] = { ...currentUser.value, id: editingUser.value.id };
+const saveUser = async () => {
+  try {
+    if (editingUser.value) {
+      // Update User
+      const payload = { ...currentUser.value };
+      delete payload.password; // Do not send password on update
+      await apiClient.put(`/users/${editingUser.value.id}`, payload);
+      console.log(t('manageUsers.userUpdatedSuccess'));
+    } else {
+      // Add User
+      await apiClient.post('/users', currentUser.value);
+      console.log(t('manageUsers.userAddedSuccess'));
     }
-    alert(t('manageUsers.userUpdatedSuccess'));
-  } else {
-    // Simulate add
-    const newUser = {
-      ...currentUser.value,
-      id: `U${String(Date.now()).slice(-3)}`,
-      createdAt: new Date().toLocaleDateString('fr-FR'),
-    };
-    users.value.unshift(newUser);
-    alert(t('manageUsers.userAddedSuccess'));
+    fetchUsers();
+    closeModal();
+  } catch (error) {
+    console.error('Failed to save user:', error);
+    const errorMessage = error.response?.data?.message || 'An unknown error occurred';
+    console.log(`Error: ${errorMessage}`);
   }
-  closeModal();
 };
 
 const confirmDeleteUser = (user) => {
   userToDelete.value = user;
 };
 
-const deleteUser = () => {
-  if (userToDelete.value) {
-    users.value = users.value.filter(u => u.id !== userToDelete.value.id);
-    alert(t('manageUsers.userDeletedSuccess', { userName: userToDelete.value.name }));
+const deleteUser = async () => {
+  if (!userToDelete.value) return;
+  try {
+    await apiClient.delete(`/users/${userToDelete.value.id}`);
+    console.log(t('manageUsers.userDeletedSuccess', { userName: `${userToDelete.value.first_name} ${userToDelete.value.last_name}` }));
+    fetchUsers();
     userToDelete.value = null;
+  } catch (error) {
+    console.error('Failed to delete user:', error);
+    console.log('Failed to delete user.');
   }
 };
 

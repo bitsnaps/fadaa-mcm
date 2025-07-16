@@ -5,7 +5,7 @@ const { authMiddleware } = require('../middleware/auth');
 const miscApp = new Hono();
 
 // GET /api/clients-list - Get a simplified list of clients for dropdowns
-miscApp.get('/clients-list', authMiddleware, async (c) => {
+miscApp.get('/clients', authMiddleware, async (c) => {
     try {
         const clients = await models.Client.findAll({
             attributes: ['id', 'company_name'],
@@ -19,7 +19,7 @@ miscApp.get('/clients-list', authMiddleware, async (c) => {
 });
 
 // GET /api/offices-available - Get a list of available offices for dropdowns
-miscApp.get('/offices-available', authMiddleware, async (c) => {
+miscApp.get('/offices', authMiddleware, async (c) => {
     try {
         const offices = await models.Office.findAll({
             where: { status: 'Available' },
@@ -34,7 +34,7 @@ miscApp.get('/offices-available', authMiddleware, async (c) => {
 });
 
 // GET /api/investments-list - Get a simplified list of investments for dropdowns
-miscApp.get('/investments-list', authMiddleware, async (c) => {
+miscApp.get('/investments', authMiddleware, async (c) => {
     try {
         const investments = await models.Investment.findAll({
             attributes: ['id', 'name'],
@@ -46,7 +46,33 @@ miscApp.get('/investments-list', authMiddleware, async (c) => {
         return c.json({ success: false, message: 'Failed to fetch investment list' }, 500);
     }
 });
+// GET /api/roles - Get a simplified list of roles for dropdowns
+miscApp.get('/roles', authMiddleware, async (c) => {
+    try {
+        const roles = await models.Role.findAll({
+            attributes: ['id', 'name'],
+            order: [['name', 'ASC']]
+        });
+        return c.json({ success: true, roles });
+    } catch (error) {
+        console.error('Error fetching role list:', error);
+        return c.json({ success: false, message: 'Failed to fetch role list' }, 500);
+    }
+});
 
+// GET /api/branches - Get a simplified list of branches for dropdowns
+miscApp.get('/branches', authMiddleware, async (c) => {
+    try {
+        const branches = await models.Branch.findAll({
+            attributes: ['id', 'name'],
+            order: [['name', 'ASC']]
+        });
+        return c.json({ success: true, branches });
+    } catch (error) {
+        console.error('Error fetching branch list:', error);
+        return c.json({ success: false, message: 'Failed to fetch branch list' }, 500);
+    }
+});
 miscApp.get('/', async (c) => {
     return c.json({message: 'ready'});
 });

@@ -49,7 +49,7 @@ const {
 User.belongsTo(Role, { as: 'role', foreignKey: 'role_id' });
 Role.hasMany(User, { foreignKey: 'role_id' });
 
-User.belongsTo(Branch, { foreignKey: 'branch_id' });
+User.belongsTo(Branch, { as: 'branch', foreignKey: 'branch_id' });
 Branch.hasMany(User, { foreignKey: 'branch_id' });
 
 // Client associations
