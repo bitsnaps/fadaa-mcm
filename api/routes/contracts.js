@@ -13,7 +13,8 @@ contractApp.get('/', async (c) => {
         const contracts = await models.Contract.findAll({
             include: [
                 { model: models.Client, attributes: ['id', 'company_name'] },
-                { model: models.Office, attributes: ['id', 'name'] }
+                { model: models.Office, attributes: ['id', 'name'] },
+                { model: models.Tax }
             ]
         });
         return c.json({ success: true, contracts });
@@ -27,10 +28,10 @@ contractApp.get('/', async (c) => {
 contractApp.post('/', async (c) => {
     try {
         const body = await c.req.parseBody();
-        const { client_id, office_id, start_date, end_date, monthly_rate } = body;
+        const { client_id, office_id, start_date, end_date, monthly_rate, tax_id } = body;
         const documentFile = body['document'];
 
-        if (!client_id || !office_id || !start_date || !end_date || !monthly_rate || !documentFile) {
+        if (!client_id || !office_id || !start_date || !end_date || !monthly_rate) {
             return c.json({ success: false, message: 'Missing required fields' }, 400);
         }
 
@@ -46,7 +47,7 @@ contractApp.post('/', async (c) => {
         const fileData = await documentFile.arrayBuffer();
         await fs.writeFile(filePath, Buffer.from(fileData));
 
-        const documentUrl = `/uploads/contracts/${newFileName}`;
+        const documentUrl = documentFile ? `/uploads/contracts/${newFileName}` : null;
         // --- End File Upload Logic ---
 
         const newContract = await models.Contract.create({
@@ -56,7 +57,8 @@ contractApp.post('/', async (c) => {
             end_date,
             monthly_rate,
             status: 'Active', // Or 'Pending' if an approval process is needed
-            document_url: documentUrl
+            document_url: documentUrl,
+            taxId: tax_id || null
         });
 
         // Optionally, update the office status

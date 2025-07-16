@@ -26,12 +26,24 @@ module.exports = (sequelize) => {
     notes: {
       type: DataTypes.TEXT,
     },
+    taxId: {
+       type: DataTypes.INTEGER,
+       allowNull: true,
+       references: {
+           model: 'Taxes',
+           key: 'id'
+       }
+    }
   }, {
     tableName: 'client_services',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   });
+
+  ClientService.associate = (models) => {
+   ClientService.belongsTo(models.Tax, { foreignKey: 'taxId' });
+  };
 
   return ClientService;
 };

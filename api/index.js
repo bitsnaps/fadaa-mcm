@@ -10,6 +10,7 @@ const notificationApp = require('./routes/notifications');
 const miscApp = require('./routes/misc');
 const authApp = require('./routes/auth');
 const documentApp = require('./routes/documents');
+const clientServicesApp = require('./routes/clientServices');
 
 const app = new Hono();
 
@@ -29,6 +30,7 @@ app.route('/api/taxes', taxApp);
 app.route('/api/contracts', contractApp);
 app.route('/api/notifications', notificationApp);
 app.route('/api/documents', documentApp);
+app.route('/api/client-services', clientServicesApp);
 
 // --- Static File Serving ---
 // Serve the uploaded contract files

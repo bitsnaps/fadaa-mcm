@@ -34,7 +34,26 @@ const adminMiddleware = async (c, next) => {
     }
 };
 
+const adminOrAssistantMiddleware = async (c, next) => {
+    try {
+        const user = c.get('user');
+        if (!user || !user.role_id) {
+            return c.json({ success: false, message: 'Forbidden' }, 403);
+        }
+
+        const role = await models.Role.findOne({ where: { id: user.role_id } });
+
+        if (!role || !['admin', 'assistant'].includes(role.name.toLowerCase())) {
+            return c.json({ success: false, message: 'Forbidden, admins or assistants only' }, 403);
+        }
+        await next();
+    } catch (error) {
+        return c.json({ success: false, message: 'An error occurred during authorization' }, 500);
+    }
+};
+
 module.exports = {
     authMiddleware,
-    adminMiddleware
+    adminMiddleware,
+    adminOrAssistantMiddleware
 };

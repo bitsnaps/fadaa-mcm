@@ -89,7 +89,8 @@
     "delete": "Supprimer",
     "cancel": "Annuler",
     "save": "Enregistrer",
-    "confirmDeleteTax": "Êtes-vous sûr de vouloir supprimer cette taxe ?"
+    "confirmDeleteTax": "Êtes-vous sûr de vouloir supprimer cette taxe ?",
+    "selectTax": "Sélectionnez une taxe"
   },
   "monthlyReport": {
     "title": "Rapport Mensuel",

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getContracts, getClientsList, getAvailableOffices, addContract } from '@/services/ApiClient';
+import apiClient, { getContracts, getClientsList, getAvailableOffices, addContract } from '@/services/ApiClient';
 import { Modal } from 'bootstrap';
 import { format } from 'date-fns';
 
@@ -20,10 +20,12 @@ const newContract = ref({
   start_date: '',
   end_date: '',
   monthly_rate: '',
-  document: null
+  document: null,
+  tax_ids: []
 });
 const clients = ref([]);
 const offices = ref([]);
+const availableTaxes = ref([]);
 
 
 const fetchContracts = async () => {
@@ -98,15 +100,19 @@ const archiveContract = async (contractId) => {
 
 const openAddContractModal = async () => {
   try {
-    const [clientsResponse, officesResponse] = await Promise.all([
+    const [clientsResponse, officesResponse, taxesResponse] = await Promise.all([
       getClientsList(),
-      getAvailableOffices()
+      getAvailableOffices(),
+      apiClient.get('/taxes')
     ]);
     if (clientsResponse.data.success) {
       clients.value = clientsResponse.data.clients;
     }
     if (officesResponse.data.success) {
         offices.value = officesResponse.data.offices;
+    }
+    if (taxesResponse.data.success) {
+       availableTaxes.value = taxesResponse.data.taxes;
     }
     const modalInstance = Modal.getOrCreateInstance(addContractModal.value);
     modalInstance.show();
@@ -135,7 +141,7 @@ const submitNewContract = async () => {
       modalInstance.hide();
       fetchContracts(); // Refresh the list
        // Reset form
-       newContract.value = { client_id: null, office_id: null, start_date: '', end_date: '', monthly_rate: '', document: null };
+       newContract.value = { client_id: null, office_id: null, start_date: '', end_date: '', monthly_rate: '', document: null, tax_ids: [] };
     } else {
       alert('Failed to add contract: ' + response.data.message);
     }
@@ -260,6 +266,14 @@ const submitNewContract = async () => {
                         <div class="mb-3">
                             <label for="monthly_rate" class="form-label">{{ t('addClient.form.paymentTerms') }}</label>
                             <input type="number" id="monthly_rate" class="form-control" v-model="newContract.monthly_rate" placeholder="e.g., 50000" required>
+                        </div>
+                        <div class="mb-3">
+                           <label for="contractTaxes" class="form-label">{{ t('manageTaxes.title') }}</label>
+                           <select multiple class="form-select" id="contractTaxes" v-model="newContract.tax_ids">
+                               <option v-for="tax in availableTaxes" :key="tax.id" :value="tax.id">
+                                   {{ tax.name }} ({{ tax.rate }}%)
+                               </option>
+                           </select>
                         </div>
                         <div class="mb-3">
                             <label for="document" class="form-label">{{ t('addClient.form.attachments') }}</label>

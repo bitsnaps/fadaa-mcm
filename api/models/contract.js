@@ -26,12 +26,24 @@ module.exports = (sequelize) => {
     document_url: {
       type: DataTypes.STRING(255),
     },
+     taxId: {
+       type: DataTypes.INTEGER,
+       allowNull: true,
+       references: {
+           model: 'Taxes',
+           key: 'id'
+       }
+     }
   }, {
     tableName: 'contracts',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   });
+
+  Contract.associate = (models) => {
+   Contract.belongsTo(models.Tax, { foreignKey: 'taxId' });
+  };
 
   return Contract;
 };

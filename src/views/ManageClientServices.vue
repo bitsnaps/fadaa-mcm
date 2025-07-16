@@ -52,6 +52,17 @@
                 <button type="submit" class="btn btn-primary btn-fadaa-primary w-100">{{ $t('clientServices.addService') }}</button>
               </div>
             </div>
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label for="serviceTaxes" class="form-label">{{ $t('manageTaxes.title') }}</label>
+                    <select class="form-select" id="serviceTaxes" v-model="newService.tax_id">
+                        <option :value="null">-- {{ $t('manageTaxes.selectTax') }} --</option>
+                        <option v-for="tax in availableTaxes" :key="tax.id" :value="tax.id">
+                            {{ tax.name }} ({{ tax.rate }}%)
+                        </option>
+                    </select>
+                </div>
+            </div>
              <div class="mb-3">
                 <label for="serviceNotes" class="form-label">{{ $t('clientServices.notes') }}</label>
                 <textarea class="form-control" id="serviceNotes" v-model="newService.notes" rows="2"></textarea>
@@ -119,7 +130,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 // import { useAuthStore } from '@/stores/auth';
-// import apiClient from '@/services/ApiClient';
+import apiClient from '@/services/ApiClient';
 
 // const authStore = useAuthStore();
 
@@ -128,13 +139,15 @@ const clientSearch = ref('');
 const selectedClientId = ref('');
 const clientServices = ref([]);
 const availableServiceCategories = ref([]);
+const availableTaxes = ref([]);
 const loadingClientData = ref(false);
 
 const newService = ref({
   categoryId: '',
   paymentType: 'recurrent',
   price: 0,
-  notes: ''
+  notes: '',
+  tax_id: null
 });
 
 const selectedClientName = computed(() => {
@@ -163,6 +176,15 @@ const fetchServiceCategories = async () => {
     { id: 3, name: 'Utilities', description: 'Internet, electricity, etc.' },
     { id: 4, name: 'Catering & Refreshments', description: 'Coffee, snacks, catering.' }
   ];
+};
+
+const fetchTaxes = async () => {
+  try {
+    const response = await apiClient.get('/taxes');
+    availableTaxes.value = response.data.taxes;
+  } catch (error) {
+    console.error("Failed to fetch taxes:", error);
+  }
 };
 
 const loadClientServices = async () => {
@@ -210,7 +232,7 @@ const handleAddServiceToClient = async () => {
   };
   clientServices.value.push(serviceToAdd);
   // Reset form
-  newService.value = { categoryId: '', paymentType: 'recurrent', price: 0, notes: '' };
+  newService.value = { categoryId: '', paymentType: 'recurrent', price: 0, notes: '', tax_id: null };
   console.log('Service added successfully (mock).');
 };
 
@@ -232,6 +254,7 @@ const resetClientSearch = () => {
 onMounted(() => {
   fetchClients();
   fetchServiceCategories();
+  fetchTaxes();
 });
 
 </script>
