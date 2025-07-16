@@ -8,7 +8,7 @@ taxApp.use('*', authMiddleware, adminMiddleware); // Protect all tax routes
 // GET /api/taxes - Get all taxes
 taxApp.get('/', async (c) => {
     try {
-        const taxes = await models.Tax.findAll();
+        const taxes = await models.Tax.findAll({ paranoid: false });
         return c.json({ success: true, taxes });
     } catch (error) {
         console.error('Error fetching taxes:', error);
@@ -38,7 +38,7 @@ taxApp.post('/', async (c) => {
 taxApp.get('/:id', async (c) => {
     try {
         const { id } = c.req.param();
-        const tax = await models.Tax.findByPk(id);
+        const tax = await models.Tax.findByPk(id, { paranoid: false });
         if (tax) {
             return c.json({ success: true, tax });
         }
@@ -54,7 +54,7 @@ taxApp.put('/:id', async (c) => {
     try {
         const { id } = c.req.param();
         const { name, rate, description } = await c.req.json();
-        const tax = await models.Tax.findByPk(id);
+        const tax = await models.Tax.findByPk(id, { paranoid: false });
         if (!tax) {
             return c.json({ success: false, message: 'Tax not found' }, 404);
         }
@@ -73,12 +73,12 @@ taxApp.put('/:id', async (c) => {
 taxApp.delete('/:id', async (c) => {
     try {
         const { id } = c.req.param();
-        const tax = await models.Tax.findByPk(id);
+        const tax = await models.Tax.findByPk(id, { paranoid: false });
         if (!tax) {
             return c.json({ success: false, message: 'Tax not found' }, 404);
         }
         
-        await tax.destroy(); // This will soft-delete
+        await tax.destroy({ force: true }); // This will hard-delete
         return c.json({ success: true, message: 'Tax deleted successfully' });
     } catch (error) {
         console.error('Error deleting tax:', error);
