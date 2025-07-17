@@ -125,6 +125,13 @@ contractApp.delete('/:id', authMiddleware, async (c) => {
         // For now, we just delete the contract
         await contract.destroy();
         
+        return c.json({ success: true, message: 'Contract deleted successfully' });
+    } catch (error) {
+        console.error(`Error deleting contract ${id}:`, error);
+        return c.json({ success: false, message: 'Failed to delete contract' }, 500);
+    }
+});
+
 // POST /api/contracts/:id/document - Upload a document for an existing contract
 contractApp.post('/:id/document', async (c) => {
     try {
@@ -162,12 +169,6 @@ contractApp.post('/:id/document', async (c) => {
     } catch (error) {
         console.error(`Error uploading document for contract ${c.req.param('id')}:`, error);
         return c.json({ success: false, message: 'Failed to upload document' }, 500);
-    }
-});
-        return c.json({ success: true, message: 'Contract deleted successfully' });
-    } catch (error) {
-        console.error(`Error deleting contract ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to delete contract' }, 500);
     }
 });
 

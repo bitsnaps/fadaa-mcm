@@ -32,3 +32,6 @@ api/.env.*
 
 # docs
 docs/
+
+# uploads
+public/uploads
