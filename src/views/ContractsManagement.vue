@@ -88,14 +88,23 @@ const downloadDocument = (docUrl) => {
 };
 
 const archiveContract = async (contractId) => {
-  // This would ideally call an API to update the status
-  const contract = contracts.value.find(c => c.id === contractId);
-  if (contract) {
-    console.log(`Archiving contract ${contractId} - API call needed`);
-    // Example: await ApiClient.updateContractStatus(contractId, 'Archived');
-    // For now, just update locally
-    contract.status = 'Terminated'; // or 'Expired' / 'Archived' depending on logic
-  }
+    try {
+        await apiClient.put(`/contracts/${contractId}/status`, { status: 'Terminated' });
+        fetchContracts();
+    } catch (error) {
+        console.error(`Failed to archive contract ${contractId}:`, error);
+    }
+};
+
+const deleteContract = async (contractId) => {
+    if(confirm(t('contracts.confirmDelete'))) {
+        try {
+            await apiClient.delete(`/contracts/${contractId}`);
+            fetchContracts();
+        } catch (error) {
+            console.error(`Failed to delete contract ${contractId}:`, error);
+        }
+    }
 };
 
 const openAddContractModal = async () => {
@@ -106,10 +115,10 @@ const openAddContractModal = async () => {
       apiClient.get('/taxes')
     ]);
     if (clientsResponse.data.success) {
-      clients.value = clientsResponse.data.clients;
+      clients.value = clientsResponse.data.data;
     }
     if (officesResponse.data.success) {
-        offices.value = officesResponse.data.offices;
+        offices.value = officesResponse.data.data;
     }
     if (taxesResponse.data.success) {
        availableTaxes.value = taxesResponse.data.taxes;
@@ -129,8 +138,12 @@ const submitNewContract = async () => {
   isSubmitting.value = true;
   const formData = new FormData();
   Object.keys(newContract.value).forEach(key => {
-    if (newContract.value[key]) {
-      formData.append(key, newContract.value[key]);
+    if (key === 'tax_ids') {
+        newContract.value[key].forEach(taxId => {
+            formData.append('tax_ids[]', taxId);
+        });
+    } else if (newContract.value[key]) {
+        formData.append(key, newContract.value[key]);
     }
   });
 
@@ -217,6 +230,9 @@ const submitNewContract = async () => {
               </button>
               <button v-if="contract.status === 'Active'" @click="archiveContract(contract.id)" class="btn btn-sm btn-outline-warning" :title="t('contracts.archiveContract')">
                 <i class="bi bi-archive"></i>
+              </button>
+              <button @click="deleteContract(contract.id)" class="btn btn-sm btn-outline-danger ms-1" :title="t('contracts.deleteContract')">
+                <i class="bi bi-trash"></i>
               </button>
             </td>
           </tr>

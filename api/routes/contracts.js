@@ -14,7 +14,7 @@ contractApp.get('/', async (c) => {
             include: [
                 { model: models.Client, attributes: ['id', 'company_name'] },
                 { model: models.Office, attributes: ['id', 'name'] },
-                { model: models.Tax }
+                { model: models.Tax, as: 'taxes' }
             ]
         });
         return c.json({ success: true, contracts });
@@ -28,26 +28,29 @@ contractApp.get('/', async (c) => {
 contractApp.post('/', async (c) => {
     try {
         const body = await c.req.parseBody();
-        const { client_id, office_id, start_date, end_date, monthly_rate, tax_id } = body;
+        const { client_id, office_id, start_date, end_date, monthly_rate, tax_ids } = body;
         const documentFile = body['document'];
 
         if (!client_id || !office_id || !start_date || !end_date || !monthly_rate) {
             return c.json({ success: false, message: 'Missing required fields' }, 400);
         }
 
+        let documentUrl = null;
         // --- File Upload Logic ---
-        const uploadDir = path.join(__dirname, '..', '..', 'public', 'uploads', 'contracts');
-        await fs.mkdir(uploadDir, { recursive: true });
+        if (documentFile && documentFile.name) {
+            const uploadDir = path.join(__dirname, '..', '..', 'public', 'uploads', 'contracts');
+            await fs.mkdir(uploadDir, { recursive: true });
 
-        const timestamp = Date.now();
-        const fileExtension = path.extname(documentFile.name);
-        const newFileName = `contract-${client_id}-${timestamp}${fileExtension}`;
-        const filePath = path.join(uploadDir, newFileName);
-        
-        const fileData = await documentFile.arrayBuffer();
-        await fs.writeFile(filePath, Buffer.from(fileData));
+            const timestamp = Date.now();
+            const fileExtension = path.extname(documentFile.name);
+            const newFileName = `contract-${client_id}-${timestamp}${fileExtension}`;
+            const filePath = path.join(uploadDir, newFileName);
+            
+            const fileData = await documentFile.arrayBuffer();
+            await fs.writeFile(filePath, Buffer.from(fileData));
 
-        const documentUrl = documentFile ? `/uploads/contracts/${newFileName}` : null;
+            documentUrl = `/uploads/contracts/${newFileName}`;
+        }
         // --- End File Upload Logic ---
 
         const newContract = await models.Contract.create({
@@ -58,8 +61,15 @@ contractApp.post('/', async (c) => {
             monthly_rate,
             status: 'Active', // Or 'Pending' if an approval process is needed
             document_url: documentUrl,
-            taxId: tax_id || null
         });
+
+        if (tax_ids) {
+            const taxIdArray = Array.isArray(tax_ids) ? tax_ids : [tax_ids];
+            if (taxIdArray.length > 0) {
+              const taxes = await models.Tax.findAll({ where: { id: taxIdArray } });
+              await newContract.setTaxes(taxes);
+            }
+        }
 
         // Optionally, update the office status
         await models.Office.update({ status: 'Occupied' }, { where: { id: office_id } });
@@ -71,5 +81,56 @@ contractApp.post('/', async (c) => {
         return c.json({ success: false, message: 'Failed to create contract' }, 500);
     }
 });
+
+// PUT /api/contracts/:id - Update a contract's status
+contractApp.put('/:id/status', authMiddleware, async (c) => {
+    try {
+        const { id } = c.req.param();
+        const { status } = await c.req.json();
+
+        if (!status) {
+            return c.json({ success: false, message: 'Status is required' }, 400);
+        }
+
+        const contract = await models.Contract.findByPk(id);
+        if (!contract) {
+            return c.json({ success: false, message: 'Contract not found' }, 404);
+        }
+
+        await contract.update({ status });
+
+        // If contract is terminated, maybe change office status back to 'Available'
+        if (status === 'Terminated' || status === 'Expired') {
+            await models.Office.update({ status: 'Available' }, { where: { id: contract.office_id } });
+        }
+
+        return c.json({ success: true, message: 'Contract status updated successfully', contract });
+    } catch (error) {
+        console.error(`Error updating contract ${id} status:`, error);
+        return c.json({ success: false, message: 'Failed to update contract status' }, 500);
+    }
+});
+
+
+// DELETE /api/contracts/:id - Delete a contract
+contractApp.delete('/:id', authMiddleware, async (c) => {
+    try {
+        const { id } = c.req.param();
+        const contract = await models.Contract.findByPk(id);
+        if (!contract) {
+            return c.json({ success: false, message: 'Contract not found' }, 404);
+        }
+
+        // Optionally, handle related cleanup, like setting office to 'Available'
+        // For now, we just delete the contract
+        await contract.destroy();
+        
+        return c.json({ success: true, message: 'Contract deleted successfully' });
+    } catch (error) {
+        console.error(`Error deleting contract ${id}:`, error);
+        return c.json({ success: false, message: 'Failed to delete contract' }, 500);
+    }
+});
+
 
 module.exports = contractApp;

@@ -42,7 +42,7 @@ const {
   User, Role, Branch, Client, Office, Contract, ServiceCategory,
   ClientService, Document, Task, Notification, FinancialReport,
   ComplianceReport, Investment, ClientInvestment, OfficeDesign,
-  SystemSetting, ActivityLog, Tax
+  SystemSetting, ActivityLog, Tax, ContractTax
 } = db;
 
 // User associations
@@ -68,6 +68,10 @@ Contract.belongsTo(Client, { foreignKey: 'client_id' });
 Client.hasMany(Contract, { foreignKey: 'client_id' });
 Contract.belongsTo(Office, { foreignKey: 'office_id' });
 Office.hasMany(Contract, { foreignKey: 'office_id' });
+
+// Contract-Tax many-to-many relationship
+Contract.belongsToMany(Tax, { through: ContractTax, foreignKey: 'contract_id', as: 'taxes' });
+Tax.belongsToMany(Contract, { through: ContractTax, foreignKey: 'tax_id' });
 
 // ClientService associations
 ClientService.belongsTo(Client, { foreignKey: 'client_id' });

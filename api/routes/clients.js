@@ -8,9 +8,20 @@ const clientsApp = new Hono();
 clientsApp.get('/', authMiddleware, async (c) => {
     try {
         const clients = await models.Client.findAll({
+            attributes: [
+                'id',
+                'company_name',
+                'first_name',
+                'last_name',
+                'email',
+                'phone_number',
+                'address',
+                'status',
+                'created_at'
+            ],
             include: [
-                { model: models.User, as: 'managed_by' },
-                { model: models.Office, as: 'office' }
+                { model: models.User, as: 'managed_by', attributes: ['id', 'first_name', 'last_name'] },
+                { model: models.Office, as: 'office', attributes: ['id', 'name'] }
             ],
             order: [['company_name', 'ASC']],
         });

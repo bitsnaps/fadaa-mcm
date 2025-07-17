@@ -37,6 +37,18 @@ const client = ref({
 const pageTitle = computed(() => clientId.value ? t('addClient.editTitle') : t('addClient.addTitle'));
 const submitButtonText = computed(() => clientId.value ? t('addClient.submitButtonUpdate') : t('addClient.submitButtonAdd'));
 const validationErrors = ref({});
+const availableOffices = ref([]);
+
+const fetchAvailableOffices = async () => {
+    try {
+        const response = await apiClient.get('/misc/offices');
+        if(response.data.success) {
+            availableOffices.value = response.data.offices;
+        }
+    } catch (error) {
+        console.error("Failed to fetch available offices:", error);
+    }
+};
 
 const validateForm = () => {
     const errors = {};
@@ -50,6 +62,7 @@ const validateForm = () => {
 };
 
 onMounted(async () => {
+  fetchAvailableOffices();
   if (clientId.value) {
     try {
         const response = await apiClient.get(`/clients/${clientId.value}`);
@@ -224,8 +237,12 @@ const handleFileUpload = (event) => {
         </div>
         <div class="mb-3">
           <label for="officeId" class="form-label">{{ t('addClient.form.assignOffice') }}</label>
-          <input type="number" class="form-control" id="officeId" v-model.number="client.office_id">
-          <!-- TODO: Implement office selection dropdown/modal based on availability -->
+            <select class="form-select" id="officeId" v-model="client.office_id">
+                <option :value="null">{{ t('addClient.form.noOfficeAssigned') }}</option>
+                <option v-for="office in availableOffices" :key="office.id" :value="office.id">
+                    {{ office.name }}
+                </option>
+            </select>
         </div>
         <div class="mb-3">
           <label for="attachments" class="form-label">{{ t('addClient.form.attachments') }}</label>

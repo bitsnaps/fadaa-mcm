@@ -16,6 +16,10 @@ const authApp = require('./routes/auth');
 const documentApp = require('./routes/documents');
 const clientServicesApp = require('./routes/clientServices');
 
+if (process.env.NODE_ENV !== 'test') {
+    require('./cron/scheduler');
+}
+
 const app = new Hono();
 
 // Add CORS middleware (for Dev)

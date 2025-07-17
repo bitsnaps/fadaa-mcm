@@ -79,6 +79,13 @@ const routes = [
     meta: { requiresAuth: true, roles: ['admin','assistant'] }
   },
   {
+    path: '/edit-client/:clientId',
+    name: 'EditClient',
+    component: AddClient,
+    meta: { requiresAuth: true, roles: ['admin', 'assistant'] },
+    props: true
+  },
+  {
     path: '/tasks',
     name: 'Tasks',
     components: { default: Tasks, header: Navbar }, // Use Tasks component and Navbar

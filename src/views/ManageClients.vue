@@ -56,7 +56,7 @@ const viewClientDetails = (client) => {
 };
 
 const editClient = (clientId) => {
-  router.push({ name: 'AddClient', params: { clientId } });
+  router.push({ name: 'EditClient', params: { clientId } });
 };
 
 const manageClientServices = (clientId) => {
@@ -160,30 +160,35 @@ const deleteClient = async (clientId) => {
           <div class="modal-body" v-if="selectedClient">
             <div class="row">
               <div class="col-md-6">
+                <h5>{{ t('manageClients.companyInformation') }}</h5>
                 <p><strong>{{ $t('manageClients.detailsId') }}</strong> {{ selectedClient.id }}</p>
                 <p><strong>{{ $t('manageClients.companyName') }}</strong> {{ selectedClient.company_name }}</p>
-                <p><strong>{{ $t('manageClients.contactName') }}</strong> {{ selectedClient.first_name }} {{ selectedClient.last_name }}</p>
                 <p><strong>{{ $t('manageClients.detailsEmail') }}</strong> {{ selectedClient.email }}</p>
-                <p><strong>{{ $t('manageClients.detailsPhone') }}</strong> {{ selectedClient.phone_number }}</p>
+                <p><strong>{{ $t('manageClients.detailsPhone') }}</strong> {{ selectedClient.phone_number || 'N/A' }}</p>
+                <p><strong>{{ $t('manageClients.detailsAddress') }}</strong> {{ selectedClient.address || 'N/A' }}</p>
               </div>
               <div class="col-md-6">
+                <h5>{{ t('manageClients.contactPersonInformation') }}</h5>
+                <p><strong>{{ $t('manageClients.contactName') }}</strong> {{ selectedClient.contact_person_name || `${selectedClient.first_name} ${selectedClient.last_name}` }}</p>
+                <p><strong>{{ $t('manageClients.detailsEmail') }}</strong> {{ selectedClient.contact_person_email }}</p>
+                <p><strong>{{ $t('manageClients.detailsPhone') }}</strong> {{ selectedClient.contact_person_phone }}</p>
+                <hr>
                 <p><strong>{{ $t('manageClients.detailsStatus') }}</strong>
                   <span
                     :class="['badge',
                              selectedClient.status === 'Active' ? 'bg-success' :
                              selectedClient.status === 'Inactive' ? 'bg-secondary' :
-                             'bg-warning text-dark']">
+                              'bg-warning text-dark']">
                     {{ $t(`manageClients.statuses.${selectedClient.status.toLowerCase()}`) }}
                   </span>
                 </p>
-                <p><strong>{{ $t('manageClients.detailsAddress') }}</strong> {{ selectedClient.address }}</p>
                 <p><strong>{{ $t('manageClients.detailsRegistrationDate') }}</strong> {{ formatDate(selectedClient.created_at) }}</p>
               </div>
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('manageClients.close') }}</button>
-            <button type="button" class="btn btn-warning" @click="editClient(selectedClient.id); viewClientModal.hide();">{{ $t('manageClients.editClient') }}</button>
+            <button type="button" class="btn btn-warning" @click="editClient(selectedClient.id); if(viewClientModal) viewClientModal.hide();">{{ $t('manageClients.editClient') }}</button>
           </div>
         </div>
       </div>
