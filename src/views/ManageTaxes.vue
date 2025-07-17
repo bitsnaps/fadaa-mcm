@@ -20,6 +20,7 @@
                 <th>{{ $t('manageTaxes.name') }}</th>
                 <th>{{ $t('manageTaxes.rate') }} (%)</th>
                 <th>{{ $t('manageTaxes.description') }}</th>
+                <th>{{ $t('manageTaxes.bearer') }}</th>
                 <th>{{ $t('manageTaxes.actions') }}</th>
               </tr>
             </thead>
@@ -28,6 +29,7 @@
                 <td>{{ tax.name }}</td>
                 <td>{{ tax.rate }}</td>
                 <td>{{ tax.description }}</td>
+                <td>{{ tax.bearer }}</td>
                 <td>
                   <button class="btn btn-sm btn-outline-primary me-2" @click="openEditModal(tax)">
                     <i class="bi bi-pencil-fill"></i>
@@ -38,7 +40,7 @@
                 </td>
               </tr>
               <tr v-if="!taxes.length">
-                <td colspan="4" class="text-center text-muted">No taxes found.</td>
+                <td colspan="5" class="text-center text-muted">No taxes found.</td>
               </tr>
             </tbody>
           </table>
@@ -67,6 +69,13 @@
               <div class="mb-3">
                 <label for="taxDescription" class="form-label">{{ $t('manageTaxes.description') }}</label>
                 <textarea class="form-control" id="taxDescription" v-model="currentTax.description"></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="taxBearer" class="form-label">{{ $t('manageTaxes.bearer') }}</label>
+                <select class="form-select" id="taxBearer" v-model="currentTax.bearer">
+                    <option value="Client">{{ t('manageTaxes.client') }}</option>
+                    <option value="Company">{{ t('manageTaxes.company') }}</option>
+                </select>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" @click="closeModal">{{ $t('manageTaxes.cancel') }}</button>
@@ -114,7 +123,8 @@ const currentTax = ref({
   id: null,
   name: '',
   rate: '',
-  description: ''
+  description: '',
+  bearer: 'Client'
 });
 
 const fetchTaxes = async () => {
@@ -129,7 +139,7 @@ const fetchTaxes = async () => {
 
 const openCreateModal = () => {
   isEditing.value = false;
-  currentTax.value = { id: null, name: '', rate: '', description: '' };
+  currentTax.value = { id: null, name: '', rate: '', description: '', bearer: 'Client' };
   isModalOpen.value = true;
 };
 
@@ -142,7 +152,7 @@ const openEditModal = (tax) => {
 const closeModal = () => {
     isModalOpen.value = false;
     isEditing.value = false;
-    currentTax.value = { id: null, name: '', rate: '', description: '' };
+    currentTax.value = { id: null, name: '', rate: '', description: '', bearer: 'Client' };
 };
 
 const saveTax = async () => {

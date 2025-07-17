@@ -19,11 +19,11 @@ taxApp.get('/', async (c) => {
 // POST /api/taxes - Create a new tax
 taxApp.post('/', async (c) => {
     try {
-        const { name, rate, description } = await c.req.json();
+        const { name, rate, description, bearer } = await c.req.json();
         if (!name || !rate) {
             return c.json({ success: false, message: 'Name and rate are required' }, 400);
         }
-        const newTax = await models.Tax.create({ name, rate, description });
+        const newTax = await models.Tax.create({ name, rate, description, bearer });
         return c.json({ success: true, message: 'Tax created successfully', tax: newTax }, 201);
     } catch (error) {
         if (error.name === 'SequelizeUniqueConstraintError') {
@@ -53,12 +53,12 @@ taxApp.get('/:id', async (c) => {
 taxApp.put('/:id', async (c) => {
     try {
         const { id } = c.req.param();
-        const { name, rate, description } = await c.req.json();
+        const { name, rate, description, bearer } = await c.req.json();
         const tax = await models.Tax.findByPk(id, { paranoid: false });
         if (!tax) {
             return c.json({ success: false, message: 'Tax not found' }, 404);
         }
-        await tax.update({ name, rate, description });
+        await tax.update({ name, rate, description, bearer });
         return c.json({ success: true, message: 'Tax updated successfully', tax });
     } catch (error) {
         if (error.name === 'SequelizeUniqueConstraintError') {

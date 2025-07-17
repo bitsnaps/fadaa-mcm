@@ -90,7 +90,10 @@
     "cancel": "Cancel",
     "save": "Save",
     "confirmDeleteTax": "Are you sure you want to delete this tax?",
-    "selectTax": "Select a tax"
+    "selectTax": "Select a tax",
+    "bearer": "Bearer",
+    "client": "Client",
+    "company": "Company"
   },
   "monthlyReport": {
     "title": "Monthly Report",
