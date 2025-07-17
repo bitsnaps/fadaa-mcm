@@ -23,9 +23,15 @@ const newContract = ref({
   document: null,
   tax_ids: []
 });
+
 const clients = ref([]);
 const offices = ref([]);
 const availableTaxes = ref([]);
+
+const uploadDocumentModal = ref(null);
+const selectedContractId = ref(null);
+const documentToUpload = ref(null);
+const isUploading = ref(false);
 
 
 const fetchContracts = async () => {
@@ -165,6 +171,51 @@ const submitNewContract = async () => {
     isSubmitting.value = false;
   }
 };
+
+const openUploadDocumentModal = (contractId) => {
+  selectedContractId.value = contractId;
+  const modalInstance = Modal.getOrCreateInstance(uploadDocumentModal.value);
+  modalInstance.show();
+};
+
+const handleDocumentFileChange = (event) => {
+  documentToUpload.value = event.target.files[0];
+};
+
+const submitDocumentUpload = async () => {
+  if (!documentToUpload.value) {
+    alert('Please select a document to upload.');
+    return;
+  }
+
+  isUploading.value = true;
+  const formData = new FormData();
+  formData.append('document', documentToUpload.value);
+
+  try {
+    const response = await apiClient.post(`/contracts/${selectedContractId.value}/document`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    if (response.data.success) {
+      const modalInstance = Modal.getInstance(uploadDocumentModal.value);
+      modalInstance.hide();
+      fetchContracts(); // Refresh the list
+      alert('Document uploaded successfully.');
+    } else {
+      alert('Failed to upload document: ' + response.data.message);
+    }
+  } catch (error) {
+    console.error('Error uploading document:', error);
+    alert('An error occurred while uploading the document.');
+  } finally {
+    isUploading.value = false;
+    documentToUpload.value = null;
+    selectedContractId.value = null;
+  }
+};
 </script>
 
 <template>
@@ -227,6 +278,9 @@ const submitNewContract = async () => {
               </button>
               <button @click="downloadDocument(contract.document_url)" :disabled="!contract.document_url" class="btn btn-sm btn-outline-primary me-1" :title="t('contracts.downloadContract')">
                 <i class="bi bi-download"></i>
+              </button>
+              <button v-if="!contract.document_url" @click="openUploadDocumentModal(contract.id)" class="btn btn-sm btn-outline-success me-1" :title="t('contracts.uploadDocument')">
+                <i class="bi bi-upload"></i>
               </button>
               <button v-if="contract.status === 'Active'" @click="archiveContract(contract.id)" class="btn btn-sm btn-outline-warning" :title="t('contracts.archiveContract')">
                 <i class="bi bi-archive"></i>
@@ -306,6 +360,32 @@ const submitNewContract = async () => {
                 </div>
             </div>
         </div>
+    </div>
+<!-- Upload Document Modal -->
+    <div class="modal fade" ref="uploadDocumentModal" tabindex="-1" aria-labelledby="uploadDocumentModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="uploadDocumentModalLabel">{{ t('contracts.uploadDocument') }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="submitDocumentUpload">
+              <div class="mb-3">
+                <label for="contractDocument" class="form-label">{{ t('addClient.form.attachments') }}</label>
+                <input type="file" id="contractDocument" class="form-control" @change="handleDocumentFileChange" required>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('manageUsers.cancel') }}</button>
+                <button type="submit" class="btn btn-primary" :disabled="isUploading">
+                  <span v-if="isUploading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  {{ isUploading ? 'Uploading...' : t('contracts.upload') }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

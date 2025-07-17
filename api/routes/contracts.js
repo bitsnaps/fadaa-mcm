@@ -125,6 +125,45 @@ contractApp.delete('/:id', authMiddleware, async (c) => {
         // For now, we just delete the contract
         await contract.destroy();
         
+// POST /api/contracts/:id/document - Upload a document for an existing contract
+contractApp.post('/:id/document', async (c) => {
+    try {
+        const { id } = c.req.param();
+        const body = await c.req.parseBody();
+        const documentFile = body['document'];
+
+        const contract = await models.Contract.findByPk(id);
+        if (!contract) {
+            return c.json({ success: false, message: 'Contract not found' }, 404);
+        }
+
+        if (!documentFile || !documentFile.name) {
+            return c.json({ success: false, message: 'Document file is required' }, 400);
+        }
+
+        // --- File Upload Logic ---
+        const uploadDir = path.join(__dirname, '..', '..', 'public', 'uploads', 'contracts');
+        await fs.mkdir(uploadDir, { recursive: true });
+
+        const timestamp = Date.now();
+        const fileExtension = path.extname(documentFile.name);
+        const newFileName = `contract-${contract.client_id}-${timestamp}${fileExtension}`;
+        const filePath = path.join(uploadDir, newFileName);
+        
+        const fileData = await documentFile.arrayBuffer();
+        await fs.writeFile(filePath, Buffer.from(fileData));
+
+        const documentUrl = `/uploads/contracts/${newFileName}`;
+        // --- End File Upload Logic ---
+
+        await contract.update({ document_url: documentUrl });
+
+        return c.json({ success: true, message: 'Document uploaded successfully', contract });
+    } catch (error) {
+        console.error(`Error uploading document for contract ${c.req.param('id')}:`, error);
+        return c.json({ success: false, message: 'Failed to upload document' }, 500);
+    }
+});
         return c.json({ success: true, message: 'Contract deleted successfully' });
     } catch (error) {
         console.error(`Error deleting contract ${id}:`, error);
