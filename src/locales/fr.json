@@ -403,7 +403,9 @@
     "viewContract": "Voir le Contrat",
     "downloadContract": "Télécharger le Contrat",
     "archiveContract": "Archiver le Contrat",
-    "noContractsFound": "Aucun contrat trouvé."
+    "noContractsFound": "Aucun contrat trouvé.",
+    "uploadDocument": "Téléverser un document",
+    "upload": "Téléverser"
   },
   "offices": {
     "manageOffices": "Gérer les Bureaux de Coworking",

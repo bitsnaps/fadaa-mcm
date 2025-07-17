@@ -425,7 +425,9 @@
     "archiveContract": "Archive Contract",
     "deleteContract": "Delete Contract",
     "confirmDelete": "Are you sure you want to delete this contract?",
-    "noContractsFound": "No contracts found."
+    "noContractsFound": "No contracts found.",
+    "uploadDocument": "Upload a document",
+    "upload": "Upload"
   },
   "offices": {
     "manageOffices": "Manage Coworking Offices",
