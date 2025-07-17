@@ -74,7 +74,27 @@
     "annualReport": "Rapport Annuel",
     "officeDesigner": "Concepteur d'Office",
     "activityLog": "Journal d'Activité",
-    "manageTaxes": "Gestion des Taxes"
+    "manageTaxes": "Gestion des Taxes",
+    "manageInvestments": "Gestion des Investissements"
+  },
+  "investments": {
+    "title": "Gestion des Investissements",
+    "addInvestment": "Ajouter un Investissement",
+    "editInvestment": "Modifier l'Investissement",
+    "searchPlaceholder": "Rechercher par nom, type ou statut...",
+    "noInvestmentsFound": "Aucun investissement trouvé.",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet investissement ?",
+    "tableHeaders": {
+      "name": "Nom",
+      "type": "Type",
+      "initialValue": "Valeur Initiale",
+      "currentValue": "Valeur Actuelle",
+      "status": "Statut",
+      "actions": "Actions",
+      "description": "Description"
+    },
+    "edit": "Modifier",
+    "delete": "Supprimer"
   },
   "manageTaxes": {
     "title": "Gestion des Taxes",
@@ -374,13 +394,15 @@
     "tableHeaders": {
       "name": "Nom",
       "client": "Client",
+      "investment": "Investissement",
       "type": "Type",
       "uploadDate": "Date de Téléchargement",
       "actions": "Actions"
     },
     "noDocumentsFound": "Aucun document trouvé.",
     "view": "Voir",
-    "download": "Télécharger"
+    "download": "Télécharger",
+    "selectInvestment": "Sélectionner l'investissement (Facultatif)"
   },
   "contracts": {
     "title": "Gestion des Contrats",

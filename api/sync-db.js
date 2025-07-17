@@ -1,14 +1,13 @@
-require('dotenv').config({ path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env' });
-const { sequelize } = require('./models');
+const models = require('./models');
 
 const syncDatabase = async () => {
     try {
-        await sequelize.sync({ alter: true });
+        await models.sequelize.sync({ alter: true });
         console.log('Database synchronized successfully.');
     } catch (error) {
-        console.error('Error synchronizing the database:', error);
+        console.error('Failed to synchronize database:', error);
     } finally {
-        await sequelize.close();
+        await models.sequelize.close();
     }
 };
 

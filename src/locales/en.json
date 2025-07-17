@@ -74,7 +74,27 @@
     "annualReport": "Annual Report",
     "officeDesigner": "Office Designer",
     "activityLog": "Activity Log",
-    "manageTaxes": "Tax Management"
+    "manageTaxes": "Tax Management",
+    "manageInvestments": "Investment Management"
+  },
+  "investments": {
+    "title": "Investment Management",
+    "addInvestment": "Add Investment",
+    "editInvestment": "Edit Investment",
+    "searchPlaceholder": "Search by name, type, or status...",
+    "noInvestmentsFound": "No investments found.",
+    "confirmDelete": "Are you sure you want to delete this investment?",
+    "tableHeaders": {
+      "name": "Name",
+      "type": "Type",
+      "initialValue": "Initial Value",
+      "currentValue": "Current Value",
+      "status": "Status",
+      "actions": "Actions",
+      "description": "Description"
+    },
+    "edit": "Edit",
+    "delete": "Delete"
   },
   "manageTaxes": {
     "title": "Tax Management",
@@ -394,13 +414,15 @@
     "tableHeaders": {
       "name": "Name",
       "client": "Client",
+      "investment": "Investment",
       "type": "Type",
       "uploadDate": "Upload Date",
       "actions": "Actions"
     },
     "noDocumentsFound": "No documents found.",
     "view": "View",
-    "download": "Download"
+    "download": "Download",
+    "selectInvestment": "Select Investment (Optional)"
   },
   "contracts": {
     "title": "Contract Management",

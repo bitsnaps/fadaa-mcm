@@ -15,6 +15,7 @@ const officesApp = require('./routes/offices');
 const authApp = require('./routes/auth');
 const documentApp = require('./routes/documents');
 const clientServicesApp = require('./routes/clientServices');
+const investmentsApp = require('./routes/investments');
 
 if (process.env.NODE_ENV !== 'test') {
     require('./cron/scheduler');
@@ -43,6 +44,7 @@ app.route('/api/service-categories', serviceCategoriesApp);
 app.route('/api/clients', clientsApp);
 app.route('/api/offices', officesApp);
 app.route('/api/misc', miscApp);
+app.route('/api/investments', investmentsApp);
 
 // --- Static File Serving ---
 // Serve the uploaded contract files

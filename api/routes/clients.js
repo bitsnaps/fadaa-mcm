@@ -21,7 +21,8 @@ clientsApp.get('/', authMiddleware, async (c) => {
             ],
             include: [
                 { model: models.User, as: 'managed_by', attributes: ['id', 'first_name', 'last_name'] },
-                { model: models.Office, as: 'office', attributes: ['id', 'name'] }
+                { model: models.Office, as: 'office', attributes: ['id', 'name'] },
+                { model: models.Investment, as: 'Investments', attributes: ['id', 'name'] }
             ],
             order: [['company_name', 'ASC']],
         });

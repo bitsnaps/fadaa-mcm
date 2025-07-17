@@ -26,6 +26,7 @@ import OfficeDesigner from './views/OfficeDesigner.vue';
 import MonthlyReport from './views/MonthlyReport.vue';
 import AnnualReport from './views/AnnualReport.vue';
 import ManageTaxes from './views/ManageTaxes.vue';
+import ManageInvestments from './views/ManageInvestments.vue';
 import Navbar from './components/Navbar.vue';
 
 const routes = [
@@ -197,6 +198,12 @@ const routes = [
     path: '/manage-taxes',
     name: 'ManageTaxes',
     components: { default: ManageTaxes, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin'] }
+  },
+  {
+    path: '/manage-investments',
+    name: 'ManageInvestments',
+    components: { default: ManageInvestments, header: Navbar },
     meta: { requiresAuth: true, roles: ['admin'] }
   },
 ];

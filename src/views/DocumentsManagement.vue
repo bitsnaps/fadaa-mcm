@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getDocuments, getClientsList, getInvestmentsList, addDocument } from '@/services/ApiClient';
 import { useAuthStore } from '@/stores/auth';
@@ -20,10 +20,11 @@ const newDocument = ref({
   investment_id: null,
   title: '',
   type: 'Other',
-  document: null
+  document: null,
 });
 const clients = ref([]);
-const investments = ref([]);
+const allInvestments = ref([]);
+const filteredInvestments = ref([]);
 
 const fetchDocuments = async () => {
   try {
@@ -50,11 +51,28 @@ const filteredDocuments = computed(() => {
     return documents.value;
   }
   return documents.value.filter(doc =>
-    (doc.title.toLowerCase() || '').includes(searchTerm.value.toLowerCase()) ||
-    (doc.type.toLowerCase() || '').includes(searchTerm.value.toLowerCase()) ||
-    (doc.Client?.company_name.toLowerCase() || '').includes(searchTerm.value.toLowerCase())
+    (doc.title?.toLowerCase() || '').includes(searchTerm.value.toLowerCase()) ||
+    (doc.type?.toLowerCase() || '').includes(searchTerm.value.toLowerCase()) ||
+    (doc.Client?.company_name?.toLowerCase() || '').includes(searchTerm.value.toLowerCase()) ||
+    (doc.investment?.name?.toLowerCase() || '').includes(searchTerm.value.toLowerCase())
   );
 });
+
+watch(() => newDocument.value.client_id, (newClientId) => {
+  newDocument.value.investment_id = null;
+  if (newClientId) {
+    const client = clients.value.find(c => c.id === newClientId);
+    if (client && client.Investments) {
+      filteredInvestments.value = allInvestments.value.filter(inv =>
+        client.Investments.some(ci => ci.id === inv.id)
+      );
+    } else {
+      filteredInvestments.value = [];
+    }
+  } else {
+    filteredInvestments.value = [];
+  }
+}, { immediate: true });
 
 const formatDate = (date) => {
   if (!date) return 'N/A';
@@ -90,10 +108,10 @@ const openAddDocumentModal = async () => {
       getInvestmentsList()
     ]);
     if (clientsResponse.data.success) {
-      clients.value = clientsResponse.data.clients;
+      clients.value = clientsResponse.data.data;
     }
     if (investmentsResponse.data.success) {
-      investments.value = investmentsResponse.data.investments;
+      allInvestments.value = investmentsResponse.data.investments;
     }
     const modalInstance = Modal.getOrCreateInstance(addDocumentModal.value);
     modalInstance.show();
@@ -167,6 +185,7 @@ const submitNewDocument = async () => {
           <tr>
             <th scope="col">{{ t('documents.tableHeaders.name') }}</th>
             <th scope="col">{{ t('documents.tableHeaders.client') }}</th>
+            <th scope="col">{{ t('documents.tableHeaders.investment') }}</th>
             <th scope="col">{{ t('documents.tableHeaders.type') }}</th>
             <th scope="col">{{ t('documents.tableHeaders.uploadDate') }}</th>
             <th scope="col" class="text-center">{{ t('documents.tableHeaders.actions') }}</th>
@@ -176,6 +195,7 @@ const submitNewDocument = async () => {
           <tr v-for="doc in filteredDocuments" :key="doc.id">
             <td>{{ doc.title }}</td>
             <td>{{ doc.Client?.company_name || 'N/A' }}</td>
+            <td>{{ doc.investment?.name || 'N/A' }}</td>
             <td>{{ doc.type }}</td>
             <td>{{ formatDate(doc.created_at) }}</td>
             <td class="text-center">
@@ -216,10 +236,10 @@ const submitNewDocument = async () => {
                 </select>
               </div>
               <div class="mb-3">
-                <label for="doc-investment" class="form-label">Investment</label>
-                <select id="doc-investment" class="form-select" v-model="newDocument.investment_id">
-                  <option :value="null">-- Select Investment (Optional) --</option>
-                  <option v-for="investment in investments" :key="investment.id" :value="investment.id">{{ investment.name }}</option>
+                <label for="doc-investment" class="form-label">{{ t('documents.tableHeaders.investment') }}</label>
+                <select id="doc-investment" class="form-select" v-model="newDocument.investment_id" :disabled="!newDocument.client_id">
+                  <option :value="null">-- {{ t('documents.selectInvestment') }} --</option>
+                  <option v-for="investment in filteredInvestments" :key="investment.id" :value="investment.id">{{ investment.name }}</option>
                 </select>
               </div>
               <div class="mb-3">
