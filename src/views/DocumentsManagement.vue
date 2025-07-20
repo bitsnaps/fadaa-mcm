@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getDocuments, getClientsList, getInvestmentsList, addDocument } from '@/services/ApiClient';
+import { getDocuments, getClients, getInvestmentsList, addDocument } from '@/services/ApiClient';
 import { useAuthStore } from '@/stores/auth';
 import { Modal } from 'bootstrap';
 import { format } from 'date-fns';
@@ -104,7 +104,7 @@ const downloadDocument = (docUrl) => {
 const openAddDocumentModal = async () => {
   try {
     const [clientsResponse, investmentsResponse] = await Promise.all([
-      getClientsList(),
+      getClients(),
       getInvestmentsList()
     ]);
     if (clientsResponse.data.success) {

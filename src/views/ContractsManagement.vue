@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import apiClient, { getContracts, getClientsList, getAvailableOffices, addContract } from '@/services/ApiClient';
+import apiClient, { getContracts, getClients, getAvailableOffices, addContract } from '@/services/ApiClient';
 import { Modal } from 'bootstrap';
 import { format } from 'date-fns';
 
@@ -116,7 +116,7 @@ const deleteContract = async (contractId) => {
 const openAddContractModal = async () => {
   try {
     const [clientsResponse, officesResponse, taxesResponse] = await Promise.all([
-      getClientsList(),
+      getClients(),
       getAvailableOffices(),
       apiClient.get('/taxes')
     ]);
