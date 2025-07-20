@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "sync-db": "node sync-db.js",
+    "syncdb": "node sync-db.js",
     "seed": "node seed.js"
   },
   "keywords": [],
