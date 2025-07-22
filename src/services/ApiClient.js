@@ -38,7 +38,7 @@ export function getContracts() {
     return apiClient.get('/contracts');
 }
 
-export function getClientsList() {
+export function getClients() {
     return apiClient.get('/clients');
 }
 
@@ -88,4 +88,8 @@ export const updateInvestment = (id, investmentData) => {
 
 export const deleteInvestment = (id) => {
     return apiClient.delete(`/investments/${id}`);
+};
+
+export const getBranches = () => {
+    return apiClient.get('/branches');
 };

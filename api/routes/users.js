@@ -42,9 +42,7 @@ userApp.get('/:id', authMiddleware, async (c) => {
         return c.json({ success: false, message: 'Failed to fetch user' }, 500);
     }
 });
-//curl -X POST http://localhost:3000/api/users \
-// -H "Content-Type: application/json" \
-// -d '{ "first_name": "Admin", "last_name": "User", "email": "admin@fadaa.dz", "password": "...", "role_id": 1, "branch_id": 1, "is_active": true }'
+
 userApp.post('/', authMiddleware, async (c) => {
     try {
         const { first_name, last_name, email, password, role_id, branch_id, is_active, preferences } = await c.req.json();
@@ -76,6 +74,7 @@ userApp.post('/', authMiddleware, async (c) => {
         return c.json({ success: false, message: 'An error occurred during user creation' }, 500);
     }
 });
+
 // Update a user
 userApp.put('/:id', authMiddleware, async (c) => {
     const { id } = c.req.param();

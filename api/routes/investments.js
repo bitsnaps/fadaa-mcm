@@ -10,7 +10,11 @@ investmentsApp.use('*', authMiddleware, adminMiddleware);
 investmentsApp.get('/', async (c) => {
     try {
         const investments = await models.Investment.findAll({
-            order: [['name', 'ASC']],
+            include: [
+                { model: models.Client },
+                { model: models.Branch }
+            ],
+            order: [['created_at', 'DESC']],
         });
         return c.json({ success: true, data: investments });
     } catch (error) {
@@ -23,7 +27,12 @@ investmentsApp.get('/', async (c) => {
 investmentsApp.get('/:id', async (c) => {
     try {
         const { id } = c.req.param();
-        const investment = await models.Investment.findByPk(id);
+        const investment = await models.Investment.findByPk(id, {
+            include: [
+                { model: models.Client },
+                { model: models.Branch }
+            ]
+        });
         if (!investment) {
             return c.json({ success: false, message: 'Investment not found' }, 404);
         }
@@ -38,8 +47,17 @@ investmentsApp.get('/:id', async (c) => {
 investmentsApp.post('/', async (c) => {
     try {
         const investmentData = await c.req.json();
-        const newInvestment = await models.Investment.create(investmentData);
-        return c.json({ success: true, message: 'Investment created successfully', data: newInvestment }, 201);
+        const newInvestment = await models.Investment.create({
+            ...investmentData,
+            purchase_date: new Date()
+        });
+        const finalInvestment = await models.Investment.findByPk(newInvestment.id, {
+            include: [
+                { model: models.Client },
+                { model: models.Branch }
+            ]
+        });
+        return c.json({ success: true, message: 'Investment created successfully', data: finalInvestment }, 201);
     } catch (error) {
         console.error('Error creating investment:', error);
         return c.json({ success: false, message: 'Failed to create investment' }, 500);
@@ -51,16 +69,24 @@ investmentsApp.put('/:id', async (c) => {
     try {
         const { id } = c.req.param();
         const investmentData = await c.req.json();
-        
         const investment = await models.Investment.findByPk(id);
+
         if (!investment) {
             return c.json({ success: false, message: 'Investment not found' }, 404);
         }
 
         await investment.update(investmentData);
-        return c.json({ success: true, message: 'Investment updated successfully', data: investment });
+        
+        const finalInvestment = await models.Investment.findByPk(id, {
+            include: [
+                { model: models.Client },
+                { model: models.Branch }
+            ]
+        });
+
+        return c.json({ success: true, message: 'Investment updated successfully', data: finalInvestment });
     } catch (error) {
-        console.error(`Error updating investment ${id}:`, error);
+        console.error(`Error updating investment:`, error);
         return c.json({ success: false, message: 'Failed to update investment' }, 500);
     }
 });
@@ -77,7 +103,7 @@ investmentsApp.delete('/:id', async (c) => {
         await investment.destroy();
         return c.json({ success: true, message: 'Investment deleted successfully' });
     } catch (error) {
-        console.error(`Error deleting investment ${id}:`, error);
+        console.error(`Error deleting investment:`, error);
         return c.json({ success: false, message: 'Failed to delete investment' }, 500);
     }
 });

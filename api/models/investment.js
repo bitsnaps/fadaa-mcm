@@ -7,27 +7,28 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    name: {
-      type: DataTypes.STRING(255),
+    percentage: {
+      type: DataTypes.FLOAT,
       allowNull: false,
     },
-    description: {
-      type: DataTypes.TEXT,
-    },
-    type: {
-      type: DataTypes.STRING(100),
-    },
-    status: {
-      type: DataTypes.ENUM('Active', 'Sold', 'Pending'),
+    purchase_date: {
+      type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: 'Active',
     },
-    initial_value: {
-      type: DataTypes.DECIMAL(15, 2),
+    client_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'clients',
+        key: 'id'
+      }
     },
-    current_value: {
-      type: DataTypes.DECIMAL(15, 2),
-    },
+    branch_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'branches',
+        key: 'id'
+      }
+    }
   }, {
     tableName: 'investments',
     timestamps: true,

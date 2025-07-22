@@ -41,7 +41,7 @@ Object.keys(db).forEach(modelName => {
 const {
   User, Role, Branch, Client, Office, Contract, ServiceCategory,
   ClientService, Document, Task, Notification, FinancialReport,
-  ComplianceReport, Investment, ClientInvestment, OfficeDesign,
+  ComplianceReport, Investment, OfficeDesign,
   SystemSetting, ActivityLog, Tax, ContractTax
 } = db;
 
@@ -84,8 +84,6 @@ Contract.hasMany(ClientService, { foreignKey: 'contract_id' });
 // Document associations
 Document.belongsTo(Client, { foreignKey: 'client_id' });
 Client.hasMany(Document, { foreignKey: 'client_id' });
-Document.belongsTo(Investment, { foreignKey: 'investment_id' });
-Investment.hasMany(Document, { foreignKey: 'investment_id' });
 Document.belongsTo(User, { as: 'uploaded_by', foreignKey: 'uploaded_by_user_id' });
 User.hasMany(Document, { foreignKey: 'uploaded_by_user_id' });
 
@@ -106,8 +104,11 @@ FinancialReport.belongsTo(User, { foreignKey: 'generated_by_user_id' });
 User.hasMany(FinancialReport, { foreignKey: 'generated_by_user_id' });
 
 // ClientInvestment (Many-to-Many)
-Client.belongsToMany(Investment, { through: ClientInvestment, foreignKey: 'client_id' });
-Investment.belongsToMany(Client, { through: ClientInvestment, foreignKey: 'investment_id' });
+Investment.belongsTo(Client, { foreignKey: 'client_id' });
+Client.hasMany(Investment, { foreignKey: 'client_id' });
+
+Investment.belongsTo(Branch, { foreignKey: 'branch_id' });
+Branch.hasMany(Investment, { foreignKey: 'branch_id' });
 
 // OfficeDesign associations
 OfficeDesign.belongsTo(Branch, { foreignKey: 'branch_id' });

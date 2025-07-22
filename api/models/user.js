@@ -45,6 +45,10 @@ module.exports = (sequelize) => {
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+    // Add this to prevent timezone conversion (store raw UTC):
+    // dialectOptions: {
+    //   useUTC: true, // For UTC dates (recommended)
+    // },    
   });
 
   return User;

@@ -1,12 +1,14 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getInvestments, addInvestment, updateInvestment, deleteInvestment } from '@/services/ApiClient';
+import { getInvestments, addInvestment, updateInvestment, deleteInvestment, getClients, getBranches } from '@/services/ApiClient';
 import { Modal } from 'bootstrap';
 
 const { t } = useI18n();
 
 const investments = ref([]);
+const clients = ref([]);
+const branches = ref([]);
 const isLoading = ref(true);
 const searchTerm = ref('');
 const isSubmitting = ref(false);
@@ -32,8 +34,23 @@ const fetchInvestments = async () => {
     }
 };
 
+const fetchClientsAndBranches = async () => {
+    try {
+        const [clientsRes, branchesRes] = await Promise.all([getClients(), getBranches()]);
+        if (clientsRes.data.success) {
+            clients.value = clientsRes.data.data;
+        }
+        if (branchesRes.data.success) {
+            branches.value = branchesRes.data.data;
+        }
+    } catch (error) {
+        console.error('Failed to fetch clients or branches:', error);
+    }
+};
+
 onMounted(() => {
     fetchInvestments();
+    fetchClientsAndBranches();
     modalInstance.value = new Modal(addInvestmentModal.value);
 });
 
@@ -42,21 +59,17 @@ const filteredInvestments = computed(() => {
         return investments.value;
     }
     return investments.value.filter(inv =>
-        inv.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-        inv.type.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-        inv.status.toLowerCase().includes(searchTerm.value.toLowerCase())
+        (inv.Client && inv.Client.company_name.toLowerCase().includes(searchTerm.value.toLowerCase())) ||
+        (inv.Branch && inv.Branch.name.toLowerCase().includes(searchTerm.value.toLowerCase()))
     );
 });
 
 const openAddModal = () => {
     isEditMode.value = false;
     currentInvestment.value = {
-        name: '',
-        description: '',
-        type: '',
-        status: 'Active',
-        initial_value: 0,
-        current_value: 0
+        percentage: 0,
+        client_id: null,
+        branch_id: null
     };
     modalInstance.value.show();
 };
@@ -74,12 +87,21 @@ const hideModal = () => {
 const handleSubmit = async () => {
     isSubmitting.value = true;
     try {
+        let response;
         if (isEditMode.value) {
-            await updateInvestment(currentInvestment.value.id, currentInvestment.value);
+            response = await updateInvestment(currentInvestment.value.id, currentInvestment.value);
+            if (response.data.success) {
+                const index = investments.value.findIndex(inv => inv.id === response.data.data.id);
+                if (index !== -1) {
+                    investments.value[index] = response.data.data;
+                }
+            }
         } else {
-            await addInvestment(currentInvestment.value);
+            response = await addInvestment(currentInvestment.value);
+            if (response.data.success) {
+                investments.value.push(response.data.data);
+            }
         }
-        fetchInvestments();
         hideModal();
     } catch (error) {
         console.error('Failed to submit investment:', error);
@@ -98,6 +120,7 @@ const handleDelete = async (id) => {
         }
     }
 };
+
 </script>
 
 <template>
@@ -128,25 +151,17 @@ const handleDelete = async (id) => {
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th scope="col">{{ t('investments.tableHeaders.name') }}</th>
-                        <th scope="col">{{ t('investments.tableHeaders.type') }}</th>
-                        <th scope="col">{{ t('investments.tableHeaders.initialValue') }}</th>
-                        <th scope="col">{{ t('investments.tableHeaders.currentValue') }}</th>
-                        <th scope="col">{{ t('investments.tableHeaders.status') }}</th>
+                        <th scope="col">{{ t('investments.tableHeaders.investor') }}</th>
+                        <th scope="col">{{ t('investments.tableHeaders.branch') }}</th>
+                        <th scope="col">{{ t('investments.tableHeaders.percentage') }}</th>
                         <th scope="col" class="text-center">{{ t('investments.tableHeaders.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="investment in filteredInvestments" :key="investment.id">
-                        <td>{{ investment.name }}</td>
-                        <td>{{ investment.type }}</td>
-                        <td>{{ investment.initial_value }}</td>
-                        <td>{{ investment.current_value }}</td>
-                        <td>
-                            <span :class="`badge bg-${investment.status === 'Active' ? 'success' : 'secondary'}`">
-                                {{ investment.status }}
-                            </span>
-                        </td>
+                        <td>{{ investment.Client ? investment.Client.company_name : 'N/A' }}</td>
+                        <td>{{ investment.Branch ? investment.Branch.name : 'N/A' }}</td>
+                        <td>{{ investment.percentage }}%</td>
                         <td class="text-center">
                             <button @click="openEditModal(investment)" class="btn btn-sm btn-outline-info me-1" :title="t('investments.edit')">
                                 <i class="bi bi-pencil"></i>
@@ -173,37 +188,25 @@ const handleDelete = async (id) => {
                     </div>
                     <div class="modal-body">
                         <form @submit.prevent="handleSubmit">
-                            <div class="mb-3">
-                                <label for="inv-name" class="form-label">{{ t('investments.tableHeaders.name') }}</label>
-                                <input type="text" id="inv-name" class="form-control" v-model="currentInvestment.name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="inv-desc" class="form-label">{{ t('investments.tableHeaders.description') }}</label>
-                                <textarea id="inv-desc" class="form-control" v-model="currentInvestment.description"></textarea>
-                            </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="inv-type" class="form-label">{{ t('investments.tableHeaders.type') }}</label>
-                                    <input type="text" id="inv-type" class="form-control" v-model="currentInvestment.type">
+                                    <label for="inv-client" class="form-label">{{ t('investments.tableHeaders.investor') }}</label>
+                                    <select id="inv-client" class="form-select" v-model="currentInvestment.client_id">
+                                        <option :value="null">Select an investor</option>
+                                        <option v-for="client in clients" :key="client.id" :value="client.id">{{ client.company_name }}</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="inv-status" class="form-label">{{ t('investments.tableHeaders.status') }}</label>
-                                    <select id="inv-status" class="form-select" v-model="currentInvestment.status" required>
-                                        <option>Active</option>
-                                        <option>Sold</option>
-                                        <option>Pending</option>
+                                    <label for="inv-branch" class="form-label">{{ t('investments.tableHeaders.branch') }}</label>
+                                    <select id="inv-branch" class="form-select" v-model="currentInvestment.branch_id">
+                                        <option :value="null">Select a branch</option>
+                                        <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="inv-initial" class="form-label">{{ t('investments.tableHeaders.initialValue') }}</label>
-                                    <input type="number" id="inv-initial" class="form-control" v-model.number="currentInvestment.initial_value">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="inv-current" class="form-label">{{ t('investments.tableHeaders.currentValue') }}</label>
-                                    <input type="number" id="inv-current" class="form-control" v-model.number="currentInvestment.current_value">
-                                </div>
+                            <div class="mb-3">
+                                <label for="inv-percentage" class="form-label">{{ t('investments.tableHeaders.percentage') }}</label>
+                                <input type="number" id="inv-percentage" class="form-control" v-model.number="currentInvestment.percentage">
                             </div>
                         </form>
                     </div>
