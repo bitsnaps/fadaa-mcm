@@ -1,12 +1,13 @@
 const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth');
+const { getInvestmentCalculations } = require('../controllers/investmentController');
 
 const investmentsApp = new Hono();
 
 investmentsApp.use('*', authMiddleware, adminMiddleware);
 
-// GET all investments
+// GET all investments with calculations
 investmentsApp.get('/', async (c) => {
     try {
         const investments = await models.Investment.findAll({
@@ -16,7 +17,18 @@ investmentsApp.get('/', async (c) => {
             ],
             order: [['created_at', 'DESC']],
         });
-        return c.json({ success: true, data: investments });
+
+        const enrichedInvestments = await Promise.all(
+            investments.map(async (investment) => {
+                const calculations = await getInvestmentCalculations(investment);
+                return {
+                    ...investment.toJSON(),
+                    ...calculations,
+                };
+            })
+        );
+
+        return c.json({ success: true, data: enrichedInvestments });
     } catch (error) {
         console.error('Error fetching investments:', error);
         return c.json({ success: false, message: 'Failed to fetch investments' }, 500);
