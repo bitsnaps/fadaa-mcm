@@ -75,7 +75,9 @@
     "officeDesigner": "Office Designer",
     "activityLog": "Activity Log",
     "manageTaxes": "Tax Management",
-    "manageInvestments": "Investment Management"
+    "manageInvestments": "Investment Management",
+    "manageIncomes": "Income Management",
+    "manageExpenses": "Expense Management"
   },
   "investments": {
     "title": "Investment Management",
@@ -91,6 +93,42 @@
       "investment_amount": "Investment Amount",
       "starting_date": "Start Date",
       "ending_date": "End Date",
+      "actions": "Actions"
+    },
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "incomes": {
+    "title": "Income Management",
+    "addIncome": "Add Income",
+    "editIncome": "Edit Income",
+    "searchPlaceholder": "Search by description, branch, or registered by...",
+    "noIncomesFound": "No incomes found.",
+    "confirmDelete": "Are you sure you want to delete this income?",
+    "tableHeaders": {
+      "amount": "Amount",
+      "description": "Description",
+      "transaction_date": "Transaction Date",
+      "branch": "Branch",
+      "registered_by": "Registered By",
+      "actions": "Actions"
+    },
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "expenses": {
+    "title": "Expense Management",
+    "addExpense": "Add Expense",
+    "editExpense": "Edit Expense",
+    "searchPlaceholder": "Search by description, branch, or registered by...",
+    "noExpensesFound": "No expenses found.",
+    "confirmDelete": "Are you sure you want to delete this expense?",
+    "tableHeaders": {
+      "amount": "Amount",
+      "description": "Description",
+      "transaction_date": "Transaction Date",
+      "branch": "Branch",
+      "registered_by": "Registered By",
       "actions": "Actions"
     },
     "edit": "Edit",

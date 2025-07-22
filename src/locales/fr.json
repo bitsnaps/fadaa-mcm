@@ -75,7 +75,9 @@
     "officeDesigner": "Concepteur d'Office",
     "activityLog": "Journal d'Activité",
     "manageTaxes": "Gestion des Taxes",
-    "manageInvestments": "Gestion des Investissements"
+    "manageInvestments": "Gestion des Investissements",
+    "manageIncomes": "Gestion des Revenus",
+    "manageExpenses": "Gestion des Dépenses"
   },
   "investments": {
     "title": "Gestion des Investissements",
@@ -92,6 +94,42 @@
       "status": "Statut",
       "actions": "Actions",
       "description": "Description"
+    },
+    "edit": "Modifier",
+    "delete": "Supprimer"
+  },
+  "incomes": {
+    "title": "Gestion des Revenus",
+    "addIncome": "Ajouter un Revenu",
+    "editIncome": "Modifier le Revenu",
+    "searchPlaceholder": "Rechercher par description, agence ou enregistré par...",
+    "noIncomesFound": "Aucun revenu trouvé.",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce revenu ?",
+    "tableHeaders": {
+      "amount": "Montant",
+      "description": "Description",
+      "transaction_date": "Date de Transaction",
+      "branch": "Agence",
+      "registered_by": "Enregistré par",
+      "actions": "Actions"
+    },
+    "edit": "Modifier",
+    "delete": "Supprimer"
+  },
+  "expenses": {
+    "title": "Gestion des Dépenses",
+    "addExpense": "Ajouter une Dépense",
+    "editExpense": "Modifier la Dépense",
+    "searchPlaceholder": "Rechercher par description, agence ou enregistré par...",
+    "noExpensesFound": "Aucune dépense trouvée.",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette dépense ?",
+    "tableHeaders": {
+      "amount": "Montant",
+      "description": "Description",
+      "transaction_date": "Date de Transaction",
+      "branch": "Agence",
+      "registered_by": "Enregistré par",
+      "actions": "Actions"
     },
     "edit": "Modifier",
     "delete": "Supprimer"

@@ -113,6 +113,19 @@ const isCollapsed = computed(() => sidebarStore.isCollapsed);
 
         <!-- FADAA Operational Core & Financials -->
         <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+          <router-link to="/manage-incomes" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-cash-coin me-2"></i>
+            {{ $t('sidebar.manageIncomes') }}
+          </router-link>
+        </li>
+        <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+          <router-link to="/manage-expenses" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-cash-stack me-2"></i>
+            {{ $t('sidebar.manageExpenses') }}
+          </router-link>
+        </li>
+                
+        <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
           <router-link to="/investment-tracking" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-graph-up me-2"></i>
             {{ $t('sidebar.investmentTracking') }}

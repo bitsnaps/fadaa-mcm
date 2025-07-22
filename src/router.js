@@ -27,6 +27,8 @@ import MonthlyReport from './views/MonthlyReport.vue';
 import AnnualReport from './views/AnnualReport.vue';
 import ManageTaxes from './views/ManageTaxes.vue';
 import ManageInvestments from './views/ManageInvestments.vue';
+import ManageIncomes from './views/ManageIncomes.vue';
+import ManageExpenses from './views/ManageExpenses.vue';
 import Navbar from './components/Navbar.vue';
 
 const routes = [
@@ -205,6 +207,18 @@ const routes = [
     name: 'ManageInvestments',
     components: { default: ManageInvestments, header: Navbar },
     meta: { requiresAuth: true, roles: ['admin'] }
+  },
+  {
+    path: '/manage-incomes',
+    name: 'ManageIncomes',
+    components: { default: ManageIncomes, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+  },
+  {
+    path: '/manage-expenses',
+    name: 'ManageExpenses',
+    components: { default: ManageExpenses, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
   },
 ];
 

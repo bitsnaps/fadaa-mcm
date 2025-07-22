@@ -42,7 +42,7 @@ const {
   User, Role, Branch, Client, Office, Contract, ServiceCategory,
   ClientService, Document, Task, Notification, FinancialReport,
   ComplianceReport, Investment, OfficeDesign,
-  SystemSetting, ActivityLog, Tax, ContractTax
+  SystemSetting, ActivityLog, Tax, ContractTax, Income, Expense
 } = db;
 
 // User associations
@@ -117,6 +117,18 @@ Branch.hasOne(OfficeDesign, { foreignKey: 'branch_id' });
 // ActivityLog associations
 ActivityLog.belongsTo(User, { foreignKey: 'user_id' });
 User.hasMany(ActivityLog, { foreignKey: 'user_id' });
+
+// Income associations
+Income.belongsTo(Branch, { foreignKey: 'branch_id' });
+Branch.hasMany(Income, { foreignKey: 'branch_id' });
+Income.belongsTo(User, { as: 'registered_by_user', foreignKey: 'registered_by' });
+User.hasMany(Income, { as: 'registered_incomes', foreignKey: 'registered_by' });
+
+// Expense associations
+Expense.belongsTo(Branch, { foreignKey: 'branch_id' });
+Branch.hasMany(Expense, { foreignKey: 'branch_id' });
+Expense.belongsTo(User, { as: 'registered_by_user', foreignKey: 'registered_by' });
+User.hasMany(Expense, { as: 'registered_expenses', foreignKey: 'registered_by' });
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
