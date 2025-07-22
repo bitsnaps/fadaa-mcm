@@ -11,9 +11,17 @@ module.exports = (sequelize) => {
       type: DataTypes.FLOAT,
       allowNull: false,
     },
-    purchase_date: {
+    starting_date: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
+    },
+    ending_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    investment_amount: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
     },
     client_id: {
       type: DataTypes.INTEGER,

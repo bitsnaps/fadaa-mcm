@@ -48,8 +48,7 @@ investmentsApp.post('/', async (c) => {
     try {
         const investmentData = await c.req.json();
         const newInvestment = await models.Investment.create({
-            ...investmentData,
-            purchase_date: new Date()
+            ...investmentData
         });
         const finalInvestment = await models.Investment.findByPk(newInvestment.id, {
             include: [

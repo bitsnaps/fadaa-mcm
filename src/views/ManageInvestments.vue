@@ -69,7 +69,10 @@ const openAddModal = () => {
     currentInvestment.value = {
         percentage: 0,
         client_id: null,
-        branch_id: null
+        branch_id: null,
+        starting_date: '',
+        ending_date: '',
+        investment_amount: 0
     };
     modalInstance.value.show();
 };
@@ -154,6 +157,9 @@ const handleDelete = async (id) => {
                         <th scope="col">{{ t('investments.tableHeaders.investor') }}</th>
                         <th scope="col">{{ t('investments.tableHeaders.branch') }}</th>
                         <th scope="col">{{ t('investments.tableHeaders.percentage') }}</th>
+                        <th scope="col">{{ t('investments.tableHeaders.investment_amount') }}</th>
+                        <th scope="col">{{ t('investments.tableHeaders.starting_date') }}</th>
+                        <th scope="col">{{ t('investments.tableHeaders.ending_date') }}</th>
                         <th scope="col" class="text-center">{{ t('investments.tableHeaders.actions') }}</th>
                     </tr>
                 </thead>
@@ -162,6 +168,9 @@ const handleDelete = async (id) => {
                         <td>{{ investment.Client ? investment.Client.company_name : 'N/A' }}</td>
                         <td>{{ investment.Branch ? investment.Branch.name : 'N/A' }}</td>
                         <td>{{ investment.percentage }}%</td>
+                        <td>{{ investment.investment_amount }}</td>
+                        <td>{{ investment.starting_date ? new Date(investment.starting_date).toLocaleDateString() : 'N/A' }}</td>
+                        <td>{{ investment.ending_date ? new Date(investment.ending_date).toLocaleDateString() : 'N/A' }}</td>
                         <td class="text-center">
                             <button @click="openEditModal(investment)" class="btn btn-sm btn-outline-info me-1" :title="t('investments.edit')">
                                 <i class="bi bi-pencil"></i>
@@ -207,6 +216,20 @@ const handleDelete = async (id) => {
                             <div class="mb-3">
                                 <label for="inv-percentage" class="form-label">{{ t('investments.tableHeaders.percentage') }}</label>
                                 <input type="number" id="inv-percentage" class="form-control" v-model.number="currentInvestment.percentage">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="inv-starting-date" class="form-label">{{ t('investments.tableHeaders.starting_date') }}</label>
+                                    <input type="date" id="inv-starting-date" class="form-control" v-model="currentInvestment.starting_date">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="inv-ending-date" class="form-label">{{ t('investments.tableHeaders.ending_date') }}</label>
+                                    <input type="date" id="inv-ending-date" class="form-control" v-model="currentInvestment.ending_date">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="inv-amount" class="form-label">{{ t('investments.tableHeaders.investment_amount') }}</label>
+                                <input type="number" id="inv-amount" class="form-control" v-model.number="currentInvestment.investment_amount">
                             </div>
                         </form>
                     </div>
