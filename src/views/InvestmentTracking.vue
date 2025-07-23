@@ -110,6 +110,8 @@
                   <th>{{ $t('investmentTracking.breakdown.yourStake') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.contractStart') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.contractEnd') }}</th>
+                  <th>{{ $t('investmentTracking.breakdown.totalIncome') }}</th>
+                  <th>{{ $t('investmentTracking.breakdown.totalExpenses') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.branchNetProfit') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.yourProfitShare') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.status') }}</th>
@@ -122,6 +124,8 @@
                   <td>{{ branch.participationPercentage }}%</td>
                   <td>{{ branch.contractStartDate }}</td>
                   <td>{{ branch.contractEndDate }} ({{ branch.daysRemaining }} {{ $t('investmentTracking.breakdown.daysRemaining') }})</td>
+                  <td>{{ formatCurrency(branch.totalIncome) }}</td>
+                  <td>{{ formatCurrency(branch.totalExpenses) }}</td>
                   <td>{{ formatCurrency(branch.branchNetProfitSelectedPeriod) }}</td>
                   <td>{{ formatCurrency(branch.yourProfitShareSelectedPeriod) }}</td>
                   <td><span :class="['badge', getStatusClass(branch.status)]">{{ getStatusTranslation(branch.status) }}</span></td>
@@ -262,6 +266,8 @@ const branchInvestments = computed(() => {
       daysRemaining: calculateDaysRemaining(inv.ending_date),
       branchNetProfitSelectedPeriod: inv.branchNetProfitSelectedPeriod,
       yourProfitShareSelectedPeriod: inv.yourProfitShareSelectedPeriod,
+      totalIncome: inv.totalIncome,
+      totalExpenses: inv.totalExpenses,
       status: status,
     };
   });

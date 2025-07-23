@@ -2,9 +2,9 @@ const models = require('../models');
 const { Op } = require('sequelize');
 
 const getInvestmentCalculations = async (investment) => {
-  const { branch_id, percentage, investment_amount, starting_date, ending_date } = investment;
+  const { branch_id, percentage, starting_date, ending_date } = investment;
 
-  // 1. Find relevant financial reports for the branch within the investment period
+/*/ Old code (this commented code need to be updated rather then removed, because we need to include income from services and exclude theirs taxes)
   const financialReports = await models.FinancialReport.findAll({
     where: {
       // This logic assumes reports are generated for periods that an investment might span.
@@ -21,7 +21,33 @@ const getInvestmentCalculations = async (investment) => {
     return sum + (report.content && report.content.netProfit ? report.content.netProfit : 0);
   }, 0);
 
-  // 3. Calculate the investor's gross share
+  */
+  // 1. Calculate total income for the branch within the investment period
+  const totalIncome = await models.Income.sum('amount', {
+    where: {
+      branch_id,
+      transaction_date: {
+        [Op.gte]: starting_date,
+        [Op.lte]: ending_date,
+      },
+    },
+  });
+
+  // 2. Calculate total expense for the branch within the investment period
+  const totalExpense = await models.Expense.sum('amount', {
+    where: {
+      branch_id,
+      transaction_date: {
+        [Op.gte]: starting_date,
+        [Op.lte]: ending_date,
+      },
+    },
+  });
+
+  // 3. Calculate total net profit for the period
+  const totalNetProfit = totalIncome - totalExpense;
+
+  // 4. Calculate the investor's gross share
   const grossProfitShare = totalNetProfit * (percentage / 100);
 
   // 4. Find applicable taxes where the bearer is the 'Client'

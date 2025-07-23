@@ -231,6 +231,8 @@
       "contractStart": "Contract Start",
       "contractEnd": "Contract End",
       "branchNetProfit": "Branch Net Profit (Period)",
+      "totalIncome": "Total Income (Period)",
+      "totalExpenses": "Total Expenses (Period)",
       "yourProfitShare": "Your Profit Share (Period)",
       "status": "Status",
       "daysRemaining": "days remaining"
