@@ -4,7 +4,7 @@ const syncDatabase = async () => {
     try {
         await models.sequelize.query('SET FOREIGN_KEY_CHECKS = 0', { raw: true });
         // await models.sequelize.sync({ force: true });
-        await models.sequelize.sync({ force: false });
+        await models.sequelize.sync({ alter: true });
         console.log('Database synchronized successfully.');
     } catch (error) {
         console.error('Failed to synchronize database:', error);

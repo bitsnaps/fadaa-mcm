@@ -89,6 +89,7 @@
     "tableHeaders": {
       "investor": "Investor",
       "branch": "Branch",
+      "name": "Name",
       "percentage": "Percentage",
       "investment_amount": "Investment Amount",
       "starting_date": "Start Date",

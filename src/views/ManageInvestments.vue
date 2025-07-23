@@ -67,6 +67,7 @@ const filteredInvestments = computed(() => {
 const openAddModal = () => {
     isEditMode.value = false;
     currentInvestment.value = {
+        name: '',
         percentage: 0,
         client_id: null,
         branch_id: null,
@@ -156,8 +157,9 @@ const handleDelete = async (id) => {
                     <tr>
                         <th scope="col">{{ t('investments.tableHeaders.investor') }}</th>
                         <th scope="col">{{ t('investments.tableHeaders.branch') }}</th>
+                        <th scope="col">{{ t('investments.tableHeaders.name') }}</th>
                         <th scope="col">{{ t('investments.tableHeaders.percentage') }}</th>
-                        <th scope="col">{{ t('investments.tableHeaders.investment_amount') }}</th>
+                        <th scope-="col">{{ t('investments.tableHeaders.investment_amount') }}</th>
                         <th scope="col">{{ t('investments.tableHeaders.starting_date') }}</th>
                         <th scope="col">{{ t('investments.tableHeaders.ending_date') }}</th>
                         <th scope="col" class="text-center">{{ t('investments.tableHeaders.actions') }}</th>
@@ -167,6 +169,7 @@ const handleDelete = async (id) => {
                     <tr v-for="investment in filteredInvestments" :key="investment.id">
                         <td>{{ investment.Client ? investment.Client.company_name : 'N/A' }}</td>
                         <td>{{ investment.Branch ? investment.Branch.name : 'N/A' }}</td>
+                        <td>{{ investment.name }}</td>
                         <td>{{ investment.percentage }}%</td>
                         <td>{{ investment.investment_amount }}</td>
                         <td>{{ investment.starting_date ? new Date(investment.starting_date).toLocaleDateString() : 'N/A' }}</td>
@@ -212,6 +215,10 @@ const handleDelete = async (id) => {
                                         <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
                                     </select>
                                 </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="inv-name" class="form-label">{{ t('investments.tableHeaders.name') }}</label>
+                                <input type="text" id="inv-name" class="form-control" v-model="currentInvestment.name">
                             </div>
                             <div class="mb-3">
                                 <label for="inv-percentage" class="form-label">{{ t('investments.tableHeaders.percentage') }}</label>

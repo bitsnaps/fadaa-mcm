@@ -1,5 +1,5 @@
 require('dotenv').config({ path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env' });
-const { Role, Branch, User, Income, Expense } = require('./models');
+const { Role, Branch, User, Income, Expense, Client, Investment } = require('./models');
 
 const seedDatabase = async () => {
     try {
@@ -31,6 +31,28 @@ const seedDatabase = async () => {
         ]);
 
         console.log('Incomes and expenses seeded successfully.');
+
+        // Create a default client for the main branch
+        const [mainClient] = await Client.findOrCreate({
+            where: { email: 'main.client@example.com' },
+            defaults: {
+                company_name: 'Main Client',
+                first_name: 'Main',
+                last_name: 'Client',
+                managed_by_user_id: 1, // Assuming admin user with ID 1 exists
+                status: 'active'
+            }
+        });
+
+        console.log('Clients seeded successfully.');
+
+        // Seed some investments for the main client and branch
+        await Investment.bulkCreate([
+            { name: 'Tech Startup Investment', percentage: 10, investment_amount: 50000, client_id: mainClient.id, branch_id: mainBranch.id, starting_date: new Date('2025-01-15') },
+            { name: 'Real Estate Fund', percentage: 15, investment_amount: 100000, client_id: mainClient.id, branch_id: mainBranch.id, starting_date: new Date('2025-03-10') },
+        ]);
+
+        console.log('Investments seeded successfully.');
 
     } catch (error) {
         console.error('Error seeding the database:', error);

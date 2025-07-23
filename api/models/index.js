@@ -86,6 +86,8 @@ Document.belongsTo(Client, { foreignKey: 'client_id' });
 Client.hasMany(Document, { foreignKey: 'client_id' });
 Document.belongsTo(User, { as: 'uploaded_by', foreignKey: 'uploaded_by_user_id' });
 User.hasMany(Document, { foreignKey: 'uploaded_by_user_id' });
+Document.belongsTo(Investment, { foreignKey: 'investment_id' });
+Investment.hasMany(Document, { foreignKey: 'investment_id' });
 
 // Task associations
 Task.belongsTo(User, { as: 'assigned_to', foreignKey: 'assigned_to_user_id' });
