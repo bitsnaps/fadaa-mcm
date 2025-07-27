@@ -622,7 +622,18 @@
     "confirmRemove": "Are you sure you want to remove this service from the client?",
     "selectClientAndService": "Please select a client and a service category.",
     "noServicesYet": "This client has no active services.",
-    "noClientSelected": "Please select a client to view and manage their services."
+    "noClientSelected": "Please select a client to view and manage their services.",
+    "clients": "Clients",
+    "noClientsFound": "No clients found.",
+    "viewServices": "View Services"
+  },
+  "client": {
+    "companyName": "Company Name",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phoneNumber": "Phone Number",
+    "status": "Status"
   },
   "financialReporting": {
     "title": "Financial Reporting",

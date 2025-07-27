@@ -1,5 +1,5 @@
 require('dotenv').config({ path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env' });
-const { Role, Branch, User, Income, Expense, Client, Investment } = require('./models');
+const { Role, Branch, Office, User, Tax, Income, Expense, Client, Investment, ServiceCategory } = require('./models');
 
 const seedDatabase = async () => {
     try {
@@ -14,8 +14,18 @@ const seedDatabase = async () => {
         // Create a default branch
         const [mainBranch] = await Branch.findOrCreate({ where: { name: 'Main Branch' }, defaults: { location: 'Headquarters', status: 'active' } });
 
+        // Create an office for the "mainBranch" here
+        await Office.findOrCreate({ where: { name: 'Big Room'}, defaults: { type: 'Coworking Desk', capacity: 30, status: 'Available', amenities: 'Wi-Fi, Coffee', branch_id: mainBranch.id }});
+
+        // Create some category of services
+        await ServiceCategory.findOrCreate({ where: { name: 'Rental Equipement' }, defaults: { description: 'Rental of any type of equipements.' } });
+        await ServiceCategory.findOrCreate({ where: { name: 'Deep Cleaning' }, defaults: { description: 'Perform a deep clean to office.' } });
+
+        // Create some taxes (TVA -> 19%, IBS -> 26%)
+        await Tax.findOrCreate({ where: { name: 'VAT'}, defaults: { rate: '19.00', description: 'Value added tax', bearer: 'Client'}});
+
         // Create the admin user (since password should be hashed, this will be don through cli)
-        // await User.findOrCreate({ where: { email: 'admin@fadaa.dz'}, defaults: { first_name: 'admin', last_name: 'admin', password: 'admin' }})
+        await User.findOrCreate({ where: { email: 'admin@fadaa.dz'}, defaults: { first_name: 'admin', last_name: 'admin', password_hash: '$2b$10$E2v.3E.6K2.a9jZ5l.8X.uY.8aJ5.j.J.j5.j.J.j5.j.J' }})
 
         console.log('Branches seeded successfully.');
 

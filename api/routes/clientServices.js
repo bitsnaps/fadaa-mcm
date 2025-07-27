@@ -13,10 +13,15 @@ clientServicesApp.get('/:clientId', async (c) => {
     try {
         const services = await models.ClientService.findAll({
             where: { client_id: clientId },
-            include: [{
-                model: models.Tax,
-                through: { attributes: [] } // Exclude join table attributes
-            }]
+            include: [
+                {
+                    model: models.Tax
+                },
+                {
+                    model: models.ServiceCategory,
+                    attributes: ['name']
+                }
+            ]
         });
         return c.json({ success: true, services });
     } catch (error) {

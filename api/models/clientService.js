@@ -11,7 +11,7 @@ module.exports = (sequelize) => {
       type: DataTypes.TEXT,
     },
     payment_type: {
-      type: DataTypes.ENUM('Monthly', 'Quarterly', 'Annually', 'OneTime'),
+      type: DataTypes.STRING,
       allowNull: false,
     },
     price: {
@@ -33,6 +33,22 @@ module.exports = (sequelize) => {
            model: 'Taxes',
            key: 'id'
        }
+    },
+    client_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'clients',
+        key: 'id'
+      }
+    },
+    service_category_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'service_categories',
+        key: 'id'
+      }
     }
   }, {
     tableName: 'client_services',
@@ -42,7 +58,9 @@ module.exports = (sequelize) => {
   });
 
   ClientService.associate = (models) => {
-   ClientService.belongsTo(models.Tax, { foreignKey: 'taxId' });
+    ClientService.belongsTo(models.Tax, { foreignKey: 'taxId' });
+    ClientService.belongsTo(models.Client, { foreignKey: 'client_id' });
+    ClientService.belongsTo(models.ServiceCategory, { foreignKey: 'service_category_id' });
   };
 
   return ClientService;
