@@ -106,8 +106,8 @@ FinancialReport.belongsTo(User, { foreignKey: 'generated_by_user_id' });
 User.hasMany(FinancialReport, { foreignKey: 'generated_by_user_id' });
 
 // ClientInvestment (Many-to-Many)
-Investment.belongsTo(Client, { foreignKey: 'client_id' });
-Client.hasMany(Investment, { foreignKey: 'client_id' });
+Investment.belongsTo(User, { as: 'investor', foreignKey: 'investor_id' });
+User.hasMany(Investment, { as: 'investments', foreignKey: 'investor_id' });
 
 Investment.belongsTo(Branch, { foreignKey: 'branch_id' });
 Branch.hasMany(Investment, { foreignKey: 'branch_id' });

@@ -12,7 +12,7 @@ investmentsApp.get('/', async (c) => {
     try {
         const investments = await models.Investment.findAll({
             include: [
-                { model: models.Client },
+                { model: models.User, as: 'investor' },
                 { model: models.Branch }
             ],
             order: [['created_at', 'DESC']],
@@ -41,7 +41,7 @@ investmentsApp.get('/:id', async (c) => {
         const { id } = c.req.param();
         const investment = await models.Investment.findByPk(id, {
             include: [
-                { model: models.Client },
+                { model: models.User, as: 'investor' },
                 { model: models.Branch }
             ]
         });
@@ -64,7 +64,7 @@ investmentsApp.post('/', async (c) => {
         });
         const finalInvestment = await models.Investment.findByPk(newInvestment.id, {
             include: [
-                { model: models.Client },
+                { model: models.User, as: 'investor' },
                 { model: models.Branch }
             ]
         });
@@ -90,7 +90,7 @@ investmentsApp.put('/:id', async (c) => {
         
         const finalInvestment = await models.Investment.findByPk(id, {
             include: [
-                { model: models.Client },
+                { model: models.User, as: 'investor' },
                 { model: models.Branch }
             ]
         });

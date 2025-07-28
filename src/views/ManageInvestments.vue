@@ -1,13 +1,13 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getInvestments, addInvestment, updateInvestment, deleteInvestment, getClients, getBranches } from '@/services/ApiClient';
+import { getInvestments, addInvestment, updateInvestment, deleteInvestment, getInvestors, getBranches } from '@/services/ApiClient';
 import { Modal } from 'bootstrap';
 
 const { t } = useI18n();
 
 const investments = ref([]);
-const clients = ref([]);
+const investors = ref([]);
 const branches = ref([]);
 const isLoading = ref(true);
 const searchTerm = ref('');
@@ -34,23 +34,23 @@ const fetchInvestments = async () => {
     }
 };
 
-const fetchClientsAndBranches = async () => {
+const fetchInvestorsAndBranches = async () => {
     try {
-        const [clientsRes, branchesRes] = await Promise.all([getClients(), getBranches()]);
-        if (clientsRes.data.success) {
-            clients.value = clientsRes.data.data;
+        const [investorsRes, branchesRes] = await Promise.all([getInvestors(), getBranches()]);
+        if (investorsRes.data.success) {
+            investors.value = investorsRes.data.data;
         }
         if (branchesRes.data.success) {
             branches.value = branchesRes.data.data;
         }
     } catch (error) {
-        console.error('Failed to fetch clients or branches:', error);
+        console.error('Failed to fetch investors or branches:', error);
     }
 };
 
 onMounted(() => {
     fetchInvestments();
-    fetchClientsAndBranches();
+    fetchInvestorsAndBranches();
     modalInstance.value = new Modal(addInvestmentModal.value);
 });
 
@@ -59,7 +59,7 @@ const filteredInvestments = computed(() => {
         return investments.value;
     }
     return investments.value.filter(inv =>
-        (inv.Client && inv.Client.company_name.toLowerCase().includes(searchTerm.value.toLowerCase())) ||
+        (inv.investor && (inv.investor.first_name + ' ' + inv.investor.last_name).toLowerCase().includes(searchTerm.value.toLowerCase())) ||
         (inv.Branch && inv.Branch.name.toLowerCase().includes(searchTerm.value.toLowerCase()))
     );
 });
@@ -69,7 +69,7 @@ const openAddModal = () => {
     currentInvestment.value = {
         name: '',
         percentage: 0,
-        client_id: null,
+        investor_id: null,
         branch_id: null,
         starting_date: '',
         ending_date: '',
@@ -167,7 +167,7 @@ const handleDelete = async (id) => {
                 </thead>
                 <tbody>
                     <tr v-for="investment in filteredInvestments" :key="investment.id">
-                        <td>{{ investment.Client ? investment.Client.company_name : 'N/A' }}</td>
+                        <td>{{ investment.investor ? investment.investor.first_name + ' ' + investment.investor.last_name : 'N/A' }}</td>
                         <td>{{ investment.Branch ? investment.Branch.name : 'N/A' }}</td>
                         <td>{{ investment.name }}</td>
                         <td>{{ investment.percentage }}%</td>
@@ -203,9 +203,9 @@ const handleDelete = async (id) => {
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="inv-client" class="form-label">{{ t('investments.tableHeaders.investor') }}</label>
-                                    <select id="inv-client" class="form-select" v-model="currentInvestment.client_id">
+                                    <select id="inv-investor" class="form-select" v-model="currentInvestment.investor_id">
                                         <option :value="null">Select an investor</option>
-                                        <option v-for="client in clients" :key="client.id" :value="client.id">{{ client.company_name }}</option>
+                                        <option v-for="investor in investors" :key="investor.id" :value="investor.id">{{ investor.first_name }} {{ investor.last_name }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">

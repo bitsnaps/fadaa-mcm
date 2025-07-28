@@ -23,6 +23,28 @@ userApp.get('/', authMiddleware, async (c) => {
     }
 });
 
+// Get users by role
+userApp.get('/role/:roleName', authMiddleware, async (c) => {
+    const { roleName } = c.req.param();
+    try {
+        const users = await models.User.findAll({
+            include: [
+                {
+                    model: models.Role,
+                    as: 'role',
+                    where: { name: roleName }
+                },
+                { model: models.Branch, as: 'branch' }
+            ],
+            order: [['created_at', 'DESC']]
+        });
+        return c.json({ success: true, data: users });
+    } catch (error) {
+        console.error(`Error fetching users with role ${roleName}:`, error);
+        return c.json({ success: false, message: 'Failed to fetch users' }, 500);
+    }
+});
+
 // Get a single user by ID
 userApp.get('/:id', authMiddleware, async (c) => {
     const { id } = c.req.param();

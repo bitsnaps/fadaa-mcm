@@ -93,3 +93,7 @@ export const deleteInvestment = (id) => {
 export const getBranches = () => {
     return apiClient.get('/branches');
 };
+
+export const getInvestors = () => {
+    return apiClient.get('/users/role/Investor');
+};

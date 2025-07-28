@@ -27,10 +27,10 @@ module.exports = (sequelize) => {
         type: DataTypes.FLOAT,
         allowNull: true,
     },
-    client_id: {
+    investor_id: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'clients',
+        model: 'users',
         key: 'id'
       }
     },
