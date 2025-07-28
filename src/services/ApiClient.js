@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '../stores/auth';
+import { restoreTextDirection } from 'chart.js/helpers';
 
 const getApiBaseUrl = () => {
   if (import.meta.env.DEV) {
@@ -96,4 +97,36 @@ export const getBranches = () => {
 
 export const getInvestors = () => {
     return apiClient.get('/users/role/Investor');
+};
+
+export const getTotalClients = () => {
+    return apiClient.get('/clients/total');
+};
+
+export const getTotalIncome = (params) => {
+    return apiClient.get('/incomes/total', { params });
+};
+
+export const getTotalExpense = (params) => {
+    return apiClient.get('/expenses/total', { params });
+};
+
+export const getMonthlyIncomeByBranch = () => {
+    return apiClient.get('/incomes/monthly-by-branch');
+};
+
+export const getNotifications = () => {
+    return apiClient.get('/notifications');
+};
+
+export const getActivityLogs = () => {
+    return apiClient.get('/activity-logs');
+};
+
+export const getAssistants = () => {
+    return apiClient.get('/users/role/Assistant');
+};
+
+export const getOffices = (params) => {
+    return apiClient.get('/offices', { params });
 };

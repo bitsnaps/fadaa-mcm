@@ -4,8 +4,21 @@ const { authMiddleware } = require('../middleware/auth');
 
 const clientsApp = new Hono();
 
+clientsApp.use('*', authMiddleware);
+
+// GET total number of clients
+clientsApp.get('/total', async (c) => {
+    try {
+      const count = await models.Client.count();
+      return c.json({ success: true, data: count });
+    } catch (error) {
+      console.error('Error fetching total clients:', error);
+      return c.json({ success: false, message: 'Failed to fetch total clients' }, 500);
+    }
+});
+
 // GET all clients
-clientsApp.get('/', authMiddleware, async (c) => {
+clientsApp.get('/', async (c) => {
     try {
         const clients = await models.Client.findAll({
             attributes: [
@@ -33,7 +46,7 @@ clientsApp.get('/', authMiddleware, async (c) => {
 });
 
 // GET a single client by ID
-clientsApp.get('/:id', authMiddleware, async (c) => {
+clientsApp.get('/:id', async (c) => {
     try {
         const { id } = c.req.param();
         const client = await models.Client.findByPk(id);
@@ -48,7 +61,7 @@ clientsApp.get('/:id', authMiddleware, async (c) => {
 });
 
 // POST a new client
-clientsApp.post('/', authMiddleware, async (c) => {
+clientsApp.post('/', async (c) => {
     try {
         const clientData = await c.req.json();
         const newClient = await models.Client.create(clientData);
@@ -60,7 +73,7 @@ clientsApp.post('/', authMiddleware, async (c) => {
 });
 
 // PUT (update) a client
-clientsApp.put('/:id', authMiddleware, async (c) => {
+clientsApp.put('/:id', async (c) => {
     try {
         const { id } = c.req.param();
         const clientData = await c.req.json();
@@ -79,7 +92,7 @@ clientsApp.put('/:id', authMiddleware, async (c) => {
 });
 
 // DELETE a client
-clientsApp.delete('/:id', authMiddleware, async (c) => {
+clientsApp.delete('/:id', async (c) => {
     try {
         const { id } = c.req.param();
         const client = await models.Client.findByPk(id);

@@ -8,7 +8,7 @@
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-people-fill me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.clients') }}</h5>
-            <p class="card-text fs-4 fw-bold">1,250</p>
+            <p class="card-text fs-4 fw-bold">{{ kpis.clients }}</p>
           </div>
         </div>
       </div>
@@ -16,7 +16,7 @@
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-cash-coin me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.monthlyRevenue') }}</h5>
-            <p class="card-text fs-4 fw-bold">{{ formatCurrency(75000) }}</p>
+            <p class="card-text fs-4 fw-bold">{{ formatCurrency(kpis.monthlyRevenue) }}</p>
           </div>
         </div>
       </div>
@@ -24,7 +24,7 @@
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-graph-up-arrow me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.monthlyNet') }}</h5>
-            <p class="card-text fs-4 fw-bold">{{ formatCurrency(25000) }}</p>
+            <p class="card-text fs-4 fw-bold">{{ formatCurrency(kpis.monthlyNet) }}</p>
           </div>
         </div>
       </div>
@@ -51,14 +51,8 @@
           </div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
-              <li class="list-group-item list-group-item-danger d-flex align-items-center">
-                <i class="bi bi-exclamation-octagon-fill me-2 fs-4"></i> {{ $t('dashboard.notifications.urgentContract') }}
-              </li>
-              <li class="list-group-item list-group-item-warning d-flex align-items-center">
-                <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i> {{ $t('dashboard.notifications.pendingApproval') }}
-              </li>
-              <li class="list-group-item list-group-item-info d-flex align-items-center">
-                <i class="bi bi-info-circle-fill me-2 fs-4"></i> {{ $t('dashboard.notifications.systemMaintenance') }}
+              <li v-for="notification in notifications" :key="notification.id" class="list-group-item d-flex align-items-center" :class="`list-group-item-${notification.type || 'info'}`">
+                <i :class="`bi ${getNotificationIcon(notification.type)} me-2 fs-4`"></i> {{ notification.message }}
               </li>
             </ul>
           </div>
@@ -75,10 +69,11 @@
           </div>
           <div class="card-body">
             <ul class="list-unstyled">
-              <li class="mb-2"><i class="bi bi-person-check-fill text-success me-2"></i>{{ $t('dashboard.recentActivities.newClient') }}</li>
-              <li class="mb-2"><i class="bi bi-file-earmark-text-fill text-primary me-2"></i>{{ $t('dashboard.recentActivities.contractUpdate') }}</li>
-              <li class="mb-2"><i class="bi bi-chat-dots-fill text-info me-2"></i>{{ $t('dashboard.recentActivities.communicationLog') }}</li>
-              <li class="mb-2"><i class="bi bi-calendar-event-fill text-fadaa-orange me-2"></i>{{ $t('dashboard.recentActivities.followUpReminder') }}</li>
+              <li v-for="activity in recentActivities" :key="activity.id" class="mb-2">
+                <i :class="`bi ${getActivityIcon(activity.action)} me-2`"></i>
+                {{ activity.action }} - {{ activity.details ? activity.details.message : '' }}
+                <span class="text-muted small">({{ formatDistanceToNow(new Date(activity.created_at), { addSuffix: true, locale: fr }) }})</span>
+              </li>
             </ul>
           </div>
         </div>
@@ -90,17 +85,11 @@
           </div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ $t('dashboard.assistantPerformance.assistant1') }}
-                <span class="badge bg-success rounded-pill">{{ $t('dashboard.assistantPerformance.statusExcellent') }}</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ $t('dashboard.assistantPerformance.assistant2') }}
-                <span class="badge bg-primary rounded-pill">{{ $t('dashboard.assistantPerformance.statusGood') }}</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ $t('dashboard.assistantPerformance.assistant3') }}
-                <span class="badge bg-warning text-dark rounded-pill">{{ $t('dashboard.assistantPerformance.statusNeedsImprovement') }}</span>
+              <li v-for="assistant in assistants" :key="assistant.id" class="list-group-item d-flex justify-content-between align-items-center">
+                {{ assistant.first_name }} {{ assistant.last_name }}
+                <span :class="`badge bg-${assistant.is_active ? 'success' : 'danger'} rounded-pill`">
+                  {{ assistant.is_active ? $t('dashboard.assistantPerformance.statusActive') : $t('dashboard.assistantPerformance.statusInactive') }}
+                </span>
               </li>
             </ul>
           </div>
@@ -171,58 +160,131 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, Filler } from 'chart.js';
 import { formatCurrency } from '@/helpers/utils.js';
+import {
+  getTotalClients,
+  getTotalIncome,
+  getTotalExpense,
+  getMonthlyIncomeByBranch,
+  getNotifications,
+  getActivityLogs,
+  getAssistants,
+  getOffices,
+} from '@/services/ApiClient';
+import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
+
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, Filler);
 
-const mockOffices = ref([
-  { id: 1, branch: 'Branche Principale', space: 100, status: 'Occupé' },
-  { id: 2, branch: 'Branche Centre-ville', space: 75, status: 'Nouveau' },
-  { id: 3, branch: 'Branche Principale', space: 120, status: 'Actif' },
-  { id: 4, branch: 'Branche Ouest', space: 90, status: 'En instance' },
-  { id: 5, branch: 'Branche Principale', space: 50, status: 'Inactif' },
-  { id: 6, branch: 'Branche Centre-ville', space: 150, status: 'Occupé' },
-  { id: 7, branch: 'Branche Ouest', space: 60, status: 'Nouveau' },
-  { id: 8, branch: 'Branche Est', space: 110, status: 'Actif' },
-  { id: 9, branch: 'Branche Nord', space: 80, status: 'Inactif' },
-  { id: 10, branch: 'Branche Sud', space: 95, status: 'En instance' },
-]);
+const kpis = ref({
+  clients: 0,
+  monthlyRevenue: 0,
+  monthlyNet: 0,
+});
+
+const notifications = ref([]);
+const recentActivities = ref([]);
+const assistants = ref([]);
+const offices = ref([]);
 
 const searchTerm = ref('');
 const sortKey = ref('id');
 const sortAsc = ref(true);
 const currentPage = ref(1);
 const itemsPerPage = ref(5);
+const totalOffices = ref(0);
 
-const filteredOffices = computed(() => {
-  let offices = mockOffices.value;
-  if (searchTerm.value) {
-    offices = offices.filter(office =>
-      Object.values(office).some(val =>
-        String(val).toLowerCase().includes(searchTerm.value.toLowerCase())
-      )
-    );
-  }
-  return offices.sort((a, b) => {
-    let valA = a[sortKey.value];
-    let valB = b[sortKey.value];
-    if (typeof valA === 'string') valA = valA.toLowerCase();
-    if (typeof valB === 'string') valB = valB.toLowerCase();
-    return (valA < valB ? -1 : 1) * (sortAsc.value ? 1 : -1);
-  });
+const chartData = ref({
+  labels: [],
+  datasets: [],
 });
 
+const fetchDashboardData = async () => {
+  try {
+    // KPIs
+    const clientsRes = await getTotalClients();
+    kpis.value.clients = clientsRes.data.data;
+
+    const now = new Date();
+    const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
+
+    const incomeRes = await getTotalIncome({ startDate, endDate });
+    kpis.value.monthlyRevenue = incomeRes.data.data;
+
+    const expenseRes = await getTotalExpense({ startDate, endDate });
+    const totalExpense = expenseRes.data.data;
+    kpis.value.monthlyNet = kpis.value.monthlyRevenue - totalExpense;
+
+    // Chart
+    const chartRes = await getMonthlyIncomeByBranch();
+    chartData.value = chartRes.data.data;
+
+    // Notifications
+    const notificationsRes = await getNotifications();
+    notifications.value = notificationsRes.data.notifications;
+
+    // Recent Activities
+    const activitiesRes = await getActivityLogs();
+    recentActivities.value = activitiesRes.data.data;
+
+    // Assistants
+    const assistantsRes = await getAssistants();
+    assistants.value = assistantsRes.data.data;
+
+    // Offices
+    fetchOffices();
+
+  } catch (error) {
+    console.error('Failed to fetch dashboard data:', error);
+  }
+};
+
+const fetchOffices = async () => {
+  try {
+    const params = {
+      page: currentPage.value,
+      limit: itemsPerPage.value,
+      search: searchTerm.value,
+      sortBy: sortKey.value,
+      sortAsc: sortAsc.value,
+    };
+    const response = await getOffices(params);
+    offices.value = response.data.data;
+    totalOffices.value = response.data.pagination.total;
+  } catch (error) {
+    console.error('Failed to fetch offices:', error);
+  }
+};
+
+onMounted(fetchDashboardData);
+
 const totalPages = computed(() => {
-  return Math.ceil(filteredOffices.value.length / itemsPerPage.value);
+  return Math.ceil(totalOffices.value / itemsPerPage.value);
 });
 
 const paginatedOffices = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value;
-  const end = start + itemsPerPage.value;
-  return filteredOffices.value.slice(start, end);
+  return offices.value;
 });
+
+const getNotificationIcon = (type) => {
+  switch (type) {
+    case 'danger': return 'bi-exclamation-octagon-fill';
+    case 'warning': return 'bi-exclamation-triangle-fill';
+    case 'info': return 'bi-info-circle-fill';
+    default: return 'bi-bell-fill';
+  }
+};
+
+const getActivityIcon = (action) => {
+  if (action.includes('Client')) return 'bi-person-check-fill text-success';
+  if (action.includes('Contract')) return 'bi-file-earmark-text-fill text-primary';
+  if (action.includes('Communication')) return 'bi-chat-dots-fill text-info';
+  return 'bi-list-task';
+};
 
 const sortBy = (key) => {
   if (sortKey.value === key) {
@@ -270,7 +332,7 @@ const statusBadge = (status) => {
   }
 };
 
-// Chart.js data and options
+/*/ Chart.js data and options
 const chartData = ref({
   labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
   datasets: [
@@ -293,7 +355,7 @@ const chartData = ref({
       stack: 'Stack 0',
     },
   ],
-});
+});*/
 
 const chartOptions = ref({
   responsive: true,

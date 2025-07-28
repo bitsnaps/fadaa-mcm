@@ -18,6 +18,7 @@ const clientServicesApp = require('./routes/clientServices');
 const investmentsApp = require('./routes/investments');
 const incomesApp = require('./routes/incomes');
 const expensesApp = require('./routes/expenses');
+const activityLogsApp = require('./routes/activityLogs');
 const { hashPassword } = require('./lib/auth');
 const models = require('./models');
 
@@ -51,6 +52,7 @@ app.route('/api/misc', miscApp);
 app.route('/api/investments', investmentsApp);
 app.route('/api/incomes', incomesApp);
 app.route('/api/expenses', expensesApp);
+app.route('/api/activity-logs', activityLogsApp);
 
 // --- Static File Serving ---
 // Serve the uploaded contract files
