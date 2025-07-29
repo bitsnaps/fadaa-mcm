@@ -16,6 +16,9 @@
           <div class="text-center my-2">{{ $t('clientServices.noServicesYet') }}</div>
         </template>
         <template #cell(actions)="row">
+          <b-button size="sm" variant="primary" class="me-1" @click="openEditServiceModal(row.item)">
+            <i class="bi bi-pencil"></i> {{ $t('clientServices.edit') }}
+          </b-button>
           <b-button size="sm" variant="danger" @click="confirmRemoveService(row.item.id)">
             <i class="bi bi-trash"></i> {{ $t('clientServices.remove') }}
           </b-button>
@@ -26,12 +29,14 @@
       <b-button @click="cancel()">{{ $t('manageUsers.cancel') }}</b-button>
     </template>
   </b-modal>
+  <AddServiceModal ref="addServiceModalRef" :client="client" :editingService="serviceToEdit" @service-added="fetchClientServices(client.id)" @service-updated="fetchClientServices(client.id)" />
 </template>
 
 <script setup>
 import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import apiClient from '@/services/ApiClient';
+import AddServiceModal from '@/components/AddServiceModal.vue';
 
 const { t } = useI18n();
 
@@ -44,6 +49,8 @@ const props = defineProps({
 
 const services = ref([]);
 const loading = ref(false);
+const serviceToEdit = ref(null);
+const addServiceModalRef = ref(null);
 
 const fields = computed(() => [
   { key: 'ServiceCategory.name', label: t('clientServices.service'), sortable: true },
@@ -51,6 +58,7 @@ const fields = computed(() => [
   { key: 'price', label: t('clientServices.price'), sortable: true },
   { key: 'status', label: t('clientServices.status'), sortable: true },
   { key: 'notes', label: t('clientServices.notes'), sortable: true },
+  { key: 'Tax.name', label: t('manageTaxes.title'), sortable: true },
   { key: 'actions', label: t('clientServices.actions') }
 ]);
 
@@ -87,4 +95,9 @@ watch(() => props.client, (newClient) => {
     fetchClientServices(newClient.id);
   }
 });
+
+const openEditServiceModal = (service) => {
+  serviceToEdit.value = service;
+  addServiceModalRef.value.show();
+};
 </script>

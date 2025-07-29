@@ -1,5 +1,5 @@
 <template>
-  <b-modal ref="modal" id="add-service-modal" :title="$t('clientServices.addNewService')" @hidden="resetModal" @ok.prevent="handleSubmit">
+  <b-modal ref="modal" id="add-service-modal" :title="modalTitle" @hidden="resetModal" @ok.prevent="handleSubmit">
     <form>
       <div class="mb-3">
         <label for="serviceCategorySelect" class="form-label">{{ $t('clientServices.serviceCategory') }} <span class="text-danger">*</span></label>
@@ -23,7 +23,7 @@
       </div>
       <div class="mb-3">
         <label for="serviceTaxes" class="form-label">{{ $t('manageTaxes.title') }}</label>
-        <select class="form-select" id="serviceTaxes" v-model="newService.tax_id">
+        <select class="form-select" id="serviceTaxes" v-model="newService.taxId">
             <option :value="null">-- {{ $t('manageTaxes.selectTax') }} --</option>
             <option v-for="tax in availableTaxes" :key="tax.id" :value="tax.id">
                 {{ tax.name }} ({{ tax.rate }}%)
@@ -37,7 +37,7 @@
     </form>
     <template #modal-footer="{ ok, cancel }">
         <b-button @click="cancel()">{{ $t('manageUsers.cancel') }}</b-button>
-       <b-button variant="primary" @click="ok()" :disabled="!isFormValid">{{ $t('clientServices.addService') }}</b-button>
+       <b-button variant="primary" @click="ok()" :disabled="!isFormValid">{{ props.editingService ? $t('clientServices.saveChanges') : $t('clientServices.addService') }}</b-button>
     </template>
   </b-modal>
 </template>
@@ -45,6 +45,9 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import apiClient from '@/services/ApiClient';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const modal = ref(null);
 
@@ -52,25 +55,36 @@ const props = defineProps({
   client: {
     type: Object,
     default: null
+  },
+  editingService: {
+    type: Object,
+    default: null
   }
 });
 
-const emit = defineEmits(['service-added']);
+const emit = defineEmits(['service-added', 'service-updated']);
 
 const newService = ref({
   categoryId: '',
   paymentType: 'recurrent',
   price: 0,
   notes: '',
-  tax_id: null
+  taxId: null
 });
 
 const availableServiceCategories = ref([]);
 const availableTaxes = ref([]);
 
+const modalTitle = computed(() => {
+  return props.editingService
+    ? t('clientServices.editService')
+    : t('clientServices.addNewService');
+});
+
 const isFormValid = computed(() => {
   return newService.value.categoryId && newService.value.price > 0;
 });
+
 
 const fetchServiceCategories = async () => {
   try {
@@ -91,15 +105,22 @@ const fetchTaxes = async () => {
 };
 
 const resetModal = () => {
-  newService.value = {
-    categoryId: '',
-    paymentType: 'recurrent',
-    price: 0,
-    notes: '',
-    tax_id: null
-  };
+  if (props.editingService) {
+    newService.value = { ...props.editingService };
+  } else {
+    newService.value = {
+      categoryId: '',
+      paymentType: 'recurrent',
+      price: 0,
+      notes: '',
+      taxId: null
+    };
+  }
 };
 
+defineExpose({
+  show: () => modal.value.show()
+});
 const handleSubmit = async () => {
   if (!isFormValid.value) return;
 
@@ -107,11 +128,16 @@ const handleSubmit = async () => {
     const payload = {
       ...newService.value,
     };
-    await apiClient.post(`/client-services/${props.client.id}`, payload);
-    emit('service-added');
+    if (props.editingService) {
+      await apiClient.put(`/client-services/${props.editingService.id}`, payload);
+      emit('service-updated');
+    } else {
+      await apiClient.post(`/client-services/${props.client.id}`, payload);
+      emit('service-added');
+    }
     modal.value.hide();
   } catch (error) {
-    console.error('Failed to add service:', error);
+    console.error('Failed to save service:', error);
   }
 };
 
@@ -125,4 +151,19 @@ watch(() => props.client, (newClient) => {
     resetModal();
   }
 });
+
+watch(() => props.editingService, (newVal) => {
+  if (newVal) {
+    newService.value = {
+      id: newVal.id,
+      categoryId: newVal.service_category_id,
+      paymentType: newVal.payment_type,
+      price: newVal.price,
+      notes: newVal.notes,
+      taxId: newVal.taxId
+    };
+  } else {
+    resetModal();
+  }
+}, { immediate: true });
 </script>

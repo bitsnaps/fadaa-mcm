@@ -59,6 +59,35 @@ clientServicesApp.post('/:clientId', async (c) => {
     }
 });
 
+// PUT /api/client-services/:serviceId - Update a service for a client
+clientServicesApp.put('/:serviceId', async (c) => {
+    const { serviceId } = c.req.param();
+    try {
+        const { categoryId, paymentType, price, notes, taxId } = await c.req.json();
+        
+        if (!categoryId || !paymentType || !price) {
+            return c.json({ success: false, message: 'Missing required fields' }, 400);
+        }
+
+        const service = await models.ClientService.findByPk(serviceId);
+        if (!service) {
+            return c.json({ success: false, message: 'Service not found' }, 404);
+        }
+
+        await service.update({
+            service_category_id: categoryId,
+            payment_type: paymentType,
+            price,
+            notes,
+            taxId
+        });
+
+        return c.json({ success: true, message: 'Service updated successfully', service });
+    } catch (error) {
+        console.error('Error updating client service:', error);
+        return c.json({ success: false, message: 'Failed to update service' }, 500);
+    }
+});
 // DELETE /api/client-services/:serviceId - Remove a service from a client
 clientServicesApp.delete('/:serviceId', async (c) => {
     const { serviceId } = c.req.param();

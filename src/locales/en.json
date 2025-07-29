@@ -137,7 +137,7 @@
     "delete": "Delete"
   },
   "manageTaxes": {
-    "title": "Tax Management",
+    "title": "Tax",
     "addTax": "Add Tax",
     "editTax": "Edit Tax",
     "createTax": "Create Tax",
@@ -607,6 +607,7 @@
     "price": "Price",
     "notes": "Notes",
     "addService": "Add Service",
+    "editService": "Edit Service",
     "currentServices": "Current Services",
     "service": "Service",
     "type": "Type",
@@ -615,6 +616,7 @@
     "active": "Active",
     "inactive": "Inactive",
     "remove": "Remove",
+    "edit": "Edit",
     "loading": "Loading...",
     "loadingClientData": "Loading client data...",
     "noServices": "This client has no subscribed services.",

@@ -136,7 +136,7 @@
     "delete": "Supprimer"
   },
   "manageTaxes": {
-    "title": "Gestion des Taxes",
+    "title": "Taxe",
     "addTax": "Ajouter une Taxe",
     "editTax": "Modifier la Taxe",
     "createTax": "Créer une Taxe",
@@ -581,6 +581,7 @@
     "price": "Prix",
     "notes": "Remarques",
     "addService": "Ajouter un service",
+    "editService": "Modifier un service",
     "currentServices": "Services actuels",
     "service": "Service",
     "type": "Type",
@@ -589,6 +590,7 @@
     "active": "Actif",
     "inactive": "Inactif",
     "remove": "Supprimer",
+    "edit": "Modifier",
     "noServices": "Ce client n'a aucun service souscrit.",
     "addSuccess": "Service ajouté avec succès (maquette).",
     "removeSuccess": "Service supprimé avec succès (maquette).",
