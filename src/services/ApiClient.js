@@ -130,3 +130,7 @@ export const getAssistants = () => {
 export const getOffices = (params) => {
     return apiClient.get('/offices', { params });
 };
+
+export const getRevenueSummary = (params) => {
+    return apiClient.get('/financials/revenue-summary', { params });
+};

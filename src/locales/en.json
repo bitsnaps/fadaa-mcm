@@ -26,6 +26,7 @@
       "title": "Assistant Performance",
       "assistant1": "Assistant 1",
       "statusExcellent": "Excellent",
+      "statusActive": "Active",
       "assistant2": "Assistant 2",
       "statusGood": "Good",
       "assistant3": "Assistant 3",

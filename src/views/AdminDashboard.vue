@@ -122,8 +122,8 @@
               </tr>
               <tr v-for="office in paginatedOffices" :key="office.id">
                 <td>{{ office.id }}</td>
-                <td>{{ office.branch }}</td>
-                <td>{{ office.space }}</td>
+                <td>{{ office.branch.name }}</td>
+                <td>{{ office.capacity }}</td>
                 <td><span :class="statusBadge(office.status)">{{ office.status }}</span></td>
               </tr>
             </tbody>
@@ -166,13 +166,12 @@ import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, Li
 import { formatCurrency } from '@/helpers/utils.js';
 import {
   getTotalClients,
-  getTotalIncome,
-  getTotalExpense,
   getMonthlyIncomeByBranch,
   getNotifications,
   getActivityLogs,
   getAssistants,
   getOffices,
+  getRevenueSummary,
 } from '@/services/ApiClient';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -212,12 +211,9 @@ const fetchDashboardData = async () => {
     const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
 
-    const incomeRes = await getTotalIncome({ startDate, endDate });
-    kpis.value.monthlyRevenue = incomeRes.data.data;
-
-    const expenseRes = await getTotalExpense({ startDate, endDate });
-    const totalExpense = expenseRes.data.data;
-    kpis.value.monthlyNet = kpis.value.monthlyRevenue - totalExpense;
+    const revenueSummaryRes = await getRevenueSummary({ startDate, endDate });
+    kpis.value.monthlyRevenue = revenueSummaryRes.data.data.netRevenue;
+    kpis.value.monthlyNet = revenueSummaryRes.data.data.netProfit;
 
     // Chart
     const chartRes = await getMonthlyIncomeByBranch();
