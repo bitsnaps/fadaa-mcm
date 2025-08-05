@@ -29,6 +29,7 @@ import ManageTaxes from './views/ManageTaxes.vue';
 import ManageInvestments from './views/ManageInvestments.vue';
 import ManageIncomes from './views/ManageIncomes.vue';
 import ManageExpenses from './views/ManageExpenses.vue';
+import ManageProfiles from './views/ManageProfiles.vue';
 import Navbar from './components/Navbar.vue';
 
 const routes = [
@@ -219,6 +220,12 @@ const routes = [
     name: 'ManageExpenses',
     components: { default: ManageExpenses, header: Navbar },
     meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+  },
+  {
+    path: '/manage-profiles',
+    name: 'ManageProfiles',
+    components: { default: ManageProfiles, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin'] }
   },
 ];
 

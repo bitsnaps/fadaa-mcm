@@ -10,6 +10,7 @@ module.exports = (sequelize) => {
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
       comment: 'The name of the profile, e.g., "Real Values" or "Simulation Q1".'
     },
     description: {
@@ -20,30 +21,13 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
-      comment: 'Indicates if this is the currently active profile for the client.'
-    },
-    client_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'clients',
-        key: 'id'
-      }
+      comment: 'Indicates if this is the globally active profile.'
     }
   }, {
     tableName: 'profiles',
     timestamps: true,
     createdAt: 'created_at',
-    updatedAt: 'updated_at',
-    indexes: [
-      {
-        unique: true,
-        fields: ['client_id', 'is_active'],
-        where: {
-          is_active: true
-        }
-      }
-    ]
+    updatedAt: 'updated_at'
   });
 
   return Profile;

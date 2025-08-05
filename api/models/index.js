@@ -60,9 +60,6 @@ Client.belongsTo(Office, { as: 'office', foreignKey: 'office_id' });
 Office.hasMany(Client, { as: 'clients', foreignKey: 'office_id' });
 
 // Profile associations
-Client.hasMany(Profile, { foreignKey: 'client_id' });
-Profile.belongsTo(Client, { foreignKey: 'client_id' });
-
 Profile.hasMany(Investment, { foreignKey: 'profile_id' });
 Investment.belongsTo(Profile, { foreignKey: 'profile_id' });
 

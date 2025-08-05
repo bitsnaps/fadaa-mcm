@@ -78,7 +78,26 @@
     "manageTaxes": "Tax Management",
     "manageInvestments": "Investment Management",
     "manageIncomes": "Income Management",
-    "manageExpenses": "Expense Management"
+    "manageExpenses": "Expense Management",
+    "manageProfiles": "Profile Management"
+  },
+  "profiles": {
+    "addProfile": "Add Profile",
+    "editProfile": "Edit Profile",
+    "confirmDelete": "Are you sure you want to delete this profile? This action cannot be undone.",
+    "activate": "Activate",
+    "edit": "Edit",
+    "delete": "Delete",
+    "tableHeaders": {
+      "name": "Name",
+      "description": "Description",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    }
   },
   "investments": {
     "title": "Investment Management",

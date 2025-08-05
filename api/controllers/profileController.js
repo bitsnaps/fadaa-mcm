@@ -1,71 +1,50 @@
-const { Profile, Client } = require('../models');
-const { sequelize } = require('../models');
+const { Profile, sequelize } = require('../models');
+const { Op } = require('sequelize');
 
-// Get all profiles for a specific client
-exports.getClientProfiles = async (c) => {
+// Get all profiles
+exports.getAllProfiles = async (c) => {
   try {
-    const { clientId } = c.req.param();
-    const profiles = await Profile.findAll({ where: { client_id: clientId } });
-    if (!profiles) {
-      return c.json({ message: 'No profiles found for this client.' }, 404);
-    }
+    const profiles = await Profile.findAll();
     return c.json(profiles);
   } catch (error) {
-    return c.json({ message: 'Error fetching client profiles', error: error.message }, 500);
+    return c.json({ message: 'Error fetching profiles', error: error.message }, 500);
   }
 };
 
-// Create a new profile for a client
+// Create a new profile
 exports.createProfile = async (c) => {
   try {
-    const { clientId } = c.req.param();
     const { name, description } = await c.req.json();
-
-    const client = await Client.findByPk(clientId);
-    if (!client) {
-      return c.json({ message: 'Client not found.' }, 404);
-    }
-
+    const countProfiles = await Profile.count();
     const newProfile = await Profile.create({
       name,
       description,
-      client_id: clientId,
-      is_active: false, // Profiles are never created as active by default
+      is_active: countProfiles == 0,
     });
-
     return c.json(newProfile, 201);
   } catch (error) {
     return c.json({ message: 'Error creating profile', error: error.message }, 500);
   }
 };
 
-// Set a specific profile to be the active one for a client
+// Set a profile as the globally active one
 exports.setActiveProfile = async (c) => {
   const { profileId } = c.req.param();
   const transaction = await sequelize.transaction();
-
+  
   try {
-    const profileToActivate = await Profile.findByPk(profileId);
+    const profileToActivate = await Profile.findByPk(profileId, { transaction });
     if (!profileToActivate) {
       await transaction.rollback();
       return c.json({ message: 'Profile not found.' }, 404);
     }
-
-    // Deactivate all other profiles for this client
-    await Profile.update(
-      { is_active: false },
-      {
-        where: {
-          client_id: profileToActivate.client_id,
-          id: { [sequelize.Op.ne]: profileId } // Op.ne means "not equal"
-        },
-        transaction
-      }
-    );
-
+    
+    // Deactivate all profiles first
+    await Profile.update({ is_active: false }, { where: {}, transaction });
+    
     // Activate the target profile
     await profileToActivate.update({ is_active: true }, { transaction });
-
+    
     await transaction.commit();
     return c.json({ message: 'Profile activated successfully.' });
   } catch (error) {

@@ -13,22 +13,13 @@ clientServicesApp.get('/:clientId', async (c) => {
     const { profile_id } = c.req.query();
 
     try {
-        let finalProfileId = profile_id;
-
-        // If no profile_id is provided, find the active one for the client
-        if (!finalProfileId) {
-            const activeProfile = await models.Profile.findOne({
-                where: { client_id: clientId, is_active: true }
-            });
-            // If there's no active profile, we can't fetch profile-specific services
-            if (!activeProfile) {
-                return c.json({ success: true, services: [] }); // Return empty array
-            }
-            finalProfileId = activeProfile.id;
+        const whereClause = { client_id: clientId };
+        if (profile_id) {
+            whereClause.profile_id = profile_id;
         }
 
         const services = await models.ClientService.findAll({
-            where: { client_id: clientId, profile_id: finalProfileId },
+            where: whereClause,
             include: [
                 {
                     model: models.Profile

@@ -7,13 +7,13 @@ const profilesApp = new Hono();
 // All profile routes should be protected and accessible only by authorized users (e.g., admins)
 profilesApp.use('*', authMiddleware, adminMiddleware);
 
-// --- Profile Routes ---
+// --- Global Profile Routes ---
 
-// GET all profiles for a specific client
-profilesApp.get('/clients/:clientId/profiles', profileController.getClientProfiles);
+// GET all profiles
+profilesApp.get('/', profileController.getAllProfiles);
 
-// POST a new profile for a client
-profilesApp.post('/clients/:clientId/profiles', profileController.createProfile);
+// POST a new profile
+profilesApp.post('/', profileController.createProfile);
 
 // PUT to set a profile as active
 profilesApp.put('/:profileId/activate', profileController.setActiveProfile);

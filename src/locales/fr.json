@@ -78,7 +78,26 @@
     "manageTaxes": "Gestion des Taxes",
     "manageInvestments": "Gestion des Investissements",
     "manageIncomes": "Gestion des Revenus",
-    "manageExpenses": "Gestion des Dépenses"
+    "manageExpenses": "Gestion des Dépenses",
+    "manageProfiles": "Gestion des Profils"
+  },
+  "profiles": {
+    "addProfile": "Ajouter un Profil",
+    "editProfile": "Modifier le Profil",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce profil ? Cette action est irréversible.",
+    "activate": "Activer",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "tableHeaders": {
+      "name": "Nom",
+      "description": "Description",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    }
   },
   "investments": {
     "title": "Gestion des Investissements",
