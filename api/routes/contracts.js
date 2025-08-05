@@ -10,9 +10,18 @@ contractApp.use('*', authMiddleware);
 // GET /api/contracts - Get all contracts
 contractApp.get('/', async (c) => {
     try {
+        const { profile_id } = c.req.query();
+        let whereClause = {};
+
+        if (profile_id) {
+            whereClause.profile_id = profile_id;
+        }
+
         const contracts = await models.Contract.findAll({
+            where: whereClause,
             include: [
                 { model: models.Client, attributes: ['id', 'company_name'] },
+                { model: models.Profile },
                 { model: models.Office, attributes: ['id', 'name'] },
                 { model: models.Tax, as: 'taxes' }
             ]
@@ -28,11 +37,11 @@ contractApp.get('/', async (c) => {
 contractApp.post('/', async (c) => {
     try {
         const body = await c.req.parseBody();
-        const { client_id, office_id, start_date, end_date, monthly_rate, tax_ids } = body;
+        const { client_id, office_id, start_date, end_date, monthly_rate, tax_ids, profile_id } = body;
         const documentFile = body['document'];
 
-        if (!client_id || !office_id || !start_date || !end_date || !monthly_rate) {
-            return c.json({ success: false, message: 'Missing required fields' }, 400);
+        if (!client_id || !office_id || !start_date || !end_date || !monthly_rate || !profile_id) {
+            return c.json({ success: false, message: 'Missing required fields, including profile_id' }, 400);
         }
 
         let documentUrl = null;
@@ -56,6 +65,7 @@ contractApp.post('/', async (c) => {
         const newContract = await models.Contract.create({
             client_id,
             office_id,
+            profile_id,
             start_date,
             end_date,
             monthly_rate,

@@ -35,6 +35,14 @@ module.exports = (sequelize) => {
       },
       allowNull: false,
     },
+    profile_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'profiles',
+        key: 'id'
+      }
+    },
   }, {
     tableName: 'incomes',
     timestamps: true,

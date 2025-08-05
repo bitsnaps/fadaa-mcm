@@ -9,8 +9,13 @@ incomesApp.use('*', authMiddleware, adminOrAssistantMiddleware); // Apply middle
 // GET total income for a given period (e.g., current month)
 incomesApp.get('/total', async (c) => {
     try {
-      const { startDate, endDate } = c.req.query();
+      const { startDate, endDate, profile_id } = c.req.query();
       const whereClause = {};
+
+      if (profile_id) {
+        whereClause.profile_id = profile_id;
+      }
+
       if (startDate && endDate) {
         whereClause.transaction_date = {
           [models.Sequelize.Op.between]: [new Date(startDate), new Date(endDate)],
@@ -36,7 +41,15 @@ incomesApp.get('/total', async (c) => {
 // GET monthly income aggregated by branch
 incomesApp.get('/monthly-by-branch', async (c) => {
     try {
+      const { profile_id } = c.req.query();
+      let whereClause = {};
+
+      if (profile_id) {
+        whereClause.profile_id = profile_id;
+      }
+
       const incomes = await models.Income.findAll({
+        where: whereClause,
         attributes: [
           [models.Sequelize.fn('DATE_FORMAT', models.Sequelize.col('transaction_date'), '%Y-%m'), 'month'],
           [models.Sequelize.fn('SUM', models.Sequelize.col('amount')), 'total_amount'],
@@ -106,9 +119,18 @@ incomesApp.get('/monthly-by-branch', async (c) => {
 // GET all incomes
 incomesApp.get('/', async (c) => {
     try {
+      const { profile_id } = c.req.query();
+      let whereClause = {};
+
+      if (profile_id) {
+        whereClause.profile_id = profile_id;
+      }
+
       const incomes = await models.Income.findAll({
+        where: whereClause,
         include: [
           { model: models.Branch },
+          { model: models.Profile },
           { model: models.User, as: 'registered_by_user', attributes: ['id', 'first_name', 'last_name'] }
         ],
         order: [['transaction_date', 'DESC']],
@@ -144,6 +166,9 @@ incomesApp.get('/:id', async (c) => {
 incomesApp.post('/', async (c) => {
     try {
       const incomeData = await c.req.json();
+      if (!incomeData.profile_id) {
+        return c.json({ success: false, message: 'profile_id is required' }, 400);
+      }
       const newIncome = await models.Income.create(incomeData);
       const finalIncome = await models.Income.findByPk(newIncome.id, {
         include: [

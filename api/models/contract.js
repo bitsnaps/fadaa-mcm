@@ -26,6 +26,14 @@ module.exports = (sequelize) => {
     document_url: {
       type: DataTypes.STRING(255),
     },
+   profile_id: {
+     type: DataTypes.INTEGER,
+     allowNull: true,
+     references: {
+       model: 'profiles',
+       key: 'id'
+     }
+   }
   }, {
     tableName: 'contracts',
     timestamps: true,

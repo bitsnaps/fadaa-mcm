@@ -10,10 +10,29 @@ clientServicesApp.use('*', authMiddleware, adminOrAssistantMiddleware);
 // GET /api/client-services/:clientId - Get all services for a specific client
 clientServicesApp.get('/:clientId', async (c) => {
     const { clientId } = c.req.param();
+    const { profile_id } = c.req.query();
+
     try {
+        let finalProfileId = profile_id;
+
+        // If no profile_id is provided, find the active one for the client
+        if (!finalProfileId) {
+            const activeProfile = await models.Profile.findOne({
+                where: { client_id: clientId, is_active: true }
+            });
+            // If there's no active profile, we can't fetch profile-specific services
+            if (!activeProfile) {
+                return c.json({ success: true, services: [] }); // Return empty array
+            }
+            finalProfileId = activeProfile.id;
+        }
+
         const services = await models.ClientService.findAll({
-            where: { client_id: clientId },
+            where: { client_id: clientId, profile_id: finalProfileId },
             include: [
+                {
+                    model: models.Profile
+                },
                 {
                     model: models.Tax
                 },
@@ -34,14 +53,15 @@ clientServicesApp.get('/:clientId', async (c) => {
 clientServicesApp.post('/:clientId', async (c) => {
     const { clientId } = c.req.param();
     try {
-        const { categoryId, paymentType, price, notes, tax_ids } = await c.req.json();
+        const { categoryId, paymentType, price, notes, tax_ids, profile_id } = await c.req.json();
         
-        if (!categoryId || !paymentType || !price) {
-            return c.json({ success: false, message: 'Missing required fields' }, 400);
+        if (!categoryId || !paymentType || !price || !profile_id) {
+            return c.json({ success: false, message: 'Missing required fields, including profile_id' }, 400);
         }
 
         const newService = await models.ClientService.create({
             client_id: clientId,
+            profile_id: profile_id,
             service_category_id: categoryId,
             payment_type: paymentType,
             price,

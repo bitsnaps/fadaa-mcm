@@ -2,7 +2,15 @@ const models = require('../models');
 const { Op } = require('sequelize');
 
 const getInvestmentCalculations = async (investment) => {
-  const { branch_id, percentage, starting_date, ending_date } = investment;
+  const { branch_id, percentage, starting_date, ending_date, profile_id } = investment;
+
+  if (!profile_id) {
+    // If an investment record somehow has no profile, we cannot calculate its profit.
+    return {
+      branchNetProfitSelectedPeriod: 0,
+      yourProfitShareSelectedPeriod: 0,
+    };
+  }
 
 /*/ Old code (this commented code need to be updated rather then removed, because we need to include income from services and exclude theirs taxes)
   const financialReports = await models.FinancialReport.findAll({
@@ -26,6 +34,7 @@ const getInvestmentCalculations = async (investment) => {
   const totalIncome = await models.Income.sum('amount', {
     where: {
       branch_id,
+      profile_id,
       transaction_date: {
         [Op.gte]: starting_date,
         [Op.lte]: ending_date,
@@ -37,6 +46,7 @@ const getInvestmentCalculations = async (investment) => {
   const totalExpense = await models.Expense.sum('amount', {
     where: {
       branch_id,
+      profile_id,
       transaction_date: {
         [Op.gte]: starting_date,
         [Op.lte]: ending_date,

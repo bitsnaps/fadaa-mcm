@@ -10,10 +10,19 @@ investmentsApp.use('*', authMiddleware, adminMiddleware);
 // GET all investments with calculations
 investmentsApp.get('/', async (c) => {
     try {
+        const { profile_id } = c.req.query();
+        let whereClause = {};
+
+        if (profile_id) {
+            whereClause.profile_id = profile_id;
+        }
+
         const investments = await models.Investment.findAll({
+            where: whereClause,
             include: [
                 { model: models.User, as: 'investor' },
-                { model: models.Branch }
+                { model: models.Branch },
+                { model: models.Profile }
             ],
             order: [['created_at', 'DESC']],
         });
@@ -59,6 +68,9 @@ investmentsApp.get('/:id', async (c) => {
 investmentsApp.post('/', async (c) => {
     try {
         const investmentData = await c.req.json();
+        if (!investmentData.profile_id) {
+            return c.json({ success: false, message: 'profile_id is required' }, 400);
+        }
         const newInvestment = await models.Investment.create({
             ...investmentData
         });

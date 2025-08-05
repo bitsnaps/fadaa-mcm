@@ -42,7 +42,7 @@ const {
   User, Role, Branch, Client, Office, Contract, ServiceCategory,
   ClientService, Document, Task, Notification, FinancialReport,
   ComplianceReport, Investment, OfficeDesign,
-  SystemSetting, ActivityLog, Tax, ContractTax, Income, Expense
+  SystemSetting, ActivityLog, Tax, ContractTax, Income, Expense, Profile
 } = db;
 
 // User associations
@@ -58,6 +58,19 @@ User.hasMany(Client, { foreignKey: 'managed_by_user_id' });
 
 Client.belongsTo(Office, { as: 'office', foreignKey: 'office_id' });
 Office.hasMany(Client, { as: 'clients', foreignKey: 'office_id' });
+
+// Profile associations
+Client.hasMany(Profile, { foreignKey: 'client_id' });
+Profile.belongsTo(Client, { foreignKey: 'client_id' });
+
+Profile.hasMany(Investment, { foreignKey: 'profile_id' });
+Investment.belongsTo(Profile, { foreignKey: 'profile_id' });
+
+Profile.hasMany(Income, { foreignKey: 'profile_id' });
+Income.belongsTo(Profile, { foreignKey: 'profile_id' });
+
+Profile.hasMany(Expense, { foreignKey: 'profile_id' });
+Expense.belongsTo(Profile, { foreignKey: 'profile_id' });
 
 // Office associations
 Office.belongsTo(Branch, { as: 'branch', foreignKey: 'branch_id' });
@@ -88,6 +101,9 @@ Document.belongsTo(User, { as: 'uploaded_by', foreignKey: 'uploaded_by_user_id' 
 User.hasMany(Document, { foreignKey: 'uploaded_by_user_id' });
 Document.belongsTo(Investment, { foreignKey: 'investment_id' });
 Investment.hasMany(Document, { foreignKey: 'investment_id' });
+
+Profile.hasMany(Contract, { foreignKey: 'profile_id' });
+Contract.belongsTo(Profile, { foreignKey: 'profile_id' });
 
 // Task associations
 Task.belongsTo(User, { as: 'assigned_to', foreignKey: 'assigned_to_user_id' });

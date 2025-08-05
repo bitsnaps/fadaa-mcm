@@ -49,9 +49,17 @@ module.exports = (sequelize) => {
         model: 'service_categories',
         key: 'id'
       }
-    }
-  }, {
-    tableName: 'client_services',
+   },
+   profile_id: {
+     type: DataTypes.INTEGER,
+     allowNull: true,
+     references: {
+       model: 'profiles',
+       key: 'id'
+     }
+   }
+ }, {
+   tableName: 'client_services',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
@@ -61,6 +69,7 @@ module.exports = (sequelize) => {
     ClientService.belongsTo(models.Tax, { foreignKey: 'taxId' });
     ClientService.belongsTo(models.Client, { foreignKey: 'client_id' });
     ClientService.belongsTo(models.ServiceCategory, { foreignKey: 'service_category_id' });
+    ClientService.belongsTo(models.Profile, { foreignKey: 'profile_id' });
   };
 
   return ClientService;

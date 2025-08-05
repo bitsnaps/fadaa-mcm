@@ -40,6 +40,14 @@ module.exports = (sequelize) => {
         model: 'branches',
         key: 'id'
       }
+    },
+    profile_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'profiles',
+        key: 'id'
+      }
     }
   }, {
     tableName: 'investments',

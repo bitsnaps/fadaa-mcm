@@ -9,8 +9,13 @@ expensesApp.use('*', authMiddleware, adminOrAssistantMiddleware);
 // GET total expenses for a given period (e.g., current month)
 expensesApp.get('/total', async (c) => {
     try {
-      const { startDate, endDate } = c.req.query();
+      const { startDate, endDate, profile_id } = c.req.query();
       const whereClause = {};
+
+      if (profile_id) {
+        whereClause.profile_id = profile_id;
+      }
+
       if (startDate && endDate) {
         whereClause.transaction_date = {
           [models.Sequelize.Op.between]: [new Date(startDate), new Date(endDate)],
@@ -36,9 +41,18 @@ expensesApp.get('/total', async (c) => {
 // GET all expenses
 expensesApp.get('/', async (c) => {
     try {
+      const { profile_id } = c.req.query();
+      let whereClause = {};
+
+      if (profile_id) {
+        whereClause.profile_id = profile_id;
+      }
+
       const expenses = await models.Expense.findAll({
+        where: whereClause,
         include: [
           { model: models.Branch },
+          { model: models.Profile },
           { model: models.User, as: 'registered_by_user', attributes: ['id', 'first_name', 'last_name'] }
         ],
         order: [['transaction_date', 'DESC']],
@@ -74,6 +88,9 @@ expensesApp.get('/:id', async (c) => {
 expensesApp.post('/', async (c) => {
     try {
       const expenseData = await c.req.json();
+      if (!expenseData.profile_id) {
+        return c.json({ success: false, message: 'profile_id is required' }, 400);
+      }
       const newExpense = await models.Expense.create(expenseData);
       const finalExpense = await models.Expense.findByPk(newExpense.id, {
         include: [
