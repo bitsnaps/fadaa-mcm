@@ -2,38 +2,40 @@
   <div class="dashboard-container container-fluid">
     <h2 class="mb-4">{{ $t('dashboard.title') }}</h2>
 
-    <!-- Section 1: Major KPIs -->
-    <div class="row gy-4 mb-4">
-      <div class="col-md-4">
-        <div class="card h-100 shadow-sm text-center">
-          <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-people-fill me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.clients') }}</h5>
-            <p class="card-text fs-4 fw-bold">{{ kpis.clients }}</p>
+    <ProfileTabs @update:activeProfile="onProfileChange">
+      <template #default="{ profileId }">
+        <!-- Section 1: Major KPIs -->
+        <div class="row gy-4 mb-4">
+          <div class="col-md-4">
+            <div class="card h-100 shadow-sm text-center">
+              <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-people-fill me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.clients') }}</h5>
+                <p class="card-text fs-4 fw-bold">{{ kpis.clients }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card h-100 shadow-sm text-center">
+              <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-cash-coin me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.monthlyRevenue') }}</h5>
+                <p class="card-text fs-4 fw-bold">{{ formatCurrency(kpis.monthlyRevenue) }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card h-100 shadow-sm text-center">
+              <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-graph-up-arrow me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.monthlyNet') }}</h5>
+                <p class="card-text fs-4 fw-bold">{{ formatCurrency(kpis.monthlyNet) }}</p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100 shadow-sm text-center">
-          <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-cash-coin me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.monthlyRevenue') }}</h5>
-            <p class="card-text fs-4 fw-bold">{{ formatCurrency(kpis.monthlyRevenue) }}</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100 shadow-sm text-center">
-          <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-graph-up-arrow me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.monthlyNet') }}</h5>
-            <p class="card-text fs-4 fw-bold">{{ formatCurrency(kpis.monthlyNet) }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Section 2: Monthly Sales Stacked BarChart -->
-    <div class="row mb-4">
-      <div class="col-lg-6">
-        <div class="card shadow-sm">
+        <!-- Section 2: Monthly Sales Stacked BarChart -->
+		<div class="row mb-4">
+			<div class="col-lg-6">
+        		<div class="card shadow-sm mb-4">
           <div class="card-header bg-fadaa-yellow">
             <h5 class="mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>{{ $t('dashboard.charts.monthlySales') }}</h5>
           </div>
@@ -41,10 +43,10 @@
             <Bar :data="chartData" :options="chartOptions" style="height: 300px;" />
           </div>
         </div>
-      </div>
-
-      <!-- Section 3: Notifications -->
-      <div class="col-lg-6">
+			</div>
+			
+      	<!-- Section 3: Notifications -->
+      	<div class="col-lg-6">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-yellow">
             <h5 class="mb-0"><i class="bi bi-bell-fill me-2"></i>{{ $t('dashboard.notifications.title') }}</h5>
@@ -58,11 +60,16 @@
           </div>
         </div>
       </div>
-    </div>
+	  		
+		</div>
+      </template>
+    </ProfileTabs>
 
-    <!-- Section 4: Recent Activities & Assistant Performance -->
+    <!-- Global Sections (Mostly not profile-specific) -->
     <div class="row mb-4">
-      <div class="col-md-6">
+
+      <!-- Section 4: Recent Activities -->
+      <div class="col-lg-6">
         <div class="card shadow-sm h-100">
           <div class="card-header bg-fadaa-yellow">
             <h5 class="mb-0"><i class="bi bi-list-task me-2"></i>{{ $t('dashboard.recentActivities.title') }}</h5>
@@ -77,27 +84,32 @@
             </ul>
           </div>
         </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card shadow-sm h-100">
-          <div class="card-header bg-fadaa-yellow">
-            <h5 class="mb-0"><i class="bi bi-person-workspace me-2"></i>{{ $t('dashboard.assistantPerformance.title') }}</h5>
-          </div>
-          <div class="card-body">
-            <ul class="list-group list-group-flush">
-              <li v-for="assistant in assistants" :key="assistant.id" class="list-group-item d-flex justify-content-between align-items-center">
-                {{ assistant.first_name }} {{ assistant.last_name }}
-                <span :class="`badge bg-${assistant.is_active ? 'success' : 'danger'} rounded-pill`">
-                  {{ assistant.is_active ? $t('dashboard.assistantPerformance.statusActive') : $t('dashboard.assistantPerformance.statusInactive') }}
-                </span>
-              </li>
-            </ul>
-          </div>
+      </div><!-- Recent Activities -->
+
+
+    <!-- Assistant Performance -->
+    <div class="col-md-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-fadaa-yellow">
+          <h5 class="mb-0"><i class="bi bi-person-workspace me-2"></i>{{ $t('dashboard.assistantPerformance.title') }}</h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li v-for="assistant in assistants" :key="assistant.id" class="list-group-item d-flex justify-content-between align-items-center">
+              {{ assistant.first_name }} {{ assistant.last_name }}
+              <span :class="`badge bg-${assistant.is_active ? 'success' : 'danger'} rounded-pill`">
+                {{ assistant.is_active ? $t('dashboard.assistantPerformance.statusActive') : 'Inactive' }}
+              </span>
+            </li>
+          </ul>
         </div>
       </div>
+    </div><!-- Assistants Performance -->
+
     </div>
 
-    <!-- Existing Office List Table (Kept for now, clarify if removal needed) -->
+
+    <!-- Office List Table -->
     <div class="card shadow-sm mb-4">
       <div class="card-header bg-fadaa-yellow">
         <h5 class="mb-0"><i class="bi bi-building me-2"></i>{{ $t('dashboard.officeList.title') }}</h5>
@@ -145,7 +157,7 @@
       </div>
     </div>
 
-    <!-- Existing Data Export Section (Kept for now, clarify if removal needed) -->
+    <!-- Data Export Section -->
     <div class="card shadow-sm">
       <div class="card-header bg-fadaa-yellow">
         <h5 class="mb-0"><i class="bi bi-download me-2"></i>{{ $t('dashboard.dataExport.title') }}</h5>
@@ -164,6 +176,7 @@ import { ref, computed, onMounted } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, Filler } from 'chart.js';
 import { formatCurrency } from '@/helpers/utils.js';
+import ProfileTabs from '@/components/ProfileTabs.vue';
 import {
   getTotalClients,
   getMonthlyIncomeByBranch,
@@ -184,6 +197,7 @@ const kpis = ref({
   monthlyNet: 0,
 });
 
+const activeProfileId = ref(null);
 const notifications = ref([]);
 const recentActivities = ref([]);
 const assistants = ref([]);
@@ -201,7 +215,8 @@ const chartData = ref({
   datasets: [],
 });
 
-const fetchDashboardData = async () => {
+const fetchDashboardData = async (profileId) => {
+  if (!profileId) return;
   try {
     // KPIs
     const clientsRes = await getTotalClients();
@@ -211,32 +226,36 @@ const fetchDashboardData = async () => {
     const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
 
-    const revenueSummaryRes = await getRevenueSummary({ startDate, endDate });
+    const revenueSummaryRes = await getRevenueSummary({ startDate, endDate, profile_id: profileId });
     kpis.value.monthlyRevenue = revenueSummaryRes.data.data.netRevenue;
     kpis.value.monthlyNet = revenueSummaryRes.data.data.netProfit;
 
     // Chart
-    const chartRes = await getMonthlyIncomeByBranch();
+    const chartRes = await getMonthlyIncomeByBranch({ profile_id: profileId });
     chartData.value = chartRes.data.data;
 
-    // Notifications
-    const notificationsRes = await getNotifications();
-    notifications.value = notificationsRes.data.notifications;
+    // Global Data (fetch only once)
+    if (notifications.value.length === 0) {
+      const notificationsRes = await getNotifications();
+      notifications.value = notificationsRes.data.notifications;
 
-    // Recent Activities
-    const activitiesRes = await getActivityLogs();
-    recentActivities.value = activitiesRes.data.data;
+      const activitiesRes = await getActivityLogs();
+      recentActivities.value = activitiesRes.data.data;
 
-    // Assistants
-    const assistantsRes = await getAssistants();
-    assistants.value = assistantsRes.data.data;
+      const assistantsRes = await getAssistants();
+      assistants.value = assistantsRes.data.data;
 
-    // Offices
-    fetchOffices();
+      fetchOffices();
+    }
 
   } catch (error) {
     console.error('Failed to fetch dashboard data:', error);
   }
+};
+
+const onProfileChange = (profileId) => {
+  activeProfileId.value = profileId;
+  fetchDashboardData(profileId);
 };
 
 const fetchOffices = async () => {
@@ -256,7 +275,9 @@ const fetchOffices = async () => {
   }
 };
 
-onMounted(fetchDashboardData);
+onMounted(() => {
+  // fetchDashboardData is now called by onProfileChange
+});
 
 const totalPages = computed(() => {
   return Math.ceil(totalOffices.value / itemsPerPage.value);
@@ -281,6 +302,7 @@ const getActivityIcon = (action) => {
   if (action.includes('Communication')) return 'bi-chat-dots-fill text-info';
   return 'bi-list-task';
 };
+
 
 const sortBy = (key) => {
   if (sortKey.value === key) {
@@ -328,42 +350,10 @@ const statusBadge = (status) => {
   }
 };
 
-/*/ Chart.js data and options
-const chartData = ref({
-  labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
-  datasets: [
-    {
-      label: 'Ventes Agence A',
-      backgroundColor: '#4A90E2', // FADAA Blue - Consider using FADAA colors from PRD
-      data: [40, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11],
-      stack: 'Stack 0',
-    },
-    {
-      label: 'Ventes Agence B',
-      backgroundColor: '#F5A623', // FADAA Orange
-      data: [30, 25, 15, 30, 20, 30, 49, 70, 50, 30, 22, 21],
-      stack: 'Stack 0',
-    },
-    {
-      label: 'Ventes Agence C',
-      backgroundColor: '#7ED321', // FADAA Green - Consider using FADAA colors from PRD
-      data: [20, 35, 25, 20, 30, 20, 59, 60, 60, 10, 32, 31],
-      stack: 'Stack 0',
-    },
-  ],
-});*/
-
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
-    title: {
-      display: true,
-      text: 'Ventes Mensuelles Cumulées par Agence',
-      font: {
-        size: 16,
-      }
-    },
     legend: {
       position: 'top',
     },
@@ -384,12 +374,11 @@ const chartOptions = ref({
       beginAtZero: true,
       title: {
         display: true,
-        text: 'Montant des Ventes (en k)'
+        text: 'Amount'
       }
     },
   },
 });
-
 </script>
 
 <style scoped>

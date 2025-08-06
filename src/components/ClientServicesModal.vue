@@ -29,7 +29,7 @@
       <b-button @click="cancel()">{{ $t('manageUsers.cancel') }}</b-button>
     </template>
   </b-modal>
-  <AddServiceModal ref="addServiceModalRef" :client="client" :editingService="serviceToEdit" @service-added="fetchClientServices(client.id)" @service-updated="fetchClientServices(client.id)" />
+  <AddServiceModal ref="addServiceModalRef" :client="client" :editingService="serviceToEdit" :profileId="profileId" @service-added="fetchClientServices(client.id, profileId)" @service-updated="fetchClientServices(client.id, profileId)" />
 </template>
 
 <script setup>
@@ -43,6 +43,10 @@ const { t } = useI18n();
 const props = defineProps({
   client: {
     type: Object,
+    default: null
+  },
+  profileId: {
+    type: Number,
     default: null
   }
 });
@@ -62,14 +66,18 @@ const fields = computed(() => [
   { key: 'actions', label: t('clientServices.actions') }
 ]);
 
-const fetchClientServices = async (clientId) => {
-  if (!clientId) return;
+const fetchClientServices = async (clientId, profileId) => {
+  if (!clientId || !profileId) {
+    services.value = [];
+    return;
+  }
   loading.value = true;
   try {
-    const response = await apiClient.get(`/client-services/${clientId}`);
+    const response = await apiClient.get(`/client-services/${clientId}`, { params: { profile_id: profileId } });
     services.value = response.data.services;
   } catch (error) {
     console.error('Failed to fetch client services:', error);
+    services.value = [];
   } finally {
     loading.value = false;
   }
@@ -84,15 +92,17 @@ const confirmRemoveService = (serviceId) => {
 const removeService = async (serviceId) => {
   try {
     await apiClient.delete(`/client-services/${serviceId}`);
-    fetchClientServices(props.client.id);
+    fetchClientServices(props.client.id, props.profileId);
   } catch (error) {
     console.error('Failed to remove service:', error);
   }
 };
 
-watch(() => props.client, (newClient) => {
-  if (newClient) {
-    fetchClientServices(newClient.id);
+watch(() => [props.client, props.profileId], ([newClient, newProfileId]) => {
+  if (newClient && newProfileId) {
+    fetchClientServices(newClient.id, newProfileId);
+  } else {
+    services.value = [];
   }
 });
 

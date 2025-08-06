@@ -59,6 +59,10 @@ const props = defineProps({
   editingService: {
     type: Object,
     default: null
+  },
+  profileId: {
+    type: Number,
+    default: null
   }
 });
 
@@ -127,6 +131,7 @@ const handleSubmit = async () => {
   try {
     const payload = {
       ...newService.value,
+      profile_id: props.profileId
     };
     if (props.editingService) {
       await apiClient.put(`/client-services/${props.editingService.id}`, payload);

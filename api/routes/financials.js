@@ -9,13 +9,17 @@ financialsApp.use('*', authMiddleware);
 
 financialsApp.get('/revenue-summary', async (c) => {
     try {
-        const { startDate, endDate } = c.req.query();
+        const { startDate, endDate, profile_id } = c.req.query();
 
         const whereClause = {};
         if (startDate && endDate) {
             whereClause.created_at = {
                 [Op.between]: [new Date(startDate), new Date(endDate)],
             };
+        }
+
+        if (profile_id) {
+            whereClause.profile_id = profile_id;
         }
 
         // 1. Calculate revenue from Client Services
@@ -55,19 +59,19 @@ financialsApp.get('/revenue-summary', async (c) => {
         });
 
         // 3. Calculate revenue from other Incomes
-        const incomes = await models.Income.findAll({
-            where: {
-                transaction_date: whereClause.created_at
-            }
-        });
+        const incomeWhere = { transaction_date: whereClause.created_at };
+        if (profile_id) {
+            incomeWhere.profile_id = profile_id;
+        }
+        const incomes = await models.Income.findAll({ where: incomeWhere });
         const incomeRevenue = incomes.reduce((sum, income) => sum + parseFloat(income.amount), 0);
         
         // 4. Calculate total Expenses
-        const expenses = await models.Expense.findAll({
-             where: {
-                transaction_date: whereClause.created_at
-            }
-        });
+        const expenseWhere = { transaction_date: whereClause.created_at };
+        if (profile_id) {
+            expenseWhere.profile_id = profile_id;
+        }
+        const expenses = await models.Expense.findAll({ where: expenseWhere });
         const totalExpense = expenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
 
         // 5. Calculate Net Revenue and Net Profit

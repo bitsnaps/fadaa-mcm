@@ -35,8 +35,8 @@ apiClient.interceptors.request.use(
 
 export default apiClient;
 
-export function getContracts() {
-    return apiClient.get('/contracts');
+export function getContracts(profileId) {
+    return apiClient.get('/contracts', { params: { profile_id: profileId } });
 }
 
 export function getClients() {
@@ -71,8 +71,8 @@ export const getInvestmentsList = () => {
     return apiClient.get('/misc/investments');
 };
 
-export const getInvestments = () => {
-    return apiClient.get('/investments');
+export const getInvestments = (profileId) => {
+    return apiClient.get('/investments', { params: { profile_id: profileId } });
 };
 
 export const getInvestment = (id) => {

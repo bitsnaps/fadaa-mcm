@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import apiClient, { getContracts, getClients, getAvailableOffices, addContract } from '@/services/ApiClient';
 import { Modal } from 'bootstrap';
 import { format } from 'date-fns';
+import ProfileTabs from '@/components/ProfileTabs.vue';
 
 const { t } = useI18n();
 
@@ -11,6 +12,7 @@ const contracts = ref([]);
 const searchTerm = ref('');
 const isLoading = ref(true);
 const isSubmitting = ref(false);
+const activeProfileId = ref(null);
 
 // Modal state
 const addContractModal = ref(null);
@@ -21,7 +23,8 @@ const newContract = ref({
   end_date: '',
   monthly_rate: '',
   document: null,
-  tax_ids: []
+  tax_ids: [],
+  profile_id: null
 });
 
 const clients = ref([]);
@@ -34,24 +37,32 @@ const documentToUpload = ref(null);
 const isUploading = ref(false);
 
 
-const fetchContracts = async () => {
+const fetchContracts = async (profileId) => {
+  if (!profileId) return;
   try {
     isLoading.value = true;
-    const response = await getContracts();
+    const response = await getContracts(profileId);
     if (response.data.success) {
       contracts.value = response.data.contracts;
     } else {
       console.error('Failed to fetch contracts:', response.data.message);
+      contracts.value = [];
     }
   } catch (error) {
     console.error('An error occurred while fetching contracts:', error);
+    contracts.value = [];
   } finally {
     isLoading.value = false;
   }
 };
 
+const onProfileChange = (profileId) => {
+  activeProfileId.value = profileId;
+  fetchContracts(profileId);
+};
+
 onMounted(() => {
-  fetchContracts();
+  // fetchContracts is now called by onProfileChange
 });
 
 const filteredContracts = computed(() => {
@@ -96,7 +107,7 @@ const downloadDocument = (docUrl) => {
 const archiveContract = async (contractId) => {
     try {
         await apiClient.put(`/contracts/${contractId}/status`, { status: 'Terminated' });
-        fetchContracts();
+        fetchContracts(activeProfileId.value);
     } catch (error) {
         console.error(`Failed to archive contract ${contractId}:`, error);
     }
@@ -106,7 +117,7 @@ const deleteContract = async (contractId) => {
     if(confirm(t('contracts.confirmDelete'))) {
         try {
             await apiClient.delete(`/contracts/${contractId}`);
-            fetchContracts();
+            fetchContracts(activeProfileId.value);
         } catch (error) {
             console.error(`Failed to delete contract ${contractId}:`, error);
         }
@@ -114,6 +125,7 @@ const deleteContract = async (contractId) => {
 };
 
 const openAddContractModal = async () => {
+  newContract.value.profile_id = activeProfileId.value;
   try {
     const [clientsResponse, officesResponse, taxesResponse] = await Promise.all([
       getClients(),
@@ -158,9 +170,9 @@ const submitNewContract = async () => {
     if (response.data.success) {
       const modalInstance = Modal.getInstance(addContractModal.value);
       modalInstance.hide();
-      fetchContracts(); // Refresh the list
+      fetchContracts(activeProfileId.value); // Refresh the list
        // Reset form
-       newContract.value = { client_id: null, office_id: null, start_date: '', end_date: '', monthly_rate: '', document: null, tax_ids: [] };
+       newContract.value = { client_id: null, office_id: null, start_date: '', end_date: '', monthly_rate: '', document: null, tax_ids: [], profile_id: activeProfileId.value };
     } else {
       alert('Failed to add contract: ' + response.data.message);
     }
@@ -202,7 +214,7 @@ const submitDocumentUpload = async () => {
     if (response.data.success) {
       const modalInstance = Modal.getInstance(uploadDocumentModal.value);
       modalInstance.hide();
-      fetchContracts(); // Refresh the list
+      fetchContracts(activeProfileId.value); // Refresh the list
       alert('Document uploaded successfully.');
     } else {
       alert('Failed to upload document: ' + response.data.message);
@@ -220,82 +232,85 @@ const submitDocumentUpload = async () => {
 
 <template>
   <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <!-- Changed title to reflect contract management -->
-      <h2>{{ t('contracts.title') }}</h2>
-      <button class="btn btn-primary" @click="openAddContractModal">
-        <i class="bi bi-plus-lg me-2"></i>{{ t('contracts.addNewContract') }}
-      </button>
-    </div>
+    <h2>{{ t('contracts.title') }}</h2>
 
-    <div class="mb-3">
-      <input
-        type="text"
-        class="form-control"
-        v-model="searchTerm"
-        :placeholder="t('contracts.searchPlaceholder')"
-      />
-    </div>
-
-    <div v-if="isLoading" class="text-center">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+    <ProfileTabs @update:activeProfile="onProfileChange">
+      <template #default="{ profileId }">
+        <div class="d-flex justify-content-between align-items-center my-4">
+          <div>
+            <input
+              type="text"
+              class="form-control"
+              v-model="searchTerm"
+              :placeholder="t('contracts.searchPlaceholder')"
+            />
+          </div>
+          <button class="btn btn-primary" @click="openAddContractModal">
+            <i class="bi bi-plus-lg me-2"></i>{{ t('contracts.addNewContract') }}
+          </button>
         </div>
-    </div>
 
-    <div v-else-if="filteredContracts.length > 0" class="table-responsive">
-      <table class="table table-hover align-middle">
-        <thead class="table-light">
-          <tr>
-            <th scope="col">{{ t('contracts.tableHeaders.client') }}</th>
-            <th scope="col">{{ t('contracts.tableHeaders.office') }}</th>
-            <th scope="col">{{ t('contracts.tableHeaders.status') }}</th>
-            <th scope="col">{{ t('contracts.tableHeaders.startDate') }}</th>
-            <th scope="col">{{ t('contracts.tableHeaders.endDate') }}</th>
-            <th scope="col" class="text-center">{{ t('contracts.tableHeaders.actions') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="contract in filteredContracts" :key="contract.id">
-            <td>{{ contract.Client?.company_name || 'N/A' }}</td>
-            <td>{{ contract.Office?.name || 'N/A' }}</td>
-            <td>
-              <span
-                :class="['badge', {
-                  'bg-success': contract.status === 'Active',
-                  'bg-warning text-dark': contract.status === 'Pending',
-                  'bg-danger': contract.status === 'Expired',
-                  'bg-secondary': contract.status === 'Terminated'
-                }]">
-                {{ t(`contracts.status.${contract.status.toLowerCase()}`) }}
-              </span>
-            </td>
-            <td>{{ formatDate(contract.start_date) }}</td>
-            <td>{{ formatDate(contract.end_date) }}</td>
-            <td class="text-center">
-              <button @click="viewDocument(contract.document_url)" :disabled="!contract.document_url" class="btn btn-sm btn-outline-info me-1" :title="t('contracts.viewContract')">
-                <i class="bi bi-eye"></i>
-              </button>
-              <button @click="downloadDocument(contract.document_url)" :disabled="!contract.document_url" class="btn btn-sm btn-outline-primary me-1" :title="t('contracts.downloadContract')">
-                <i class="bi bi-download"></i>
-              </button>
-              <button v-if="!contract.document_url" @click="openUploadDocumentModal(contract.id)" class="btn btn-sm btn-outline-success me-1" :title="t('contracts.uploadDocument')">
-                <i class="bi bi-upload"></i>
-              </button>
-              <button v-if="contract.status === 'Active'" @click="archiveContract(contract.id)" class="btn btn-sm btn-outline-warning" :title="t('contracts.archiveContract')">
-                <i class="bi bi-archive"></i>
-              </button>
-              <button @click="deleteContract(contract.id)" class="btn btn-sm btn-outline-danger ms-1" :title="t('contracts.deleteContract')">
-                <i class="bi bi-trash"></i>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div v-else class="alert alert-info text-center" role="alert">
-      {{ t('contracts.noContractsFound') }}
-    </div>
+        <div v-if="isLoading" class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <div v-else-if="filteredContracts.length > 0" class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">{{ t('contracts.tableHeaders.client') }}</th>
+                <th scope="col">{{ t('contracts.tableHeaders.office') }}</th>
+                <th scope="col">{{ t('contracts.tableHeaders.status') }}</th>
+                <th scope="col">{{ t('contracts.tableHeaders.startDate') }}</th>
+                <th scope="col">{{ t('contracts.tableHeaders.endDate') }}</th>
+                <th scope="col" class="text-center">{{ t('contracts.tableHeaders.actions') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="contract in filteredContracts" :key="contract.id">
+                <td>{{ contract.Client?.company_name || 'N/A' }}</td>
+                <td>{{ contract.Office?.name || 'N/A' }}</td>
+                <td>
+                  <span
+                    :class="['badge', {
+                      'bg-success': contract.status === 'Active',
+                      'bg-warning text-dark': contract.status === 'Pending',
+                      'bg-danger': contract.status === 'Expired',
+                      'bg-secondary': contract.status === 'Terminated'
+                    }]">
+                    {{ t(`contracts.status.${contract.status.toLowerCase()}`) }}
+                  </span>
+                </td>
+                <td>{{ formatDate(contract.start_date) }}</td>
+                <td>{{ formatDate(contract.end_date) }}</td>
+                <td class="text-center">
+                  <button @click="viewDocument(contract.document_url)" :disabled="!contract.document_url" class="btn btn-sm btn-outline-info me-1" :title="t('contracts.viewContract')">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button @click="downloadDocument(contract.document_url)" :disabled="!contract.document_url" class="btn btn-sm btn-outline-primary me-1" :title="t('contracts.downloadContract')">
+                    <i class="bi bi-download"></i>
+                  </button>
+                  <button v-if="!contract.document_url" @click="openUploadDocumentModal(contract.id)" class="btn btn-sm btn-outline-success me-1" :title="t('contracts.uploadDocument')">
+                    <i class="bi bi-upload"></i>
+                  </button>
+                  <button v-if="contract.status === 'Active'" @click="archiveContract(contract.id)" class="btn btn-sm btn-outline-warning" :title="t('contracts.archiveContract')">
+                    <i class="bi bi-archive"></i>
+                  </button>
+                  <button @click="deleteContract(contract.id)" class="btn btn-sm btn-outline-danger ms-1" :title="t('contracts.deleteContract')">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-else class="alert alert-info text-center" role="alert">
+          {{ t('contracts.noContractsFound') }}
+        </div>
+      </template>
+    </ProfileTabs>
 
     <!-- Add/Edit Modal -->
     <div class="modal fade" ref="addContractModal" tabindex="-1" aria-labelledby="addContractModalLabel" aria-hidden="true">

@@ -5,6 +5,7 @@ import { getIncomes, addIncome, updateIncome, deleteIncome } from '@/services/In
 import { getBranches } from '@/services/ApiClient'; // Assuming getBranches is in ApiClient
 import { useAuthStore } from '@/stores/auth'; // To get registered_by user ID
 import { Modal } from 'bootstrap';
+import ProfileTabs from '@/components/ProfileTabs.vue';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -14,26 +15,35 @@ const branches = ref([]);
 const isLoading = ref(true);
 const searchTerm = ref('');
 const isSubmitting = ref(false);
+const activeProfileId = ref(null);
 
 const modalInstance = ref(null);
 const addIncomeModal = ref(null);
 const currentIncome = ref({});
 const isEditMode = ref(false);
 
-const fetchIncomes = async () => {
+const fetchIncomes = async (profileId) => {
+    if (!profileId) return;
     try {
         isLoading.value = true;
-        const response = await getIncomes();
+        const response = await getIncomes(profileId);
         if (response.data.success) {
             incomes.value = response.data.data;
         } else {
             console.error('Failed to fetch incomes:', response.data.message);
+            incomes.value = [];
         }
     } catch (error) {
         console.error('An error occurred while fetching incomes:', error);
+        incomes.value = [];
     } finally {
         isLoading.value = false;
     }
+};
+
+const onProfileChange = (profileId) => {
+    activeProfileId.value = profileId;
+    fetchIncomes(profileId);
 };
 
 const fetchBranches = async () => {
@@ -48,7 +58,6 @@ const fetchBranches = async () => {
 };
 
 onMounted(() => {
-    fetchIncomes();
     fetchBranches();
     modalInstance.value = new Modal(addIncomeModal.value);
 });
@@ -72,6 +81,7 @@ const openAddModal = () => {
         transaction_date: new Date().toISOString().slice(0, 10), // Default to today's date
         branch_id: null,
         registered_by: authStore.user.id, // Set current user as registered_by
+        profile_id: activeProfileId.value,
     };
     modalInstance.value.show();
 };
@@ -96,7 +106,7 @@ const handleSubmit = async () => {
             response = await addIncome(currentIncome.value);
         }
         if (response.data.success) {
-            fetchIncomes(); // Re-fetch all incomes to update the list
+            fetchIncomes(activeProfileId.value); // Re-fetch all incomes to update the list
             hideModal();
         } else {
             console.error('Failed to submit income:', response.data.message);
@@ -113,7 +123,7 @@ const handleDelete = async (id) => {
         try {
             const response = await deleteIncome(id);
             if (response.data.success) {
-                fetchIncomes(); // Re-fetch all incomes to update the list
+                fetchIncomes(activeProfileId.value); // Re-fetch all incomes to update the list
             } else {
                 console.error('Failed to delete income:', response.data.message);
             }
@@ -126,62 +136,66 @@ const handleDelete = async (id) => {
 
 <template>
     <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>{{ t('incomes.title') }}</h2>
-            <button class="btn btn-primary" @click="openAddModal">
-                <i class="bi bi-plus-lg me-2"></i>{{ t('incomes.addIncome') }}
-            </button>
-        </div>
+        <h2>{{ t('incomes.title') }}</h2>
 
-        <div class="mb-3">
-            <input
-                type="text"
-                class="form-control"
-                v-model="searchTerm"
-                :placeholder="t('incomes.searchPlaceholder')"
-            />
-        </div>
+        <ProfileTabs @update:activeProfile="onProfileChange">
+            <template #default="{ profileId }">
+                <div class="d-flex justify-content-between align-items-center my-4">
+                    <div>
+                        <input
+                            type="text"
+                            class="form-control"
+                            v-model="searchTerm"
+                            :placeholder="t('incomes.searchPlaceholder')"
+                        />
+                    </div>
+                    <button class="btn btn-primary" @click="openAddModal">
+                        <i class="bi bi-plus-lg me-2"></i>{{ t('incomes.addIncome') }}
+                    </button>
+                </div>
 
-        <div v-if="isLoading" class="text-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
+                <div v-if="isLoading" class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
 
-        <div v-else-if="filteredIncomes.length > 0" class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">{{ t('incomes.tableHeaders.amount') }}</th>
-                        <th scope="col">{{ t('incomes.tableHeaders.description') }}</th>
-                        <th scope="col">{{ t('incomes.tableHeaders.transaction_date') }}</th>
-                        <th scope="col">{{ t('incomes.tableHeaders.branch') }}</th>
-                        <th scope="col">{{ t('incomes.tableHeaders.registered_by') }}</th>
-                        <th scope="col" class="text-center">{{ t('incomes.tableHeaders.actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="income in filteredIncomes" :key="income.id">
-                        <td>{{ income.amount }}</td>
-                        <td>{{ income.description }}</td>
-                        <td>{{ income.transaction_date ? new Date(income.transaction_date).toLocaleDateString() : 'N/A' }}</td>
-                        <td>{{ income.Branch ? income.Branch.name : 'N/A' }}</td>
-                        <td>{{ income.registered_by_user ? `${income.registered_by_user.first_name} ${income.registered_by_user.last_name}` : 'N/A' }}</td>
-                        <td class="text-center">
-                            <button @click="openEditModal(income)" class="btn btn-sm btn-outline-info me-1" :title="t('incomes.edit')">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button @click="handleDelete(income.id)" class="btn btn-sm btn-outline-danger" :title="t('incomes.delete')">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div v-else class="alert alert-info text-center" role="alert">
-            {{ t('incomes.noIncomesFound') }}
-        </div>
+                <div v-else-if="filteredIncomes.length > 0" class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">{{ t('incomes.tableHeaders.amount') }}</th>
+                                <th scope="col">{{ t('incomes.tableHeaders.description') }}</th>
+                                <th scope="col">{{ t('incomes.tableHeaders.transaction_date') }}</th>
+                                <th scope="col">{{ t('incomes.tableHeaders.branch') }}</th>
+                                <th scope="col">{{ t('incomes.tableHeaders.registered_by') }}</th>
+                                <th scope="col" class="text-center">{{ t('incomes.tableHeaders.actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="income in filteredIncomes" :key="income.id">
+                                <td>{{ income.amount }}</td>
+                                <td>{{ income.description }}</td>
+                                <td>{{ income.transaction_date ? new Date(income.transaction_date).toLocaleDateString() : 'N/A' }}</td>
+                                <td>{{ income.Branch ? income.Branch.name : 'N/A' }}</td>
+                                <td>{{ income.registered_by_user ? `${income.registered_by_user.first_name} ${income.registered_by_user.last_name}` : 'N/A' }}</td>
+                                <td class="text-center">
+                                    <button @click="openEditModal(income)" class="btn btn-sm btn-outline-info me-1" :title="t('incomes.edit')">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button @click="handleDelete(income.id)" class="btn btn-sm btn-outline-danger" :title="t('incomes.delete')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div v-else class="alert alert-info text-center" role="alert">
+                    {{ t('incomes.noIncomesFound') }}
+                </div>
+            </template>
+        </ProfileTabs>
 
         <!-- Add/Edit Income Modal -->
         <div class="modal fade" ref="addIncomeModal" tabindex="-1" aria-labelledby="incomeModalLabel" aria-hidden="true">

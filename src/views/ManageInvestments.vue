@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getInvestments, addInvestment, updateInvestment, deleteInvestment, getInvestors, getBranches } from '@/services/ApiClient';
 import { Modal } from 'bootstrap';
+import ProfileTabs from '@/components/ProfileTabs.vue';
 
 const { t } = useI18n();
 
@@ -12,26 +13,35 @@ const branches = ref([]);
 const isLoading = ref(true);
 const searchTerm = ref('');
 const isSubmitting = ref(false);
+const activeProfileId = ref(null);
 
 const modalInstance = ref(null);
 const addInvestmentModal = ref(null);
 const currentInvestment = ref({});
 const isEditMode = ref(false);
 
-const fetchInvestments = async () => {
+const fetchInvestments = async (profileId) => {
+    if (!profileId) return;
     try {
         isLoading.value = true;
-        const response = await getInvestments();
+        const response = await getInvestments(profileId); // Pass profileId to the service
         if (response.data.success) {
             investments.value = response.data.data;
         } else {
             console.error('Failed to fetch investments:', response.data.message);
+            investments.value = [];
         }
     } catch (error) {
         console.error('An error occurred while fetching investments:', error);
+        investments.value = [];
     } finally {
         isLoading.value = false;
     }
+};
+
+const onProfileChange = (profileId) => {
+    activeProfileId.value = profileId;
+    fetchInvestments(profileId);
 };
 
 const fetchInvestorsAndBranches = async () => {
@@ -49,7 +59,6 @@ const fetchInvestorsAndBranches = async () => {
 };
 
 onMounted(() => {
-    fetchInvestments();
     fetchInvestorsAndBranches();
     modalInstance.value = new Modal(addInvestmentModal.value);
 });
@@ -73,7 +82,8 @@ const openAddModal = () => {
         branch_id: null,
         starting_date: '',
         ending_date: '',
-        investment_amount: 0
+        investment_amount: 0,
+        profile_id: activeProfileId.value // Set the current profile id
     };
     modalInstance.value.show();
 };
@@ -129,66 +139,70 @@ const handleDelete = async (id) => {
 
 <template>
     <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>{{ t('investments.title') }}</h2>
-            <button class="btn btn-primary" @click="openAddModal">
-                <i class="bi bi-plus-lg me-2"></i>{{ t('investments.addInvestment') }}
-            </button>
-        </div>
+        <h2>{{ t('investments.title') }}</h2>
+        
+        <ProfileTabs @update:activeProfile="onProfileChange">
+            <template #default="{ profileId }">
+                <div class="d-flex justify-content-between align-items-center my-4">
+                    <div>
+                        <input
+                            type="text"
+                            class="form-control"
+                            v-model="searchTerm"
+                            :placeholder="t('investments.searchPlaceholder')"
+                        />
+                    </div>
+                    <button class="btn btn-primary" @click="openAddModal">
+                        <i class="bi bi-plus-lg me-2"></i>{{ t('investments.addInvestment') }}
+                    </button>
+                </div>
 
-        <div class="mb-3">
-            <input
-                type="text"
-                class="form-control"
-                v-model="searchTerm"
-                :placeholder="t('investments.searchPlaceholder')"
-            />
-        </div>
+                <div v-if="isLoading" class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
 
-        <div v-if="isLoading" class="text-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-
-        <div v-else-if="filteredInvestments.length > 0" class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">{{ t('investments.tableHeaders.investor') }}</th>
-                        <th scope="col">{{ t('investments.tableHeaders.branch') }}</th>
-                        <th scope="col">{{ t('investments.tableHeaders.name') }}</th>
-                        <th scope="col">{{ t('investments.tableHeaders.percentage') }}</th>
-                        <th scope-="col">{{ t('investments.tableHeaders.investment_amount') }}</th>
-                        <th scope="col">{{ t('investments.tableHeaders.starting_date') }}</th>
-                        <th scope="col">{{ t('investments.tableHeaders.ending_date') }}</th>
-                        <th scope="col" class="text-center">{{ t('investments.tableHeaders.actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="investment in filteredInvestments" :key="investment.id">
-                        <td>{{ investment.investor ? investment.investor.first_name + ' ' + investment.investor.last_name : 'N/A' }}</td>
-                        <td>{{ investment.Branch ? investment.Branch.name : 'N/A' }}</td>
-                        <td>{{ investment.name }}</td>
-                        <td>{{ investment.percentage }}%</td>
-                        <td>{{ investment.investment_amount }}</td>
-                        <td>{{ investment.starting_date ? new Date(investment.starting_date).toLocaleDateString() : 'N/A' }}</td>
-                        <td>{{ investment.ending_date ? new Date(investment.ending_date).toLocaleDateString() : 'N/A' }}</td>
-                        <td class="text-center">
-                            <button @click="openEditModal(investment)" class="btn btn-sm btn-outline-info me-1" :title="t('investments.edit')">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button @click="handleDelete(investment.id)" class="btn btn-sm btn-outline-danger" :title="t('investments.delete')">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div v-else class="alert alert-info text-center" role="alert">
-            {{ t('investments.noInvestmentsFound') }}
-        </div>
+                <div v-else-if="filteredInvestments.length > 0" class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">{{ t('investments.tableHeaders.investor') }}</th>
+                                <th scope="col">{{ t('investments.tableHeaders.branch') }}</th>
+                                <th scope="col">{{ t('investments.tableHeaders.name') }}</th>
+                                <th scope="col">{{ t('investments.tableHeaders.percentage') }}</th>
+                                <th scope-="col">{{ t('investments.tableHeaders.investment_amount') }}</th>
+                                <th scope="col">{{ t('investments.tableHeaders.starting_date') }}</th>
+                                <th scope="col">{{ t('investments.tableHeaders.ending_date') }}</th>
+                                <th scope="col" class="text-center">{{ t('investments.tableHeaders.actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="investment in filteredInvestments" :key="investment.id">
+                                <td>{{ investment.investor ? investment.investor.first_name + ' ' + investment.investor.last_name : 'N/A' }}</td>
+                                <td>{{ investment.Branch ? investment.Branch.name : 'N/A' }}</td>
+                                <td>{{ investment.name }}</td>
+                                <td>{{ investment.percentage }}%</td>
+                                <td>{{ investment.investment_amount }}</td>
+                                <td>{{ investment.starting_date ? new Date(investment.starting_date).toLocaleDateString() : 'N/A' }}</td>
+                                <td>{{ investment.ending_date ? new Date(investment.ending_date).toLocaleDateString() : 'N/A' }}</td>
+                                <td class="text-center">
+                                    <button @click="openEditModal(investment)" class="btn btn-sm btn-outline-info me-1" :title="t('investments.edit')">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button @click="handleDelete(investment.id)" class="btn btn-sm btn-outline-danger" :title="t('investments.delete')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div v-else class="alert alert-info text-center" role="alert">
+                    {{ t('investments.noInvestmentsFound') }}
+                </div>
+            </template>
+        </ProfileTabs>
 
         <!-- Add/Edit Investment Modal -->
         <div class="modal fade" ref="addInvestmentModal" tabindex="-1" aria-labelledby="investmentModalLabel" aria-hidden="true">
