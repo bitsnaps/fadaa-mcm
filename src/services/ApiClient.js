@@ -134,3 +134,38 @@ export const getOffices = (params) => {
 export const getRevenueSummary = (params) => {
     return apiClient.get('/financials/revenue-summary', { params });
 };
+
+// --- Admin/Assistant: Withdrawals management ---
+export const getAllWithdrawals = (params = {}) => {
+  return apiClient.get('/withdrawals', { params });
+};
+
+export const approveWithdrawal = (id) => {
+  return apiClient.put(`/withdrawals/${id}/approve`);
+};
+
+export const rejectWithdrawal = (id) => {
+  return apiClient.put(`/withdrawals/${id}/reject`);
+};
+
+export const markWithdrawalPaid = (id) => {
+  return apiClient.put(`/withdrawals/${id}/mark-paid`);
+};
+
+// Investor-facing withdrawals and investments endpoints
+export const getMyInvestments = () => {
+  return apiClient.get('/investor/investments');
+};
+
+export const getMyWithdrawals = (params = {}) => {
+  return apiClient.get('/investor/withdrawals', { params });
+};
+
+export const getAvailableWithdrawalAmount = (investmentId) => {
+  return apiClient.get(`/investor/withdrawals/available/${investmentId}`);
+};
+
+export const createWithdrawal = (payload) => {
+  return apiClient.post('/investor/withdrawals', payload);
+};
+

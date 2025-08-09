@@ -1,9 +1,10 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Line } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler } from 'chart.js';
 import { formatCurrency } from '@/helpers/utils.js';
+import { getMyInvestments, getMyWithdrawals, createWithdrawal } from '@/services/ApiClient.js';
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler);
 
@@ -11,6 +12,95 @@ const { t, locale } = useI18n();
 
 const chartFilter = ref('monthly'); // monthly, bi-yearly, yearly
 const tableFilter = ref('monthly'); // Default to yearly to show all initially
+
+// --- Investor withdrawals integration (live data) ---
+const invIsLoading = ref(true);
+const invError = ref(null);
+const myInvestments = ref([]);
+const myWithdrawals = ref([]);
+const withdrawalForm = ref({
+  investment_id: '',
+  amount: '',
+  payment_method: '',
+  notes: ''
+});
+
+const totals = computed(() => {
+  const accrued = myInvestments.value.reduce((s, inv) => s + (inv.yourProfitShareSelectedPeriod || 0), 0);
+  const withdrawnPaid = myWithdrawals.value
+    .filter(w => w.status === 'paid')
+    .reduce((s, w) => s + (Number(w.amount) || 0), 0);
+  const committed = myWithdrawals.value
+    .filter(w => ['pending', 'approved'].includes(w.status))
+    .reduce((s, w) => s + (Number(w.amount) || 0), 0);
+  const available = Math.max(accrued - (withdrawnPaid + committed), 0);
+  return { accrued, withdrawnPaid, committed, available };
+});
+
+const selectedInvestmentAvailable = computed(() => {
+  const id = withdrawalForm.value.investment_id;
+  const inv = myInvestments.value.find(i => String(i.id) === String(id));
+  if (!inv) return 0;
+  const available = inv.availableForWithdrawal != null
+    ? inv.availableForWithdrawal
+    : Math.max((inv.yourProfitShareSelectedPeriod || 0) - (inv.withdrawalsCommitted || 0), 0);
+  return available;
+});
+
+async function loadInvestorData() {
+  invIsLoading.value = true;
+  invError.value = null;
+  try {
+    const resInv = await getMyInvestments();
+    if (resInv.data?.success) {
+      myInvestments.value = resInv.data.data || [];
+    }
+    const resW = await getMyWithdrawals();
+    if (resW.data?.success) {
+      myWithdrawals.value = resW.data.data || [];
+    }
+  } catch (e) {
+    invError.value = e.message || 'Failed to load investor data';
+    console.error(e);
+  } finally {
+    invIsLoading.value = false;
+  }
+}
+
+async function submitWithdrawal() {
+  try {
+    const amt = Number(withdrawalForm.value.amount);
+    if (!withdrawalForm.value.investment_id || !amt || amt <= 0) {
+      alert(t('investorDashboard.withdrawals.form.validationRequired'));
+      return;
+    }
+    if (amt > selectedInvestmentAvailable.value) {
+      alert(t('investorDashboard.withdrawals.form.validationExceeds'));
+      return;
+    }
+    const payload = {
+      investment_id: withdrawalForm.value.investment_id,
+      amount: amt,
+      payment_method: withdrawalForm.value.payment_method || undefined,
+      notes: withdrawalForm.value.notes || undefined,
+    };
+    const res = await createWithdrawal(payload);
+    if (res.data?.success) {
+      withdrawalForm.value.amount = '';
+      withdrawalForm.value.payment_method = '';
+      withdrawalForm.value.notes = '';
+      await loadInvestorData();
+      alert(t('investorDashboard.withdrawals.form.success'));
+    } else {
+      throw new Error(res.data?.message || 'Request failed');
+    }
+  } catch (e) {
+    console.error('Withdrawal submit failed:', e);
+    alert(t('investorDashboard.withdrawals.form.error'));
+  }
+}
+
+onMounted(loadInvestorData);
 
 // Yearly data (represents all current investments)
 const yearlyInvestments = ref([
@@ -276,6 +366,134 @@ watch(locale, () => {
 <template>
   <div class="dashboard-container container-fluid">
     <h2 class="mb-4">{{ $t('investorDashboard.title') }}</h2>
+
+    <!-- Withdrawals KPIs + Request -->
+    <div class="row gy-4 mb-4">
+      <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header bg-fadaa-light-blue">
+            <h5 class="mb-0"><i class="bi bi-cash-coin me-2"></i>{{ $t('investorDashboard.withdrawals.title') }}</h5>
+          </div>
+          <div class="card-body" v-if="!invIsLoading && !invError">
+            <div class="row text-center">
+              <div class="col-6 mb-3">
+                <div class="fw-semibold">{{ $t('investorDashboard.withdrawals.kpis.accrued') }}</div>
+                <div class="fs-5">{{ formatCurrency(totals.accrued) }}</div>
+              </div>
+              <div class="col-6 mb-3">
+                <div class="fw-semibold">{{ $t('investorDashboard.withdrawals.kpis.withdrawnPaid') }}</div>
+                <div class="fs-5">{{ formatCurrency(totals.withdrawnPaid) }}</div>
+              </div>
+              <div class="col-6">
+                <div class="fw-semibold">{{ $t('investorDashboard.withdrawals.kpis.committed') }}</div>
+                <div class="fs-5">{{ formatCurrency(totals.committed) }}</div>
+              </div>
+              <div class="col-6">
+                <div class="fw-semibold">{{ $t('investorDashboard.withdrawals.kpis.available') }}</div>
+                <div class="fs-5">{{ formatCurrency(totals.available) }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body" v-else>
+            <div v-if="invError" class="alert alert-danger">{{ invError }}</div>
+            <div v-else class="text-center">
+              <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header bg-fadaa-light-blue">
+            <h5 class="mb-0"><i class="bi bi-send-plus me-2"></i>{{ $t('investorDashboard.withdrawals.form.title') }}</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label">{{ $t('investorDashboard.withdrawals.form.selectInvestment') }}</label>
+              <select class="form-select" v-model="withdrawalForm.investment_id">
+                <option value="" disabled>{{ $t('investorDashboard.withdrawals.form.selectInvestment') }}</option>
+                <option v-for="inv in myInvestments" :key="inv.id" :value="inv.id">
+                  {{ inv.Branch?.name || inv.name }} ({{ inv.percentage }}%)
+                </option>
+              </select>
+              <small v-if="withdrawalForm.investment_id" class="text-muted">
+                {{ $t('investorDashboard.withdrawals.form.availableForThisInvestment') }}:
+                {{ formatCurrency(selectedInvestmentAvailable) }}
+              </small>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">{{ $t('investorDashboard.withdrawals.form.amount') }}</label>
+              <input type="number" class="form-control" v-model="withdrawalForm.amount" min="0" step="0.01" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">{{ $t('investorDashboard.withdrawals.form.paymentMethod') }}</label>
+              <select class="form-select" v-model="withdrawalForm.payment_method">
+                <option value="">{{ $t('investorDashboard.withdrawals.form.paymentMethod') }}</option>
+                <option value="bank transfer">Bank transfer</option>
+                <option value="cash">Cash</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">{{ $t('investorDashboard.withdrawals.form.notes') }}</label>
+              <textarea class="form-control" v-model="withdrawalForm.notes" rows="2"></textarea>
+            </div>
+
+            <button class="btn btn-primary"
+              :disabled="!withdrawalForm.investment_id || !withdrawalForm.amount || Number(withdrawalForm.amount) <= 0 || Number(withdrawalForm.amount) > Number(selectedInvestmentAvailable)"
+              @click="submitWithdrawal">
+              <i class="bi bi-check2-circle me-1"></i> {{ $t('investorDashboard.withdrawals.form.submit') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Withdrawals -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-fadaa-light-blue">
+            <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>{{ $t('investorDashboard.withdrawals.history.title') }}</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>{{ $t('investorDashboard.withdrawals.history.date') }}</th>
+                    <th>{{ $t('investorDashboard.withdrawals.history.investment') }}</th>
+                    <th>{{ $t('investorDashboard.withdrawals.history.amount') }}</th>
+                    <th>{{ $t('investorDashboard.withdrawals.history.status') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="myWithdrawals.length === 0">
+                    <td colspan="4" class="text-center">—</td>
+                  </tr>
+                  <tr v-for="w in myWithdrawals.slice(0,5)" :key="w.id">
+                    <td>{{ new Date(w.requested_at || w.created_at).toLocaleString() }}</td>
+                    <td>{{ w.Investment?.name || w.investment_id }}</td>
+                    <td>{{ formatCurrency(w.amount) }}</td>
+                    <td>
+                      <span :class="['badge',
+                        w.status==='paid' ? 'bg-success' :
+                        w.status==='approved' ? 'bg-primary' :
+                        w.status==='pending' ? 'bg-warning text-dark' : 'bg-danger']">
+                        {{ $t(`investorDashboard.withdrawals.statuses.${w.status}`) }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Section 1: Major KPIs -->
     <div class="row gy-4 mb-4">

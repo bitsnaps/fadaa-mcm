@@ -56,6 +56,12 @@ const isCollapsed = computed(() => sidebarStore.isCollapsed);
             {{ $t('sidebar.manageInvestments') }}
           </router-link>
         </li>
+        <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+          <router-link to="/manage-withdrawals" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-bank2 me-2"></i>
+            {{ $t('sidebar.manageWithdrawals') }}
+          </router-link>
+        </li>
         <li class="nav-item" v-if="userRole === 'assistant'">
           <router-link to="/assistant-dashboard" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-person-workspace me-2"></i>

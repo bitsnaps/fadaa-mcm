@@ -30,6 +30,7 @@ import ManageInvestments from './views/ManageInvestments.vue';
 import ManageIncomes from './views/ManageIncomes.vue';
 import ManageExpenses from './views/ManageExpenses.vue';
 import ManageProfiles from './views/ManageProfiles.vue';
+import ManageWithdrawals from './views/ManageWithdrawals.vue';
 import Navbar from './components/Navbar.vue';
 
 const routes = [
@@ -219,6 +220,12 @@ const routes = [
     path: '/manage-expenses',
     name: 'ManageExpenses',
     components: { default: ManageExpenses, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+  },
+  {
+    path: '/manage-withdrawals',
+    name: 'ManageWithdrawals',
+    components: { default: ManageWithdrawals, header: Navbar },
     meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
   },
   {

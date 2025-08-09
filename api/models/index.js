@@ -42,7 +42,7 @@ const {
   User, Role, Branch, Client, Office, Contract, ServiceCategory,
   ClientService, Document, Task, Notification, FinancialReport,
   ComplianceReport, Investment, OfficeDesign,
-  SystemSetting, ActivityLog, Tax, ContractTax, Income, Expense, Profile
+  SystemSetting, ActivityLog, Tax, ContractTax, Income, Expense, Profile, Withdrawal
 } = db;
 
 // User associations
@@ -132,6 +132,25 @@ Branch.hasOne(OfficeDesign, { foreignKey: 'branch_id' });
 // ActivityLog associations
 ActivityLog.belongsTo(User, { foreignKey: 'user_id' });
 User.hasMany(ActivityLog, { foreignKey: 'user_id' });
+
+// Withdrawal associations
+if (Withdrawal) {
+  // Link to investor (user who requested)
+  Withdrawal.belongsTo(User, { as: 'investor', foreignKey: 'investor_id' });
+  User.hasMany(Withdrawal, { as: 'withdrawals', foreignKey: 'investor_id' });
+
+  // Link to processor (admin/assistant who processed)
+  Withdrawal.belongsTo(User, { as: 'processed_by_user', foreignKey: 'processed_by' });
+  User.hasMany(Withdrawal, { as: 'processed_withdrawals', foreignKey: 'processed_by' });
+
+  // Link to investment
+  Withdrawal.belongsTo(Investment, { foreignKey: 'investment_id' });
+  Investment.hasMany(Withdrawal, { foreignKey: 'investment_id' });
+
+  // Link to profile
+  Withdrawal.belongsTo(Profile, { foreignKey: 'profile_id' });
+  Profile.hasMany(Withdrawal, { foreignKey: 'profile_id' });
+}
 
 // Income associations
 Income.belongsTo(Branch, { foreignKey: 'branch_id' });

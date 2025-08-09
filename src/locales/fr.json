@@ -77,6 +77,7 @@
     "activityLog": "Journal d'Activité",
     "manageTaxes": "Gestion des Taxes",
     "manageInvestments": "Gestion des Investissements",
+    "manageWithdrawals": "Gestion des Retraits",
     "manageIncomes": "Gestion des Revenus",
     "manageExpenses": "Gestion des Dépenses",
     "manageProfiles": "Gestion des Profils"
@@ -877,6 +878,41 @@
         "biYearlyLabel": "Revenus Semestriels",
         "yearlyLabel": "Revenus Annuels",
         "revenue": "Revenus (en k)"
+    },
+"withdrawals": {
+      "title": "Retraits",
+      "kpis": {
+        "accrued": "Bénéfice net accumulé (à ce jour)",
+        "withdrawnPaid": "Retiré (Payé)",
+        "committed": "Engagé (En attente + Approuvé)",
+        "available": "Disponible"
+      },
+      "form": {
+        "title": "Demander un Retrait",
+        "selectInvestment": "Sélectionner un investissement",
+        "availableForThisInvestment": "Disponible pour cet investissement",
+        "amount": "Montant",
+        "paymentMethod": "Moyen de paiement (optionnel)",
+        "notes": "Notes (optionnel)",
+        "submit": "Envoyer la demande",
+        "validationRequired": "Veuillez sélectionner un investissement et saisir un montant positif.",
+        "validationExceeds": "Le montant demandé dépasse le solde disponible pour l’investissement sélectionné.",
+        "success": "Demande de retrait soumise.",
+        "error": "Échec de l’envoi de la demande de retrait."
+      },
+      "history": {
+        "title": "Retraits récents",
+        "date": "Demandé le",
+        "investment": "Investissement",
+        "amount": "Montant",
+        "status": "Statut"
+      },
+      "statuses": {
+        "pending": "En attente",
+        "approved": "Approuvé",
+        "paid": "Payé",
+        "rejected": "Rejeté"
+      }
     },
     "statuses":{
       "active": "Actif",

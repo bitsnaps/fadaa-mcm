@@ -52,8 +52,28 @@ const adminOrAssistantMiddleware = async (c, next) => {
     }
 };
 
+// Investor-only middleware
+const investorMiddleware = async (c, next) => {
+    try {
+        const user = c.get('user');
+        if (!user || !user.role_id) {
+            return c.json({ success: false, message: 'Forbidden' }, 403);
+        }
+
+        const role = await models.Role.findOne({ where: { id: user.role_id } });
+
+        if (!role || role.name.toLowerCase() !== 'investor') {
+            return c.json({ success: false, message: 'Forbidden, investors only' }, 403);
+        }
+        await next();
+    } catch (error) {
+        return c.json({ success: false, message: 'An error occurred during authorization' }, 500);
+    }
+};
+
 module.exports = {
     authMiddleware,
     adminMiddleware,
-    adminOrAssistantMiddleware
+    adminOrAssistantMiddleware,
+    investorMiddleware
 };
