@@ -128,7 +128,7 @@ const handleDelete = async (id) => {
     if (confirm(t('investments.confirmDelete'))) {
         try {
             await deleteInvestment(id);
-            fetchInvestments();
+            fetchInvestments(activeProfileId.value);
         } catch (error) {
             console.error('Failed to delete investment:', error);
         }

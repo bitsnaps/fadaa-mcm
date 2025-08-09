@@ -1,9 +1,10 @@
 <template>
   <BTabs v-if="profiles.length > 0" @update:model-value="onTabChange" nav-class="mb-3">
-    <BTab v-for="profile in profiles" 
-          :key="profile.id" 
+    <BTab v-for="profile in profiles"
+          :key="profile.id"
+          :id="`profile-${profile.id}`"
           :title="profile.name"
-          :active="profile.id === localActiveProfileId" 
+          :active="profile.id === localActiveProfileId"
           :lazy="true">
       <!-- The content will be rendered by the parent component inside a slot -->
       <slot :profileId="profile.id"></slot>
@@ -47,13 +48,38 @@ async function fetchProfiles() {
   }
 }
 
-function onTabChange(newTabIndex) {
-  // console.log(newTabIndex); // <-- IT SHOWS: "BootstrapVueNext__ID__v-58__tabpane___"
-  const newProfile = profiles.value[newTabIndex];
-  // console.log('change profile: ', newProfile);
+function onTabChange(newActive) {
+  console.debug('[ProfileTabs] onTabChange payload:', newActive, 'type:', typeof newActive);
+  // Normalize payload: could be a numeric index or a tab pane id string
+  const payload = String(newActive);
+  let newProfile = null;
+
+  // Case 1: numeric index payload
+  const idx = Number(payload);
+  if (!Number.isNaN(idx) && profiles.value[idx]) {
+    newProfile = profiles.value[idx];
+  } else {
+    // Case 2: explicit BTab id we set, e.g., "profile-123"
+    const m1 = payload.match(/profile-(\d+)/);
+    if (m1) {
+      const pid = Number(m1[1]);
+      newProfile = profiles.value.find(p => p.id === pid) || null;
+    } else {
+      // Fallback: try to extract a number and match by id
+      const m2 = payload.match(/(\d+)/);
+      if (m2) {
+        const pid2 = Number(m2[1]);
+        newProfile = profiles.value.find(p => p.id === pid2) || null;
+      }
+    }
+  }
+
   if (newProfile) {
+    console.debug('[ProfileTabs] resolved profile id:', newProfile.id);
     localActiveProfileId.value = newProfile.id; // Update local state for immediate visual feedback
     emit('update:activeProfile', newProfile.id); // Inform parent
+  } else {
+    console.warn('Tabs onTabChange: could not resolve profile from payload', newActive);
   }
 }
 </script>
