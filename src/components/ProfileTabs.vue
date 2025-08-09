@@ -6,13 +6,13 @@
           :active="profile.id === localActiveProfileId" 
           :lazy="true">
       <!-- The content will be rendered by the parent component inside a slot -->
-      <slot :profile-id="profile.id"></slot>
+      <slot :profileId="profile.id"></slot>
     </BTab>
   </BTabs>
 </template>
 
 <script setup>
-import { ref, onMounted, defineEmits } from 'vue';
+import { ref, onMounted } from 'vue';
 import { BTabs, BTab } from 'bootstrap-vue-next';
 import profileService from '@/services/profileService';
 
@@ -48,7 +48,9 @@ async function fetchProfiles() {
 }
 
 function onTabChange(newTabIndex) {
+  // console.log(newTabIndex); // <-- IT SHOWS: "BootstrapVueNext__ID__v-58__tabpane___"
   const newProfile = profiles.value[newTabIndex];
+  // console.log('change profile: ', newProfile);
   if (newProfile) {
     localActiveProfileId.value = newProfile.id; // Update local state for immediate visual feedback
     emit('update:activeProfile', newProfile.id); // Inform parent
