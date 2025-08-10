@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import apiClient, { getContracts, getClients, getAvailableOffices, addContract } from '@/services/ApiClient';
 import { Modal } from 'bootstrap';
@@ -14,6 +14,10 @@ const isLoading = ref(true);
 const isSubmitting = ref(false);
 const activeProfileId = ref(null);
 
+// Pagination state
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+
 // Modal state
 const addContractModal = ref(null);
 const newContract = ref({
@@ -24,7 +28,8 @@ const newContract = ref({
   monthly_rate: '',
   document: null,
   tax_ids: [],
-  profile_id: null
+  profile_id: null,
+  status: 'Active'
 });
 
 const clients = ref([]);
@@ -65,20 +70,76 @@ onMounted(() => {
   // fetchContracts is now called by onProfileChange
 });
 
+watch(searchTerm, () => {
+  currentPage.value = 1;
+});
+
 const filteredContracts = computed(() => {
   if (!searchTerm.value) {
     return contracts.value;
   }
+  const lowerCaseSearchTerm = searchTerm.value.toLowerCase();
   return contracts.value.filter(contract =>
-    (contract.Client?.company_name.toLowerCase() || '').includes(searchTerm.value.toLowerCase()) ||
-    (contract.Office?.name.toLowerCase() || '').includes(searchTerm.value.toLowerCase()) ||
-    contract.status.toLowerCase().includes(searchTerm.value.toLowerCase())
+    (contract.Client?.company_name.toLowerCase() || '').includes(lowerCaseSearchTerm) ||
+    (contract.Office?.name.toLowerCase() || '').includes(lowerCaseSearchTerm) ||
+    (contract.monthly_rate?.toString() || '').includes(lowerCaseSearchTerm) ||
+    contract.status.toLowerCase().includes(lowerCaseSearchTerm)
   );
 });
+
+const paginatedContracts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return filteredContracts.value.slice(start, end);
+});
+
+const totalPages = computed(() => {
+  if (filteredContracts.value.length === 0) return 1;
+  return Math.ceil(filteredContracts.value.length / itemsPerPage.value);
+});
+
+const changePage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
 
 const formatDate = (date) => {
   if (!date) return t('documents.notApplicable');
   return format(new Date(date), 'yyyy-MM-dd');
+};
+
+const formatCurrency = (value) => {
+  const number = parseFloat(value);
+  if (isNaN(number)) {
+    return t('documents.notApplicable');
+  }
+  // Assuming DZD currency for Algeria, based on user timezone.
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'DZD' }).format(number);
+};
+
+const calculateTotalAmount = (contract) => {
+  const monthlyRate = parseFloat(contract.monthly_rate);
+  if (isNaN(monthlyRate)) return 0;
+
+  // Support both API include alias 'taxes' and potential 'Taxes'
+  const taxes = Array.isArray(contract?.taxes)
+    ? contract.taxes
+    : Array.isArray(contract?.Taxes)
+      ? contract.Taxes
+      : [];
+
+  if (taxes.length === 0) {
+    return monthlyRate;
+  }
+
+  const totalTaxRate = taxes.reduce((sum, tax) => {
+    const rate = parseFloat(tax.rate);
+    return sum + (isNaN(rate) ? 0 : rate);
+  }, 0);
+
+  const totalAmount = monthlyRate * (1 + totalTaxRate / 100);
+  return totalAmount;
 };
 
 const viewDocument = (docUrl) => {
@@ -172,7 +233,7 @@ const submitNewContract = async () => {
       modalInstance.hide();
       fetchContracts(activeProfileId.value); // Refresh the list
        // Reset form
-       newContract.value = { client_id: null, office_id: null, start_date: '', end_date: '', monthly_rate: '', document: null, tax_ids: [], profile_id: activeProfileId.value };
+       newContract.value = { client_id: null, office_id: null, start_date: '', end_date: '', monthly_rate: '', document: null, tax_ids: [], profile_id: activeProfileId.value, status: 'Active' };
     } else {
       alert('Failed to add contract: ' + response.data.message);
     }
@@ -265,11 +326,13 @@ const submitDocumentUpload = async () => {
                 <th scope="col">{{ t('contracts.tableHeaders.status') }}</th>
                 <th scope="col">{{ t('contracts.tableHeaders.startDate') }}</th>
                 <th scope="col">{{ t('contracts.tableHeaders.endDate') }}</th>
+                <th scope="col">{{ t('contracts.tableHeaders.monthlyRate', 'Monthly Rate') }}</th>
+                <th scope="col">{{ t('contracts.tableHeaders.totalAmount', 'Total Amount') }}</th>
                 <th scope="col" class="text-center">{{ t('contracts.tableHeaders.actions') }}</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="contract in filteredContracts" :key="contract.id">
+              <tr v-for="contract in paginatedContracts" :key="contract.id">
                 <td>{{ contract.Client?.company_name || 'N/A' }}</td>
                 <td>{{ contract.Office?.name || 'N/A' }}</td>
                 <td>
@@ -285,6 +348,8 @@ const submitDocumentUpload = async () => {
                 </td>
                 <td>{{ formatDate(contract.start_date) }}</td>
                 <td>{{ formatDate(contract.end_date) }}</td>
+                <td>{{ formatCurrency(contract.monthly_rate) }}</td>
+                <td>{{ formatCurrency(calculateTotalAmount(contract)) }}</td>
                 <td class="text-center">
                   <button @click="viewDocument(contract.document_url)" :disabled="!contract.document_url" class="btn btn-sm btn-outline-info me-1" :title="t('contracts.viewContract')">
                     <i class="bi bi-eye"></i>
@@ -305,6 +370,21 @@ const submitDocumentUpload = async () => {
               </tr>
             </tbody>
           </table>
+          <div v-if="totalPages > 1" class="d-flex justify-content-center mt-4">
+              <nav aria-label="Page navigation">
+                  <ul class="pagination">
+                      <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                          <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">{{ t('pagination.previous', 'Previous') }}</a>
+                      </li>
+                      <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
+                          <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+                      </li>
+                      <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                          <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">{{ t('pagination.next', 'Next') }}</a>
+                      </li>
+                  </ul>
+              </nav>
+          </div>
         </div>
         <div v-else class="alert alert-info text-center" role="alert">
           {{ t('contracts.noContractsFound') }}
@@ -348,17 +428,30 @@ const submitDocumentUpload = async () => {
                                 <input type="date" id="end_date" class="form-control" v-model="newContract.end_date" required>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="monthly_rate" class="form-label">{{ t('addClient.form.paymentTerms') }}</label>
-                            <input type="number" id="monthly_rate" class="form-control" v-model="newContract.monthly_rate" placeholder="e.g., 50000" required>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="monthly_rate" class="form-label">{{ t('contracts.tableHeaders.monthlyRate', 'Monthly Rate') }}</label>
+                                <input type="number" id="monthly_rate" class="form-control" v-model="newContract.monthly_rate" placeholder="e.g., 50000" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="status" class="form-label">{{ t('contracts.tableHeaders.status') }}</label>
+                                <select id="status" class="form-select" v-model="newContract.status" required>
+                                    <option value="Active">{{ t('contracts.status.active', 'Active') }}</option>
+                                    <option value="Pending">{{ t('contracts.status.pending', 'Pending') }}</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                           <label for="contractTaxes" class="form-label">{{ t('manageTaxes.title') }}</label>
-                           <select multiple class="form-select" id="contractTaxes" v-model="newContract.tax_ids">
-                               <option v-for="tax in availableTaxes" :key="tax.id" :value="tax.id">
-                                   {{ tax.name }} ({{ tax.rate }}%)
-                               </option>
-                           </select>
+                         <div class="mb-3">
+                           <label class="form-label">{{ t('manageTaxes.title') }}</label>
+                           <p class="form-text text-muted">{{ t('contracts.taxSelectionNote', 'Taxes are applied to the monthly rate to calculate the total amount.') }}</p>
+                           <div class="d-flex flex-wrap gap-3">
+                               <div v-for="tax in availableTaxes" :key="tax.id" class="form-check">
+                                   <input class="form-check-input" type="checkbox" :value="tax.id" :id="`tax-${tax.id}`" v-model="newContract.tax_ids">
+                                   <label class="form-check-label" :for="`tax-${tax.id}`">
+                                       {{ tax.name }} ({{ tax.rate }}%)
+                                   </label>
+                               </div>
+                           </div>
                         </div>
                         <div class="mb-3">
                             <label for="document" class="form-label">{{ t('addClient.form.attachments') }}</label>
