@@ -1,7 +1,7 @@
 import apiClient from './ApiClient';
 
-export const getExpenses = () => {
-  return apiClient.get('/expenses');
+export const getExpenses = (profileId) => {
+  return apiClient.get('/expenses', { params: { profile_id: profileId } });
 };
 
 export const getExpense = (id) => {

@@ -1,7 +1,7 @@
 import apiClient from './ApiClient';
 
-export const getIncomes = () => {
-  return apiClient.get('/incomes');
+export const getIncomes = (profileId) => {
+  return apiClient.get('/incomes', { params: { profile_id: profileId } });
 };
 
 export const getIncome = (id) => {
