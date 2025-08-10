@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import apiClient, { getContracts, getClients, getAvailableOffices, addContract } from '@/services/ApiClient';
+import apiClient, { getContracts, getClients, getAvailableOffices, addContract, updateContract } from '@/services/ApiClient';
 import { Modal } from 'bootstrap';
 import { format } from 'date-fns';
 import ProfileTabs from '@/components/ProfileTabs.vue';
@@ -20,7 +20,9 @@ const itemsPerPage = ref(10);
 
 // Modal state
 const addContractModal = ref(null);
+const isEditMode = ref(false);
 const newContract = ref({
+  id: null,
   client_id: null,
   office_id: null,
   start_date: '',
@@ -186,7 +188,19 @@ const deleteContract = async (contractId) => {
 };
 
 const openAddContractModal = async () => {
-  newContract.value.profile_id = activeProfileId.value;
+  isEditMode.value = false;
+  newContract.value = {
+    id: null,
+    client_id: null,
+    office_id: null,
+    start_date: '',
+    end_date: '',
+    monthly_rate: '',
+    document: null,
+    tax_ids: [],
+    profile_id: activeProfileId.value,
+    status: 'Active'
+  };
   try {
     const [clientsResponse, officesResponse, taxesResponse] = await Promise.all([
       getClients(),
@@ -213,33 +227,81 @@ const handleFileChange = (event) => {
   newContract.value.document = event.target.files[0];
 };
 
+const openEditContractModal = async (contract) => {
+  isEditMode.value = true;
+  const contractData = JSON.parse(JSON.stringify(contract));
+
+  newContract.value = {
+    id: contractData.id,
+    client_id: contractData.client_id,
+    office_id: contractData.office_id,
+    start_date: formatDate(contractData.start_date),
+    end_date: formatDate(contractData.end_date),
+    monthly_rate: contractData.monthly_rate,
+    document: null, // Don't pre-fill file input
+    tax_ids: contractData.taxes ? contractData.taxes.map(t => t.id) : [],
+    profile_id: contractData.profile_id,
+    status: contractData.status,
+    original_office_id: contractData.office_id // Keep track of the original office
+  };
+
+  try {
+    const [clientsResponse, officesResponse, taxesResponse] = await Promise.all([
+      getClients(),
+      getAvailableOffices(),
+      apiClient.get('/taxes')
+    ]);
+    if (clientsResponse.data.success) clients.value = clientsResponse.data.data;
+    if (officesResponse.data.success) offices.value = officesResponse.data.data;
+    if (taxesResponse.data.success) availableTaxes.value = taxesResponse.data.taxes;
+
+    const modalInstance = Modal.getOrCreateInstance(addContractModal.value);
+    modalInstance.show();
+  } catch (error) {
+    console.error('Error fetching data for modal:', error);
+  }
+};
+
 const submitNewContract = async () => {
   isSubmitting.value = true;
   const formData = new FormData();
-  Object.keys(newContract.value).forEach(key => {
+
+  // Clean up the object before sending
+  const contractData = { ...newContract.value };
+  if (!isEditMode.value) {
+    delete contractData.id;
+  }
+
+  Object.keys(contractData).forEach(key => {
     if (key === 'tax_ids') {
-        newContract.value[key].forEach(taxId => {
-            formData.append('tax_ids[]', taxId);
-        });
-    } else if (newContract.value[key]) {
-        formData.append(key, newContract.value[key]);
+      contractData[key].forEach(taxId => {
+        formData.append('tax_ids[]', taxId);
+      });
+    } else if (key === 'document' && contractData[key]) {
+      formData.append(key, contractData[key]);
+    } else if (key !== 'document' && contractData[key] !== null && contractData[key] !== undefined) {
+      formData.append(key, contractData[key]);
     }
   });
 
   try {
-    const response = await addContract(formData);
+    let response;
+    if (isEditMode.value) {
+      response = await updateContract(newContract.value.id, formData);
+    } else {
+      response = await addContract(formData);
+    }
+
     if (response.data.success) {
       const modalInstance = Modal.getInstance(addContractModal.value);
       modalInstance.hide();
-      fetchContracts(activeProfileId.value); // Refresh the list
-       // Reset form
-       newContract.value = { client_id: null, office_id: null, start_date: '', end_date: '', monthly_rate: '', document: null, tax_ids: [], profile_id: activeProfileId.value, status: 'Active' };
+      fetchContracts(activeProfileId.value);
     } else {
-      alert('Failed to add contract: ' + response.data.message);
+      alert(`Failed to ${isEditMode.value ? 'update' : 'add'} contract: ` + response.data.message);
     }
   } catch (error) {
-    console.error('Error submitting new contract:', error);
-    alert('An error occurred while adding the contract.');
+    console.error(`Error submitting ${isEditMode.value ? 'updated' : 'new'} contract:`, error);
+    alert(`An error occurred while ${isEditMode.value ? 'updating' : 'adding'} the contract.`);
   } finally {
     isSubmitting.value = false;
   }
@@ -360,6 +422,9 @@ const submitDocumentUpload = async () => {
                   <button v-if="!contract.document_url" @click="openUploadDocumentModal(contract.id)" class="btn btn-sm btn-outline-success me-1" :title="t('contracts.uploadDocument')">
                     <i class="bi bi-upload"></i>
                   </button>
+                  <button @click="openEditContractModal(contract)" class="btn btn-sm btn-outline-secondary me-1" :title="t('contracts.editContract', 'Edit Contract')">
+                      <i class="bi bi-pencil"></i>
+                  </button>
                   <button v-if="contract.status === 'Active'" @click="archiveContract(contract.id)" class="btn btn-sm btn-outline-warning" :title="t('contracts.archiveContract')">
                     <i class="bi bi-archive"></i>
                   </button>
@@ -397,7 +462,7 @@ const submitDocumentUpload = async () => {
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addContractModalLabel">{{ t('contracts.addNewContract') }}</h5>
+                    <h5 class="modal-title" id="addContractModalLabel">{{ isEditMode ? t('contracts.editContractTitle', 'Edit Contract') : t('contracts.addNewContract') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -463,7 +528,7 @@ const submitDocumentUpload = async () => {
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('manageUsers.cancel') }}</button>
                     <button type="button" class="btn btn-primary" @click="submitNewContract" :disabled="isSubmitting">
                         <span v-if="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                        {{ isSubmitting ? 'Submitting...' : t('addClient.submitButtonAdd') }}
+                        {{ isSubmitting ? t('contracts.submitting', 'Submitting...') : (isEditMode ? t('contracts.updateButton', 'Update') : t('contracts.addButton', 'Add Contract')) }}
                     </button>
                 </div>
             </div>

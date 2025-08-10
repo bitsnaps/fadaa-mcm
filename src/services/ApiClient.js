@@ -55,6 +55,14 @@ export function addContract(formData) {
     });
 }
 
+export function updateContract(id, formData) {
+    return apiClient.put(`/contracts/${id}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+}
+
 export const getDocuments = () => {
     return apiClient.get('/documents');
 };

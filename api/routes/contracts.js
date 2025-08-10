@@ -92,6 +92,80 @@ contractApp.post('/', async (c) => {
     }
 });
 
+// PUT /api/contracts/:id - Update a contract
+contractApp.put('/:id', async (c) => {
+    try {
+        const { id } = c.req.param();
+        const body = await c.req.parseBody();
+        const { client_id, office_id, start_date, end_date, monthly_rate, tax_ids, status } = body;
+
+        const contract = await models.Contract.findByPk(id);
+        if (!contract) {
+            return c.json({ success: false, message: 'Contract not found' }, 404);
+        }
+
+        // --- File Upload Logic for Updates ---
+        const documentFile = body['document'];
+        let documentUrl = contract.document_url; // Keep existing if not updated
+
+        if (documentFile && documentFile.name) {
+            const uploadDir = path.join(__dirname, '..', '..', 'public', 'uploads', 'contracts');
+            await fs.mkdir(uploadDir, { recursive: true });
+
+            // Optional: Delete old file
+            if (contract.document_url) {
+                const oldFilePath = path.join(__dirname, '..', '..', 'public', contract.document_url);
+                try {
+                    await fs.unlink(oldFilePath);
+                } catch (err) {
+                    console.error("Error deleting old contract document:", err);
+                }
+            }
+
+            const timestamp = Date.now();
+            const fileExtension = path.extname(documentFile.name);
+            const newFileName = `contract-${client_id}-${timestamp}${fileExtension}`;
+            const filePath = path.join(uploadDir, newFileName);
+            
+            const fileData = await documentFile.arrayBuffer();
+            await fs.writeFile(filePath, Buffer.from(fileData));
+
+            documentUrl = `/uploads/contracts/${newFileName}`;
+        }
+        // --- End File Upload Logic ---
+
+        await contract.update({
+            client_id,
+            office_id,
+            start_date,
+            end_date,
+            monthly_rate,
+            status,
+            document_url: documentUrl,
+        });
+
+        if (tax_ids) {
+            const taxIdArray = Array.isArray(tax_ids) ? tax_ids.map(id => parseInt(id, 10)) : [parseInt(tax_ids, 10)];
+            const taxes = await models.Tax.findAll({ where: { id: taxIdArray } });
+            await contract.setTaxes(taxes);
+        } else {
+            await contract.setTaxes([]);
+        }
+        
+        // If office was changed, update statuses
+        if (body.original_office_id && office_id !== body.original_office_id) {
+            await models.Office.update({ status: 'Available' }, { where: { id: body.original_office_id } });
+            await models.Office.update({ status: 'Occupied' }, { where: { id: office_id } });
+        }
+
+
+        return c.json({ success: true, message: 'Contract updated successfully', contract });
+    } catch (error) {
+        console.error('Error updating contract:', error);
+        return c.json({ success: false, message: 'Failed to update contract' }, 500);
+    }
+});
+
 // PUT /api/contracts/:id - Update a contract's status
 contractApp.put('/:id/status', authMiddleware, async (c) => {
     try {

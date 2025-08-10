@@ -508,13 +508,18 @@
     },
     "viewContract": "View Contract",
     "downloadContract": "Download Contract",
+    "editContract": "Edit Contract",
+    "editContractTitle": "Edit Contract",
     "archiveContract": "Archive Contract",
     "deleteContract": "Delete Contract",
     "confirmDelete": "Are you sure you want to delete this contract?",
     "noContractsFound": "No contracts found.",
     "uploadDocument": "Upload a document",
     "upload": "Upload",
-    "taxSelectionNote": "Taxes are applied to the monthly rate to calculate the total amount."
+    "taxSelectionNote": "Taxes are applied to the monthly rate to calculate the total amount.",
+    "submitting": "Submitting...",
+    "updateButton": "Update",
+    "addButton": "Add Contract"
   },
   "offices": {
     "manageOffices": "Manage Coworking Offices",
