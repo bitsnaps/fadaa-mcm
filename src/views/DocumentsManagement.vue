@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getDocuments, getClients, getInvestmentsList, addDocument } from '@/services/ApiClient';
+import { getDocuments, getClients, getInvestmentsList, addDocument, getClientInvestments, updateDocument, deleteDocument } from '@/services/ApiClient';
 import { useAuthStore } from '@/stores/auth';
 import { Modal } from 'bootstrap';
 import { format } from 'date-fns';
@@ -15,6 +15,7 @@ const isLoading = ref(true);
 const isSubmitting = ref(false);
 
 const addDocumentModal = ref(null);
+const editDocumentModal = ref(null);
 const newDocument = ref({
   client_id: null,
   investment_id: null,
@@ -22,16 +23,29 @@ const newDocument = ref({
   type: 'Other',
   document: null,
 });
+const editingDocument = ref(null);
 const clients = ref([]);
 const allInvestments = ref([]);
 const filteredInvestments = ref([]);
+const documentToDelete = ref(null);
 
-const fetchDocuments = async () => {
+// Pagination
+const currentPage = ref(1);
+const perPage = ref(10);
+const totalDocuments = ref(0);
+
+const fetchDocuments = async (page = 1) => {
+  isLoading.value = true;
   try {
-    isLoading.value = true;
-    const response = await getDocuments();
+    const response = await getDocuments({
+      page,
+      limit: perPage.value,
+      searchTerm: searchTerm.value,
+    });
     if (response.data.success) {
       documents.value = response.data.documents;
+      totalDocuments.value = response.data.total;
+      currentPage.value = page;
     } else {
       console.error('Failed to fetch documents:', response.data.message);
     }
@@ -43,8 +57,26 @@ const fetchDocuments = async () => {
 };
 
 onMounted(() => {
-  fetchDocuments();
+  fetchDocuments(currentPage.value);
+  fetchClientsAndInvestments();
 });
+
+const fetchClientsAndInvestments = async () => {
+  try {
+    const [clientsResponse, investmentsResponse] = await Promise.all([
+      getClients(),
+      getInvestmentsList()
+    ]);
+    if (clientsResponse.data.success) {
+      clients.value = clientsResponse.data.data;
+    }
+    if (investmentsResponse.data.success) {
+      allInvestments.value = investmentsResponse.data.investments;
+    }
+  } catch (error) {
+    console.error('Error fetching clients and investments:', error);
+  }
+};
 
 const filteredDocuments = computed(() => {
   if (!searchTerm.value) {
@@ -54,25 +86,28 @@ const filteredDocuments = computed(() => {
     (doc.title?.toLowerCase() || '').includes(searchTerm.value.toLowerCase()) ||
     (doc.type?.toLowerCase() || '').includes(searchTerm.value.toLowerCase()) ||
     (doc.Client?.company_name?.toLowerCase() || '').includes(searchTerm.value.toLowerCase()) ||
-    (doc.investment?.name?.toLowerCase() || '').includes(searchTerm.value.toLowerCase())
+    (doc.Investment?.name?.toLowerCase() || '').includes(searchTerm.value.toLowerCase())
   );
 });
 
-watch(() => newDocument.value.client_id, (newClientId) => {
+watch(() => newDocument.value.client_id, async (newClientId) => {
   newDocument.value.investment_id = null;
   if (newClientId) {
-    const client = clients.value.find(c => c.id === newClientId);
-    if (client && client.Investments) {
-      filteredInvestments.value = allInvestments.value.filter(inv =>
-        client.Investments.some(ci => ci.id === inv.id)
-      );
-    } else {
+    try {
+      const response = await getClientInvestments(newClientId);
+      if (response.data.success) {
+        filteredInvestments.value = response.data.data;
+      } else {
+        filteredInvestments.value = [];
+      }
+    } catch (error) {
+      console.error('Error fetching client investments:', error);
       filteredInvestments.value = [];
     }
   } else {
     filteredInvestments.value = [];
   }
-}, { immediate: true });
+});
 
 const formatDate = (date) => {
   if (!date) return 'N/A';
@@ -101,23 +136,22 @@ const downloadDocument = (docUrl) => {
   }
 };
 
-const openAddDocumentModal = async () => {
-  try {
-    const [clientsResponse, investmentsResponse] = await Promise.all([
-      getClients(),
-      getInvestmentsList()
-    ]);
-    if (clientsResponse.data.success) {
-      clients.value = clientsResponse.data.data;
-    }
-    if (investmentsResponse.data.success) {
-      allInvestments.value = investmentsResponse.data.investments;
-    }
-    const modalInstance = Modal.getOrCreateInstance(addDocumentModal.value);
-    modalInstance.show();
-  } catch (error) {
-    console.error('Error fetching data for modal:', error);
-  }
+const openAddDocumentModal = () => {
+  newDocument.value = { client_id: null, investment_id: null, title: '', type: 'Other', document: null };
+  const modalInstance = Modal.getOrCreateInstance(addDocumentModal.value);
+  modalInstance.show();
+};
+
+const openEditDocumentModal = (doc) => {
+  editingDocument.value = { ...doc };
+  const modalInstance = Modal.getOrCreateInstance(editDocumentModal.value);
+  modalInstance.show();
+};
+
+const openDeleteModal = (doc) => {
+  documentToDelete.value = doc;
+  const deleteModal = new Modal(document.getElementById('deleteDocumentModal'));
+  deleteModal.show();
 };
 
 const handleFileChange = (event) => {
@@ -128,9 +162,7 @@ const submitNewDocument = async () => {
   isSubmitting.value = true;
   const formData = new FormData();
   
-  // Add user id to the form data
   formData.append('uploaded_by_user_id', authStore.user.id);
-
   Object.keys(newDocument.value).forEach(key => {
     if (newDocument.value[key]) {
       formData.append(key, newDocument.value[key]);
@@ -142,14 +174,51 @@ const submitNewDocument = async () => {
     if (response.data.success) {
       const modalInstance = Modal.getInstance(addDocumentModal.value);
       modalInstance.hide();
-      fetchDocuments(); // Refresh the list
-      newDocument.value = { client_id: null, investment_id: null, title: '', type: 'Other', document: null };
+      fetchDocuments(currentPage.value); // Refresh the list
     } else {
       alert('Failed to add document: ' + response.data.message);
     }
   } catch (error) {
     console.error('Error submitting new document:', error);
     alert('An error occurred while adding the document.');
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+const submitUpdateDocument = async () => {
+  isSubmitting.value = true;
+  try {
+    const response = await updateDocument(editingDocument.value.id, editingDocument.value);
+    if (response.data.success) {
+      const modalInstance = Modal.getInstance(editDocumentModal.value);
+      modalInstance.hide();
+      fetchDocuments(currentPage.value);
+    } else {
+      alert('Failed to update document: ' + response.data.message);
+    }
+  } catch (error) {
+    console.error('Error updating document:', error);
+    alert('An error occurred while updating the document.');
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+const confirmDeleteDocument = async () => {
+  isSubmitting.value = true;
+  try {
+    const response = await deleteDocument(documentToDelete.value.id);
+    if (response.data.success) {
+      const deleteModal = Modal.getInstance(document.getElementById('deleteDocumentModal'));
+      deleteModal.hide();
+      fetchDocuments(currentPage.value);
+    } else {
+      alert('Failed to delete document: ' + response.data.message);
+    }
+  } catch (error) {
+    console.error('Error deleting document:', error);
+    alert('An error occurred while deleting the document.');
   } finally {
     isSubmitting.value = false;
   }
@@ -195,7 +264,7 @@ const submitNewDocument = async () => {
           <tr v-for="doc in filteredDocuments" :key="doc.id">
             <td>{{ doc.title }}</td>
             <td>{{ doc.Client?.company_name || 'N/A' }}</td>
-            <td>{{ doc.investment?.name || 'N/A' }}</td>
+            <td>{{ doc.Investment?.name || 'N/A' }}</td>
             <td>{{ doc.type }}</td>
             <td>{{ formatDate(doc.created_at) }}</td>
             <td class="text-center">
@@ -205,6 +274,12 @@ const submitNewDocument = async () => {
               <button @click="downloadDocument(doc.file_path)" :disabled="!doc.file_path" class="btn btn-sm btn-outline-primary me-1" :title="t('documents.download')">
                 <i class="bi bi-download"></i>
               </button>
+              <button @click="openEditDocumentModal(doc)" class="btn btn-sm btn-outline-secondary me-1" :title="t('documents.edit')">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button @click="openDeleteModal(doc)" class="btn btn-sm btn-outline-danger" :title="t('documents.delete')">
+                <i class="bi bi-trash"></i>
+              </button>
             </td>
           </tr>
         </tbody>
@@ -213,6 +288,21 @@ const submitNewDocument = async () => {
     <div v-else class="alert alert-info text-center" role="alert">
       {{ t('documents.noDocumentsFound') }}
     </div>
+
+    <!-- Pagination -->
+    <nav v-if="totalDocuments > perPage" aria-label="Page navigation">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+          <a class="page-link" href="#" @click.prevent="fetchDocuments(currentPage - 1)">{{ t('pagination.previous') }}</a>
+        </li>
+        <li v-for="page in Math.ceil(totalDocuments / perPage)" :key="page" class="page-item" :class="{ active: currentPage === page }">
+          <a class="page-link" href="#" @click.prevent="fetchDocuments(page)">{{ page }}</a>
+        </li>
+        <li class="page-item" :class="{ disabled: currentPage === Math.ceil(totalDocuments / perPage) }">
+          <a class="page-link" href="#" @click.prevent="fetchDocuments(currentPage + 1)">{{ t('pagination.next') }}</a>
+        </li>
+      </ul>
+    </nav>
 
     <!-- Add Document Modal -->
     <div class="modal fade" ref="addDocumentModal" tabindex="-1" aria-labelledby="addDocumentModalLabel" aria-hidden="true">
@@ -225,13 +315,13 @@ const submitNewDocument = async () => {
           <div class="modal-body">
             <form @submit.prevent="submitNewDocument">
               <div class="mb-3">
-                <label for="doc-title" class="form-label">{{ t('documents.tableHeaders.name') }}</label>
+                <label for="doc-title" class="form-label">{{ t('documents.tableHeaders.name') }}*</label>
                 <input type="text" id="doc-title" class="form-control" v-model="newDocument.title" required>
               </div>
               <div class="mb-3">
-                <label for="doc-client" class="form-label">{{ t('documents.tableHeaders.client') }}</label>
+                <label for="doc-client" class="form-label">{{ t('documents.tableHeaders.client') }}*</label>
                 <select id="doc-client" class="form-select" v-model="newDocument.client_id" required>
-                  <option :value="null" disabled>-- Select Client --</option>
+                  <option :value="null" disabled>-- {{ t('documents.selectClient') }} --</option>
                   <option v-for="client in clients" :key="client.id" :value="client.id">{{ client.company_name }}</option>
                 </select>
               </div>
@@ -252,16 +342,74 @@ const submitNewDocument = async () => {
                 </select>
               </div>
               <div class="mb-3">
-                <label for="document-file" class="form-label">{{ t('addClient.form.attachments') }}</label>
+                <label for="document-file" class="form-label">{{ t('documents.form.attachments') }}*</label>
                 <input type="file" id="document-file" class="form-control" @change="handleFileChange" required>
               </div>
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('manageUsers.cancel') }}</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('documents.cancel') }}</button>
             <button type="button" class="btn btn-primary" @click="submitNewDocument" :disabled="isSubmitting">
               <span v-if="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              {{ isSubmitting ? 'Submitting...' : t('addClient.submitButtonAdd') }}
+              {{ isSubmitting ? t('documents.submitting') : t('documents.addButton') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Document Modal -->
+    <div class="modal fade" ref="editDocumentModal" tabindex="-1" aria-labelledby="editDocumentModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editDocumentModalLabel">{{ t('documents.editDocument') }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="submitUpdateDocument" v-if="editingDocument">
+              <div class="mb-3">
+                <label for="edit-doc-title" class="form-label">{{ t('documents.tableHeaders.name') }}</label>
+                <input type="text" id="edit-doc-title" class="form-control" v-model="editingDocument.title" required>
+              </div>
+              <div class="mb-3">
+                <label for="edit-doc-type" class="form-label">{{ t('documents.tableHeaders.type') }}</label>
+                <select id="edit-doc-type" class="form-select" v-model="editingDocument.type" required>
+                  <option>Contract</option>
+                  <option>Report</option>
+                  <option>Identification</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('documents.cancel') }}</button>
+            <button type="button" class="btn btn-primary" @click="submitUpdateDocument" :disabled="isSubmitting">
+              <span v-if="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              {{ isSubmitting ? t('documents.updating') : t('documents.updateButton') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Document Modal -->
+    <div class="modal fade" id="deleteDocumentModal" tabindex="-1" aria-labelledby="deleteDocumentModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteDocumentModalLabel">{{ t('documents.deleteDocument') }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            {{ t('documents.deleteConfirmation') }}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('documents.cancel') }}</button>
+            <button type="button" class="btn btn-danger" @click="confirmDeleteDocument" :disabled="isSubmitting">
+              <span v-if="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              {{ isSubmitting ? t('documents.deleting') : t('documents.delete') }}
             </button>
           </div>
         </div>

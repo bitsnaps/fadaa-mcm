@@ -42,6 +42,9 @@ export function getContracts(profileId) {
 export function getClients() {
     return apiClient.get('/clients');
 }
+export function getClientInvestments(clientId) {
+    return apiClient.get(`/clients/${clientId}/investments`);
+}
 
 export function getAvailableOffices() {
     return apiClient.get('/offices');
@@ -73,6 +76,14 @@ export const addDocument = (formData) => {
             'Content-Type': 'multipart/form-data'
         }
     });
+};
+
+export const updateDocument = (id, data) => {
+    return apiClient.put(`/documents/${id}`, data);
+};
+
+export const deleteDocument = (id) => {
+    return apiClient.delete(`/documents/${id}`);
 };
 
 export const getInvestmentsList = () => {

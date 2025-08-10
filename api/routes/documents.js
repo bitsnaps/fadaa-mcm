@@ -67,4 +67,47 @@ documentApp.post('/', async (c) => {
     }
 });
 
+// Update a document
+documentApp.put('/:id', async (c) => {
+    try {
+        const { id } = c.req.param();
+        const { title, type } = await c.req.json();
+
+        const document = await models.Document.findByPk(id);
+        if (!document) {
+            return c.json({ success: false, message: 'Document not found' }, 404);
+        }
+
+        await document.update({ title, type });
+
+        return c.json({ success: true, message: 'Document updated successfully', data: document });
+    } catch (error) {
+        console.error('Error updating document:', error);
+        return c.json({ success: false, message: 'Failed to update document' }, 500);
+    }
+});
+
+// Delete a document
+documentApp.delete('/:id', async (c) => {
+    try {
+        const { id } = c.req.param();
+        const document = await models.Document.findByPk(id);
+        if (!document) {
+            return c.json({ success: false, message: 'Document not found' }, 404);
+        }
+
+        // Optional: Delete the file from storage as well
+        // const filePath = path.join(__dirname, '../public', document.file_path);
+        // if (fs.existsSync(filePath)) {
+        //     fs.unlinkSync(filePath);
+        // }
+
+        await document.destroy();
+        return c.json({ success: true, message: 'Document deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting document:', error);
+        return c.json({ success: false, message: 'Failed to delete document' }, 500);
+    }
+});
+
 module.exports = documentApp;

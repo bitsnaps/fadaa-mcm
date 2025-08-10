@@ -461,7 +461,22 @@
     "noDocumentsFound": "Aucun document trouvé.",
     "view": "Voir",
     "download": "Télécharger",
-    "selectInvestment": "Sélectionner l'investissement (Facultatif)"
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "selectInvestment": "Sélectionner l'investissement (Facultatif)",
+    "selectClient": "-- Sélectionner un Client --",
+    "editDocument": "Modifier le document",
+    "deleteDocument": "Supprimer le document",
+    "deleteConfirmation": "Êtes-vous sûr de vouloir supprimer ce document ? Cette action est irréversible.",
+    "updateButton": "Mettre à jour",
+    "addButton": "Ajouter le document",
+    "submitting": "Soumission...",
+    "updating": "Mise à jour...",
+    "deleting": "Suppression...",
+    "cancel": "Annuler",
+    "form": {
+        "attachments": "Pièce jointe"
+    }
   },
   "contracts": {
     "title": "Gestion des Contrats",

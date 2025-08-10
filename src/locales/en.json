@@ -484,7 +484,22 @@
     "noDocumentsFound": "No documents found.",
     "view": "View",
     "download": "Download",
-    "selectInvestment": "Select Investment (Optional)"
+    "edit": "Edit",
+    "delete": "Delete",
+    "selectInvestment": "Select Investment (Optional)",
+    "selectClient": "-- Select Client --",
+    "editDocument": "Edit Document",
+    "deleteDocument": "Delete Document",
+    "deleteConfirmation": "Are you sure you want to delete this document? This action cannot be undone.",
+    "updateButton": "Update",
+    "addButton": "Add Document",
+    "submitting": "Submitting...",
+    "updating": "Updating...",
+    "deleting": "Deleting...",
+    "cancel": "Cancel",
+    "form": {
+        "attachments": "Attachment"
+    }
   },
   "contracts": {
     "title": "Contract Management",
