@@ -17,10 +17,10 @@
         </template>
         <template #cell(actions)="row">
           <b-button size="sm" variant="primary" class="me-1" @click="openEditServiceModal(row.item)">
-            <i class="bi bi-pencil"></i> {{ $t('clientServices.edit') }}
+            <i class="bi bi-pencil"></i>
           </b-button>
           <b-button size="sm" variant="danger" @click="confirmRemoveService(row.item.id)">
-            <i class="bi bi-trash"></i> {{ $t('clientServices.remove') }}
+            <i class="bi bi-trash"></i>
           </b-button>
         </template>
       </b-table>

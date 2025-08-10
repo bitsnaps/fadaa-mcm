@@ -624,8 +624,6 @@
     "actions": "Actions",
     "active": "Actif",
     "inactive": "Inactif",
-    "remove": "Supprimer",
-    "edit": "Modifier",
     "noServices": "Ce client n'a aucun service souscrit.",
     "addSuccess": "Service ajouté avec succès (maquette).",
     "removeSuccess": "Service supprimé avec succès (maquette).",

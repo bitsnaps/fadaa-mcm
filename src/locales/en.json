@@ -658,8 +658,6 @@
     "actions": "Actions",
     "active": "Active",
     "inactive": "Inactive",
-    "remove": "Remove",
-    "edit": "Edit",
     "loading": "Loading...",
     "loadingClientData": "Loading client data...",
     "noServices": "This client has no subscribed services.",
