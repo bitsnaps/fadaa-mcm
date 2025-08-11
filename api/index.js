@@ -23,6 +23,7 @@ const financialsApp = require('./routes/financials');
 const profilesApp = require('./routes/profiles');
 const investorApp = require('./routes/investor');
 const withdrawalsApp = require('./routes/withdrawals');
+const reportsApp = require('./routes/reports');
 const { hashPassword } = require('./lib/auth');
 const models = require('./models');
 
@@ -61,6 +62,8 @@ app.route('/api/financials', financialsApp);
 app.route('/api/profiles', profilesApp);
 app.route('/api/investor', investorApp);
 app.route('/api/withdrawals', withdrawalsApp);
+app.route('/api/reports', reportsApp);
+
 
 // --- Static File Serving ---
 // Serve the uploaded contract files
@@ -102,6 +105,7 @@ app.post('/api/create-user', async (c) => {
       return c.json({ success: false, message: 'An error occurred during user creation' }, 500);
   }
 });
+
 
 serve(app, (info) => {
   console.log(`Listening on http://localhost:${info.port}`);

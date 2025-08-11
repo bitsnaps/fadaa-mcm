@@ -16,8 +16,11 @@
   "dependencies": {
     "@hono/node-server": "^1.14.1",
     "dotenv": "^17.2.0",
+    "exceljs": "^4.4.0",
     "hono": "^4.7.7",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "mysql2": "^3.14.2",
     "node-cron": "^4.2.1",
     "nodemailer": "^6.10.1",

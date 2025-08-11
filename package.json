@@ -16,6 +16,7 @@
     "bootswatch": "^5.3.6",
     "chart.js": "^4.4.9",
     "date-fns": "^4.1.0",
+    "file-saver": "^2.0.5",
     "interactjs": "^1.10.27",
     "pinia": "^3.0.2",
     "vue": "^3.5.13",
