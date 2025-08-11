@@ -1,22 +1,24 @@
 <template>
   <div class="container-fluid p-4">
     <h1 class="h3 mb-4 text-gray-800">{{ $t('investmentTracking.title') }}</h1>
+    <ProfileTabs @update:active-profile="updateActiveProfile" />
 
-    <div v-if="isLoading" class="text-center">
-      <div class="spinner-border" role="status">
-        <span class="visually-hidden">Loading...</span>
+    <div v-if="activeProfileId">
+      <div v-if="isLoading" class="text-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
       </div>
-    </div>
 
-    <div v-if="error" class="alert alert-danger">
-      {{ error }}
-    </div>
+      <div v-if="error" class="alert alert-danger">
+        {{ error }}
+      </div>
 
-    <div v-if="!isLoading && !error">
-      <!-- Investment Summary -->
-      <div class="card shadow mb-4">
-        <div class="card-header py-3">
-          <h6 class="m-0 font-weight-bold text-primary">{{ $t('investmentTracking.summary.title') }}</h6>
+      <div v-if="!isLoading && !error">
+        <!-- Investment Summary -->
+        <div class="card shadow mb-4">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">{{ $t('investmentTracking.summary.title') }}</h6>
         </div>
         <div class="card-body">
           <div class="row">
@@ -210,21 +212,30 @@
         </ul>
       </div>
     </div>
-
   </div>
+    <div v-else class="text-center p-5">
+      <p>{{ $t('investmentTracking.selectProfilePrompt') }}</p>
+    </div>
+</div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { formatCurrency, formatDate } from "@/helpers/utils.js";
 import ApiClient from '@/services/ApiClient.js';
+import ProfileTabs from '@/components/ProfileTabs.vue';
 
 const { t } = useI18n();
 
 const investments = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
+const activeProfileId = ref(null);
+
+const updateActiveProfile = (profileId) => {
+  activeProfileId.value = profileId;
+};
 
 const investmentSummary = computed(() => {
   if (!investments.value.length) {
@@ -278,10 +289,13 @@ const profitSharePayouts = ref([]); // Placeholder - Requires a dedicated endpoi
 
 const documents = ref([]); // Placeholder - Requires a dedicated endpoint
 
-const fetchInvestments = async () => {
+const fetchInvestments = async (profileId) => {
+  if (!profileId) return;
   try {
     isLoading.value = true;
-    const { data: response } = await ApiClient.get('/investments');
+    error.value = null;
+    investments.value = []; // Reset on new fetch
+    const { data: response } = await ApiClient.get('/investments', { params: { profile_id: profileId } });
     if (response.success) {
       investments.value = response.data;
     } else {
@@ -295,7 +309,15 @@ const fetchInvestments = async () => {
   }
 };
 
-onMounted(fetchInvestments);
+onMounted(() => {
+  // Initial fetch will be triggered by the watcher once activeProfileId is set by ProfileTabs
+});
+
+watch(activeProfileId, (newProfileId) => {
+  if (newProfileId) {
+    fetchInvestments(newProfileId);
+  }
+}, { immediate: true });
 
 
 function calculateDaysRemaining(endDateString) {
