@@ -11,6 +11,19 @@ exports.getAllProfiles = async (c) => {
   }
 };
 
+// Get the currently active profile
+exports.getActiveProfile = async (c) => {
+  try {
+    const activeProfile = await Profile.findOne({ where: { is_active: true } });
+    if (!activeProfile) {
+      return c.json({ message: 'No active profile found.' }, 404);
+    }
+    return c.json(activeProfile);
+  } catch (error) {
+    return c.json({ message: 'Error fetching active profile', error: error.message }, 500);
+  }
+};
+
 // Create a new profile
 exports.createProfile = async (c) => {
   try {

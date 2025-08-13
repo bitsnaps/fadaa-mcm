@@ -172,8 +172,8 @@ export const markWithdrawalPaid = (id) => {
 };
 
 // Investor-facing withdrawals and investments endpoints
-export const getMyInvestments = () => {
-  return apiClient.get('/investor/investments');
+export const getMyInvestments = (params = {}) => {
+  return apiClient.get('/investor/investments', { params });
 };
 
 export const getMyWithdrawals = (params = {}) => {

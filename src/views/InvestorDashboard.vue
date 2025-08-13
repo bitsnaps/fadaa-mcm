@@ -5,6 +5,7 @@ import { Line } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler } from 'chart.js';
 import { formatCurrency } from '@/helpers/utils.js';
 import { getMyInvestments, getMyWithdrawals, createWithdrawal } from '@/services/ApiClient.js';
+import profileService from '@/services/profileService.js';
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler);
 
@@ -18,6 +19,7 @@ const invIsLoading = ref(true);
 const invError = ref(null);
 const myInvestments = ref([]);
 const myWithdrawals = ref([]);
+const activeProfileId = ref(null);
 const withdrawalForm = ref({
   investment_id: '',
   amount: '',
@@ -48,14 +50,16 @@ const selectedInvestmentAvailable = computed(() => {
 });
 
 async function loadInvestorData() {
+  if (!activeProfileId.value) return;
   invIsLoading.value = true;
   invError.value = null;
   try {
-    const resInv = await getMyInvestments();
+    const params = { profile_id: activeProfileId.value };
+    const resInv = await getMyInvestments(params);
     if (resInv.data?.success) {
       myInvestments.value = resInv.data.data || [];
     }
-    const resW = await getMyWithdrawals();
+    const resW = await getMyWithdrawals(params);
     if (resW.data?.success) {
       myWithdrawals.value = resW.data.data || [];
     }
@@ -83,6 +87,7 @@ async function submitWithdrawal() {
       amount: amt,
       payment_method: withdrawalForm.value.payment_method || undefined,
       notes: withdrawalForm.value.notes || undefined,
+      profile_id: activeProfileId.value
     };
     const res = await createWithdrawal(payload);
     if (res.data?.success) {
@@ -100,7 +105,22 @@ async function submitWithdrawal() {
   }
 }
 
-onMounted(loadInvestorData);
+async function initializeDashboard() {
+  try {
+    const response = await profileService.getActiveProfile();
+    if (response.data) {
+      activeProfileId.value = response.data.id;
+      await loadInvestorData();
+    } else {
+      throw new Error('No active profile found.');
+    }
+  } catch (error) {
+    invError.value = error.message || 'Failed to initialize dashboard.';
+    console.error(error);
+  }
+}
+
+onMounted(initializeDashboard);
 
 // Yearly data (represents all current investments)
 const yearlyInvestments = ref([
@@ -670,7 +690,6 @@ watch(locale, () => {
         </div>
       </div>
     </div>
-
   </div>
 </template>
 

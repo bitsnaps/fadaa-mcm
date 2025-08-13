@@ -4,6 +4,9 @@ export default {
   getAllProfiles() {
     return ApiClient.get('/profiles');
   },
+  getActiveProfile() {
+    return ApiClient.get('/profiles/active-profile');
+  },
   createProfile(profileData) {
     return ApiClient.post('/profiles', profileData);
   },

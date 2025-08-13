@@ -9,6 +9,7 @@ import {
   getInvestors,
   getInvestmentsList
 } from '@/services/ApiClient.js';
+import ProfileTabs from '@/components/ProfileTabs.vue';
 
 const isLoading = ref(true);
 const error = ref(null);
@@ -18,12 +19,16 @@ const investments = ref([]);
 const statusFilter = ref(''); // '', 'pending', 'approved', 'paid', 'rejected'
 const investmentIdFilter = ref('');
 const investorIdFilter = ref('');
+const activeProfileId = ref(null);
 
 async function loadWithdrawals() {
+  if (!activeProfileId.value) return;
   isLoading.value = true;
   error.value = null;
   try {
-    const params = {};
+    const params = {
+      profile_id: activeProfileId.value
+    };
     if (statusFilter.value) params.status = statusFilter.value;
     if (investmentIdFilter.value) params.investment_id = investmentIdFilter.value;
     if (investorIdFilter.value) params.investor_id = investorIdFilter.value;
@@ -43,10 +48,11 @@ async function loadWithdrawals() {
 }
 
 async function loadFilterData() {
+    if (!activeProfileId.value) return;
   try {
     const [investorsRes, investmentsRes] = await Promise.all([
-      getInvestors(),
-      getInvestmentsList()
+      getInvestors({ profile_id: activeProfileId.value }),
+      getInvestmentsList({ profile_id: activeProfileId.value })
     ]);
     if (investorsRes.data?.success) {
       investors.value = investorsRes.data.data;
@@ -85,9 +91,14 @@ function statusBadgeClass(status) {
   return 'bg-secondary';
 }
 
-onMounted(() => {
+function onProfileChange(profileId) {
+  activeProfileId.value = profileId;
   loadWithdrawals();
   loadFilterData();
+}
+
+onMounted(() => {
+  // loadWithdrawals and loadFilterData will be called by onProfileChange
 });
 </script>
 
@@ -100,123 +111,127 @@ onMounted(() => {
       </button>
     </div>
 
-    <div class="card mb-3 shadow-sm">
-      <div class="card-header bg-fadaa-light-blue">Filters</div>
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-3">
-            <label class="form-label">Status</label>
-            <select v-model="statusFilter" class="form-select">
-              <option value="">All</option>
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="paid">Paid</option>
-              <option value="rejected">Rejected</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">Investment</label>
-            <select v-model="investmentIdFilter" class="form-select">
-              <option value="">All</option>
-              <option v-for="inv in investments" :key="inv.id" :value="inv.id">
-                {{ inv.name }}
-              </option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">Investor</label>
-            <select v-model="investorIdFilter" class="form-select">
-              <option value="">All</option>
-              <option v-for="inv in investors" :key="inv.id" :value="inv.id">
-                {{ inv.first_name }} {{ inv.last_name }} (ID: {{ inv.id }})
-              </option>
-            </select>
-          </div>
-          <div class="col-md-3 d-flex align-items-end">
-            <button class="btn btn-primary w-100" @click="loadWithdrawals">
-              <i class="bi bi-filter-square me-1"></i> Apply
-            </button>
+    <ProfileTabs @update:activeProfile="onProfileChange">
+      <template #default="{ profileId }">
+        <div class="card mb-3 shadow-sm">
+          <div class="card-header bg-fadaa-light-blue">Filters</div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select v-model="statusFilter" class="form-select">
+                  <option value="">All</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="paid">Paid</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Investment</label>
+                <select v-model="investmentIdFilter" class="form-select">
+                  <option value="">All</option>
+                  <option v-for="inv in investments" :key="inv.id" :value="inv.id">
+                    {{ inv.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Investor</label>
+                <select v-model="investorIdFilter" class="form-select">
+                  <option value="">All</option>
+                  <option v-for="inv in investors" :key="inv.id" :value="inv.id">
+                    {{ inv.first_name }} {{ inv.last_name }} (ID: {{ inv.id }})
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-3 d-flex align-items-end">
+                <button class="btn btn-primary w-100" @click="loadWithdrawals">
+                  <i class="bi bi-filter-square me-1"></i> Apply
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div v-if="isLoading" class="text-center my-5">
-      <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
-    </div>
-    <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
-
-    <div v-else class="card shadow-sm">
-      <div class="card-header bg-fadaa-light-blue d-flex justify-content-between align-items-center">
-        <span>Withdrawals</span>
-        <span class="badge bg-secondary">{{ withdrawals.length }}</span>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-bordered table-hover align-middle">
-            <thead>
-              <tr>
-                <th width="80">ID</th>
-                <th>Requested At</th>
-                <th>Investor</th>
-                <th>Investment</th>
-                <th>Amount</th>
-                <th>Payment Method</th>
-                <th>Status</th>
-                <th width="240">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="withdrawals.length === 0">
-                <td colspan="8" class="text-center">No withdrawals found.</td>
-              </tr>
-              <tr v-for="w in withdrawals" :key="w.id">
-                <td>{{ w.id }}</td>
-                <td>{{ new Date(w.requested_at || w.created_at).toLocaleString() }}</td>
-                <td>
-                  <div>{{ w.investor?.first_name }} {{ w.investor?.last_name }}</div>
-                  <small class="text-muted">ID: {{ w.investor?.id }}</small>
-                </td>
-                <td>
-                  <div>{{ w.Investment?.name || ('#' + w.investment_id) }}</div>
-                  <small class="text-muted">Investment ID: {{ w.investment_id }}</small>
-                </td>
-                <td>{{ formatCurrency(w.amount) }}</td>
-                <td>{{ w.payment_method || '—' }}</td>
-                <td>
-                  <span :class="['badge', statusBadgeClass(w.status)]">{{ w.status }}</span>
-                </td>
-                <td>
-                  <div class="btn-group btn-group-sm" role="group">
-                    <button
-                      v-if="w.status === 'pending'"
-                      class="btn btn-outline-primary"
-                      @click="onApprove(w.id)"
-                    >
-                      <i class="bi bi-check2-circle"></i> Approve
-                    </button>
-                    <button
-                      v-if="w.status === 'pending'"
-                      class="btn btn-outline-danger"
-                      @click="onReject(w.id)"
-                    >
-                      <i class="bi bi-x-circle"></i> Reject
-                    </button>
-                    <button
-                      v-if="w.status === 'approved'"
-                      class="btn btn-outline-success"
-                      @click="onMarkPaid(w.id)"
-                    >
-                      <i class="bi bi-cash-coin"></i> Mark Paid
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div v-if="isLoading" class="text-center my-5">
+          <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
         </div>
-      </div>
-    </div>
+        <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
+
+        <div v-else class="card shadow-sm">
+          <div class="card-header bg-fadaa-light-blue d-flex justify-content-between align-items-center">
+            <span>Withdrawals</span>
+            <span class="badge bg-secondary">{{ withdrawals.length }}</span>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th width="80">ID</th>
+                    <th>Requested At</th>
+                    <th>Investor</th>
+                    <th>Investment</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                    <th width="240">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="withdrawals.length === 0">
+                    <td colspan="8" class="text-center">No withdrawals found.</td>
+                  </tr>
+                  <tr v-for="w in withdrawals" :key="w.id">
+                    <td>{{ w.id }}</td>
+                    <td>{{ new Date(w.requested_at || w.created_at).toLocaleString() }}</td>
+                    <td>
+                      <div>{{ w.investor?.first_name }} {{ w.investor?.last_name }}</div>
+                      <small class="text-muted">ID: {{ w.investor?.id }}</small>
+                    </td>
+                    <td>
+                      <div>{{ w.Investment?.name || ('#' + w.investment_id) }}</div>
+                      <small class="text-muted">Investment ID: {{ w.investment_id }}</small>
+                    </td>
+                    <td>{{ formatCurrency(w.amount) }}</td>
+                    <td>{{ w.payment_method || '—' }}</td>
+                    <td>
+                      <span :class="['badge', statusBadgeClass(w.status)]">{{ w.status }}</span>
+                    </td>
+                    <td>
+                      <div class="btn-group btn-group-sm" role="group">
+                        <button
+                          v-if="w.status === 'pending'"
+                          class="btn btn-outline-primary"
+                          @click="onApprove(w.id)"
+                        >
+                          <i class="bi bi-check2-circle"></i> Approve
+                        </button>
+                        <button
+                          v-if="w.status === 'pending'"
+                          class="btn btn-outline-danger"
+                          @click="onReject(w.id)"
+                        >
+                          <i class="bi bi-x-circle"></i> Reject
+                        </button>
+                        <button
+                          v-if="w.status === 'approved'"
+                          class="btn btn-outline-success"
+                          @click="onMarkPaid(w.id)"
+                        >
+                          <i class="bi bi-cash-coin"></i> Mark Paid
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </template>
+    </ProfileTabs>
   </div>
 </template>
 
