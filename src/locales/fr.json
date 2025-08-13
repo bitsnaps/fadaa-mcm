@@ -931,5 +931,66 @@
       "active": "Actif",
       "pending": "En attente"
     }
-  }
+  },
+  "manageWithdrawals": {
+    "title": "Gérer les Retraits",
+    "add": "Ajouter un Retrait",
+    "refresh": "Rafraîchir",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce retrait ?",
+    "approveConfirm": "Approuver ce retrait ?",
+    "rejectConfirm": "Rejeter ce retrait ?",
+    "markPaidConfirm": "Marquer ce retrait comme PAYÉ ?",
+    "filters": {
+      "title": "Filtres",
+      "status": "Statut",
+      "all": "Tous",
+      "investment": "Investissement",
+      "investor": "Investisseur",
+      "apply": "Appliquer"
+    },
+    "table": {
+      "title": "Retraits",
+      "id": "ID",
+      "requestedAt": "Demandé le",
+      "investor": "Investisseur",
+      "investment": "Investissement",
+      "amount": "Montant",
+      "paymentMethod": "Moyen de Paiement",
+      "status": "Statut",
+      "actions": "Actions",
+      "noWithdrawals": "Aucun retrait trouvé."
+    },
+    "actions": {
+      "approve": "Approuver",
+      "reject": "Rejeter",
+      "markPaid": "Marquer Payé",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    },
+    "modal": {
+      "addTitle": "Ajouter un Retrait",
+      "editTitle": "Modifier le Retrait",
+      "investor": "Investisseur",
+      "investment": "Investissement",
+      "amount": "Montant",
+      "paymentMethod": "Moyen de Paiement",
+      "selectPaymentMethod": "Sélectionner un moyen de paiement",
+      "status": "Statut",
+      "notes": "Notes",
+      "close": "Fermer",
+      "save": "Enregistrer"
+    }
+  },
+  "withdrawalStatuses": {
+    "pending": "En attente",
+    "approved": "Approuvé",
+    "rejected": "Rejeté",
+    "paid": "Payé",
+    "cancelled": "Annulé"
+  },
+  "paymentMethods": {
+    "bank_transfer": "Virement Bancaire",
+    "cash": "Espèces"
+  },
+  "loading": "Chargement..."
 }

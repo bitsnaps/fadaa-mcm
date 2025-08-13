@@ -988,5 +988,66 @@
       "active": "Active",
       "pending": "Pending"
     }
-  }
+  },
+  "manageWithdrawals": {
+    "title": "Manage Withdrawals",
+    "add": "Add Withdrawal",
+    "refresh": "Refresh",
+    "deleteConfirm": "Are you sure you want to delete this withdrawal?",
+    "approveConfirm": "Approve this withdrawal?",
+    "rejectConfirm": "Reject this withdrawal?",
+    "markPaidConfirm": "Mark this withdrawal as PAID?",
+    "filters": {
+      "title": "Filters",
+      "status": "Status",
+      "all": "All",
+      "investment": "Investment",
+      "investor": "Investor",
+      "apply": "Apply"
+    },
+    "table": {
+      "title": "Withdrawals",
+      "id": "ID",
+      "requestedAt": "Requested At",
+      "investor": "Investor",
+      "investment": "Investment",
+      "amount": "Amount",
+      "paymentMethod": "Payment Method",
+      "status": "Status",
+      "actions": "Actions",
+      "noWithdrawals": "No withdrawals found."
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "markPaid": "Mark Paid",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "modal": {
+      "addTitle": "Add Withdrawal",
+      "editTitle": "Edit Withdrawal",
+      "investor": "Investor",
+      "investment": "Investment",
+      "amount": "Amount",
+      "paymentMethod": "Payment Method",
+      "selectPaymentMethod": "Select Payment Method",
+      "status": "Status",
+      "notes": "Notes",
+      "close": "Close",
+      "save": "Save Changes"
+    }
+  },
+  "withdrawalStatuses": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "paid": "Paid",
+    "cancelled": "Cancelled"
+  },
+  "paymentMethods": {
+    "bank_transfer": "Bank Transfer",
+    "cash": "Cash"
+  },
+  "loading": "Loading..."
 }

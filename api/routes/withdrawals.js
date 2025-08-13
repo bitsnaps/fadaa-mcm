@@ -211,4 +211,129 @@ withdrawalsApp.put('/:id/mark-paid', async (c) => {
   }
 });
 
+// GET /withdrawals/:id - get a single withdrawal by its ID
+withdrawalsApp.get('/:id', async (c) => {
+  try {
+    const { id } = c.req.param();
+    const withdrawal = await models.Withdrawal.findByPk(id, {
+      include: [
+        { model: models.Investment },
+        { model: models.Profile },
+        { model: models.User, as: 'investor', attributes: ['id', 'first_name', 'last_name', 'email'] },
+        { model: models.User, as: 'processed_by_user', attributes: ['id', 'first_name', 'last_name', 'email'] },
+      ],
+    });
+
+    if (!withdrawal) {
+      return c.json({ success: false, message: 'Withdrawal not found' }, 404);
+    }
+
+    return c.json({ success: true, data: withdrawal });
+  } catch (error) {
+    console.error('Error fetching withdrawal:', error);
+    return c.json({ success: false, message: 'Failed to fetch withdrawal' }, 500);
+  }
+});
+
+
+// POST /withdrawals - create a new withdrawal
+withdrawalsApp.post('/', async (c) => {
+  try {
+    const user = c.get('user');
+    const {
+      investment_id,
+      investor_id,
+      profile_id,
+      amount,
+      status = 'pending',
+      payment_method,
+      notes,
+    } = await c.req.json();
+
+    if (!investment_id || !investor_id || !profile_id || !amount) {
+      return c.json({ success: false, message: 'Missing required fields' }, 400);
+    }
+
+    const newWithdrawal = await models.Withdrawal.create({
+      investment_id,
+      investor_id,
+      profile_id,
+      amount,
+      status,
+      payment_method,
+      notes,
+      requested_at: new Date(),
+      processed_by: user.id,
+    });
+
+    return c.json({ success: true, message: 'Withdrawal created successfully', data: newWithdrawal }, 201);
+  } catch (error) {
+    console.error('Error creating new withdrawal:', error);
+    return c.json({ success: false, message: 'Failed to create new withdrawal' }, 500);
+  }
+});
+
+// PUT /withdrawals/:id - update an existing withdrawal
+withdrawalsApp.put('/:id', async (c) => {
+  try {
+    const { id } = c.req.param();
+    const user = c.get('user');
+    const {
+      amount,
+      status,
+      payment_method,
+      notes,
+    } = await c.req.json();
+
+    const wd = await loadWithdrawalOr404(id);
+    if (!wd) {
+      return c.json({ success: false, message: 'Withdrawal not found' }, 404);
+    }
+
+    await wd.update({
+      amount,
+      status,
+      payment_method,
+      notes,
+      processed_by: user.id,
+    });
+
+    const finalWithdrawal = await models.Withdrawal.findByPk(wd.id, {
+      include: [
+        { model: models.Investment },
+        { model: models.Profile },
+        { model: models.User, as: 'investor', attributes: ['id', 'first_name', 'last_name', 'email'] },
+        { model: models.User, as: 'processed_by_user', attributes: ['id', 'first_name', 'last_name', 'email'] },
+      ],
+    });
+
+    return c.json({ success: true, message: 'Withdrawal updated successfully', data: finalWithdrawal });
+  } catch (error) {
+    console.error('Error updating withdrawal:', error);
+    return c.json({ success: false, message: 'Failed to update withdrawal' }, 500);
+  }
+});
+
+// DELETE /withdrawals/:id - delete a withdrawal
+withdrawalsApp.delete('/:id', async (c) => {
+  try {
+    const { id } = c.req.param();
+    const wd = await loadWithdrawalOr404(id);
+    if (!wd) {
+      return c.json({ success: false, message: 'Withdrawal not found' }, 404);
+    }
+
+    if (wd.status === 'paid' || wd.status === 'approved') {
+       return c.json({ success: false, message: `Cannot delete a withdrawal with status: ${wd.status}` }, 400);
+    }
+
+    await wd.destroy();
+    return c.json({ success: true, message: 'Withdrawal deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting withdrawal:', error);
+    return c.json({ success: false, message: 'Failed to delete withdrawal' }, 500);
+  }
+});
+
+
 module.exports = withdrawalsApp;

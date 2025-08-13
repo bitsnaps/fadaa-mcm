@@ -171,6 +171,23 @@ export const markWithdrawalPaid = (id) => {
   return apiClient.put(`/withdrawals/${id}/mark-paid`);
 };
 
+export const getWithdrawal = (id) => {
+  return apiClient.get(`/withdrawals/${id}`);
+};
+
+export const createWithdrawalAsAdmin = (data) => {
+  return apiClient.post('/withdrawals', data);
+};
+
+export const updateWithdrawal = (id, data) => {
+  return apiClient.put(`/withdrawals/${id}`, data);
+};
+
+export const deleteWithdrawal = (id) => {
+  return apiClient.delete(`/withdrawals/${id}`);
+};
+
+
 // Investor-facing withdrawals and investments endpoints
 export const getMyInvestments = (params = {}) => {
   return apiClient.get('/investor/investments', { params });
