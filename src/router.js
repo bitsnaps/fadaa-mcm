@@ -1,4 +1,5 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router';
+import { useAuthStore } from './stores/auth'; // Import the auth store
 import Login from './views/Login.vue';
 import AdminDashboard from './views/AdminDashboard.vue';
 import AssistantDashboard from './views/AssistantDashboard.vue';
@@ -237,11 +238,10 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  // history: createWebHistory(),
+  history: createWebHashHistory(),
   routes
 });
-
-import { useAuthStore } from './stores/auth'; // Import the auth store
 
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore(); // Initialize the store
