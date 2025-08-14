@@ -48,6 +48,11 @@ module.exports = (sequelize) => {
         model: 'profiles',
         key: 'id'
       }
+    },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'Comprehensive',
     }
   }, {
     tableName: 'investments',

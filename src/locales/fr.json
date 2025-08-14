@@ -108,10 +108,12 @@
     "noInvestmentsFound": "Aucun investissement trouvé.",
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet investissement ?",
     "tableHeaders": {
+      "investor": "Investisseur",
       "name": "Nom",
       "type": "Type",
-      "initialValue": "Valeur Initiale",
-      "currentValue": "Valeur Actuelle",
+      "investment_amount": "Montant",
+      "starting_date": "Début",
+      "ending_date": "Fin",      
       "status": "Statut",
       "actions": "Actions",
       "description": "Description"
@@ -672,7 +674,14 @@
         "utilities": "Services Publics",
         "other": "Autres"
       }
-    }
+    },
+    "investmentBreakdown": {
+      "title": "Répartition des investissements par type",
+      "type": "Type",
+      "totalInvested": "Total investi",
+      "totalProfitShare": "Partage des bénéfices totaux",
+      "chartTitle": "Répartition des investissements par type"
+    }      
   },
   "complianceManagement": {
     "title": "Gestion de la Conformité",

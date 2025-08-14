@@ -112,10 +112,11 @@
       "branch": "Branch",
       "name": "Name",
       "percentage": "Percentage",
-      "investment_amount": "Investment Amount",
+      "investment_amount": "Amount",
       "starting_date": "Start Date",
       "ending_date": "End Date",
-      "actions": "Actions"
+      "actions": "Actions",
+      "type": "Type"
     },
     "edit": "Edit",
     "delete": "Delete"
@@ -250,6 +251,7 @@
       "branchName": "Branch Name",
       "yourInvestment": "Your Investment",
       "yourStake": "Your Stake (%)",
+      "type": "Type",
       "contractStart": "Contract Start",
       "contractEnd": "Contract End",
       "branchNetProfit": "Branch Net Profit (Period)",
@@ -721,7 +723,14 @@
         "utilities": "Utilities",
         "other": "Other"
       }
-    }
+    },
+    "investmentBreakdown": {
+      "title": "Investment Breakdown by Type",
+      "type": "Type",
+      "totalInvested": "Total Invested",
+      "totalProfitShare": "Total Profit Share",
+      "chartTitle": "Investment Distribution by Type"
+    }    
   },
   "complianceManagement": {
     "title": "Compliance Management",

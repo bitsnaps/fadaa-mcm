@@ -5,31 +5,19 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const investment = ref(null);
 
-// Mock investment data - replace with API call
-const mockInvestment = {
-  id: 'inv001',
-  name: 'Tech Startup Fund',
-  description: 'Early-stage investment in emerging technology companies.',
-  initialInvestment: 50000,
-  currentValue: 75000,
-  returnPercentage: 50,
-  status: 'Active',
-  investors: [
-    { id: 'usr001', name: 'Alice Johnson' },
-    { id: 'usr002', name: 'Bob Williams' },
-  ],
-  financials: {
-    revenue: 120000,
-    expenses: 45000,
-    profit: 75000,
-  },
-};
+import ApiClient from '@/services/ApiClient.js';
 
-const fetchInvestmentDetails = (investmentId) => {
-  // Simulate API call
-  setTimeout(() => {
-    investment.value = mockInvestment;
-  }, 500);
+const fetchInvestmentDetails = async (investmentId) => {
+  try {
+    const { data: response } = await ApiClient.get(`/investments/${investmentId}`);
+    if (response.success) {
+      investment.value = response.data;
+    } else {
+      console.error(response.message);
+    }
+  } catch (error) {
+    console.error('Error fetching investment details:', error);
+  }
 };
 
 onMounted(() => {
@@ -55,17 +43,16 @@ onMounted(() => {
           <div class="col-md-6">
             <h4>Investment Details</h4>
             <ul class="list-group">
-              <li class="list-group-item"><strong>Initial Investment:</strong> ${{ investment.initialInvestment.toLocaleString() }}</li>
-              <li class="list-group-item"><strong>Current Value:</strong> ${{ investment.currentValue.toLocaleString() }}</li>
-              <li class="list-group-item"><strong>Return:</strong> {{ investment.returnPercentage }}%</li>
+              <li class="list-group-item"><strong>Type:</strong> {{ investment.type }}</li>
+              <li class="list-group-item"><strong>Initial Investment:</strong> ${{ investment.investment_amount.toLocaleString() }}</li>
+              <li class="list-group-item"><strong>Percentage:</strong> {{ investment.percentage }}%</li>
             </ul>
           </div>
           <div class="col-md-6">
             <h4>Global Financials</h4>
             <ul class="list-group">
-              <li class="list-group-item"><strong>Total Revenue:</strong> ${{ investment.financials.revenue.toLocaleString() }}</li>
-              <li class="list-group-item"><strong>Total Expenses:</strong> ${{ investment.financials.expenses.toLocaleString() }}</li>
-              <li class="list-group-item"><strong>Net Profit:</strong> ${{ investment.financials.profit.toLocaleString() }}</li>
+              <li class="list-group-item"><strong>Branch Net Profit:</strong> ${{ investment.branchNetProfitSelectedPeriod.toLocaleString() }}</li>
+              <li class="list-group-item"><strong>Your Profit Share:</strong> ${{ investment.yourProfitShareSelectedPeriod.toLocaleString() }}</li>
             </ul>
           </div>
         </div>
@@ -73,8 +60,8 @@ onMounted(() => {
         <div class="mt-4">
           <h4>Investors</h4>
           <ul class="list-group">
-            <li v-for="investor in investment.investors" :key="investor.id" class="list-group-item">
-              {{ investor.name }}
+            <li class="list-group-item">
+              {{ investment.investor.name }}
             </li>
           </ul>
         </div>

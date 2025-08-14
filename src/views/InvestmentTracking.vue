@@ -110,6 +110,7 @@
                   <th>{{ $t('investmentTracking.breakdown.branchName') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.yourInvestment') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.yourStake') }}</th>
+                  <th>{{ $t('investmentTracking.breakdown.type') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.contractStart') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.contractEnd') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.totalIncome') }}</th>
@@ -124,6 +125,7 @@
                   <td>{{ branch.branchName }}</td>
                   <td>{{ formatCurrency(branch.investmentAmount) }}</td>
                   <td>{{ branch.participationPercentage }}%</td>
+                  <td>{{ branch.type }}</td>
                   <td>{{ branch.contractStartDate }}</td>
                   <td>{{ branch.contractEndDate }} ({{ branch.daysRemaining }} {{ $t('investmentTracking.breakdown.daysRemaining') }})</td>
                   <td>{{ formatCurrency(branch.totalIncome) }}</td>
@@ -272,6 +274,7 @@ const branchInvestments = computed(() => {
       branchName: inv.Branch ? inv.Branch.name : 'N/A',
       investmentAmount: inv.investment_amount,
       participationPercentage: inv.percentage,
+      type: inv.type,
       contractStartDate: formatDate(inv.starting_date),
       contractEndDate: formatDate(inv.ending_date),
       daysRemaining: calculateDaysRemaining(inv.ending_date),

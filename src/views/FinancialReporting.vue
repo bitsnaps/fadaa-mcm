@@ -95,7 +95,43 @@
             </div>
           </div>
         </div>
-        <div v-else class="text-center">
+          <!-- Section 3: Investment Breakdown by Type -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-fadaa-light-blue">
+            <h5 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>{{ $t('financialReporting.investmentBreakdown.title') }}</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <Doughnut id="investment-pie-chart" v-if="investmentBreakdown.labels.length" :data="investmentBreakdown" :options="pieChartOptions" />
+                <p v-else class="text-center text-muted">{{ $t('financialReporting.revenueVsExpenses.loading') }}</p>
+              </div>
+              <div class="col-md-8">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>{{ $t('financialReporting.investmentBreakdown.type') }}</th>
+                      <th>{{ $t('financialReporting.investmentBreakdown.totalInvested') }}</th>
+                      <th>{{ $t('financialReporting.investmentBreakdown.totalProfitShare') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(label, index) in investmentBreakdown.labels" :key="index">
+                      <td>{{ label }}</td>
+                      <td>{{ formatCurrency(investmentBreakdown.datasets[0].data[index]) }}</td>
+                      <td>{{ formatCurrency(investmentBreakdown.profitShares[index]) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+        <div v-if="!activeProfileId" class="text-center">
           <p>{{ $t('financialReporting.noProfileSelected') }}</p>
         </div>
       </template>
@@ -110,16 +146,17 @@ import { useI18n } from 'vue-i18n';
 import { Line, Bar } from 'vue-chartjs';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import {
-  Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler
+  Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler, ArcElement
 } from 'chart.js';
 import { formatCurrency } from '@/helpers/utils.js';
 import FinancialsService from '@/services/FinancialsService';
 import { getExpenses } from '@/services/ExpenseService';
+import { getInvestments } from '@/services/ApiClient';
 import ReportService from '@/services/ReportService';
 import { saveAs } from 'file-saver';
 
 
-ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler);
+ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler, ArcElement);
 
 const { t } = useI18n();
 const activeProfileId = ref(null);
@@ -165,6 +202,7 @@ const generateReport = async () => {
 // --- Chart Data & Options ---
 const revenueExpenseChartData = ref({ labels: [], datasets: [] });
 const expenseBreakdownChartData = ref({ labels: [], datasets: [] });
+const investmentBreakdown = ref({ labels: [], datasets: [{ data: [] }], profitShares: [] });
 const expenseSummary = ref([]);
 const lineChartOptions = ref({
   responsive: true,
@@ -191,6 +229,20 @@ const barChartOptions = ref({
     x: { beginAtZero: true, title: { display: true, text: t('financialReporting.revenueVsExpenses.amountInThousands') } },
   },
 });
+const pieChartOptions = ref({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'bottom',
+    },
+    title: {
+      display: true,
+      text: t('financialReporting.investmentBreakdown.chartTitle'),
+      font: { size: 16 },
+    },
+  },
+});
 
 // --- Data Fetching ---
 const fetchFinancialData = async () => {
@@ -201,6 +253,8 @@ const fetchFinancialData = async () => {
     await fetchRevenueExpenseData();
     // Fetch data for Expense Breakdown chart
     await fetchExpenseBreakdownData();
+    // Fetch data for Investment Breakdown
+    await fetchInvestmentData();
 
   } catch (error) {
     console.error('Error fetching financial data:', error);
@@ -288,6 +342,42 @@ const fetchExpenseBreakdownData = async () => {
     console.error('Error fetching expense breakdown:', error);
     expenseBreakdownChartData.value = { labels: [], datasets: [] };
     expenseSummary.value = [];
+  }
+};
+
+const fetchInvestmentData = async () => {
+  if (!activeProfileId.value) return;
+  try {
+    const response = await getInvestments(activeProfileId.value);
+    if (response.data.success) {
+      const investments = response.data.data;
+      const breakdown = investments.reduce((acc, investment) => {
+        const type = investment.type || 'Uncategorized';
+        if (!acc[type]) {
+          acc[type] = { totalInvested: 0, totalProfitShare: 0 };
+        }
+        acc[type].totalInvested += investment.investment_amount;
+        acc[type].totalProfitShare += investment.yourProfitShareSelectedPeriod || 0;
+        return acc;
+      }, {});
+
+      const labels = Object.keys(breakdown);
+      const totalInvestedData = labels.map(label => breakdown[label].totalInvested);
+      const profitSharesData = labels.map(label => breakdown[label].totalProfitShare);
+
+      investmentBreakdown.value = {
+        labels,
+        datasets: [
+          {
+            backgroundColor: ['#42A5F5', '#66BB6A', '#FFA726', '#26A69A', '#AB47BC'],
+            data: totalInvestedData,
+          },
+        ],
+        profitShares: profitSharesData,
+      };
+    }
+  } catch (error) {
+    console.error('Error fetching investment data:', error);
   }
 };
 

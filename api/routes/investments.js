@@ -29,10 +29,10 @@ investmentsApp.get('/', async (c) => {
 
         const enrichedInvestments = await Promise.all(
             investments.map(async (investment) => {
-                const calculations = await getInvestmentCalculations(investment);
+                const calculations = await getInvestmentCalculations([investment]);
                 return {
                     ...investment.toJSON(),
-                    ...calculations,
+                    ...calculations[investment.id],
                 };
             })
         );

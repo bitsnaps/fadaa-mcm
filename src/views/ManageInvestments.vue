@@ -90,7 +90,11 @@ const openAddModal = () => {
 
 const openEditModal = (investment) => {
     isEditMode.value = true;
-    currentInvestment.value = { ...investment };
+    currentInvestment.value = {
+        ...investment,
+        starting_date: investment.starting_date ? new Date(investment.starting_date).toISOString().split('T')[0] : '',
+        ending_date: investment.ending_date ? new Date(investment.ending_date).toISOString().split('T')[0] : ''
+    };
     modalInstance.value.show();
 };
 
@@ -172,6 +176,7 @@ const handleDelete = async (id) => {
                                 <th scope="col">{{ t('investments.tableHeaders.name') }}</th>
                                 <th scope="col">{{ t('investments.tableHeaders.percentage') }}</th>
                                 <th scope-="col">{{ t('investments.tableHeaders.investment_amount') }}</th>
+                                <th scope-="col">{{ t('investments.tableHeaders.type') }}</th>
                                 <th scope="col">{{ t('investments.tableHeaders.starting_date') }}</th>
                                 <th scope="col">{{ t('investments.tableHeaders.ending_date') }}</th>
                                 <th scope="col" class="text-center">{{ t('investments.tableHeaders.actions') }}</th>
@@ -184,6 +189,7 @@ const handleDelete = async (id) => {
                                 <td>{{ investment.name }}</td>
                                 <td>{{ investment.percentage }}%</td>
                                 <td>{{ investment.investment_amount }}</td>
+                                <td>{{ investment.type }}</td>
                                 <td>{{ investment.starting_date ? new Date(investment.starting_date).toLocaleDateString() : 'N/A' }}</td>
                                 <td>{{ investment.ending_date ? new Date(investment.ending_date).toLocaleDateString() : 'N/A' }}</td>
                                 <td class="text-center">
@@ -237,6 +243,13 @@ const handleDelete = async (id) => {
                             <div class="mb-3">
                                 <label for="inv-percentage" class="form-label">{{ t('investments.tableHeaders.percentage') }}</label>
                                 <input type="number" id="inv-percentage" class="form-control" v-model.number="currentInvestment.percentage">
+                            </div>
+                            <div class="mb-3">
+                                <label for="inv-type" class="form-label">{{ t('investments.tableHeaders.type') }}</label>
+                                <select id="inv-type" class="form-select" v-model="currentInvestment.type">
+                                    <option value="Comprehensive">Comprehensive</option>
+                                    <option value="Contractual">Contractual</option>
+                                </select>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
