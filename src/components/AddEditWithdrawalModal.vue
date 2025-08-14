@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, defineEmits } from 'vue';
+import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();

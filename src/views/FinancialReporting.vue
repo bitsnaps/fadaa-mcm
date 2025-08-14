@@ -15,24 +15,15 @@
                 <div class="card-body">
                   <form @submit.prevent="generateReport">
                     <div class="row g-3">
-                      <div class="col-md-3">
-                        <label for="reportType" class="form-label">{{ $t('financialReporting.customReport.reportType') }}</label>
-                        <select id="reportType" class="form-select" v-model="reportConfig.type">
-                          <option value="profit_loss">{{ $t('financialReporting.customReport.types.profit_loss') }}</option>
-                          <option value="balance_sheet">{{ $t('financialReporting.customReport.types.balance_sheet') }}</option>
-                          <option value="cash_flow">{{ $t('financialReporting.customReport.types.cash_flow') }}</option>
-                          <option value="expense_details">{{ $t('financialReporting.customReport.types.expense_details') }}</option>
-                        </select>
-                      </div>
-                      <div class="col-md-3">
+                      <div class="col-md-4">
                         <label for="dateRangeStart" class="form-label">{{ $t('financialReporting.customReport.startDate') }}</label>
                         <input type="date" id="dateRangeStart" class="form-control" v-model="reportConfig.startDate">
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-4">
                         <label for="dateRangeEnd" class="form-label">{{ $t('financialReporting.customReport.endDate') }}</label>
                         <input type="date" id="dateRangeEnd" class="form-control" v-model="reportConfig.endDate">
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-4">
                         <label for="reportFormat" class="form-label">{{ $t('financialReporting.customReport.format') }}</label>
                         <select id="reportFormat" class="form-select" v-model="reportConfig.format">
                           <option value="pdf">PDF</option>
@@ -136,7 +127,6 @@ const revExpFilter = ref('quarterly'); // quarterly, yearly
 
 // --- Report Generation Config ---
 const reportConfig = ref({
-  type: 'profit_loss',
   startDate: new Date().toISOString().split('T')[0],
   endDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0],
   format: 'pdf',
@@ -154,7 +144,6 @@ const generateReport = async () => {
   };
 
   reportGeneratedMessage.value = t('financialReporting.customReport.generatingMessage', {
-    type: t(`financialReporting.customReport.types.${config.type}`),
     format: config.format.toUpperCase(),
   });
 
