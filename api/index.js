@@ -163,7 +163,6 @@ app.post('/api/create-user', async (c) => {
           preferences
       });
 
-      console.log('User created:', email);
       return c.json({ success: true, message: 'User created successfully', userId: newUser.id });
   } catch (error) {
       console.error('User creation error:', error);
@@ -171,6 +170,200 @@ app.post('/api/create-user', async (c) => {
   }
 });
 
+// Create a new role
+// curl -X POST http://localhost:3000/api/create-role -H "Content-Type: application/json" -d '{ "name": "Test", "description": "Test role" }'
+app.post('/api/create-role', async (c) => {
+  try {
+    const { name, description } = await c.req.json();
+
+    if (!name) {
+      return c.json({ success: false, message: 'Missing required fields' }, 400);
+    }
+
+    const existingRole = await models.Role.findOne({ where: { name } });
+    if (existingRole) {
+      return c.json({ success: false, message: 'Role already exists' }, 409);
+    }
+
+    const newRole = await models.Role.create({
+      name,
+      description,
+    });
+
+    return c.json({ success: true, message: 'Role created successfully', roleId: newRole.id });
+  } catch (error){
+    return c.json({ success: false, message: 'Role creation error.' }, 500);
+  }
+});
+
+// Create a new branch
+// curl -X POST http://localhost:3000/api/create-branch -H "Content-Type: application/json" -d '{ "name": "Main Branch", "location": "Headquarters", "status": "active" }'
+app.post('/api/create-branch', async (c) => {
+    try {
+        const { name, location, status } = await c.req.json();
+
+        if (!name || !location) {
+            return c.json({ success: false, message: 'Missing required fields' }, 400);
+        }
+
+        const existingBranch = await models.Branch.findOne({ where: { name } });
+        if (existingBranch) {
+            return c.json({ success: false, message: 'Branch already exists' }, 409);
+        }
+
+        const newBranch = await models.Branch.create({
+            name,
+            location,
+            status
+        });
+
+        return c.json({ success: true, message: 'Branch created successfully', branchId: newBranch.id });
+    } catch (error) {
+      return c.json({ success: false, message: 'Branch creation error.' }, 500);
+  }
+});
+
+// Create a new office
+// curl -X POST http://localhost:3000/api/create-office -H "Content-Type: application/json" -d '{ "name": "Big Room", "type": "Coworking Desk", "capacity": 30, "status": "Available", "amenities": "Wi-Fi, Coffee", "branch_id": 1 }'
+app.post('/api/create-office', async (c) => {
+    try {
+        const { name, type, capacity, status, amenities, branch_id } = await c.req.json();
+
+        if (!name || !type || !branch_id) {
+            return c.json({ success: false, message: 'Missing required fields' }, 400);
+        }
+
+        const existingOffice = await models.Office.findOne({ where: { name, branch_id } });
+        if (existingOffice) {
+            return c.json({ success: false, message: 'Office already exists in this branch' }, 409);
+        }
+
+        const newOffice = await models.Office.create({
+            name,
+            type,
+            capacity,
+            status,
+            amenities,
+            branch_id
+        });
+
+        return c.json({ success: true, message: 'New office created successfully', officeId: newOffice.id });
+      } catch (error) {
+        return c.json({ success: false, message: 'Tax creation error.' }, 500);
+      }
+});
+
+// Create a new service category
+// curl -X POST http://localhost:3000/api/create-service-category -H "Content-Type: application/json" -d '{ "name": "Rental Equipement", "description": "Rental of any type of equipements." }'
+app.post('/api/create-service-category', async (c) => {
+    try {
+        const { name, description } = await c.req.json();
+
+        if (!name) {
+            return c.json({ success: false, message: 'Missing required fields' }, 400);
+        }
+
+        const existingServiceCategory = await models.ServiceCategory.findOne({ where: { name } });
+        if (existingServiceCategory) {
+            return c.json({ success: false, message: 'Service category already exists' }, 409);
+        }
+
+        const newServiceCategory = await models.ServiceCategory.create({
+            name,
+            description
+        });
+
+        return c.json({ success: true, message: 'Service category created successfully', serviceCategoryId: newServiceCategory.id });
+    } catch (error) {
+      return c.json({ success: false, message: 'Service category creation error.' }, 500);
+      }
+});
+            
+// Create a new tax
+// curl -X POST http://localhost:3000/api/create-tax -H "Content-Type: application/json" -d '{ "name": "VAT", "rate": "19.00", "description": "Value added tax", "bearer": "Client" }'
+app.post('/api/create-tax', async (c) => {
+    try {
+        const { name, rate, description, bearer } = await c.req.json();
+
+        if (!name || !rate) {
+            return c.json({ success: false, message: 'Missing required fields' }, 400);
+        }
+
+        const existingTax = await models.Tax.findOne({ where: { name } });
+        if (existingTax) {
+            return c.json({ success: false, message: 'Tax already exists' }, 409);
+        }
+
+        const newTax = await models.Tax.create({
+            name,
+            rate,
+            description,
+            bearer
+        });
+
+        return c.json({ success: true, message: 'Tax created successfully', taxId: newTax.id });
+      } catch (error) {
+        return c.json({ success: false, message: 'Tax creation error.' }, 500);
+      }
+  });
+
+// Create a new profile
+// curl -X POST http://localhost:3000/api/create-profile -H "Content-Type: application/json" -d '{ "name": "Real Values", "description": "Default active profile for real operations", "is_active": true }'
+app.post('/api/create-profile', async (c) => {
+    try {
+        const { name, description, is_active } = await c.req.json();
+
+        if (!name) {
+            return c.json({ success: false, message: 'Missing required fields' }, 400);
+        }
+
+        const existingProfile = await models.Profile.findOne({ where: { name } });
+        if (existingProfile) {
+            return c.json({ success: false, message: 'Profile already exists' }, 409);
+        }
+
+        const newProfile = await models.Profile.create({
+            name,
+            description,
+            is_active
+        });
+
+        return c.json({ success: true, message: 'Profile created successfully', profileId: newProfile.id });
+    } catch (error) {
+      return c.json({ success: false, message: 'Profile creation error.' }, 500);
+    }
+});
+
+// Create a new client
+// curl -X POST http://localhost:3000/api/create-client -H "Content-Type: application/json" -d '{ "email": "main.client@example.com", "company_name": "Main Client", "first_name": "Main", "last_name": "Client", "managed_by_user_id": 1, "status": "active" }'
+app.post('/api/create-client', async (c) => {
+    try {
+        const { email, company_name, first_name, last_name, managed_by_user_id, status } = await c.req.json();
+
+        if (!email || !company_name || !first_name || !last_name || !managed_by_user_id) {
+            return c.json({ success: false, message: 'Missing required fields' }, 400);
+        }
+
+        const existingClient = await models.Client.findOne({ where: { email } });
+        if (existingClient) {
+            return c.json({ success: false, message: 'Client already exists' }, 409);
+        }
+
+        const newClient = await models.Client.create({
+            email,
+            company_name,
+            first_name,
+            last_name,
+            managed_by_user_id,
+            status
+        });
+
+        return c.json({ success: true, message: 'Client created successfully', clientId: newClient.id });
+    } catch (error) {
+        console.error('Client creation error:', error);
+        return c.json({ success: false, message: 'An error occurred during client creation' }, 500);
+    }
+});
 
 serve(app, (info) => {
   //console.log(`Listening on http://localhost:${info.port}`);
