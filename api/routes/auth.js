@@ -5,7 +5,7 @@ const { verifyPassword } = require('../lib/auth');
 
 const authApp = new Hono();
 
-authApp.post('/login', async (c) => {
+authApp.post('/api/login', async (c) => {
   try {
       const { email, password } = await c.req.json();
 
