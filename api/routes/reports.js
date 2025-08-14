@@ -5,7 +5,7 @@ const ExcelJS = require('exceljs');
 const { Op } = require('sequelize');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
-const { getMonthlyReport, getAnnualReport } = require('../controllers/reportController');
+const { getMonthlyReport, getAnnualReport, downloadMonthlyReport, downloadAnnualReport } = require('../controllers/reportController');
 
 const reportsApp = new Hono();
 
@@ -13,6 +13,8 @@ reportsApp.use('*', authMiddleware);
 
 reportsApp.get('/monthly', getMonthlyReport);
 reportsApp.get('/annual', getAnnualReport);
+reportsApp.post('/monthly/download', downloadMonthlyReport);
+reportsApp.post('/annual/download', downloadAnnualReport);
 
 // A helper function to fetch financial data
 async function getFinancialData(profile_id, startDate, endDate) {

@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import ReportService from '@/services/ReportService';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import ApiClient from '@/services/ApiClient';
+import { saveAs } from 'file-saver';
 
 const { t } = useI18n();
 
@@ -48,8 +49,15 @@ async function generateReport() {
   }
 }
 
-function downloadReport(format) {
-  alert(`Downloading report as ${format}`);
+async function downloadReport(format) {
+  try {
+    const config = { ...filters.value, format };
+    const response = await ReportService.downloadMonthlyReport(config);
+    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+    saveAs(blob, `monthly-report-${filters.value.year}-${filters.value.month}.${format}`);
+  } catch (error) {
+    console.error('Error downloading monthly report:', error);
+  }
 }
 
 onMounted(() => {

@@ -7,6 +7,7 @@ import ReportService from '@/services/ReportService';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import ApiClient from '@/services/ApiClient';
 import { formatCurrency } from '@/helpers/utils.js';
+import { saveAs } from 'file-saver';
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
@@ -61,8 +62,15 @@ async function generateReport() {
   }
 }
 
-function downloadReport(format) {
-  alert(`Downloading report as ${format}`);
+async function downloadReport(format) {
+  try {
+    const config = { ...filters.value, format };
+    const response = await ReportService.downloadAnnualReport(config);
+    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+    saveAs(blob, `annual-report-${filters.value.year}.${format}`);
+  } catch (error) {
+    console.error('Error downloading annual report:', error);
+  }
 }
 
 onMounted(() => {
