@@ -6,4 +6,10 @@ export default {
       responseType: 'blob', // Important for file downloads
     });
   },
+  getMonthlyReport(filters) {
+    return ApiClient.get('/reports/monthly', { params: filters });
+  },
+  getAnnualReport(filters) {
+    return ApiClient.get('/reports/annual', { params: filters });
+  },
 };

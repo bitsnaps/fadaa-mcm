@@ -5,10 +5,14 @@ const ExcelJS = require('exceljs');
 const { Op } = require('sequelize');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
+const { getMonthlyReport, getAnnualReport } = require('../controllers/reportController');
 
 const reportsApp = new Hono();
 
 reportsApp.use('*', authMiddleware);
+
+reportsApp.get('/monthly', getMonthlyReport);
+reportsApp.get('/annual', getAnnualReport);
 
 // A helper function to fetch financial data
 async function getFinancialData(profile_id, startDate, endDate) {

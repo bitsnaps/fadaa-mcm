@@ -5,7 +5,7 @@ import apiClient, { getContracts, getClients, getAvailableOffices, addContract, 
 import { Modal } from 'bootstrap';
 import { format } from 'date-fns';
 import ProfileTabs from '@/components/ProfileTabs.vue';
-
+import { formatCurrency } from '@/helpers/utils.js';
 const { t } = useI18n();
 
 const contracts = ref([]);
@@ -109,15 +109,6 @@ const changePage = (page) => {
 const formatDate = (date) => {
   if (!date) return t('documents.notApplicable');
   return format(new Date(date), 'yyyy-MM-dd');
-};
-
-const formatCurrency = (value) => {
-  const number = parseFloat(value);
-  if (isNaN(number)) {
-    return t('documents.notApplicable');
-  }
-  // Assuming DZD currency for Algeria, based on user timezone.
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'DZD' }).format(number);
 };
 
 const calculateTotalAmount = (contract) => {

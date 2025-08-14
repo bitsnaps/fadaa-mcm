@@ -7,9 +7,11 @@ export function getPreferredLanguage() {
 }
 
 export const formatCurrency = (value) => {
+    const number = parseFloat(value);
     if (typeof value !== 'number') return '-';
-    return new Intl.NumberFormat(getPreferredLanguage(), { style: 'currency', currency: 'DZD' }).format(value);
-  };
+    return new Intl.NumberFormat(getPreferredLanguage(), { style: 'currency', currency: 'DZD' }).format(number);
+};
+
 export const formatDate = (dateString) => {
   if (!dateString) return '-';
   const date = new Date(dateString);
@@ -19,3 +21,11 @@ export const formatDate = (dateString) => {
     day: 'numeric'
   }).format(date);
 };
+// export const formatCurrency = (value) => {
+//   const number = parseFloat(value);
+//   if (isNaN(number)) {
+//     return t('documents.notApplicable');
+//   }
+//   // Assuming DZD currency for Algeria, based on user timezone.
+//   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'DZD' }).format(number);
+// };
