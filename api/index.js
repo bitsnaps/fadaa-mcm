@@ -35,7 +35,7 @@ const app = new Hono();
 
 // Add CORS middleware (for Dev)
 app.use('/*', cors({
-    origin: ['https://www.fadaa.dz','http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: ['https://www.app.fadaa.dz','http://localhost:5173', 'http://127.0.0.1:5173'],
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization', 'x-csrf-token'],
     credentials: true
@@ -70,9 +70,74 @@ app.route('/api/reports', reportsApp);
 app.use('/uploads/contracts/*', serveStatic({ root: './public' }));
 app.use('/uploads/documents/*', serveStatic({ root: './public' }));
 
-/**
- * Create the first user (admin)
- */
+// 1- Should be executed with:
+// curl -X POST /api/install
+app.post('/api/install', async (c) => {
+  // Only allow in debug mode
+  if (process.env.NODE_ENV === 'production') {
+    return c.json({ error: 'Install endpoint is only available in debug mode' }, 403);
+  }
+
+  try {
+    const tableStatus = {};
+    
+    // Test connection
+    await models.sequelize.authenticate();
+    
+    // Check each model's table existence
+    for (const [modelName, model] of Object.entries(models)) {
+      if (model.tableName) { // Only check actual models, not sequelize/Op
+        try {
+          await model.describe(); // This will throw if table doesn't exist
+          tableStatus[modelName] = 'exists';
+        } catch (err) {
+          tableStatus[modelName] = 'missing';
+        }
+      }
+    }
+
+    // Create missing tables
+    await models.sequelize.sync({ alter: false }); // Don't alter existing tables
+    
+    // Verify all tables after sync
+    const finalStatus = {};
+    for (const [modelName, model] of Object.entries(models)) {
+      if (model.tableName) {
+        try {
+          const tableInfo = await model.describe();
+          finalStatus[modelName] = {
+            status: 'ready',
+            columns: Object.keys(tableInfo).length
+          };
+        } catch (err) {
+          finalStatus[modelName] = {
+            status: 'error',
+            error: err.message
+          };
+        }
+      }
+    }
+
+    return c.json({
+      success: (Object.keys(finalStatus).length == Object.keys(tableStatus).length),
+      message: `Database installation completed`,
+      details: {
+        initialStatus: tableStatus,
+        finalStatus: finalStatus
+      }
+    });
+
+  } catch (error) {
+    console.error('Installation error:', error);
+    return c.json({
+      success: false,
+      error: error.message,
+      details: error.stack
+    }, 500);
+  }
+});
+
+// Create the first user (admin)
 //curl -X POST http://localhost:3000/api/create-user -H "Content-Type: application/json" -d '{ "first_name": "Admin", "last_name": "User", "email": "admin@fadaa.dz", "password": "...", "role_id": 1, "branch_id": 1, "is_active": true }'
 app.post('/api/create-user', async (c) => {
   try {
@@ -108,5 +173,5 @@ app.post('/api/create-user', async (c) => {
 
 
 serve(app, (info) => {
-  console.log(`Listening on http://localhost:${info.port}`);
+  //console.log(`Listening on http://localhost:${info.port}`);
 });
