@@ -734,6 +734,10 @@
   },
   "complianceManagement": {
     "title": "Compliance Management",
+    "loading": "Loading compliance data...",
+    "actions": "Actions",
+    "save": "Save",
+    "cancel": "Cancel",
     "overview": {
       "overallStatus": "Overall Status",
       "compliant": "Compliant",
@@ -745,6 +749,9 @@
     },
     "upcomingDeadlines": {
       "title": "Upcoming Deadlines",
+      "add": "Add Deadline",
+      "addTitle": "Add New Deadline",
+      "editTitle": "Edit Deadline",
       "task": "Task",
       "description": "Description",
       "dueDate": "Due Date",
@@ -754,15 +761,29 @@
         "medium": "Medium",
         "low": "Low"
       },
-      "noDeadlines": "No upcoming deadlines."
+      "noDeadlines": "No upcoming deadlines.",
+      "confirmDelete": "Are you sure you want to delete this deadline?"
     },
     "recentActivities": {
       "title": "Recent Compliance Activities",
+      "log": "Log Activity",
+      "addTitle": "Log New Activity",
+      "editTitle": "Edit Activity",
+      "activity": "Activity",
+      "description": "Description",
+      "status": "Status",
       "noActivities": "No recent activities.",
       "statuses": {
         "completed": "Completed",
-        "in_progress": "In Progress"
-      }
+        "in_progress": "In Progress",
+        "pending": "Pending"
+      },
+      "confirmDelete": "Are you sure you want to delete this activity?"
+    },
+    "errors": {
+      "fetchFailed": "Failed to load compliance data.",
+      "saveFailed": "Failed to save the item.",
+      "deleteFailed": "Failed to delete the item."
     }
   },
   "officeDesigner": {

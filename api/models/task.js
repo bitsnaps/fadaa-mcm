@@ -14,6 +14,12 @@ module.exports = (sequelize) => {
     description: {
       type: DataTypes.TEXT,
     },
+    category: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      comment: 'Category to group tasks, e.g., "Compliance"',
+    },
     status: {
       type: DataTypes.ENUM('Pending', 'In Progress', 'Completed', 'Cancelled'),
       allowNull: false,

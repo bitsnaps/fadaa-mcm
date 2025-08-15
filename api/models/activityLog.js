@@ -17,6 +17,11 @@ module.exports = (sequelize) => {
     target_entity_id: {
       type: DataTypes.INTEGER,
     },
+    context: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      comment: 'The context of the activity, e.g., "Compliance", "Client"',
+    },
     details: {
       type: DataTypes.TEXT,
       get() {

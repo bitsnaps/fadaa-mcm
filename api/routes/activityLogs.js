@@ -9,9 +9,16 @@ activityLogsApp.use('*', authMiddleware);
 // GET all activity logs
 activityLogsApp.get('/', async (c) => {
     try {
+      const { context, limit = 20 } = c.req.query();
+      const whereClause = {};
+      if (context) {
+        whereClause.context = context;
+      }
+
       const logs = await models.ActivityLog.findAll({
+        where: whereClause,
         order: [['created_at', 'DESC']],
-        limit: 10, // Limit to recent activities
+        limit: parseInt(limit, 10),
       });
       return c.json({ success: true, data: logs });
     } catch (error) {
@@ -44,6 +51,43 @@ activityLogsApp.post('/', async (c) => {
     } catch (error) {
       console.error('Error creating activity log:', error);
       return c.json({ success: false, message: 'Failed to create activity log' }, 500);
+    }
+});
+
+// PUT (update) an activity log
+activityLogsApp.put('/:id', async (c) => {
+    try {
+        const { id } = c.req.param();
+        const logData = await c.req.json();
+        const log = await models.ActivityLog.findByPk(id);
+
+        if (!log) {
+            return c.json({ success: false, message: 'Activity log not found' }, 404);
+        }
+
+        await log.update(logData);
+        return c.json({ success: true, message: 'Activity log updated successfully', data: log });
+    } catch (error) {
+        console.error(`Error updating activity log ${id}:`, error);
+        return c.json({ success: false, message: 'Failed to update activity log' }, 500);
+    }
+});
+
+// DELETE an activity log
+activityLogsApp.delete('/:id', async (c) => {
+    try {
+        const { id } = c.req.param();
+        const log = await models.ActivityLog.findByPk(id);
+
+        if (!log) {
+            return c.json({ success: false, message: 'Activity log not found' }, 404);
+        }
+
+        await log.destroy();
+        return c.json({ success: true, message: 'Activity log deleted successfully' });
+    } catch (error) {
+        console.error(`Error deleting activity log ${id}:`, error);
+        return c.json({ success: false, message: 'Failed to delete activity log' }, 500);
     }
 });
 

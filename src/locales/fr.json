@@ -685,6 +685,10 @@
   },
   "complianceManagement": {
     "title": "Gestion de la Conformité",
+    "loading": "Chargement des données de conformité...",
+    "actions": "Actions",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
     "overview": {
       "overallStatus": "Statut Global",
       "compliant": "Conforme",
@@ -696,6 +700,9 @@
     },
     "upcomingDeadlines": {
       "title": "Échéances à Venir",
+      "add": "Ajouter une Échéance",
+      "addTitle": "Ajouter une Nouvelle Échéance",
+      "editTitle": "Modifier l'Échéance",
       "task": "Tâche",
       "description": "Description",
       "dueDate": "Date d'Échéance",
@@ -705,15 +712,29 @@
         "medium": "Moyenne",
         "low": "Basse"
       },
-      "noDeadlines": "Aucune échéance à venir."
+      "noDeadlines": "Aucune échéance à venir.",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette échéance ?"
     },
     "recentActivities": {
       "title": "Activités de Conformité Récentes",
+      "log": "Enregistrer une Activité",
+      "addTitle": "Enregistrer une Nouvelle Activité",
+      "editTitle": "Modifier l'Activité",
+      "activity": "Activité",
+      "description": "Description",
+      "status": "Statut",
       "noActivities": "Aucune activité récente.",
       "statuses": {
-        "completed": "Complété",
-        "in_progress": "En cours"
-      }
+        "completed": "Terminée",
+        "in_progress": "En cours",
+        "pending": "En attente"
+      },
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette activité ?"
+    },
+    "errors": {
+      "fetchFailed": "Échec du chargement des données de conformité.",
+      "saveFailed": "Échec de l'enregistrement de l'élément.",
+      "deleteFailed": "Échec de la suppression de l'élément."
     }
   },
   "officeDesigner": {

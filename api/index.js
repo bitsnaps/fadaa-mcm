@@ -24,6 +24,7 @@ const profilesApp = require('./routes/profiles');
 const investorApp = require('./routes/investor');
 const withdrawalsApp = require('./routes/withdrawals');
 const reportsApp = require('./routes/reports');
+const taskApp = require('./routes/tasks');
 const { hashPassword } = require('./lib/auth');
 const models = require('./models');
 
@@ -63,6 +64,7 @@ app.route('/api/profiles', profilesApp);
 app.route('/api/investor', investorApp);
 app.route('/api/withdrawals', withdrawalsApp);
 app.route('/api/reports', reportsApp);
+app.route('/api/tasks', taskApp);
 
 
 // --- Static File Serving ---
