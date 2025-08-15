@@ -85,7 +85,7 @@ onMounted(() => {
 
 <template>
   <BNavbar toggleable="lg" variant="fadaa-blue" class="fixed-top navbar-dark">
-    <BNavbarBrand href="/" class="d-flex align-items-center">
+    <BNavbarBrand :to="{ path: '/' }" class="d-flex align-items-center">
       <BImg src="/logo.png" alt="FADAA Logo" width="30" height="30" class="d-inline-block align-text-top me-2 rounded-circle" />
       FADAA-MCM
     </BNavbarBrand>
@@ -121,7 +121,7 @@ onMounted(() => {
             </BDropdownItem>
             <BDropdownItem v-if="notifications.length === 0" disabled>{{ t('navbar.notifications.noNewNotifications') }}</BDropdownItem>
             <BDropdownItem divider />
-            <BDropdownItem href="/manage-notifications">{{ t('navbar.notifications.viewAll') }}</BDropdownItem>
+            <BDropdownItem :to="{ path: '/manage-notifications' }">{{ t('navbar.notifications.viewAll') }}</BDropdownItem>
           </BNavItemDropdown>
 
           <BNavItemDropdown id="userProfileDropdown" right menu-class="dropdown-menu-end">
