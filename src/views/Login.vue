@@ -24,7 +24,6 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
-import apiClient from '@/services/ApiClient';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -42,30 +41,30 @@ const handleLogin = async () => {
     }
 
     try {
-        const response = await apiClient.post(`${import.meta.env.DEV?'':'/api'}/login`, {
+        const success = await authStore.login({
             email: email.value,
             password: password.value,
         });
-
-        const { user, token } = response.data;
-        authStore.login(user, token);
-
-        switch (authStore.userRole) {
-            case 'admin':
-                router.push('/admin-dashboard');
-                break;
-            case 'assistant':
-                router.push('/assistant-dashboard');
-                break;
-            case 'investor':
-                router.push('/investor-dashboard');
-                break;
-            case 'client':
-                router.push('/client-portal');
-                break;
-            default:
-                router.push('/login');
-        }
+        if (success) {
+          switch (authStore.userRole) {
+              case 'admin':
+                  router.push('/admin-dashboard');
+                  break;
+              case 'assistant':
+                  router.push('/assistant-dashboard');
+                  break;
+              case 'investor':
+                  router.push('/investor-dashboard');
+                  break;
+              case 'client':
+                  router.push('/client-portal');
+                  break;
+              default:
+                  router.push('/login');
+          }
+      } else {
+        error.value = t('login.error.invalidCredentials');
+      }
     } catch (err) {
         console.error(err.message);
         if (err.response?.status === 401) {

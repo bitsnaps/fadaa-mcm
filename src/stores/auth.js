@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import apiClient from '../services/ApiClient';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -10,11 +11,19 @@ export const useAuthStore = defineStore('auth', {
     userRole: (state) => state.user?.role?.name.toLowerCase(),
   },
   actions: {
-    login(user, token) {
-      this.user = user;
-      this.token = token;
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('token', token);
+    async login(credentials) {
+      try {
+        const response = await apiClient.post('/login', credentials);
+        const { user, token } = response.data;
+        this.user = user;
+        this.token = token;
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('token', token);
+        return true;
+      } catch (error) {
+        console.error(error);
+      }
+      return false;
     },
     logout() {
       this.user = null;
