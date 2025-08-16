@@ -36,7 +36,7 @@ const app = new Hono();
 
 // Add CORS middleware (for Dev)
 app.use('/*', cors({
-    origin: ['https://www.app.fadaa.dz','http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: ['https://www.app.fadaa.dz','http://localhost:5173', 'http://localhost:4173', 'http://127.0.0.1:5173'],
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization', 'x-csrf-token'],
     credentials: true
