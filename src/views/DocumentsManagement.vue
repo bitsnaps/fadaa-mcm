@@ -1,7 +1,9 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getDocuments, getClients, getInvestmentsList, addDocument, getClientInvestments, updateDocument, deleteDocument } from '@/services/ApiClient';
+import { getDocuments, addDocument, updateDocument, deleteDocument } from '@/services/DocumentService';
+import { getClients, getClientInvestments } from '@/services/ClientService';
+import { getInvestmentsList } from '@/services/InvestmentService';
 import { useAuthStore } from '@/stores/auth';
 import { Modal } from 'bootstrap';
 import { format } from 'date-fns';

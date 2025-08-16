@@ -1,7 +1,9 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getInvestments, addInvestment, updateInvestment, deleteInvestment, getInvestors, getBranches } from '@/services/ApiClient';
+import { getInvestments, addInvestment, updateInvestment, deleteInvestment } from '@/services/InvestmentService';
+import { getInvestors } from '@/services/UserService';
+import { getBranches } from '@/services/BranchService';
 import { Modal } from 'bootstrap';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 

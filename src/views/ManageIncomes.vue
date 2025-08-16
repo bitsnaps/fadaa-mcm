@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getIncomes, addIncome, updateIncome, deleteIncome } from '@/services/IncomeService';
-import { getBranches } from '@/services/ApiClient'; // Assuming getBranches is in ApiClient
+import { getBranches } from '@/services/BranchService';
 import { useAuthStore } from '@/stores/auth'; // To get registered_by user ID
 import { Modal } from 'bootstrap';
 import ProfileTabs from '@/components/ProfileTabs.vue';

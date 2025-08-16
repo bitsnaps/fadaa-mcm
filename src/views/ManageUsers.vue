@@ -139,7 +139,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import apiClient from '@/services/ApiClient';
+import { getUsers, getRoles, getBranches, updateUser, addUser, deleteUser as deleteUserApi } from '@/services/UserService';
 import { formatDate } from '@/helpers/utils';
 
 const { t } = useI18n();
@@ -165,7 +165,7 @@ const currentUser = ref({ ...defaultUser });
 
 const fetchUsers = async () => {
   try {
-    const response = await apiClient.get('/users');
+    const response = await getUsers();
     if (response.data.success) {
       users.value = response.data.data;
     }
@@ -177,7 +177,7 @@ const fetchUsers = async () => {
 
 const fetchRoles = async () => {
   try {
-    const response = await apiClient.get('/misc/roles');
+    const response = await getRoles();
     if (response.data.success) {
       roles.value = response.data.roles;
     }
@@ -188,7 +188,7 @@ const fetchRoles = async () => {
 
 const fetchBranches = async () => {
   try {
-    const response = await apiClient.get('/misc/branches');
+    const response = await getBranches();
     if (response.data.success) {
       branches.value = response.data.branches;
     }
@@ -237,11 +237,11 @@ const saveUser = async () => {
       // Update User
       const payload = { ...currentUser.value };
       delete payload.password; // Do not send password on update
-      await apiClient.put(`/users/${editingUser.value.id}`, payload);
+      await updateUser(editingUser.value.id, payload);
       console.log(t('manageUsers.userUpdatedSuccess'));
     } else {
       // Add User
-      await apiClient.post('/users', currentUser.value);
+      await addUser(currentUser.value);
       console.log(t('manageUsers.userAddedSuccess'));
     }
     fetchUsers();
@@ -260,7 +260,7 @@ const confirmDeleteUser = (user) => {
 const deleteUser = async () => {
   if (!userToDelete.value) return;
   try {
-    await apiClient.delete(`/users/${userToDelete.value.id}`);
+    await deleteUserApi(userToDelete.value.id);
     console.log(t('manageUsers.userDeletedSuccess', { userName: `${userToDelete.value.first_name} ${userToDelete.value.last_name}` }));
     fetchUsers();
     userToDelete.value = null;

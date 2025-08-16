@@ -3,7 +3,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import * as bootstrap from 'bootstrap';
 import { useI18n } from 'vue-i18n';
-import apiClient from '@/services/ApiClient';
+import { getOffices, getBranches, addOffice, updateOffice, deleteOffice as deleteOfficeApi } from '@/services/OfficeService';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -36,7 +36,7 @@ const fetchOffices = async () => {
       limit: pagination.value.limit,
       search: searchTerm.value,
     };
-    const response = await apiClient.get('/offices', { params });
+    const response = await getOffices(params);
     if (response.data.success) {
       offices.value = response.data.data;
       pagination.value = response.data.pagination;
@@ -48,7 +48,7 @@ const fetchOffices = async () => {
 
 const fetchBranches = async () => {
     try {
-        const response = await apiClient.get('/misc/branches');
+        const response = await getBranches();
         if(response.data.success) {
             branches.value = response.data.branches;
         }
@@ -108,9 +108,9 @@ const saveOffice = async () => {
   try {
     const payload = { ...officeForm.value };
     if (isEditMode.value) {
-      await apiClient.put(`/offices/${payload.id}`, payload);
+      await updateOffice(payload.id, payload);
     } else {
-      await apiClient.post('/offices', payload);
+      await addOffice(payload);
     }
     fetchOffices();
     if(addEditOfficeModal) addEditOfficeModal.hide();
@@ -122,7 +122,7 @@ const saveOffice = async () => {
 const deleteOffice = async (officeId) => {
   if (confirm(t('offices.confirmDeleteOffice.message', { officeName: offices.value.find(o => o.id === officeId)?.name }))) {
     try {
-        await apiClient.delete(`/offices/${officeId}`);
+        await deleteOfficeApi(officeId);
         fetchOffices();
     } catch (error) {
         console.error("Failed to delete office:", error);

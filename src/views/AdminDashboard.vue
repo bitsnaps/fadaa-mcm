@@ -177,15 +177,12 @@ import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, Filler } from 'chart.js';
 import { formatCurrency } from '@/helpers/utils.js';
 import ProfileTabs from '@/components/ProfileTabs.vue';
-import {
-  getTotalClients,
-  getMonthlyIncomeByBranch,
-  getNotifications,
-  getActivityLogs,
-  getAssistants,
-  getOffices,
-  getRevenueSummary,
-} from '@/services/ApiClient';
+import { getTotalClients } from '@/services/ClientService';
+import { getActivityLogs } from '@/services/ActivityLogService';
+import { getAssistants } from '@/services/UserService';
+import { getOffices } from '@/services/OfficeService';
+import { getNotifications } from '@/services/notificationService';
+import { getMonthlyIncomeByBranch, getRevenueSummary } from '@/services/DashboardService';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 

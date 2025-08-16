@@ -149,9 +149,9 @@ import {
   Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler, ArcElement
 } from 'chart.js';
 import { formatCurrency } from '@/helpers/utils.js';
-import FinancialsService from '@/services/FinancialsService';
+import { getRevenueSummary } from '@/services/DashboardService';
 import { getExpenses } from '@/services/ExpenseService';
-import { getInvestments } from '@/services/ApiClient';
+import { getInvestments } from '@/services/InvestmentService';
 import ReportService from '@/services/ReportService';
 import { saveAs } from 'file-saver';
 
@@ -267,7 +267,11 @@ const fetchRevenueExpenseData = async () => {
   const { labels, startDate, endDate } = getChartTimeRange(isQuarterly);
 
   try {
-    const response = await FinancialsService.getRevenueSummary(activeProfileId.value, startDate, endDate);
+    const response = await getRevenueSummary({
+      profile_id: activeProfileId.value,
+      startDate,
+      endDate,
+    });
     const summary = response.data.data;
 
     revenueExpenseChartData.value = {

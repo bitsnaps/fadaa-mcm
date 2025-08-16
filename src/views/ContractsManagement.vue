@@ -1,7 +1,10 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import apiClient, { getContracts, getClients, getAvailableOffices, addContract, updateContract } from '@/services/ApiClient';
+import apiClient from '@/services/ApiClient';
+import { getContracts, addContract, updateContract } from '@/services/ContractService';
+import { getClients } from '@/services/ClientService';
+import { getAvailableOffices } from '@/services/OfficeService';
 import { Modal } from 'bootstrap';
 import { format } from 'date-fns';
 import ProfileTabs from '@/components/ProfileTabs.vue';

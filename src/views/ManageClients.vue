@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import * as bootstrap from 'bootstrap';
 import { useI18n } from 'vue-i18n';
-import apiClient from '@/services/ApiClient';
+import { getClients, deleteClient } from '@/services/ClientService';
 import { formatDate } from '@/helpers/utils';
 
 const { t } = useI18n();
@@ -16,7 +16,7 @@ let viewClientModal = null;
 
 const fetchClients = async () => {
   try {
-    const response = await apiClient.get('/clients');
+    const response = await getClients();
     if (response.data.success) {
       clients.value = response.data.data;
     }
@@ -64,10 +64,10 @@ const manageClientServices = (clientId) => {
   router.push({ name: 'ManageClientServices', query: { clientId } });
 };
 
-const deleteClient = async (clientId) => {
+const removeClient = async (clientId) => {
     if(confirm(t('manageClients.confirmDelete'))) {
         try {
-            await apiClient.delete(`/clients/${clientId}`);
+            await deleteClient(clientId);
             fetchClients();
         } catch (error) {
             console.error('Failed to delete client:', error);
@@ -132,7 +132,7 @@ const deleteClient = async (clientId) => {
               <button @click="manageClientServices(client.id)" class="btn btn-sm btn-outline-primary" :title="$t('manageClients.manageServices')">
                <i class="bi bi-gear"></i>
              </button>
-             <button @click="deleteClient(client.id)" class="btn btn-sm btn-outline-danger" :title="$t('manageClients.deleteClient')">
+             <button @click="removeClient(client.id)" class="btn btn-sm btn-outline-danger" :title="$t('manageClients.deleteClient')">
                <i class="bi bi-trash"></i>
              </button>
             </td>

@@ -4,8 +4,9 @@ import { useI18n } from 'vue-i18n';
 import { Line } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler } from 'chart.js';
 import { formatCurrency } from '@/helpers/utils.js';
-import { getMyInvestments, getMyWithdrawals, createWithdrawal } from '@/services/ApiClient.js';
-import profileService from '@/services/profileService.js';
+import { getMyWithdrawals, createWithdrawal } from '@/services/WithdrawalService';
+import { getMyInvestments } from '@/services/InvestmentService';
+import profileService from '@/services/profileService';
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler);
 

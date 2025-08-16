@@ -7,12 +7,12 @@ import {
   approveWithdrawal,
   rejectWithdrawal,
   markWithdrawalPaid,
-  getInvestors,
-  getInvestmentsList,
   createWithdrawalAsAdmin,
   updateWithdrawal,
   deleteWithdrawal,
-} from '@/services/ApiClient.js';
+} from '@/services/WithdrawalService.js';
+import { getInvestors } from '@/services/UserService.js';
+import { getInvestmentsList } from '@/services/InvestmentService.js';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import AddEditWithdrawalModal from '@/components/AddEditWithdrawalModal.vue';
 
