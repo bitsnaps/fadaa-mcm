@@ -12,12 +12,30 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
     type: {
-      type: DataTypes.ENUM('NewTask', 'TaskUpdate', 'ContractReminder', 'SystemAlert'),
+      type: DataTypes.ENUM(
+        'NewTask',
+        'TaskUpdate',
+        'ContractReminder',
+        'SystemAlert',
+        'InvestorContractExpiry',
+        'HighValueTransaction',
+        'OfficeBookingRequest',
+        'ClientDeletion'
+      ),
       allowNull: false,
     },
     is_read: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'users',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL'
     },
     related_entity_type: {
       type: DataTypes.STRING(50),

@@ -16,11 +16,7 @@
       "systemMaintenance": "Maintenance système prévue (Normal)"
     },
     "recentActivities": {
-      "title": "Activités Récentes (Clients)",
-      "newClient": "Nouveau client \"Alpha Corp\" ajouté.",
-      "contractUpdate": "Contrat pour \"Beta Ltd\" mis à jour.",
-      "communicationLog": "Communication enregistrée avec \"Gamma Inc\".",
-      "followUpReminder": "Rappel : Suivi avec \"Delta Co\" demain."
+      "title": "Activités Récentes (Clients)"
     },
     "assistantPerformance": {
       "title": "Performance des Assistants",
@@ -837,7 +833,8 @@
       "mock1": "Notification 1",
       "mock2": "Notification 2",
       "noNewNotifications": "Aucune nouvelle notification",
-      "viewAll": "Voir toutes les notifications"
+      "viewAll": "Voir toutes les notifications",
+      "markAllAsRead": "Marquer tout comme lu"
     },
     "user": {
       "profile": "Profil",
@@ -1022,5 +1019,44 @@
     "bank_transfer": "Virement Bancaire",
     "cash": "Espèces"
   },
-  "loading": "Chargement..."
+  "loading": "Chargement...",
+  "notifications": {
+    "manage": "Gérer les Notifications",
+    "list": "Liste des Notifications",
+    "create": "Créer une Notification",
+    "id": "ID",
+    "message": "Message",
+    "type": "Type",
+    "status": "Statut",
+    "date": "Date",
+    "actions": "Actions",
+    "noNotifications": "Aucune notification à afficher.",
+    "read": "Lu",
+    "unread": "Non lu",
+    "markAsRead": "Marquer comme lu",
+    "createModalTitle": "Créer une Notification",
+    "types": {
+        "NewTask": "Nouvelle Tâche",
+        "TaskUpdate": "Mise à Jour de Tâche",
+        "ContractReminder": "Rappel de Contrat",
+        "SystemAlert": "Alerte Système",
+        "InvestorContractExpiry": "Expiration de Contrat Investisseur",
+        "HighValueTransaction": "Transaction de Haute Valeur",
+        "OfficeBookingRequest": "Demande de Réservation de Bureau",
+        "ClientDeletion": "Suppression de Client"
+    },
+    "markAllAsRead": "Marquer tout comme lu",
+    "editModalTitle": "Modifier la Notification",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette notification?",
+    "searchPlaceholder": "Rechercher par message...",
+    "sortBy": {
+        "date": "Trier par Date",
+        "type": "Trier par Type",
+        "status": "Trier par Statut"
+    },
+    "sortOrder": {
+        "desc": "Décroissant",
+        "asc": "Croissant"
+    }
+  }
 }

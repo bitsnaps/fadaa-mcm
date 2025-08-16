@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useSidebarStore } from '@/stores/sidebar';
 import { useI18n } from 'vue-i18n';
 import { getNotifications, markNotificationsAsRead } from '@/services/notificationService';
+import { BModal } from 'bootstrap-vue-next';
 import {
   BNavbar,
   BNavbarBrand,
@@ -75,10 +76,44 @@ const handleNotificationDropdownClick = async () => {
   }
 };
 
+const getNotificationIcon = (type) => {
+  switch (type) {
+    case 'NewTask': return 'bi-list-task';
+    case 'TaskUpdate': return 'bi-pencil-square';
+    case 'ContractReminder': return 'bi-file-earmark-text';
+    case 'SystemAlert': return 'bi-exclamation-triangle';
+    case 'InvestorContractExpiry': return 'bi-calendar-x';
+    case 'HighValueTransaction': return 'bi-cash-coin';
+    case 'OfficeBookingRequest': return 'bi-building-add';
+    case 'ClientDeletion': return 'bi-person-x';
+    default: return 'bi-bell';
+  }
+};
+
+const getNotificationLink = (notification) => {
+    if (!notification.related_entity_type || !notification.related_entity_id) {
+        return '#';
+    }
+    switch (notification.related_entity_type) {
+        case 'investment':
+            return `/investments/${notification.related_entity_id}`;
+        case 'expense':
+            return `/manage-expenses`;
+        case 'income':
+            return `/manage-incomes`;
+        case 'office':
+            return `/manage-offices`;
+        case 'client':
+            return `/manage-clients`;
+        default:
+            return '#';
+    }
+};
 
 onMounted(() => {
   if (isAuthenticated.value) {
     fetchNotifications();
+    setInterval(fetchNotifications, 60000); // Refresh every minute
   }
 });
 </script>
@@ -116,8 +151,15 @@ onMounted(() => {
               <i class="bi bi-bell-fill"></i>
               <span v-if="unreadCount > 0" class="badge rounded-pill bg-danger">{{ unreadCount }}</span>
             </template>
-            <BDropdownItem v-for="notification in notifications" :key="notification.id" href="#">
-              {{ notification.message }}
+            <BDropdownItem v-for="notification in notifications" :key="notification.id" :to="getNotificationLink(notification)" link-class="d-flex align-items-center">
+                <i :class="['bi', getNotificationIcon(notification.type), 'me-2']"></i>
+                <div class="flex-grow-1">
+                    <p class="mb-0" :class="{'fw-bold': !notification.is_read}">{{ notification.message }}</p>
+                    <small class="text-muted">{{ new Date(notification.created_at).toLocaleString() }}</small>
+                </div>
+                <BButton variant="light" size="sm" class="ms-2" @click.stop.prevent="markNotificationsAsRead([notification.id])" v-if="!notification.is_read">
+                    <i class="bi bi-check"></i>
+                </BButton>
             </BDropdownItem>
             <BDropdownItem v-if="notifications.length === 0" disabled>{{ t('navbar.notifications.noNewNotifications') }}</BDropdownItem>
             <BDropdownItem divider />

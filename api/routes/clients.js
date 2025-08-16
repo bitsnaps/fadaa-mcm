@@ -1,6 +1,8 @@
 const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
+const { createNotification } = require('../services/notificationService');
+const { Op } = require('sequelize');
 
 const clientsApp = new Hono();
 
@@ -136,7 +138,23 @@ clientsApp.delete('/:id', async (c) => {
             return c.json({ success: false, message: 'Client not found' }, 404);
         }
 
+        const deletedClientName = client.company_name || `${client.first_name} ${client.last_name}`;
         await client.destroy();
+
+        // Notify admins about the client deletion
+        const admins = await models.User.findAll({ where: { role_id: 1 } }); // Assuming 1 is 'admin'
+        const message = `Client ${deletedClientName} has been deleted by ${c.get('user').first_name}.`;
+
+        for (const admin of admins) {
+            await createNotification({
+                userId: admin.id,
+                type: 'ClientDeletion',
+                message: message,
+                relatedEntityType: 'client',
+                relatedEntityId: parseInt(id),
+            });
+        }
+
         return c.json({ success: true, message: 'Client deleted successfully' });
     } catch (error) {
         console.error(`Error deleting client ${id}:`, error);

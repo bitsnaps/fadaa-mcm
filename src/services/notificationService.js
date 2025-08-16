@@ -1,7 +1,7 @@
 import apiClient from './ApiClient';
 
-export const getNotifications = () => {
-  return apiClient.get('/notifications');
+export const getNotifications = (params) => {
+  return apiClient.get('/notifications', { params });
 };
 
 export const markNotificationsAsRead = (notificationIds) => {

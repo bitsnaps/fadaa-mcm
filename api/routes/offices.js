@@ -2,6 +2,7 @@ const { Hono } = require('hono');
 const { Op } = require('sequelize');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
+const { createNotification } = require('../services/notificationService');
 
 const officesApp = new Hono();
 
@@ -63,10 +64,29 @@ officesApp.put('/:id', authMiddleware, async (c) => {
     try {
         const { id } = c.req.param();
         const { name, branch_id, capacity, status, amenities, type } = await c.req.json();
-        
+        const user = c.get('user');
+
         const office = await models.Office.findByPk(id);
         if (!office) {
             return c.json({ success: false, message: 'Office not found' }, 404);
+        }
+
+        // If an assistant tries to set the status to 'En instance', create a notification for admins
+        if (user.role_id === 2 && status === 'En instance') { // Assuming 2 is 'assistant'
+            const admins = await models.User.findAll({ where: { role_id: 1 } }); // Assuming 1 is 'admin'
+            const message = `Assistant ${user.first_name} has requested to book office ${office.name}.`;
+
+            for (const admin of admins) {
+                await createNotification({
+                    userId: admin.id,
+                    type: 'OfficeBookingRequest',
+                    message: message,
+                    relatedEntityType: 'office',
+                    relatedEntityId: office.id,
+                });
+            }
+            // Prevent the status change and inform the assistant
+            return c.json({ success: true, message: 'Booking request sent to admin for approval.' });
         }
 
         await office.update({ name, branch_id, capacity, status, amenities, type });

@@ -1,6 +1,8 @@
 const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
+const { createNotification } = require('../services/notificationService');
+const { Op } = require('sequelize');
 
 const incomesApp = new Hono();
 
@@ -170,6 +172,29 @@ incomesApp.post('/', async (c) => {
         return c.json({ success: false, message: 'profile_id is required' }, 400);
       }
       const newIncome = await models.Income.create(incomeData);
+
+      // High-value transaction notification
+      const HIGH_VALUE_THRESHOLD = 10000;
+      if (newIncome.amount > HIGH_VALUE_THRESHOLD) {
+        const admins = await models.User.findAll({
+            where: {
+                role_id: {
+                    [Op.in]: [1], // Assuming 1 is admin
+                },
+            },
+        });
+        const message = `A high-value income of ${newIncome.amount} was recorded by ${c.get('user').first_name}.`;
+        for (const admin of admins) {
+          await createNotification({
+            userId: admin.id,
+            type: 'HighValueTransaction',
+            message: message,
+            relatedEntityType: 'income',
+            relatedEntityId: newIncome.id,
+          });
+        }
+      }
+
       const finalIncome = await models.Income.findByPk(newIncome.id, {
         include: [
           { model: models.Branch },
