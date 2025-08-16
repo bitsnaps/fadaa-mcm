@@ -105,7 +105,7 @@ expensesApp.post('/', async (c) => {
                 },
             },
         });
-        const message = `A high-value expense of ${newExpense.amount} was recorded by ${c.get('user').first_name}.`;
+        const message = `A high-value expense of ${newExpense.amount} was recorded by ${c.get('user').email}.`;
         for (const admin of admins) {
           await createNotification({
             userId: admin.id,

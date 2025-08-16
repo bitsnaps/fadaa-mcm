@@ -183,7 +183,7 @@ incomesApp.post('/', async (c) => {
                 },
             },
         });
-        const message = `A high-value income of ${newIncome.amount} was recorded by ${c.get('user').first_name}.`;
+        const message = `A high-value income of ${newIncome.amount} was recorded by ${c.get('user').email}.`;
         for (const admin of admins) {
           await createNotification({
             userId: admin.id,

@@ -143,7 +143,7 @@ clientsApp.delete('/:id', async (c) => {
 
         // Notify admins about the client deletion
         const admins = await models.User.findAll({ where: { role_id: 1 } }); // Assuming 1 is 'admin'
-        const message = `Client ${deletedClientName} has been deleted by ${c.get('user').first_name}.`;
+        const message = `Client ${deletedClientName} has been deleted by ${c.get('user').email}.`;
 
         for (const admin of admins) {
             await createNotification({
