@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { useAuthStore } from '../stores/auth';
-import { restoreTextDirection } from 'chart.js/helpers';
 
 const getApiBaseUrl = () => {
+  const API_BASE_URL = '/api';
   if (import.meta.env.DEV) {
-    return '/api';
+    return API_BASE_URL;
   }
   // In production, use same origin or configured URL
-  return import.meta.env.VITE_API_BASE_URL || '/api';
+  return import.meta.env.VITE_API_BASE_URL || API_BASE_URL;
 };
 
 const apiClient = axios.create({
