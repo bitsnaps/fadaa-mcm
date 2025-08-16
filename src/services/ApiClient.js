@@ -1,15 +1,8 @@
 import axios from 'axios';
 import { useAuthStore } from '../stores/auth';
 
-const getApiBaseUrl = () => {
-  const API_URL = '/api';
-  // In production, use same origin or configured URL
-  // return import.meta.env.VITE_API_BASE_URL || `${window.location.origin}/${API_URL}`;
-  return API_URL;
-};
-
 const apiClient = axios.create({
-  baseURL: getApiBaseUrl(),
+  baseURL: '/api',
   withCredentials: false,
   headers: {
     'Accept': 'application/json',
