@@ -31,3 +31,18 @@ export const updateUser = (id, userData) => {
 export const deleteUser = (id) => {
     return apiClient.delete(`/users/${id}`);
 };
+export const updateUserProfile = (id, userData) => {
+    return apiClient.put(`/users/profile/${id}`, userData);
+};
+
+export const changePassword = (id, passwordData) => {
+    return apiClient.post(`/users/change-password/${id}`, passwordData);
+};
+
+export const uploadProfilePicture = (id, formData) => {
+    return apiClient.post(`/users/profile-picture/${id}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};

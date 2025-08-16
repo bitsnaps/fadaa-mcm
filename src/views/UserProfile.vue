@@ -3,17 +3,18 @@
 import { ref, reactive, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useI18n } from 'vue-i18n';
+import { updateUserProfile, changePassword, uploadProfilePicture } from '@/services/UserService';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
 
-const user = computed(() => authStore.user || { firstName: '', lastName: '', email: '', phone: '', role: '', profilePictureUrl: '' });
+const user = computed(() => authStore.user || { firstName: '', lastName: '', email: '', /*phone: '',*/ role: '', profilePictureUrl: '' });
 
 const editableUser = reactive({
   firstName: '',
   lastName: '',
   email: '',
-  phone: '',
+  // phone: '',
 });
 
 const passwordForm = reactive({
@@ -27,10 +28,10 @@ const profileImageUrl = ref('/logo.png'); // Default placeholder image
 
 onMounted(() => {
   if (user.value) {
-    editableUser.firstName = user.value.firstName;
-    editableUser.lastName = user.value.lastName;
+    editableUser.firstName = user.value.first_name;
+    editableUser.lastName = user.value.last_name;
     editableUser.email = user.value.email;
-    editableUser.phone = user.value.phone;
+    // editableUser.phone = user.value.phone;
     if (user.value.profilePictureUrl) {
         profileImageUrl.value = user.value.profilePictureUrl;
     }
@@ -50,54 +51,80 @@ const onFileChange = (event) => {
   }
 };
 
-const uploadProfilePicture = async () => {
+const handleUploadProfilePicture = async () => {
   if (!selectedFile.value) {
     alert(t('userProfile.alerts.selectFile'));
     return;
   }
-  // Placeholder for actual upload logic
-  console.log('Uploading picture:', selectedFile.value.name);
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  // Assume success and update store/user object if backend updates it
-  // For now, we've already updated profileImageUrl for preview
-  // authStore.updateUserProfilePicture(newImageUrl); // Example if store handles it
-  alert(t('userProfile.alerts.pictureUpdated'));
-  selectedFile.value = null; // Reset file input
+  
+  const formData = new FormData();
+  formData.append('profilePicture', selectedFile.value);
+
+  try {
+    const response = await uploadProfilePicture(user.value.id, formData);
+    if (response.success) {
+      alert(t('userProfile.alerts.pictureUpdated'));
+      // Optionally, update the user's profile picture URL in the auth store
+      // authStore.updateUserProfilePicture(response.data.profilePictureUrl);
+      selectedFile.value = null;
+    } else {
+      alert(t('userProfile.alerts.pictureUpdateFailed'));
+    }
+  } catch (error) {
+    console.error('Error uploading profile picture:', error);
+    alert(t('userProfile.alerts.pictureUpdateFailed'));
+  }
 };
 
-const updateProfile = async () => {
-  // Placeholder for actual profile update logic
-  console.log('Updating profile with:', editableUser);
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  // authStore.updateUser(editableUser); // Example if store handles it
-  alert(t('userProfile.alerts.profileUpdated'));
+const handleUpdateProfile = async () => {
+  try {
+    const { data: response } = await updateUserProfile(user.value.id, {
+      first_name: editableUser.firstName,
+      last_name: editableUser.lastName,
+      // phone: editableUser.phone,
+    });
+    if (response.success) {
+      alert(t('userProfile.alerts.profileUpdated'));
+      authStore.updateUser({
+        first_name: editableUser.firstName,
+        last_name: editableUser.lastName,
+      });
+    } else {
+      alert(t('userProfile.alerts.profileUpdateFailed'));
+    }
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    alert(t('userProfile.alerts.profileUpdateFailed'));
+  }
 };
 
-const changePassword = async () => {
+const handleChangePassword = async () => {
   if (passwordForm.newPassword !== passwordForm.confirmPassword) {
     alert(t('userProfile.alerts.passwordsDoNotMatch'));
     return;
   }
-  if (passwordForm.newPassword.length < 6) { // Example validation
-      alert(t('userProfile.alerts.passwordTooShort'));
-      return;
+  if (passwordForm.newPassword.length < 6) {
+    alert(t('userProfile.alerts.passwordTooShort'));
+    return;
   }
-  // Placeholder for actual password change logic
-  console.log('Changing password...');
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  // const success = await authStore.changePassword(passwordForm.currentPassword, passwordForm.newPassword);
-  // if (success) {
-  //   alert('Mot de passe changé avec succès.');
-  // } else {
-  //   alert('Échec du changement de mot de passe. Vérifiez votre mot de passe actuel.');
-  // }
-  alert(t('userProfile.alerts.passwordChanged'));
-  passwordForm.currentPassword = '';
-  passwordForm.newPassword = '';
-  passwordForm.confirmPassword = '';
+
+  try {
+    const response = await changePassword(user.value.id, {
+      currentPassword: passwordForm.currentPassword,
+      newPassword: passwordForm.newPassword,
+    });
+    if (response.success) {
+      alert(t('userProfile.alerts.passwordChanged'));
+      passwordForm.currentPassword = '';
+      passwordForm.newPassword = '';
+      passwordForm.confirmPassword = '';
+    } else {
+      alert(response.message || t('userProfile.alerts.passwordChangeFailed'));
+    }
+  } catch (error) {
+    console.error('Error changing password:', error);
+    alert(t('userProfile.alerts.passwordChangeFailed'));
+  }
 };
 
 </script>
@@ -112,10 +139,10 @@ const changePassword = async () => {
         <div class="card shadow-sm">
           <div class="card-body text-center">
             <img :src="profileImageUrl" alt="Photo de profil" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-            <h5 class="card-title text-fadaa-orange">{{ user.firstName }} {{ user.lastName }}</h5>
-            <p class="text-muted">{{ user.role.name }}</p>
+            <h5 class="card-title text-fadaa-orange">{{ user.first_name }} {{ user.last_name }}</h5>
+            <p class="text-muted">{{ user.role?.name }}</p>
             <input type="file" class="form-control form-control-sm mt-3" @change="onFileChange" accept="image/*">
-            <button class="btn btn-sm btn-primary mt-2" @click="uploadProfilePicture" :disabled="!selectedFile">
+            <button class="btn btn-sm btn-primary mt-2" @click="handleUploadProfilePicture" :disabled="!selectedFile">
               {{ $t('userProfile.uploadPicture') }}
             </button>
           </div>
@@ -129,7 +156,7 @@ const changePassword = async () => {
             <h5 class="mb-0 text-fadaa-blue">{{ $t('userProfile.personalInformation') }}</h5>
           </div>
           <div class="card-body">
-            <form @submit.prevent="updateProfile">
+            <form @submit.prevent="handleUpdateProfile">
               <div class="mb-3 row">
                 <label for="firstName" class="col-sm-3 col-form-label">{{ $t('userProfile.firstName') }}</label>
                 <div class="col-sm-9">
@@ -149,12 +176,12 @@ const changePassword = async () => {
                    <small class="form-text text-muted">{{ $t('userProfile.emailCannotBeChanged') }}</small>
                 </div>
               </div>
-              <div class="mb-3 row">
+              <!-- <div class="mb-3 row">
                 <label for="phone" class="col-sm-3 col-form-label">{{ $t('userProfile.phone') }}</label>
                 <div class="col-sm-9">
                   <input type="tel" class="form-control" id="phone" v-model="editableUser.phone">
                 </div>
-              </div>
+              </div> -->
               <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary">{{ $t('userProfile.saveChanges') }}</button>
               </div>
@@ -168,7 +195,7 @@ const changePassword = async () => {
             <h5 class="mb-0 text-fadaa-blue">{{ $t('userProfile.changePassword') }}</h5>
           </div>
           <div class="card-body">
-            <form @submit.prevent="changePassword">
+            <form @submit.prevent="handleChangePassword">
               <div class="mb-3">
                 <label for="currentPassword" class="form-label">{{ $t('userProfile.currentPassword') }}</label>
                 <input type="password" class="form-control" id="currentPassword" v-model="passwordForm.currentPassword" required>

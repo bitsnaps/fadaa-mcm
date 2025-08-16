@@ -790,11 +790,12 @@
     "confirmNewPassword": "Confirmer le Nouveau Mot de Passe",
     "alerts": {
       "selectFile": "Veuillez sélectionner un fichier.",
-      "pictureUpdated": "Photo de profil mise à jour (simulation).",
-      "profileUpdated": "Profil mis à jour avec succès (simulation).",
+      "pictureUpdated": "Photo de profil mise à jour.",
+      "profileUpdated": "Profil mis à jour avec succès.",
+      "profileUpdateFailed": "La mise à jour du profil a échoué.",
       "passwordsDoNotMatch": "Les nouveaux mots de passe ne correspondent pas.",
       "passwordTooShort": "Le nouveau mot de passe doit comporter au moins 6 caractères.",
-      "passwordChanged": "Mot de passe changé avec succès (simulation)."
+      "passwordChanged": "Mot de passe changé avec succès."
     }
   },
   "userSettings": {

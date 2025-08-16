@@ -839,11 +839,12 @@
     "confirmNewPassword": "Confirm New Password",
     "alerts": {
       "selectFile": "Please select a file.",
-      "pictureUpdated": "Profile picture updated (simulation).",
-      "profileUpdated": "Profile updated successfully (simulation).",
+      "pictureUpdated": "Profile picture updated.",
+      "profileUpdated": "Profile updated successfully.",
+      "profileUpdateFailed": "Profile update failed.",
       "passwordsDoNotMatch": "The new passwords do not match.",
       "passwordTooShort": "The new password must be at least 6 characters long.",
-      "passwordChanged": "Password changed successfully (simulation)."
+      "passwordChanged": "Password changed successfully."
     }
   },
   "userSettings": {

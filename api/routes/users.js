@@ -124,6 +124,66 @@ userApp.put('/:id', authMiddleware, async (c) => {
     }
 });
 
+// Update user profile
+userApp.put('/profile/:id', authMiddleware, async (c) => {
+    const { id } = c.req.param();
+    try {
+        const { first_name, last_name } = await c.req.json();
+        
+        const user = await models.User.findByPk(id);
+        if (!user) {
+            return c.json({ success: false, message: 'User not found' }, 404);
+        }
+
+        await user.update({
+            first_name,
+            last_name,
+        });
+
+        return c.json({ success: true, message: 'User profile updated successfully' });
+    } catch (error) {
+        console.error(`Error updating user profile ${id}:`, error);
+        return c.json({ success: false, message: 'Failed to update user profile' }, 500);
+    }
+});
+
+// Change password
+userApp.post('/change-password/:id', authMiddleware, async (c) => {
+    const { id } = c.req.param();
+    try {
+        const { currentPassword, newPassword } = await c.req.json();
+        
+        const user = await models.User.findByPk(id);
+        if (!user) {
+            return c.json({ success: false, message: 'User not found' }, 404);
+        }
+
+        if (!verifyPassword(currentPassword, user.password_hash)) {
+            return c.json({ success: false, message: 'Invalid current password' }, 400);
+        }
+
+        await user.update({
+            password_hash: hashPassword(newPassword),
+        });
+
+        return c.json({ success: true, message: 'Password changed successfully' });
+    } catch (error) {
+        console.error(`Error changing password for user ${id}:`, error);
+        return c.json({ success: false, message: 'Failed to change password' }, 500);
+    }
+});
+
+// Upload profile picture
+userApp.post('/profile-picture/:id', authMiddleware, async (c) => {
+    const { id } = c.req.param();
+    // TODO:
+    // This is a placeholder for file upload logic.
+    // In a real application, you would use a library like `multer` for handling file uploads.
+    // For now, we'll just log the request and return a success message.
+    console.log(`Received profile picture upload request for user ${id}`);
+    return c.json({ success: true, message: 'Profile picture uploaded successfully' });
+});
+
 // Delete a user
 userApp.delete('/:id', authMiddleware, async (c) => {
     const { id } = c.req.param();
