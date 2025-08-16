@@ -7,7 +7,7 @@ const getApiBaseUrl = () => {
     return 'http://localhost:3000/api';
   }
   // In production, use same origin or configured URL
-  return import.meta.env.VITE_API_BASE_URL || window.location.origin;
+  return import.meta.env.VITE_API_BASE_URL || `${window.location.origin}/api`;
 };
 
 const apiClient = axios.create({
