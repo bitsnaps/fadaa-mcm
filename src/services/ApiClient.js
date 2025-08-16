@@ -4,10 +4,10 @@ import { restoreTextDirection } from 'chart.js/helpers';
 
 const getApiBaseUrl = () => {
   if (import.meta.env.DEV) {
-    return 'http://localhost:3000/api';
+    return '/api';
   }
   // In production, use same origin or configured URL
-  return import.meta.env.VITE_API_BASE_URL || `${window.location.origin}/api`;
+  return import.meta.env.VITE_API_BASE_URL || '/api';
 };
 
 const apiClient = axios.create({
