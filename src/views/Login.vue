@@ -42,7 +42,7 @@ const handleLogin = async () => {
     }
 
     try {
-        const response = await apiClient.post('/login', {
+        const response = await apiClient.post(`${import.meta.env.DEV?'':'/api'}/login`, {
             email: email.value,
             password: password.value,
         });

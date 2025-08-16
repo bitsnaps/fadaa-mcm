@@ -33,8 +33,6 @@ apiClient.interceptors.request.use(
   }
 );
 
-export default apiClient;
-
 export function getContracts(profileId) {
     return apiClient.get('/contracts', { params: { profile_id: profileId } });
 }
@@ -183,12 +181,13 @@ export const updateWithdrawal = (id, data) => {
   return apiClient.put(`/withdrawals/${id}`, data);
 };
 
+
 export const deleteWithdrawal = (id) => {
   return apiClient.delete(`/withdrawals/${id}`);
 };
 
+/* Investor-facing withdrawals and investments endpoints */
 
-// Investor-facing withdrawals and investments endpoints
 export const getMyInvestments = (params = {}) => {
   return apiClient.get('/investor/investments', { params });
 };
@@ -205,3 +204,4 @@ export const createWithdrawal = (payload) => {
   return apiClient.post('/investor/withdrawals', payload);
 };
 
+export default apiClient;
