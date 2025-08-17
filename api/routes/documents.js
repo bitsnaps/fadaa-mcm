@@ -1,7 +1,8 @@
 const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
-const fs = require('fs/promises');
+const { uploadMiddleware } = require('../middleware/upload');
+const fs = require('fs');
 const path = require('path');
 
 const documentApp = new Hono();
@@ -25,30 +26,15 @@ documentApp.get('/', async (c) => {
 });
 
 // POST /api/documents - Create a new document with file upload
-documentApp.post('/', async (c) => {
+documentApp.post('/', uploadMiddleware('documents', 'document'), async (c) => {
     try {
         const body = await c.req.parseBody();
         const { client_id, title, type, investment_id, uploaded_by_user_id } = body;
-        const documentFile = body['document'];
+        const documentUrl = c.req.filePath;
 
-        if (!client_id || !title || !type || !documentFile || !uploaded_by_user_id) {
-            return c.json({ success: false, message: 'Missing required fields' }, 400);
+        if (!client_id || !title || !type || !documentUrl || !uploaded_by_user_id) {
+            return c.json({ success: false, message: 'Missing required fields or file' }, 400);
         }
-
-        // --- File Upload Logic ---
-        const uploadDir = path.join(__dirname, '..', '..', 'public', 'uploads', 'documents');
-        await fs.mkdir(uploadDir, { recursive: true });
-
-        const timestamp = Date.now();
-        const fileExtension = path.extname(documentFile.name);
-        const newFileName = `document-${client_id}-${timestamp}${fileExtension}`;
-        const filePath = path.join(uploadDir, newFileName);
-        
-        const fileData = await documentFile.arrayBuffer();
-        await fs.writeFile(filePath, Buffer.from(fileData));
-
-        const documentUrl = `/uploads/documents/${newFileName}`;
-        // --- End File Upload Logic ---
 
         const newDocument = await models.Document.create({
             client_id,
@@ -96,6 +82,7 @@ documentApp.delete('/:id', async (c) => {
             return c.json({ success: false, message: 'Document not found' }, 404);
         }
 
+        // TODO:
         // Optional: Delete the file from storage as well
         // const filePath = path.join(__dirname, '../public', document.file_path);
         // if (fs.existsSync(filePath)) {

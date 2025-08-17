@@ -2,7 +2,7 @@ const { serve } = require('@hono/node-server');
 const { Hono } = require('hono');
 const { serveStatic } = require('@hono/node-server/serve-static');
 const { cors } = require('hono/cors');
-
+const crypto = require('crypto');
 const taxApp = require('./routes/taxes');
 const contractApp = require('./routes/contracts');
 const userApp = require('./routes/users');
@@ -25,6 +25,7 @@ const investorApp = require('./routes/investor');
 const withdrawalsApp = require('./routes/withdrawals');
 const reportsApp = require('./routes/reports');
 const taskApp = require('./routes/tasks');
+const clientAttachmentsApp = require('./routes/clientAttachments');
 const { hashPassword } = require('./lib/auth');
 const models = require('./models');
 
@@ -65,6 +66,7 @@ app.route('/api/investor', investorApp);
 app.route('/api/withdrawals', withdrawalsApp);
 app.route('/api/reports', reportsApp);
 app.route('/api/tasks', taskApp);
+app.route('/api/client-attachments', clientAttachmentsApp);
 
 
 // --- Static File Serving ---
@@ -72,6 +74,18 @@ app.route('/api/tasks', taskApp);
 app.use('/uploads/contracts/*', serveStatic({ root: './public' }));
 app.use('/uploads/documents/*', serveStatic({ root: './public' }));
 app.use('/uploads/*', serveStatic({ root: './public' }));
+
+app.get('/api/csrf', async (c) => {
+    const ts = c.req.query('ts');
+    if (!ts){
+        return c.json({ secret: '', stamp: 0, }, 400);
+    }
+    const token = crypto.createHash('sha256').update(ts).digest('hex');
+    return c.json({
+        secret: token,
+        stamp: Date.now()-parseInt(ts),
+    });
+});
 
 // 1- Should be executed with:
 // curl -X POST /api/install

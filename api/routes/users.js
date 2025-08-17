@@ -175,7 +175,7 @@ userApp.post('/change-password/:id', authMiddleware, async (c) => {
 });
 
 // Upload profile picture
-userApp.post('/profile-picture/:id', authMiddleware, uploadMiddleware, async (c) => {
+userApp.post('/profile-picture/:id', authMiddleware, uploadMiddleware('avatars', 'profile_picture'), async (c) => {
     const { id } = c.req.param();
     const filePath = c.req.filePath;
 

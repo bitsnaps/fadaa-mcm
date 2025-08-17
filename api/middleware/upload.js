@@ -13,30 +13,41 @@ const ensureUploadDir = () => {
     return uploadDir;
 };
 
-const uploadMiddleware = createMiddleware(async (c, next) => {
-    try {
-        const uploadDir = ensureUploadDir();
-        const formData = await c.req.parseBody({ all: true });
-        const file = formData['profile_picture'];
+const uploadMiddleware = (subDir = '', inputName = 'document') => {
+    return createMiddleware(async (c, next) => {
+        try {
+            const baseUploadDir = ensureUploadDir();
+            const uploadDir = path.join(baseUploadDir, subDir);
+            if (!fs.existsSync(uploadDir)) {
+                fs.mkdirSync(uploadDir, { recursive: true });
+            }
 
-        if (!file || !(file instanceof Blob)) {
-            return c.json({ success: false, message: 'No file uploaded or invalid file type.' }, 400);
+            const formData = await c.req.parseBody({ all: true });
+            const file = formData[inputName];
+
+            if (!file || !(file instanceof Blob) || !file.name) {
+                // If no file is present, just continue to the next middleware.
+                // The route handler will be responsible for validating if the file was required.
+                return await next();
+            }
+
+            const fileArrayBuffer = await file.arrayBuffer();
+            const fileBuffer = Buffer.from(fileArrayBuffer);
+            const fileName = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;
+            const filePath = path.join(uploadDir, fileName);
+
+            await fs.promises.writeFile(filePath, fileBuffer);
+
+            // Make the relative path available to the route handler
+            c.req.filePath = path.join('/uploads', subDir, fileName).replace(/\\/g, '/');
+
+        } catch (error) {
+            console.error('File upload error:', error);
+            return c.json({ success: false, message: 'File upload failed' }, 500);
         }
+        await next();
+    });
+};
 
-        const fileArrayBuffer = await file.arrayBuffer();
-        const fileBuffer = Buffer.from(fileArrayBuffer);
-        const fileName = `${Date.now()}-${file.name}`;
-        const filePath = path.join(uploadDir, fileName);
-
-        await fs.promises.writeFile(filePath, fileBuffer);
-
-        c.req.filePath = `/uploads/${fileName}`;
-
-    } catch (error) {
-        console.error('File upload error:', error);
-        return c.json({ success: false, message: 'File upload failed' }, 500);
-    }
-    await next();
-});
 
 module.exports = { uploadMiddleware };

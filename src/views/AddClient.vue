@@ -32,6 +32,7 @@ const client = ref({
   contract_end_date: '',
   payment_terms: '',
   office_id: null,
+  attachments: [],
 });
 
 const pageTitle = computed(() => clientId.value ? t('addClient.editTitle') : t('addClient.addTitle'));
@@ -84,13 +85,43 @@ const submitForm = async () => {
         return;
     }
     try {
+        const formData = new FormData();
+        Object.keys(client.value).forEach(key => {
+            if (key === 'attachments') {
+                client.value.attachments.forEach(file => {
+                    formData.append('attachments', file);
+                });
+            } else {
+                formData.append(key, client.value[key]);
+            }
+        });
+        
+        let response;
         if (clientId.value) {
-            await apiClient.put(`/clients/${clientId.value}`, client.value);
+            response = await apiClient.put(`/clients/${clientId.value}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             console.log(t('addClient.messages.updateSuccess'));
         } else {
-            await apiClient.post('/clients', client.value);
+            response = await apiClient.post('/clients', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             console.log(t('addClient.messages.addSuccess'));
         }
+        
+        if (response.data.success && client.value.attachments.length > 0) {
+            const newClientId = response.data.data.id;
+            const attachmentFormData = new FormData();
+            client.value.attachments.forEach(file => {
+                attachmentFormData.append('attachments', file);
+            });
+            attachmentFormData.append('uploaded_by_user_id', response.data.data.managed_by_user_id);
+
+            await apiClient.post(`/client-attachments/${newClientId}`, attachmentFormData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+        }
+
         router.push('/manage-clients');
     } catch (error) {
         console.error(`${clientId.value ? 'Update' : 'Add'} client error:`, error);
@@ -104,8 +135,6 @@ const submitForm = async () => {
 
 const handleFileUpload = (event) => {
   client.value.attachments = Array.from(event.target.files);
-  // TODO: Implement actual upload to server or temporary storage preview
-  console.log('Files selected:', client.value.attachments);
 };
 
 </script>

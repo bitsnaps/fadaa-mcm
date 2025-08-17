@@ -1,8 +1,7 @@
 const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
-const fs = require('fs/promises');
-const path = require('path');
+const { uploadMiddleware } = require('../middleware/upload');
 
 const contractApp = new Hono();
 contractApp.use('*', authMiddleware);
@@ -34,33 +33,15 @@ contractApp.get('/', async (c) => {
 });
 
 // POST /api/contracts - Create a new contract with document upload
-contractApp.post('/', async (c) => {
+contractApp.post('/', uploadMiddleware('contracts', 'document'), async (c) => {
     try {
         const body = await c.req.parseBody();
         const { client_id, office_id, start_date, end_date, monthly_rate, tax_ids, profile_id } = body;
-        const documentFile = body['document'];
+        const documentUrl = c.req.filePath;
 
         if (!client_id || !office_id || !start_date || !end_date || !monthly_rate || !profile_id) {
             return c.json({ success: false, message: 'Missing required fields, including profile_id' }, 400);
         }
-
-        let documentUrl = null;
-        // --- File Upload Logic ---
-        if (documentFile && documentFile.name) {
-            const uploadDir = path.join(__dirname, '..', '..', 'public', 'uploads', 'contracts');
-            await fs.mkdir(uploadDir, { recursive: true });
-
-            const timestamp = Date.now();
-            const fileExtension = path.extname(documentFile.name);
-            const newFileName = `contract-${client_id}-${timestamp}${fileExtension}`;
-            const filePath = path.join(uploadDir, newFileName);
-            
-            const fileData = await documentFile.arrayBuffer();
-            await fs.writeFile(filePath, Buffer.from(fileData));
-
-            documentUrl = `/uploads/contracts/${newFileName}`;
-        }
-        // --- End File Upload Logic ---
 
         const newContract = await models.Contract.create({
             client_id,
@@ -93,7 +74,7 @@ contractApp.post('/', async (c) => {
 });
 
 // PUT /api/contracts/:id - Update a contract
-contractApp.put('/:id', async (c) => {
+contractApp.put('/:id', uploadMiddleware('contracts', 'document'), async (c) => {
     try {
         const { id } = c.req.param();
         const body = await c.req.parseBody();
@@ -105,33 +86,8 @@ contractApp.put('/:id', async (c) => {
         }
 
         // --- File Upload Logic for Updates ---
-        const documentFile = body['document'];
-        let documentUrl = contract.document_url; // Keep existing if not updated
-
-        if (documentFile && documentFile.name) {
-            const uploadDir = path.join(__dirname, '..', '..', 'public', 'uploads', 'contracts');
-            await fs.mkdir(uploadDir, { recursive: true });
-
-            // Optional: Delete old file
-            if (contract.document_url) {
-                const oldFilePath = path.join(__dirname, '..', '..', 'public', contract.document_url);
-                try {
-                    await fs.unlink(oldFilePath);
-                } catch (err) {
-                    console.error("Error deleting old contract document:", err);
-                }
-            }
-
-            const timestamp = Date.now();
-            const fileExtension = path.extname(documentFile.name);
-            const newFileName = `contract-${client_id}-${timestamp}${fileExtension}`;
-            const filePath = path.join(uploadDir, newFileName);
-            
-            const fileData = await documentFile.arrayBuffer();
-            await fs.writeFile(filePath, Buffer.from(fileData));
-
-            documentUrl = `/uploads/contracts/${newFileName}`;
-        }
+        const documentUrl = c.req.filePath || contract.document_url; // Keep existing if not updated
+        
         // --- End File Upload Logic ---
 
         await contract.update({
@@ -217,35 +173,19 @@ contractApp.delete('/:id', authMiddleware, async (c) => {
 });
 
 // POST /api/contracts/:id/document - Upload a document for an existing contract
-contractApp.post('/:id/document', async (c) => {
+contractApp.post('/:id/document', uploadMiddleware('contracts', 'document'), async (c) => {
     try {
         const { id } = c.req.param();
-        const body = await c.req.parseBody();
-        const documentFile = body['document'];
+        const documentUrl = c.req.filePath;
 
         const contract = await models.Contract.findByPk(id);
         if (!contract) {
             return c.json({ success: false, message: 'Contract not found' }, 404);
         }
 
-        if (!documentFile || !documentFile.name) {
+        if (!documentUrl) {
             return c.json({ success: false, message: 'Document file is required' }, 400);
         }
-
-        // --- File Upload Logic ---
-        const uploadDir = path.join(__dirname, '..', '..', 'public', 'uploads', 'contracts');
-        await fs.mkdir(uploadDir, { recursive: true });
-
-        const timestamp = Date.now();
-        const fileExtension = path.extname(documentFile.name);
-        const newFileName = `contract-${contract.client_id}-${timestamp}${fileExtension}`;
-        const filePath = path.join(uploadDir, newFileName);
-        
-        const fileData = await documentFile.arrayBuffer();
-        await fs.writeFile(filePath, Buffer.from(fileData));
-
-        const documentUrl = `/uploads/contracts/${newFileName}`;
-        // --- End File Upload Logic ---
 
         await contract.update({ document_url: documentUrl });
 

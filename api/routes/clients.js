@@ -1,6 +1,7 @@
 const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
+const { uploadMiddleware } = require('../middleware/upload');
 const { createNotification } = require('../services/notificationService');
 const { Op } = require('sequelize');
 
@@ -99,9 +100,9 @@ clientsApp.get('/:id', async (c) => {
 });
 
 // POST a new client
-clientsApp.post('/', async (c) => {
+clientsApp.post('/', uploadMiddleware('attachments', 'attachments'), async (c) => {
     try {
-        const clientData = await c.req.json();
+        const clientData = await c.req.parseBody();
         const newClient = await models.Client.create(clientData);
         return c.json({ success: true, message: 'Client created successfully', data: newClient }, 201);
     } catch (error) {
@@ -111,10 +112,10 @@ clientsApp.post('/', async (c) => {
 });
 
 // PUT (update) a client
-clientsApp.put('/:id', async (c) => {
+clientsApp.put('/:id', uploadMiddleware('attachments', 'attachments'), async (c) => {
     try {
         const { id } = c.req.param();
-        const clientData = await c.req.json();
+        const clientData = await c.req.parseBody();
         
         const client = await models.Client.findByPk(id);
         if (!client) {

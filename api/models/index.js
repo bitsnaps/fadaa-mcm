@@ -42,7 +42,7 @@ const {
   User, Role, Branch, Client, Office, Contract, ServiceCategory,
   ClientService, Document, Task, Notification, FinancialReport,
   ComplianceReport, Investment, OfficeDesign,
-  SystemSetting, ActivityLog, Tax, ContractTax, Income, Expense, Profile, Withdrawal
+  SystemSetting, ActivityLog, Tax, ContractTax, Income, Expense, Profile, Withdrawal, ClientAttachment
 } = db;
 
 // User associations
@@ -98,6 +98,12 @@ Document.belongsTo(User, { as: 'uploaded_by', foreignKey: 'uploaded_by_user_id' 
 User.hasMany(Document, { foreignKey: 'uploaded_by_user_id' });
 Document.belongsTo(Investment, { foreignKey: 'investment_id' });
 Investment.hasMany(Document, { foreignKey: 'investment_id' });
+
+// ClientAttachment associations
+ClientAttachment.belongsTo(Client, { foreignKey: 'client_id' });
+Client.hasMany(ClientAttachment, { as: 'attachments', foreignKey: 'client_id' });
+ClientAttachment.belongsTo(User, { as: 'uploaded_by', foreignKey: 'uploaded_by_user_id' });
+User.hasMany(ClientAttachment, { foreignKey: 'uploaded_by_user_id' });
 
 Profile.hasMany(Contract, { foreignKey: 'profile_id' });
 Contract.belongsTo(Profile, { foreignKey: 'profile_id' });
