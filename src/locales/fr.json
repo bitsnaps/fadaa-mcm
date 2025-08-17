@@ -793,6 +793,7 @@
       "pictureUpdated": "Photo de profil mise à jour.",
       "profileUpdated": "Profil mis à jour avec succès.",
       "profileUpdateFailed": "La mise à jour du profil a échoué.",
+      "pictureUpdateFailed": "La mise à jour de la photo de profil a échoué.",
       "passwordsDoNotMatch": "Les nouveaux mots de passe ne correspondent pas.",
       "passwordTooShort": "Le nouveau mot de passe doit comporter au moins 6 caractères.",
       "passwordChanged": "Mot de passe changé avec succès."

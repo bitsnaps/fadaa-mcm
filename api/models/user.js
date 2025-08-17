@@ -28,6 +28,10 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    profile_picture: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
     preferences: {
       type: DataTypes.TEXT,
       allowNull: true,

@@ -71,6 +71,7 @@ app.route('/api/tasks', taskApp);
 // Serve the uploaded contract files
 app.use('/uploads/contracts/*', serveStatic({ root: './public' }));
 app.use('/uploads/documents/*', serveStatic({ root: './public' }));
+app.use('/uploads/*', serveStatic({ root: './public' }));
 
 // 1- Should be executed with:
 // curl -X POST /api/install

@@ -37,5 +37,11 @@ export const useAuthStore = defineStore('auth', {
         localStorage.setItem('user', JSON.stringify(this.user));
       }
     },
+    updateUserProfilePicture(profilePictureUrl) {
+      if (this.user) {
+        this.user.profile_picture = profilePictureUrl;
+        localStorage.setItem('user', JSON.stringify(this.user));
+      }
+    },
   },
 });

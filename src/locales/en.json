@@ -842,6 +842,7 @@
       "pictureUpdated": "Profile picture updated.",
       "profileUpdated": "Profile updated successfully.",
       "profileUpdateFailed": "Profile update failed.",
+      "pictureUpdateFailed": "Profile picture update failed.",
       "passwordsDoNotMatch": "The new passwords do not match.",
       "passwordTooShort": "The new password must be at least 6 characters long.",
       "passwordChanged": "Password changed successfully."

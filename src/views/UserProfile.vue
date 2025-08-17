@@ -8,7 +8,7 @@ import { updateUserProfile, changePassword, uploadProfilePicture } from '@/servi
 const { t } = useI18n();
 const authStore = useAuthStore();
 
-const user = computed(() => authStore.user || { firstName: '', lastName: '', email: '', /*phone: '',*/ role: '', profilePictureUrl: '' });
+const user = computed(() => authStore.user || { firstName: '', lastName: '', email: '', /*phone: '',*/ role: '', profile_picture: '' });
 
 const editableUser = reactive({
   firstName: '',
@@ -24,7 +24,7 @@ const passwordForm = reactive({
 });
 
 const selectedFile = ref(null);
-const profileImageUrl = ref('/logo.png'); // Default placeholder image
+const profileImageUrl = ref(user.value?.profile_picture ? `${[import.meta.env.VITE_PUBLIC_URL || '',user.value.profile_picture].join('/')}`: '/logo.png');
 
 onMounted(() => {
   if (user.value) {
@@ -32,8 +32,8 @@ onMounted(() => {
     editableUser.lastName = user.value.last_name;
     editableUser.email = user.value.email;
     // editableUser.phone = user.value.phone;
-    if (user.value.profilePictureUrl) {
-        profileImageUrl.value = user.value.profilePictureUrl;
+    if (user.value.profile_picture) {
+        profileImageUrl.value = `${[import.meta.env.VITE_PUBLIC_URL || '',user.value.profile_picture].join('/')}`;
     }
   }
 });
@@ -58,17 +58,17 @@ const handleUploadProfilePicture = async () => {
   }
   
   const formData = new FormData();
-  formData.append('profilePicture', selectedFile.value);
+  formData.append('profile_picture', selectedFile.value);
 
   try {
-    const response = await uploadProfilePicture(user.value.id, formData);
+    const { data: response } = await uploadProfilePicture(user.value.id, formData);
     if (response.success) {
       alert(t('userProfile.alerts.pictureUpdated'));
-      // Optionally, update the user's profile picture URL in the auth store
-      // authStore.updateUserProfilePicture(response.data.profilePictureUrl);
+      authStore.updateUserProfilePicture(response.filePath);
+      profileImageUrl.value = `${import.meta.env.VITE_PUBLIC_URL|| ''}${response.filePath}`;
       selectedFile.value = null;
     } else {
-      alert(t('userProfile.alerts.pictureUpdateFailed'));
+      alert(response.message || t('userProfile.alerts.pictureUpdateFailed'));
     }
   } catch (error) {
     console.error('Error uploading profile picture:', error);
@@ -172,7 +172,7 @@ const handleChangePassword = async () => {
               <div class="mb-3 row">
                 <label for="email" class="col-sm-3 col-form-label">{{ $t('userProfile.email') }}</label>
                 <div class="col-sm-9">
-                  <input type="email" class="form-control" id="email" v-model="editableUser.email" readonly>
+                  <input type="email" class="form-control" id="email" v-model="editableUser.email" readonly disabled>
                    <small class="form-text text-muted">{{ $t('userProfile.emailCannotBeChanged') }}</small>
                 </div>
               </div>

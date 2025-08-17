@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const models = require('../models');
 const { hashPassword, verifyPassword } = require('../lib/auth');
 const { authMiddleware } = require('../middleware/auth');
+const { uploadMiddleware } = require('../middleware/upload');
 
 const userApp = new Hono();
 
@@ -174,14 +175,23 @@ userApp.post('/change-password/:id', authMiddleware, async (c) => {
 });
 
 // Upload profile picture
-userApp.post('/profile-picture/:id', authMiddleware, async (c) => {
+userApp.post('/profile-picture/:id', authMiddleware, uploadMiddleware, async (c) => {
     const { id } = c.req.param();
-    // TODO:
-    // This is a placeholder for file upload logic.
-    // In a real application, you would use a library like `multer` for handling file uploads.
-    // For now, we'll just log the request and return a success message.
-    console.log(`Received profile picture upload request for user ${id}`);
-    return c.json({ success: true, message: 'Profile picture uploaded successfully' });
+    const filePath = c.req.filePath;
+
+    try {
+        const user = await models.User.findByPk(id);
+        if (!user) {
+            return c.json({ success: false, message: 'User not found' }, 404);
+        }
+
+        await user.update({ profile_picture: filePath });
+
+        return c.json({ success: true, message: 'Profile picture uploaded successfully', filePath });
+    } catch (error) {
+        console.error(`Error updating profile picture for user ${id}:`, error);
+        return c.json({ success: false, message: 'Failed to update profile picture' }, 500);
+    }
 });
 
 // Delete a user
