@@ -163,9 +163,21 @@
         <h5 class="mb-0"><i class="bi bi-download me-2"></i>{{ $t('dashboard.dataExport.title') }}</h5>
       </div>
       <div class="card-body text-center">
-        <button @click="exportData('excel')" class="btn btn-fadaa-orange me-2"><i class="bi bi-file-earmark-excel-fill me-1"></i>{{ $t('dashboard.dataExport.excel') }}</button>
-        <button @click="exportData('csv')" class="btn btn-fadaa-orange me-2"><i class="bi bi-filetype-csv me-1"></i>{{ $t('dashboard.dataExport.csv') }}</button>
-        <button @click="exportData('pdf')" class="btn btn-fadaa-orange"><i class="bi bi-file-earmark-pdf-fill me-1"></i>{{ $t('dashboard.dataExport.pdf') }}</button>
+        <button @click="exportData('xlsx')" class="btn btn-fadaa-orange me-2" :disabled="isExporting.excel">
+          <span v-if="isExporting.excel" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+          <i v-else class="bi bi-file-earmark-excel-fill me-1"></i>
+          {{ $t('dashboard.dataExport.excel') }}
+        </button>
+        <button @click="exportData('csv')" class="btn btn-fadaa-orange me-2" :disabled="isExporting.csv">
+          <span v-if="isExporting.csv" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+          <i v-else class="bi bi-filetype-csv me-1"></i>
+          {{ $t('dashboard.dataExport.csv') }}
+        </button>
+        <button @click="exportData('pdf')" class="btn btn-fadaa-orange" :disabled="isExporting.pdf">
+          <span v-if="isExporting.pdf" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+          <i v-else class="bi bi-file-earmark-pdf-fill me-1"></i>
+          {{ $t('dashboard.dataExport.pdf') }}
+        </button>
       </div>
     </div>
   </div>
@@ -183,6 +195,7 @@ import { getAssistants } from '@/services/UserService';
 import { getOffices } from '@/services/OfficeService';
 import { getNotifications } from '@/services/notificationService';
 import { getMonthlyIncomeByBranch, getRevenueSummary } from '@/services/DashboardService';
+import ReportService from '@/services/ReportService';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -206,6 +219,11 @@ const sortAsc = ref(true);
 const currentPage = ref(1);
 const itemsPerPage = ref(5);
 const totalOffices = ref(0);
+const isExporting = ref({
+  excel: false,
+  csv: false,
+  pdf: false,
+});
 
 const chartData = ref({
   labels: [],
@@ -327,8 +345,44 @@ const filterOffices = () => {
   currentPage.value = 1;
 };
 
-const exportData = (format) => {
-  alert(`Exportation des données vers ${format}... (Placeholder - Fonctionnalité complète dans la Tâche 3)`);
+const exportData = async (format) => {
+  if (!activeProfileId.value) {
+    alert('Please select a profile first.');
+    return;
+  }
+
+  isExporting.value[format] = true;
+  try {
+    const now = new Date();
+    const startDate = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0]; // Start of year
+    const endDate = now.toISOString().split('T')[0]; // Today
+
+    const config = {
+      format: format,
+      type: 'financial',
+      profile_id: activeProfileId.value,
+      startDate,
+      endDate,
+    };
+    
+    const response = await ReportService.generateReport(config);
+
+    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    const filename = `financial-report-${activeProfileId.value}-${new Date().toISOString().split('T')[0]}.${format}`;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+
+  } catch (error) {
+    console.error(`Failed to export data to ${format}:`, error);
+    alert(`Failed to export data. Please try again.`);
+  } finally {
+    isExporting.value[format] = false;
+  }
 };
 
 const sortIcon = (key) => {
