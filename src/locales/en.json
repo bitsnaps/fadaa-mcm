@@ -50,6 +50,11 @@
       "pdf": "PDF"
     }
   },
+  "common": {
+    "view": "View",
+    "daysLeft": "days left",
+    "na": "N/A"
+  },
   "sidebar": {
     "adminDashboard": "Admin Dashboard",
     "manageUsers": "User Management",
@@ -906,6 +911,33 @@
       "invalidCredentials": "Invalid credentials. Please try again.",
       "backendError": "An error occurred: {message}",
       "unknown": "An unknown error occurred. Please try again later."
+    }
+  },
+  "assistantDashboard": {
+    "renewals": {
+      "title": "Client Contract Renewals"
+    },
+    "expiringContracts": {
+      "title": "Expiring Contracts (Next 30 Days)"
+    },
+    "prospects": {
+      "title": "Prospect List",
+      "contact": "Contact"
+    },
+    "offices": {
+      "title": "Office Status Overview",
+      "empty": "No office status data available."
+    },
+    "tasksApprovals": {
+      "title": "Tasks / Approvals",
+      "loading": "Loading tasks...",
+      "noPending": "No pending tasks.",
+      "due": "Due",
+      "priority": "Priority",
+      "status": "Status",
+      "complete": "Complete",
+      "viewAll": "View All",
+      "completedMsg": "Task marked as completed."
     }
   },
   "investorDashboard": {

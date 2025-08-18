@@ -7,13 +7,13 @@
       <div class="col-md-6 col-lg-4">
         <div class="card h-100 shadow-sm">
           <div class="card-header bg-fadaa-yellow">
-            <h5 class="mb-0"><i class="bi bi-file-earmark-text-fill me-2"></i>Client Contract Renewals</h5>
+            <h5 class="mb-0"><i class="bi bi-file-earmark-text-fill me-2"></i>{{ t('assistantDashboard.renewals.title') }}</h5>
           </div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
-              <li v-for="renewal in mockData.renewals" :key="renewal.id" class="list-group-item d-flex justify-content-between align-items-center">
-                {{ renewal.clientName }} - {{ renewal.daysLeft }} days left
-                <button class="btn btn-sm btn-fadaa-orange"><i class="bi bi-eye-fill me-1"></i>View</button>
+              <li v-for="renewal in renewals" :key="renewal.id" class="list-group-item d-flex justify-content-between align-items-center">
+                {{ renewal.client }} - {{ renewal.daysLeft }} {{ t('common.daysLeft') }}
+                <button class="btn btn-sm btn-fadaa-orange"><i class="bi bi-eye-fill me-1"></i>{{ t('common.view') }}</button>
               </li>
             </ul>
             <div v-if="!mockData.renewals.length" class="text-center text-muted mt-2">No pending renewals.</div>
@@ -25,12 +25,12 @@
       <div class="col-md-6 col-lg-4">
         <div class="card h-100 shadow-sm">
           <div class="card-header bg-fadaa-yellow">
-            <h5 class="mb-0"><i class="bi bi-hourglass-split me-2"></i>Expiring Contracts (Next 30 Days)</h5>
+            <h5 class="mb-0"><i class="bi bi-hourglass-split me-2"></i>{{ t('assistantDashboard.expiringContracts.title') }}</h5>
           </div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
-              <li v-for="contract in mockData.expiringContracts" :key="contract.id" class="list-group-item">
-                {{ contract.clientName }} ({{ contract.officeSpace }})
+              <li v-for="contract in expiringContracts" :key="contract.id" class="list-group-item">
+                {{ contract.client }} ({{ contract.office }})
               </li>
             </ul>
             <div v-if="!mockData.expiringContracts.length" class="text-center text-muted mt-2">No contracts expiring soon.</div>
@@ -42,13 +42,13 @@
       <div class="col-md-6 col-lg-4">
         <div class="card h-100 shadow-sm">
           <div class="card-header bg-fadaa-yellow">
-            <h5 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>Prospect List</h5>
+            <h5 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>{{ t('assistantDashboard.prospects.title') }}</h5>
           </div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
-              <li v-for="prospect in mockData.prospects" :key="prospect.id" class="list-group-item d-flex justify-content-between align-items-center">
+              <li v-for="prospect in prospects" :key="prospect.id" class="list-group-item d-flex justify-content-between align-items-center">
                 {{ prospect.name }} - {{ prospect.status }}
-                <button class="btn btn-sm btn-outline-fadaa-orange"><i class="bi bi-telephone-fill me-1"></i>Contact</button>
+                <button class="btn btn-sm btn-outline-fadaa-orange"><i class="bi bi-telephone-fill me-1"></i>{{ t('assistantDashboard.prospects.contact') }}</button>
               </li>
             </ul>
             <div v-if="!mockData.prospects.length" class="text-center text-muted mt-2">No prospects in the list.</div>
@@ -60,7 +60,7 @@
       <div class="col-md-6 col-lg-8">
         <div class="card h-100 shadow-sm">
           <div class="card-header bg-fadaa-yellow">
-            <h5 class="mb-0"><i class="bi bi-building-check me-2"></i>Office Status Overview</h5>
+            <h5 class="mb-0"><i class="bi bi-building-check me-2"></i>{{ t('assistantDashboard.offices.title') }}</h5>
           </div>
           <div class="card-body">
             <div class="table-responsive">
@@ -74,7 +74,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="office in mockData.officeStatus" :key="office.id">
+                  <tr v-for="office in offices" :key="office.id">
                     <td>{{ office.id }}</td>
                     <td><span :class="statusBadge(office.status)">{{ office.status }}</span></td>
                     <td>{{ office.occupancy }}</td>
@@ -86,7 +86,7 @@
                 </tbody>
               </table>
             </div>
-            <div v-if="!mockData.officeStatus.length" class="text-center text-muted mt-2">No office status data available.</div>
+            <div v-if="offices.length === 0" class="text-center text-muted mt-2">{{ t('assistantDashboard.offices.empty') }}</div>
           </div>
         </div>
       </div>
@@ -95,19 +95,27 @@
       <div class="col-md-6 col-lg-4">
         <div class="card h-100 shadow-sm">
           <div class="card-header bg-fadaa-yellow">
-            <h5 class="mb-0"><i class="bi bi-check2-square me-2"></i>Tasks/Expense Approvals</h5>
+            <h5 class="mb-0"><i class="bi bi-check2-square me-2"></i>{{ t('assistantDashboard.tasksApprovals.title') }}</h5>
           </div>
           <div class="card-body">
+            <div v-if="tasksLoading" class="text-muted small mb-2">{{ t('assistantDashboard.tasksApprovals.loading') }}</div>
             <ul class="list-group list-group-flush">
-              <li v-for="approval in mockData.approvals" :key="approval.id" class="list-group-item d-flex justify-content-between align-items-center">
-                {{ approval.item }} ({{ approval.type }})
-                <div>
-                  <button class="btn btn-sm btn-success me-1"><i class="bi bi-check-lg"></i></button>
-                  <button class="btn btn-sm btn-danger"><i class="bi bi-x-lg"></i></button>
+              <li v-for="task in pendingTasks" :key="task.id" class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="me-2">
+                  <div class="fw-semibold">{{ task.title }}</div>
+                  <div class="text-muted small">
+                    {{ t('assistantDashboard.tasksApprovals.due') }}: {{ formatDate(task.due_date) }} ·
+                    {{ t('assistantDashboard.tasksApprovals.priority') }}: {{ task.priority }} ·
+                    {{ t('assistantDashboard.tasksApprovals.status') }}: {{ task.status }}
+                  </div>
+                </div>
+                <div class="ms-2">
+                  <button class="btn btn-sm btn-success me-1" @click="markTaskCompleted(task)"><i class="bi bi-check-lg me-1"></i>{{ t('assistantDashboard.tasksApprovals.complete') }}</button>
+                  <button class="btn btn-sm btn-outline-secondary" @click="goToTasks"><i class="bi bi-box-arrow-up-right me-1"></i>{{ t('assistantDashboard.tasksApprovals.viewAll') }}</button>
                 </div>
               </li>
             </ul>
-            <div v-if="!mockData.approvals.length" class="text-center text-muted mt-2">No pending approvals.</div>
+            <div v-if="!tasksLoading && pendingTasks.length === 0" class="text-center text-muted mt-2">{{ t('assistantDashboard.tasksApprovals.noPending') }}</div>
           </div>
         </div>
       </div>
@@ -131,38 +139,97 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useToast } from '@/helpers/toast';
+import { useI18n } from 'vue-i18n';
+import { getTasks as apiGetTasks, updateTask as apiUpdateTask } from '@/services/TaskService';
+import { getContracts } from '@/services/ContractService';
+import { getClients } from '@/services/ClientService';
+import { getOffices } from '@/services/OfficeService';
+import { useRouter } from 'vue-router';
 
+const { t } = useI18n();
+const router = useRouter();
 const authStore = useAuthStore();
-const { showSuccessToast } = useToast();
+const { showSuccessToast, showErrorToast } = useToast();
 
-const mockData = ref({
-  renewals: [
-    { id: 1, clientName: 'Client A', daysLeft: 15 },
-    { id: 2, clientName: 'Client B', daysLeft: 20 },
-    { id: 3, clientName: 'Client C', daysLeft: 10 },
-  ],
-  expiringContracts: [
-    { id: 1, clientName: 'Client C', officeSpace: 'Office 101' },
-    { id: 2, clientName: 'Client D', officeSpace: 'Office 202' },
-  ],
-  prospects: [
-    { id: 1, name: 'Prospect X', status: 'Contacted' },
-    { id: 2, name: 'Prospect Y', status: 'New Lead' },
-  ],
-  officeStatus: [
-    { id: 'OFC001', status: 'Occupé', occupancy: '100%' },
-    { id: 'OFC002', status: 'Nouveau', occupancy: '0%' },
-    { id: 'OFC003', status: 'Actif', occupancy: '75%' },
-    { id: 'OFC004', status: 'En instance', occupancy: 'Pending' },
-  ],
-  approvals: [
-    { id: 1, item: 'Expense Report #123', type: 'Expense' },
-    { id: 2, item: 'Task: Setup new client', type: 'Task' },
-  ],
-});
+const tasks = ref([]);
+const tasksLoading = ref(false);
+const pendingTasks = ref([]);
+
+const fetchTasks = async () => {
+  tasksLoading.value = true;
+  try {
+    const { data } = await apiGetTasks({ category: 'Compliance' });
+    const list = Array.isArray(data) ? data : (data?.data || []);
+    tasks.value = list;
+    pendingTasks.value = list.filter(t => (t.status === 'Pending' || t.status === 'In Progress'));
+  } catch (e) {
+    showErrorToast(t('errors.fetchFailed'));
+  } finally {
+    tasksLoading.value = false;
+  }
+};
+
+onMounted(fetchTasks);
+
+const goToTasks = () => router.push({ name: 'Tasks' });
+
+const formatDate = (dateString) => {
+  if (!dateString) return t('common.na') || 'N/A';
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(dateString).toLocaleDateString(undefined, options);
+};
+
+const markTaskCompleted = async (task) => {
+  try {
+    await apiUpdateTask(task.id, { status: 'Completed', completed_at: new Date().toISOString() });
+    showSuccessToast(t('assistantDashboard.tasksApprovals.completedMsg'));
+    await fetchTasks();
+  } catch (e) {
+    showErrorToast(t('errors.updateFailed'));
+  }
+};
+
+const renewals = ref([]);
+const expiringContracts = ref([]);
+const prospects = ref([]);
+const offices = ref([]);
+
+const loadAssistantDashboard = async () => {
+  try {
+    // Renewals: approximate via contracts ending within next 15 days
+    const { data: contractsRes } = await getContracts();
+    const contracts = contractsRes?.contracts || [];
+    const now = new Date();
+    const soon = new Date(); soon.setDate(now.getDate() + 15);
+    renewals.value = contracts
+      .filter(c => c.end_date && new Date(c.end_date) <= soon && new Date(c.end_date) >= now)
+      .map(c => ({ id: c.id, client: c.Client?.company_name || '—', daysLeft: Math.ceil((new Date(c.end_date) - now) / (1000*60*60*24)) }));
+
+    // Expiring contracts next 30 days
+    const thirty = new Date(); thirty.setDate(now.getDate() + 30);
+    expiringContracts.value = contracts
+      .filter(c => c.end_date && new Date(c.end_date) <= thirty && new Date(c.end_date) >= now)
+      .map(c => ({ id: c.id, client: c.Client?.company_name || '—', office: c.Office?.name || '—' }));
+
+    // Prospects: use clients with status = 'Lead'
+    const { data: clientsRes } = await getClients();
+    const clients = clientsRes?.data || [];
+    prospects.value = clients
+      .filter(cl => cl.status === 'Lead')
+      .map(cl => ({ id: cl.id, name: cl.company_name || `${cl.first_name} ${cl.last_name}`, status: 'Lead' }));
+
+    // Offices list: basic overview
+    const { data: officesRes } = await getOffices({ page: 1, limit: 10 });
+    offices.value = officesRes?.data || [];
+  } catch (e) {
+    // non-blocking; toasts already handled elsewhere if needed
+  }
+};
+
+onMounted(() => { fetchTasks(); loadAssistantDashboard(); });
 
 const exportData = (format) => {
   // Simulate data generation for export

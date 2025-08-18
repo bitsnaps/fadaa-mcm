@@ -50,6 +50,11 @@
       "pdf": "PDF"
     }
   },
+  "common": {
+    "view": "Voir",
+    "daysLeft": "jours restants",
+    "na": "N/D"
+  },
   "sidebar": {
     "adminDashboard": "Tableau de Bord Administrateur",
     "manageUsers": "Gestion Utilisateurs",
@@ -1002,6 +1007,33 @@
       "notes": "Notes",
       "close": "Fermer",
       "save": "Enregistrer"
+    }
+  },
+  "assistantDashboard": {
+    "renewals": {
+      "title": "Renouvellements de Contrats Client"
+    },
+    "expiringContracts": {
+      "title": "Contrats expirant (30 prochains jours)"
+    },
+    "prospects": {
+      "title": "Liste de Prospects",
+      "contact": "Contacter"
+    },
+    "offices": {
+      "title": "Aperçu de l'état des bureaux",
+      "empty": "Aucune donnée d'état des bureaux."
+    },
+    "tasksApprovals": {
+      "title": "Tâches / Approbations",
+      "loading": "Chargement des tâches...",
+      "noPending": "Aucune tâche en attente.",
+      "due": "Échéance",
+      "priority": "Priorité",
+      "status": "Statut",
+      "complete": "Terminer",
+      "viewAll": "Voir tout",
+      "completedMsg": "Tâche marquée comme terminée."
     }
   },
   "withdrawalStatuses": {

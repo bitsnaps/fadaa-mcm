@@ -28,10 +28,11 @@ const fetchTasks = async () => {
 onMounted(fetchTasks);
 
 const filteredTasks = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase();
   return tasks.value.filter(task => {
-    const matchesSearch = task.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                          task.assignedTo.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                          (task.clientName && task.clientName.toLowerCase().includes(searchQuery.value.toLowerCase()));
+    const title = (task.title || '').toLowerCase();
+    const desc = (task.description || '').toLowerCase();
+    const matchesSearch = !q || title.includes(q) || desc.includes(q);
     const matchesStatus = filterStatus.value ? task.status === filterStatus.value : true;
     const matchesPriority = filterPriority.value ? task.priority === filterPriority.value : true;
     return matchesSearch && matchesStatus && matchesPriority;
@@ -41,47 +42,63 @@ const filteredTasks = computed(() => {
 const formatDate = (dateString) => {
   if (!dateString) return 'N/A';
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  return new Date(dateString).toLocaleDateString('fr-FR', options);
+  return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
 const getPriorityBadge = (priority) => {
-  switch (priority.toLowerCase()) {
-    case 'haute': return 'badge bg-danger';
-    case 'moyenne': return 'badge bg-warning text-dark';
-    case 'basse': return 'badge bg-success';
+  const p = (priority || '').toLowerCase();
+  switch (p) {
+    case 'urgent': return 'badge bg-danger';
+    case 'high': return 'badge bg-danger';
+    case 'medium': return 'badge bg-warning text-dark';
+    case 'low': return 'badge bg-success';
     default: return 'badge bg-secondary';
   }
 };
 
 const getStatusBadge = (status) => {
-  switch (status.toLowerCase()) {
-    case 'en attente': return 'badge bg-secondary';
-    case 'en cours': return 'badge bg-primary';
-    case 'terminée': return 'badge bg-success';
-    case 'annulée': return 'badge bg-danger';
+  const s = (status || '').toLowerCase();
+  switch (s) {
+    case 'pending': return 'badge bg-secondary';
+    case 'in progress': return 'badge bg-primary';
+    case 'completed': return 'badge bg-success';
+    case 'cancelled': return 'badge bg-danger';
     default: return 'badge bg-light text-dark';
   }
 };
 
-const openCreateTaskModal = () => {
-  // Logic to open create task modal
-  showSuccessToast('Ouvrir le modal de création de tâche');
+// Minimal inline CRUD hooks; modals can be added later
+const openCreateTaskModal = async () => {
+  const title = prompt('Task title');
+  if (!title) return;
+  try {
+    await apiCreateTask({ title, priority: 'Medium', due_date: new Date().toISOString() });
+    showSuccessToast('Task created');
+    await fetchTasks();
+  } catch { showErrorToast('Failed to create task'); }
 };
 
 const openViewTaskModal = (task) => {
-  // Logic to open view task modal
-  showSuccessToast(`Voir la tâche: ${task.title}`);
+  alert(`${task.title}\n\n${task.description || ''}`);
 };
 
-const openEditTaskModal = (task) => {
-  // Logic to open edit task modal
-  showSuccessToast(`Modifier la tâche: ${task.title}`);
+const openEditTaskModal = async (task) => {
+  const title = prompt('Edit task title', task.title);
+  if (!title) return;
+  try {
+    await apiUpdateTask(task.id, { ...task, title });
+    showSuccessToast('Task updated');
+    await fetchTasks();
+  } catch { showErrorToast('Failed to update task'); }
 };
 
-const deleteTask = (taskId) => {
-  // Logic to delete task
-  tasks.value = tasks.value.filter(task => task.id !== taskId);
-  showSuccessToast(`Tâche ${taskId} supprimée`);
+const deleteTask = async (taskId) => {
+  if (!confirm('Delete this task?')) return;
+  try {
+    await apiDeleteTask(taskId);
+    showSuccessToast('Task deleted');
+    await fetchTasks();
+  } catch { showErrorToast('Failed to delete task'); }
 };
 
 </script>
@@ -125,8 +142,6 @@ const deleteTask = (taskId) => {
         <thead>
           <tr>
             <th scope="col">Titre</th>
-            <th scope="col">Assigné à</th>
-            <th scope="col">Client Associé</th>
             <th scope="col">Date d'Échéance</th>
             <th scope="col">Priorité</th>
             <th scope="col">Statut</th>
@@ -136,9 +151,7 @@ const deleteTask = (taskId) => {
         <tbody>
           <tr v-for="task in filteredTasks" :key="task.id">
             <td>{{ task.title }}</td>
-            <td>{{ task.assignedTo }}</td>
-            <td>{{ task.clientName }}</td>
-            <td>{{ formatDate(task.dueDate) }}</td>
+            <td>{{ formatDate(task.due_date) }}</td>
             <td><span :class="getPriorityBadge(task.priority)">{{ task.priority }}</span></td>
             <td><span :class="getStatusBadge(task.status)">{{ task.status }}</span></td>
             <td>
