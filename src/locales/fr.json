@@ -302,9 +302,9 @@
     "confirmDeleteTitle": "Confirmer la Suppression",
     "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer l'utilisateur {userName} ? Cette action est irréversible.",
     "delete": "Supprimer",
-    "userUpdatedSuccess": "Utilisateur mis à jour avec succès (simulation).",
-    "userAddedSuccess": "Utilisateur ajouté avec succès (simulation).",
-    "userDeletedSuccess": "Utilisateur {userName} supprimé avec succès (simulation).",
+    "userUpdatedSuccess": "Utilisateur mis à jour avec succès.",
+    "userAddedSuccess": "Utilisateur ajouté avec succès.",
+    "userDeletedSuccess": "Utilisateur {userName} supprimé avec succès.",
     "roles": {
       "admin": "Admin",
       "assistant": "Assistant",
@@ -571,7 +571,7 @@
         "dark": "Sombre"
       },
       "saveButton": "Enregistrer",
-      "alert": "Paramètres généraux enregistrés ! (Simulation)"
+      "alert": "Paramètres généraux enregistrés !"
     },
     "emailSettings": {
       "title": "Paramètres Email",
@@ -580,14 +580,14 @@
       "smtpUser": "Utilisateur SMTP",
       "smtpPassword": "Mot de Passe SMTP",
       "saveButton": "Enregistrer",
-      "alert": "Paramètres email enregistrés ! (Simulation)"
+      "alert": "Paramètres email enregistrés !"
     },
     "apiKeys": {
       "title": "Clés API",
       "googleMaps": "Clé API Google Maps",
       "openAI": "Clé API OpenAI",
       "saveButton": "Enregistrer",
-      "alert": "Clés API enregistrées ! (Simulation)"
+      "alert": "Clés API enregistrées !"
     },
     "activityLog": {
       "title": "Journal d'Activité",
@@ -643,7 +643,7 @@
       "endDate": "Date de Fin",
       "format": "Format",
       "generate": "Générer le Rapport",
-      "generatingMessage": "Rapport ({type}) pour la période du {startDate} au {endDate} au format {format} généré avec succès (simulation)."
+      "generatingMessage": "Rapport ({type}) pour la période du {startDate} au {endDate} au format {format} généré avec succès."
     },
     "revenueVsExpenses": {
       "title": "Revenus vs. Dépenses",

@@ -605,7 +605,7 @@
         "dark": "Dark"
       },
       "saveButton": "Save",
-      "alert": "General settings saved! (Simulation)"
+      "alert": "General settings saved!"
     },
     "emailSettings": {
       "title": "Email Settings",
@@ -614,14 +614,14 @@
       "smtpUser": "SMTP User",
       "smtpPassword": "SMTP Password",
       "saveButton": "Save",
-      "alert": "Email settings saved! (Simulation)"
+      "alert": "Email settings saved!"
     },
     "apiKeys": {
       "title": "API Keys",
       "googleMaps": "Google Maps API Key",
       "openAI": "OpenAI API Key",
       "saveButton": "Save",
-      "alert": "API keys saved! (Simulation)"
+      "alert": "API keys saved!"
     },
     "activityLog": {
       "title": "Activity Log",
@@ -692,7 +692,7 @@
       "endDate": "End Date",
       "format": "Format",
       "generate": "Generate Report",
-      "generatingMessage": "Report ({type}) for the period from {startDate} to {endDate} in {format} format generated successfully (simulation)."
+      "generatingMessage": "Report ({type}) for the period from {startDate} to {endDate} in {format} format generated successfully."
     },
     "revenueVsExpenses": {
       "title": "Revenue vs. Expenses",
