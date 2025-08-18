@@ -26,7 +26,19 @@ apiClient.interceptors.request.use(
 
 // Centralized error handler: map Axios errors to user-friendly, localized messages
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Success toast for write ops if backend supplies a message
+    try {
+      const notificationStore = useNotificationStore();
+      const method = (response.config?.method || '').toLowerCase();
+      const isWrite = method === 'post' || method === 'put' || method === 'delete' || method === 'patch';
+      const msg = response.data?.message;
+      if (isWrite && msg) {
+        notificationStore.setNotification({ message: msg, type: 'success' });
+      }
+    } catch {}
+    return response;
+  },
   (error) => {
     const notificationStore = useNotificationStore();
     const { t } = i18n.global;
@@ -37,11 +49,9 @@ apiClient.interceptors.response.use(
     if (error.code === 'ECONNABORTED') {
       message = t('errors.timeout');
     } else if (!error.response) {
-      // Network or CORS
       message = t('errors.network');
     } else if (status === 401) {
       message = t('errors.unauthorized');
-      // clear auth and optionally redirect
       const authStore = useAuthStore();
       authStore.logout();
     } else if (status === 403) {
@@ -49,7 +59,6 @@ apiClient.interceptors.response.use(
     } else if (status === 404) {
       message = t('errors.notFound');
     } else if (status === 422 || status === 400) {
-      // Validation or bad request
       const backendMsg = error.response.data?.message;
       message = backendMsg ? backendMsg : t('errors.validation');
     } else if (status >= 500) {
@@ -58,7 +67,6 @@ apiClient.interceptors.response.use(
       message = error.response.data.message;
     }
 
-    // Surface as a global notification
     notificationStore.setNotification({ message, type: 'error' });
 
     return Promise.reject(error);

@@ -851,6 +851,7 @@
     "passwordLabel": "Mot de passe",
     "passwordPlaceholder": "Votre mot de passe",
     "loginButton": "Se connecter",
+    "success": "Vous vous êtes connecté avec succès",    
     "error": {
       "missingCredentials": "Veuillez saisir l'e-mail et le mot de passe.",
       "invalidCredentials": "Identifiants invalides. Veuillez réessayer.",

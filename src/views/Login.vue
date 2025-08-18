@@ -14,7 +14,7 @@
           </div>
           <button type="submit" class="btn btn-fadaa-primary w-100">{{ t('login.loginButton') }} <i class="bi bi-box-arrow-in-right"></i></button>
         </form>
-        <p v-if="error" class="text-danger text-center mt-3">{{ error }}</p>
+
       </div>
     </div>
   </div>
@@ -25,18 +25,19 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useI18n } from 'vue-i18n';
+import { useToast } from '@/helpers/toast';
 
 const { t } = useI18n();
 const email = ref(import.meta.env.DEV?import.meta.env.VITE_DEFAULT_USER:'');
 const password = ref(import.meta.env.DEV?import.meta.env.VITE_DEFAULT_PASSWORD:'');
 
-const error = ref('');
 const router = useRouter();
 const authStore = useAuthStore();
+const { showErrorToast, showSuccessToast } = useToast();
 
 const handleLogin = async () => {
     if (!email.value || !password.value) {
-        error.value = t('login.error.missingCredentials');
+        showErrorToast(t('login.error.missingCredentials'));
         return;
     }
 
@@ -46,6 +47,7 @@ const handleLogin = async () => {
             password: password.value,
         });
         if (success) {
+          showSuccessToast(t('login.success'));
           switch (authStore.userRole) {
               case 'admin':
                   router.push('/admin-dashboard');
@@ -63,16 +65,16 @@ const handleLogin = async () => {
                   router.push('/login');
           }
       } else {
-        error.value = t('login.error.invalidCredentials');
+        showErrorToast(t('login.error.invalidCredentials'));
       }
     } catch (err) {
         console.error(err.message);
         if (err.response?.status === 401) {
-        error.value = t('login.error.invalidCredentials');
+          showErrorToast(t('login.error.invalidCredentials'));
         } else if (err.response?.data?.message) {
-            error.value = t('login.error.backendError', { message: err.response.data.message });
+          showErrorToast(t('login.error.backendError', { message: err.response.data.message }));
         } else {
-            error.value = t('login.error.unknown');
+          showErrorToast(t('login.error.unknown'));
         }
     }
 };

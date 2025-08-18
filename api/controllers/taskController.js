@@ -1,4 +1,5 @@
 const { Task } = require('../models');
+const { handleRouteError } = require('../lib/errorHandler');
 
 // @desc    Get all tasks, with optional filtering by category
 // @route   GET /api/tasks
@@ -15,7 +16,7 @@ const getTasks = async (c) => {
     const tasks = await Task.findAll({ where: whereClause, order: [['due_date', 'ASC']] });
     return c.json(tasks);
   } catch (error) {
-    return c.json({ message: 'Error fetching tasks', error: error.message }, 500);
+    return handleRouteError(c, 'Error fetching tasks', error);
   }
 };
 
@@ -31,7 +32,7 @@ const createTask = async (c) => {
     const newTask = await Task.create({ title, description, category, status, priority, due_date });
     return c.json(newTask, 201);
   } catch (error) {
-    return c.json({ message: 'Error creating task', error: error.message }, 500);
+    return handleRouteError(c, 'Error creating task', error);
   }
 };
 
@@ -47,7 +48,7 @@ const getTaskById = async (c) => {
     }
     return c.json(task);
   } catch (error) {
-    return c.json({ message: 'Error fetching task', error: error.message }, 500);
+    return handleRouteError(c, `Error fetching task ${c.req.param('id')}`, error);
   }
 };
 
@@ -67,7 +68,7 @@ const updateTask = async (c) => {
     await task.update({ title, description, category, status, priority, due_date, completed_at });
     return c.json(task);
   } catch (error) {
-    return c.json({ message: 'Error updating task', error: error.message }, 500);
+    return handleRouteError(c, `Error updating task ${c.req.param('id')}`, error);
   }
 };
 
@@ -86,7 +87,7 @@ const deleteTask = async (c) => {
     await task.destroy();
     return c.json({ message: 'Task deleted successfully' });
   } catch (error) {
-    return c.json({ message: 'Error deleting task', error: error.message }, 500);
+    return handleRouteError(c, `Error deleting task ${c.req.param('id')}`, error);
   }
 };
 

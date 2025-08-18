@@ -1,5 +1,6 @@
 const { Profile, sequelize } = require('../models');
 const { Op } = require('sequelize');
+const { handleRouteError } = require('../lib/errorHandler');
 
 // Get all profiles
 exports.getAllProfiles = async (c) => {
@@ -7,7 +8,7 @@ exports.getAllProfiles = async (c) => {
     const profiles = await Profile.findAll();
     return c.json(profiles);
   } catch (error) {
-    return c.json({ message: 'Error fetching profiles', error: error.message }, 500);
+    return handleRouteError(c, 'Error fetching profiles', error);
   }
 };
 
@@ -20,7 +21,7 @@ exports.getActiveProfile = async (c) => {
     }
     return c.json(activeProfile);
   } catch (error) {
-    return c.json({ message: 'Error fetching active profile', error: error.message }, 500);
+    return handleRouteError(c, 'Error fetching active profile', error);
   }
 };
 
@@ -36,7 +37,7 @@ exports.createProfile = async (c) => {
     });
     return c.json(newProfile, 201);
   } catch (error) {
-    return c.json({ message: 'Error creating profile', error: error.message }, 500);
+    return handleRouteError(c, 'Error creating profile', error);
   }
 };
 
@@ -62,7 +63,7 @@ exports.setActiveProfile = async (c) => {
     return c.json({ message: 'Profile activated successfully.' });
   } catch (error) {
     await transaction.rollback();
-    return c.json({ message: 'Error activating profile', error: error.message }, 500);
+    return handleRouteError(c, 'Error activating profile', error);
   }
 };
 
@@ -80,7 +81,7 @@ exports.updateProfile = async (c) => {
     await profile.update({ name, description });
     return c.json(profile);
   } catch (error) {
-    return c.json({ message: 'Error updating profile', error: error.message }, 500);
+    return handleRouteError(c, 'Error updating profile', error);
   }
 };
 
@@ -102,6 +103,6 @@ exports.deleteProfile = async (c) => {
     await profile.destroy();
     return c.body(null, 204);
   } catch (error) {
-    return c.json({ message: 'Error deleting profile', error: error.message }, 500);
+    return handleRouteError(c, 'Error deleting profile', error);
   }
 };
