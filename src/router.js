@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router';
 import { useAuthStore } from './stores/auth'; // Import the auth store
 import { useNotificationStore } from './stores/notification';
+import i18n from '@/i18n';
 import Login from './views/Login.vue';
 import AdminDashboard from './views/AdminDashboard.vue';
 import AssistantDashboard from './views/AssistantDashboard.vue';
@@ -254,7 +255,7 @@ router.beforeEach((to, from, next) => {
       next('/login');
     } else if (to.meta.roles && !to.meta.roles.includes(userRole)) {
       // If roles are required and user's role is not in the list, redirect
-      notificationStore.setNotification({ message: 'You are not authorized to view this page.', type: 'error' });
+      notificationStore.setNotification({ message: i18n.global.t('errors.forbidden'), type: 'error' });
       // Redirect to their respective dashboard or a generic unauthorized page
       if (userRole === 'admin') next('/admin-dashboard');
       else if (userRole === 'assistant') next('/assistant-dashboard');
@@ -262,7 +263,7 @@ router.beforeEach((to, from, next) => {
       else if (userRole === 'client') next('/client-portal');
       else next('/login'); // Fallback if role is unknown
     } else if (to.meta.role && to.meta.role !== userRole) { // Keep handling for single role meta if still used
-        notificationStore.setNotification({ message: 'You are not authorized to view this page (single role check).', type: 'error' });
+        notificationStore.setNotification({ message: i18n.global.t('errors.forbidden'), type: 'error' });
         // Redirect to their respective dashboard or a generic unauthorized page
         if (userRole === 'admin') next('/admin-dashboard');
         else if (userRole === 'assistant') next('/assistant-dashboard');

@@ -3,6 +3,7 @@ const models = require('../models');
 const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
 const { createNotification } = require('../services/notificationService');
 const { Op } = require('sequelize');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const incomesApp = new Hono();
 
@@ -228,8 +229,7 @@ incomesApp.put('/:id', async (c) => {
       });
       return c.json({ success: true, message: 'Income updated successfully', data: finalIncome });
     } catch (error) {
-      console.error(`Error updating income:`, error);
-      return c.json({ success: false, message: 'Failed to update income' }, 500);
+      return handleRouteError(c, 'Error updating income', error);
     }
 });
 
@@ -245,8 +245,7 @@ incomesApp.delete('/:id', async (c) => {
       await income.destroy();
       return c.json({ success: true, message: 'Income deleted successfully' });
     } catch (error) {
-      console.error(`Error deleting income:`, error);
-      return c.json({ success: false, message: 'Failed to delete income' }, 500);
+      return handleRouteError(c, `Error deleting income ${c.req.param('id')}`, error);
     }
 });
 

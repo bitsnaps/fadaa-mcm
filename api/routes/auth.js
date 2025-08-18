@@ -2,6 +2,7 @@ const { Hono } = require('hono');
 const jwt = require('jsonwebtoken');
 const models = require('../models');
 const { verifyPassword } = require('../lib/auth');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const authApp = new Hono();
 
@@ -37,8 +38,7 @@ authApp.post('/login', async (c) => {
         user: user
     });
   } catch (error) {
-      console.error('Login error:', error);
-      return c.json({ success: false, message: 'An error occurred during login' }, 500);
+      return handleRouteError(c, 'Login error', error);
   }
 });
 

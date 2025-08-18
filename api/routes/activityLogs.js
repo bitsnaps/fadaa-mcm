@@ -1,6 +1,7 @@
 const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const activityLogsApp = new Hono();
 
@@ -22,8 +23,7 @@ activityLogsApp.get('/', async (c) => {
       });
       return c.json({ success: true, data: logs });
     } catch (error) {
-      console.error('Error fetching activity logs:', error);
-      return c.json({ success: false, message: 'Failed to fetch activity logs' }, 500);
+      return handleRouteError(c, 'Error fetching activity logs', error);
     }
 });
 
@@ -37,8 +37,7 @@ activityLogsApp.get('/:id', async (c) => {
       }
       return c.json({ success: true, data: log });
     } catch (error) {
-      console.error(`Error fetching activity log ${id}:`, error);
-      return c.json({ success: false, message: 'Failed to fetch activity log' }, 500);
+      return handleRouteError(c, `Error fetching activity log ${c.req.param('id')}` , error);
     }
 });
 
@@ -49,8 +48,7 @@ activityLogsApp.post('/', async (c) => {
       const newLog = await models.ActivityLog.create(logData);
       return c.json({ success: true, message: 'Activity log created successfully', data: newLog }, 201);
     } catch (error) {
-      console.error('Error creating activity log:', error);
-      return c.json({ success: false, message: 'Failed to create activity log' }, 500);
+      return handleRouteError(c, 'Error creating activity log', error);
     }
 });
 
@@ -68,8 +66,7 @@ activityLogsApp.put('/:id', async (c) => {
         await log.update(logData);
         return c.json({ success: true, message: 'Activity log updated successfully', data: log });
     } catch (error) {
-        console.error(`Error updating activity log ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to update activity log' }, 500);
+        return handleRouteError(c, `Error updating activity log ${c.req.param('id')}`, error);
     }
 });
 
@@ -86,8 +83,7 @@ activityLogsApp.delete('/:id', async (c) => {
         await log.destroy();
         return c.json({ success: true, message: 'Activity log deleted successfully' });
     } catch (error) {
-        console.error(`Error deleting activity log ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to delete activity log' }, 500);
+        return handleRouteError(c, `Error deleting activity log ${c.req.param('id')}`, error);
     }
 });
 

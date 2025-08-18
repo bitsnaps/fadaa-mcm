@@ -4,6 +4,7 @@ const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
 const path = require('path');
 const fs = require('fs');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const clientAttachmentsApp = new Hono();
 clientAttachmentsApp.use('*', authMiddleware);
@@ -20,8 +21,7 @@ clientAttachmentsApp.get('/:clientId', async (c) => {
         });
         return c.json({ success: true, data: attachments });
     } catch (error) {
-        console.error('Error fetching client attachments:', error);
-        return c.json({ success: false, message: 'Failed to fetch client attachments' }, 500);
+        return handleRouteError(c, `Error fetching client attachments for client ${c.req.param('clientId')}`, error);
     }
 });
 
@@ -66,8 +66,7 @@ clientAttachmentsApp.post('/:clientId', uploadMiddleware('attachments', 'attachm
         return c.json({ success: true, message: 'Attachments uploaded successfully', data: attachmentRecords }, 201);
 
     } catch (error) {
-        console.error('Error uploading client attachments:', error);
-        return c.json({ success: false, message: 'Failed to upload attachments' }, 500);
+        return handleRouteError(c, `Error uploading client attachments for client ${c.req.param('clientId')}`, error);
     }
 });
 

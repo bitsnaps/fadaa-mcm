@@ -4,6 +4,7 @@ const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
 const fs = require('fs');
 const path = require('path');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const documentApp = new Hono();
 documentApp.use('*', authMiddleware);
@@ -48,8 +49,7 @@ documentApp.post('/', uploadMiddleware('documents', 'document'), async (c) => {
         return c.json({ success: true, message: 'Document created successfully', document: newDocument }, 201);
 
     } catch (error) {
-        console.error('Error creating document:', error);
-        return c.json({ success: false, message: 'Failed to create document' }, 500);
+        return handleRouteError(c, 'Error creating document', error);
     }
 });
 
@@ -68,8 +68,7 @@ documentApp.put('/:id', async (c) => {
 
         return c.json({ success: true, message: 'Document updated successfully', data: document });
     } catch (error) {
-        console.error('Error updating document:', error);
-        return c.json({ success: false, message: 'Failed to update document' }, 500);
+        return handleRouteError(c, `Error updating document ${c.req.param('id')}`, error);
     }
 });
 
@@ -91,8 +90,7 @@ documentApp.delete('/:id', async (c) => {
         await document.destroy();
         return c.json({ success: true, message: 'Document deleted successfully' });
     } catch (error) {
-        console.error('Error deleting document:', error);
-        return c.json({ success: false, message: 'Failed to delete document' }, 500);
+        return handleRouteError(c, `Error deleting document ${c.req.param('id')}`, error);
     }
 });
 

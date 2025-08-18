@@ -2,6 +2,7 @@ const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 const { getInvestmentCalculations } = require('../controllers/investmentController');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const investmentsApp = new Hono();
 
@@ -59,8 +60,7 @@ investmentsApp.get('/:id', async (c) => {
         }
         return c.json({ success: true, data: investment });
     } catch (error) {
-        console.error(`Error fetching investment ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to fetch investment' }, 500);
+        return handleRouteError(c, `Error fetching investment ${id}`, error);
     }
 });
 
@@ -109,8 +109,7 @@ investmentsApp.put('/:id', async (c) => {
 
         return c.json({ success: true, message: 'Investment updated successfully', data: finalInvestment });
     } catch (error) {
-        console.error(`Error updating investment:`, error);
-        return c.json({ success: false, message: 'Failed to update investment' }, 500);
+        return handleRouteError(c, 'Error updating investment', error);
     }
 });
 
@@ -126,8 +125,7 @@ investmentsApp.delete('/:id', async (c) => {
         await investment.destroy();
         return c.json({ success: true, message: 'Investment deleted successfully' });
     } catch (error) {
-        console.error(`Error deleting investment:`, error);
-        return c.json({ success: false, message: 'Failed to delete investment' }, 500);
+        return handleRouteError(c, `Error deleting investment ${c.req.param('id')}`, error);
     }
 });
 

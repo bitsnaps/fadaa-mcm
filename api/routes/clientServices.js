@@ -1,6 +1,7 @@
 const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const clientServicesApp = new Hono();
 
@@ -35,8 +36,7 @@ clientServicesApp.get('/:clientId', async (c) => {
         });
         return c.json({ success: true, services });
     } catch (error) {
-        console.error('Error fetching client services:', error);
-        return c.json({ success: false, message: 'Failed to fetch client services' }, 500);
+        return handleRouteError(c, `Error fetching client services for client ${c.req.param('clientId')}`, error);
     }
 });
 
@@ -65,8 +65,7 @@ clientServicesApp.post('/:clientId', async (c) => {
 
         return c.json({ success: true, message: 'Service added successfully', service: newService }, 201);
     } catch (error) {
-        console.error('Error adding client service:', error);
-        return c.json({ success: false, message: 'Failed to add service' }, 500);
+        return handleRouteError(c, `Error adding client service for client ${c.req.param('clientId')}`, error);
     }
 });
 
@@ -95,8 +94,7 @@ clientServicesApp.put('/:serviceId', async (c) => {
 
         return c.json({ success: true, message: 'Service updated successfully', service });
     } catch (error) {
-        console.error('Error updating client service:', error);
-        return c.json({ success: false, message: 'Failed to update service' }, 500);
+        return handleRouteError(c, `Error updating client service ${c.req.param('serviceId')}`, error);
     }
 });
 // DELETE /api/client-services/:serviceId - Remove a service from a client
@@ -110,8 +108,7 @@ clientServicesApp.delete('/:serviceId', async (c) => {
         await service.destroy();
         return c.json({ success: true, message: 'Service removed successfully' });
     } catch (error) {
-        console.error('Error removing client service:', error);
-        return c.json({ success: false, message: 'Failed to remove service' }, 500);
+        return handleRouteError(c, `Error removing client service ${c.req.param('serviceId')}`, error);
     }
 });
 

@@ -3,6 +3,7 @@ const models = require('../models');
 const { createNotification } = require('../services/notificationService');
 const { authMiddleware } = require('../middleware/auth');
 const { Op } = require('sequelize');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const notificationApp = new Hono();
 
@@ -42,8 +43,7 @@ notificationApp.get('/', async (c) => {
       limit: parseInt(limit)
     });
   } catch (error) {
-    console.error('Error fetching notifications:', error);
-    return c.json({ success: false, message: 'An error occurred while fetching notifications' }, 500);
+    return handleRouteError(c, 'Error fetching notifications', error);
   }
 });
 
@@ -63,8 +63,7 @@ notificationApp.post('/', async (c) => {
     });
     return c.json({ success: true, message: 'Notification created successfully' }, 201);
   } catch (error) {
-    console.error('Error creating notification:', error);
-    return c.json({ success: false, message: 'An error occurred while creating the notification' }, 500);
+    return handleRouteError(c, 'Error creating notification', error);
   }
 });
 notificationApp.post('/mark-read', async (c) => {
@@ -79,8 +78,7 @@ notificationApp.post('/mark-read', async (c) => {
     });
     return c.json({ success: true, message: 'Notifications marked as read' });
   } catch (error) {
-    console.error('Error marking notifications as read:', error);
-    return c.json({ success: false, message: 'An error occurred while marking notifications as read' }, 500);
+    return handleRouteError(c, 'Error marking notifications as read', error);
   }
 });
 
@@ -95,8 +93,7 @@ notificationApp.put('/:id', async (c) => {
     await notification.update({ message, type });
     return c.json({ success: true, message: 'Notification updated successfully' });
   } catch (error) {
-    console.error('Error updating notification:', error);
-    return c.json({ success: false, message: 'An error occurred while updating the notification' }, 500);
+    return handleRouteError(c, `Error updating notification ${id}`, error);
   }
 });
 
@@ -110,8 +107,7 @@ notificationApp.delete('/:id', async (c) => {
     await notification.destroy();
     return c.json({ success: true, message: 'Notification deleted successfully' });
   } catch (error) {
-    console.error('Error deleting notification:', error);
-    return c.json({ success: false, message: 'An error occurred while deleting the notification' }, 500);
+    return handleRouteError(c, `Error deleting notification ${id}`, error);
   }
 });
 

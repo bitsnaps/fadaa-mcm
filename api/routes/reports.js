@@ -5,6 +5,7 @@ const ExcelJS = require('exceljs');
 const { Op } = require('sequelize');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
+const { handleRouteError } = require('../lib/errorHandler');
 const { getMonthlyReport, getAnnualReport, downloadMonthlyReport, downloadAnnualReport } = require('../controllers/reportController');
 
 const reportsApp = new Hono();
@@ -157,8 +158,7 @@ reportsApp.post('/generate', async (c) => {
     return c.json({ success: false, message: 'Unsupported format' }, 400);
 
   } catch (error) {
-    console.error('Error generating report:', error);
-    return c.json({ success: false, message: 'Failed to generate report' }, 500);
+    return handleRouteError(c, 'Error generating report', error);
   }
 });
 

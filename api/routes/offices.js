@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { createNotification } = require('../services/notificationService');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const officesApp = new Hono();
 
@@ -61,8 +62,8 @@ officesApp.post('/', authMiddleware, async (c) => {
 
 // PUT (update) an office
 officesApp.put('/:id', authMiddleware, async (c) => {
+    const { id } = c.req.param();
     try {
-        const { id } = c.req.param();
         const { name, branch_id, capacity, status, amenities, type } = await c.req.json();
         const user = c.get('user');
 
@@ -71,11 +72,9 @@ officesApp.put('/:id', authMiddleware, async (c) => {
             return c.json({ success: false, message: 'Office not found' }, 404);
         }
 
-        // If an assistant tries to set the status to 'En instance', create a notification for admins
-        if (user.role_id === 2 && status === 'En instance') { // Assuming 2 is 'assistant'
-            const admins = await models.User.findAll({ where: { role_id: 1 } }); // Assuming 1 is 'admin'
+        if (user.role_id === 2 && status === 'En instance') {
+            const admins = await models.User.findAll({ where: { role_id: 1 } });
             const message = `Assistant ${user.first_name} has requested to book office ${office.name}.`;
-
             for (const admin of admins) {
                 await createNotification({
                     userId: admin.id,
@@ -85,22 +84,20 @@ officesApp.put('/:id', authMiddleware, async (c) => {
                     relatedEntityId: office.id,
                 });
             }
-            // Prevent the status change and inform the assistant
             return c.json({ success: true, message: 'Booking request sent to admin for approval.' });
         }
 
         await office.update({ name, branch_id, capacity, status, amenities, type });
         return c.json({ success: true, message: 'Office updated successfully', data: office });
     } catch (error) {
-        console.error(`Error updating office ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to update office' }, 500);
+        return handleRouteError(c, `Error updating office ${id}`, error);
     }
 });
 
 // DELETE an office
 officesApp.delete('/:id', authMiddleware, async (c) => {
+    const { id } = c.req.param();
     try {
-        const { id } = c.req.param();
         const office = await models.Office.findByPk(id);
         if (!office) {
             return c.json({ success: false, message: 'Office not found' }, 404);
@@ -109,8 +106,7 @@ officesApp.delete('/:id', authMiddleware, async (c) => {
         await office.destroy();
         return c.json({ success: true, message: 'Office deleted successfully' });
     } catch (error) {
-        console.error(`Error deleting office ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to delete office' }, 500);
+        return handleRouteError(c, `Error deleting office ${id}`, error);
     }
 });
 

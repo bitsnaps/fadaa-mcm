@@ -1,6 +1,7 @@
 const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const taxApp = new Hono();
 taxApp.use('*', authMiddleware, adminMiddleware); // Protect all tax routes
@@ -29,8 +30,7 @@ taxApp.post('/', async (c) => {
         if (error.name === 'SequelizeUniqueConstraintError') {
             return c.json({ success: false, message: 'A tax with this name already exists' }, 409);
         }
-        console.error('Error creating tax:', error);
-        return c.json({ success: false, message: 'Failed to create tax' }, 500);
+        return handleRouteError(c, 'Error creating tax', error);
     }
 });
 
@@ -64,8 +64,7 @@ taxApp.put('/:id', async (c) => {
         if (error.name === 'SequelizeUniqueConstraintError') {
             return c.json({ success: false, message: 'A tax with this name already exists' }, 409);
         }
-        console.error('Error updating tax:', error);
-        return c.json({ success: false, message: 'Failed to update tax' }, 500);
+        return handleRouteError(c, `Error updating tax ${c.req.param('id')}`, error);
     }
 });
 
@@ -81,8 +80,7 @@ taxApp.delete('/:id', async (c) => {
         await tax.destroy({ force: true }); // This will hard-delete
         return c.json({ success: true, message: 'Tax deleted successfully' });
     } catch (error) {
-        console.error('Error deleting tax:', error);
-        return c.json({ success: false, message: 'Failed to delete tax' }, 500);
+        return handleRouteError(c, `Error deleting tax ${c.req.param('id')}`, error);
     }
 });
 

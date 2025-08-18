@@ -1,6 +1,7 @@
 const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const miscApp = new Hono();
 
@@ -13,8 +14,7 @@ miscApp.get('/clients', authMiddleware, async (c) => {
         });
         return c.json({ success: true, clients });
     } catch (error) {
-        console.error('Error fetching client list:', error);
-        return c.json({ success: false, message: 'Failed to fetch client list' }, 500);
+        return handleRouteError(c, 'Error fetching client list', error);
     }
 });
 
@@ -28,8 +28,7 @@ miscApp.get('/offices', authMiddleware, async (c) => {
         });
         return c.json({ success: true, offices });
     } catch (error) {
-        console.error('Error fetching available offices:', error);
-        return c.json({ success: false, message: 'Failed to fetch available offices' }, 500);
+        return handleRouteError(c, 'Error fetching available offices', error);
     }
 });
 
@@ -42,8 +41,7 @@ miscApp.get('/investments', authMiddleware, async (c) => {
         });
         return c.json({ success: true, investments });
     } catch (error) {
-        console.error('Error fetching investment list:', error);
-        return c.json({ success: false, message: 'Failed to fetch investment list' }, 500);
+        return handleRouteError(c, 'Error fetching investment list', error);
     }
 });
 // GET /api/roles - Get a simplified list of roles for dropdowns
@@ -55,8 +53,7 @@ miscApp.get('/roles', authMiddleware, async (c) => {
         });
         return c.json({ success: true, roles });
     } catch (error) {
-        console.error('Error fetching role list:', error);
-        return c.json({ success: false, message: 'Failed to fetch role list' }, 500);
+        return handleRouteError(c, 'Error fetching role list', error);
     }
 });
 
@@ -69,8 +66,7 @@ miscApp.get('/branches', authMiddleware, async (c) => {
         });
         return c.json({ success: true, branches });
     } catch (error) {
-        console.error('Error fetching branch list:', error);
-        return c.json({ success: false, message: 'Failed to fetch branch list' }, 500);
+        return handleRouteError(c, 'Error fetching branch list', error);
     }
 });
 miscApp.get('/', async (c) => {

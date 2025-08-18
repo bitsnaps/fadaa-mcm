@@ -2,6 +2,7 @@ const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { Op } = require('sequelize');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const financialsApp = new Hono();
 
@@ -92,8 +93,7 @@ financialsApp.get('/revenue-summary', async (c) => {
         });
 
     } catch (error) {
-        console.error('Error fetching revenue summary:', error);
-        return c.json({ success: false, message: 'Failed to fetch revenue summary' }, 500);
+        return handleRouteError(c, 'Error fetching revenue summary', error);
     }
 });
 

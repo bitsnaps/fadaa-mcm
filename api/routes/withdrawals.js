@@ -1,6 +1,7 @@
 const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const withdrawalsApp = new Hono();
 const Op = models.Sequelize.Op;
@@ -33,8 +34,7 @@ withdrawalsApp.get('/', async (c) => {
 
     return c.json({ success: true, data: withdrawals });
   } catch (error) {
-    console.error('Error fetching withdrawals:', error);
-    return c.json({ success: false, message: 'Failed to fetch withdrawals' }, 500);
+    return handleRouteError(c, 'Error fetching withdrawals', error);
   }
 });
 
@@ -95,8 +95,7 @@ withdrawalsApp.put('/:id/approve', async (c) => {
 
     return c.json({ success: true, message: 'Withdrawal approved', data: finalWithdrawal });
   } catch (error) {
-    console.error('Error approving withdrawal:', error);
-    return c.json({ success: false, message: 'Failed to approve withdrawal' }, 500);
+    return handleRouteError(c, `Error approving withdrawal ${c.req.param('id')}`, error);
   }
 });
 
@@ -150,8 +149,7 @@ withdrawalsApp.put('/:id/reject', async (c) => {
 
     return c.json({ success: true, message: 'Withdrawal rejected', data: finalWithdrawal });
   } catch (error) {
-    console.error('Error rejecting withdrawal:', error);
-    return c.json({ success: false, message: 'Failed to reject withdrawal' }, 500);
+    return handleRouteError(c, `Error rejecting withdrawal ${c.req.param('id')}`, error);
   }
 });
 
@@ -206,8 +204,7 @@ withdrawalsApp.put('/:id/mark-paid', async (c) => {
 
     return c.json({ success: true, message: 'Withdrawal marked as paid', data: finalWithdrawal });
   } catch (error) {
-    console.error('Error marking withdrawal as paid:', error);
-    return c.json({ success: false, message: 'Failed to mark withdrawal as paid' }, 500);
+    return handleRouteError(c, `Error marking withdrawal ${c.req.param('id')} as paid`, error);
   }
 });
 
@@ -230,8 +227,7 @@ withdrawalsApp.get('/:id', async (c) => {
 
     return c.json({ success: true, data: withdrawal });
   } catch (error) {
-    console.error('Error fetching withdrawal:', error);
-    return c.json({ success: false, message: 'Failed to fetch withdrawal' }, 500);
+    return handleRouteError(c, `Error fetching withdrawal ${c.req.param('id')}`, error);
   }
 });
 
@@ -268,8 +264,7 @@ withdrawalsApp.post('/', async (c) => {
 
     return c.json({ success: true, message: 'Withdrawal created successfully', data: newWithdrawal }, 201);
   } catch (error) {
-    console.error('Error creating new withdrawal:', error);
-    return c.json({ success: false, message: 'Failed to create new withdrawal' }, 500);
+    return handleRouteError(c, 'Error creating new withdrawal', error);
   }
 });
 
@@ -309,8 +304,7 @@ withdrawalsApp.put('/:id', async (c) => {
 
     return c.json({ success: true, message: 'Withdrawal updated successfully', data: finalWithdrawal });
   } catch (error) {
-    console.error('Error updating withdrawal:', error);
-    return c.json({ success: false, message: 'Failed to update withdrawal' }, 500);
+    return handleRouteError(c, `Error updating withdrawal ${c.req.param('id')}`, error);
   }
 });
 
@@ -330,8 +324,7 @@ withdrawalsApp.delete('/:id', async (c) => {
     await wd.destroy();
     return c.json({ success: true, message: 'Withdrawal deleted successfully' });
   } catch (error) {
-    console.error('Error deleting withdrawal:', error);
-    return c.json({ success: false, message: 'Failed to delete withdrawal' }, 500);
+    return handleRouteError(c, `Error deleting withdrawal ${c.req.param('id')}`, error);
   }
 });
 

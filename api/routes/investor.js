@@ -2,6 +2,7 @@ const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware, investorMiddleware } = require('../middleware/auth');
 const { getInvestmentCalculations } = require('../controllers/investmentController');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const Op = models.Sequelize.Op;
 
@@ -60,8 +61,7 @@ investorApp.get('/investments', async (c) => {
 
     return c.json({ success: true, data });
   } catch (error) {
-    console.error('Error fetching investor investments:', error);
-    return c.json({ success: false, message: 'Failed to fetch investments' }, 500);
+    return handleRouteError(c, 'Error fetching investor investments', error);
   }
 });
 
@@ -83,8 +83,7 @@ investorApp.get('/withdrawals', async (c) => {
 
     return c.json({ success: true, data: withdrawals });
   } catch (error) {
-    console.error('Error fetching investor withdrawals:', error);
-    return c.json({ success: false, message: 'Failed to fetch withdrawals' }, 500);
+    return handleRouteError(c, 'Error fetching investor withdrawals', error);
   }
 });
 
@@ -117,8 +116,7 @@ investorApp.get('/withdrawals/available/:investmentId', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Error computing available withdrawal:', error);
-    return c.json({ success: false, message: 'Failed to compute available withdrawal' }, 500);
+    return handleRouteError(c, `Error computing available withdrawal for investment ${c.req.param('investmentId')}`, error);
   }
 });
 
@@ -191,8 +189,7 @@ investorApp.post('/withdrawals', async (c) => {
 
     return c.json({ success: true, message: 'Withdrawal request created', data: finalWithdrawal }, 201);
   } catch (error) {
-    console.error('Error creating withdrawal:', error);
-    return c.json({ success: false, message: 'Failed to create withdrawal' }, 500);
+    return handleRouteError(c, 'Error creating withdrawal', error);
   }
 });
 

@@ -2,6 +2,7 @@ const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const contractApp = new Hono();
 contractApp.use('*', authMiddleware);
@@ -31,6 +32,25 @@ contractApp.get('/', async (c) => {
         return c.json({ success: false, message: 'Failed to fetch contracts' }, 500);
     }
 });
+// GET /api/contracts/:id - Get one contract
+contractApp.get('/:id', async (c) => {
+  const { id } = c.req.param();
+  try {
+    const contract = await models.Contract.findByPk(id, {
+      include: [
+        { model: models.Client, attributes: ['id', 'company_name'] },
+        { model: models.Profile },
+        { model: models.Office, attributes: ['id', 'name'] },
+        { model: models.Tax, as: 'taxes' }
+      ]
+    });
+    if (!contract) return c.json({ success: false, message: 'Contract not found' }, 404);
+    return c.json({ success: true, contract });
+  } catch (error) {
+    return handleRouteError(c, `Error fetching contract ${id}`, error);
+  }
+});
+
 
 // POST /api/contracts - Create a new contract with document upload
 contractApp.post('/', uploadMiddleware('contracts', 'document'), async (c) => {
@@ -75,8 +95,8 @@ contractApp.post('/', uploadMiddleware('contracts', 'document'), async (c) => {
 
 // PUT /api/contracts/:id - Update a contract
 contractApp.put('/:id', uploadMiddleware('contracts', 'document'), async (c) => {
+    const { id } = c.req.param();
     try {
-        const { id } = c.req.param();
         const body = await c.req.parseBody();
         const { client_id, office_id, start_date, end_date, monthly_rate, tax_ids, status } = body;
 
@@ -85,10 +105,7 @@ contractApp.put('/:id', uploadMiddleware('contracts', 'document'), async (c) => 
             return c.json({ success: false, message: 'Contract not found' }, 404);
         }
 
-        // --- File Upload Logic for Updates ---
-        const documentUrl = c.req.filePath || contract.document_url; // Keep existing if not updated
-        
-        // --- End File Upload Logic ---
+        const documentUrl = c.req.filePath || contract.document_url;
 
         await contract.update({
             client_id,
@@ -107,25 +124,22 @@ contractApp.put('/:id', uploadMiddleware('contracts', 'document'), async (c) => 
         } else {
             await contract.setTaxes([]);
         }
-        
-        // If office was changed, update statuses
+
         if (body.original_office_id && office_id !== body.original_office_id) {
             await models.Office.update({ status: 'Available' }, { where: { id: body.original_office_id } });
             await models.Office.update({ status: 'Occupied' }, { where: { id: office_id } });
         }
 
-
         return c.json({ success: true, message: 'Contract updated successfully', contract });
     } catch (error) {
-        console.error('Error updating contract:', error);
-        return c.json({ success: false, message: 'Failed to update contract' }, 500);
+        return handleRouteError(c, `Error updating contract ${id}`, error);
     }
 });
 
 // PUT /api/contracts/:id - Update a contract's status
 contractApp.put('/:id/status', authMiddleware, async (c) => {
+    const { id } = c.req.param();
     try {
-        const { id } = c.req.param();
         const { status } = await c.req.json();
 
         if (!status) {
@@ -139,36 +153,31 @@ contractApp.put('/:id/status', authMiddleware, async (c) => {
 
         await contract.update({ status });
 
-        // If contract is terminated, maybe change office status back to 'Available'
         if (status === 'Terminated' || status === 'Expired') {
             await models.Office.update({ status: 'Available' }, { where: { id: contract.office_id } });
         }
 
         return c.json({ success: true, message: 'Contract status updated successfully', contract });
     } catch (error) {
-        console.error(`Error updating contract ${id} status:`, error);
-        return c.json({ success: false, message: 'Failed to update contract status' }, 500);
+        return handleRouteError(c, `Error updating contract ${id} status`, error);
     }
 });
 
 
 // DELETE /api/contracts/:id - Delete a contract
 contractApp.delete('/:id', authMiddleware, async (c) => {
+    const { id } = c.req.param();
     try {
-        const { id } = c.req.param();
         const contract = await models.Contract.findByPk(id);
         if (!contract) {
             return c.json({ success: false, message: 'Contract not found' }, 404);
         }
 
-        // Optionally, handle related cleanup, like setting office to 'Available'
-        // For now, we just delete the contract
         await contract.destroy();
-        
+
         return c.json({ success: true, message: 'Contract deleted successfully' });
     } catch (error) {
-        console.error(`Error deleting contract ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to delete contract' }, 500);
+        return handleRouteError(c, `Error deleting contract ${id}`, error);
     }
 });
 

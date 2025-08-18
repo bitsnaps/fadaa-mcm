@@ -4,6 +4,7 @@ const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
 const { createNotification } = require('../services/notificationService');
 const { Op } = require('sequelize');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const clientsApp = new Hono();
 
@@ -49,8 +50,8 @@ clientsApp.get('/', async (c) => {
 });
 // GET investments for a specific client
 clientsApp.get('/:id/investments', async (c) => {
+    const { id } = c.req.param();
     try {
-        const { id } = c.req.param();
         const client = await models.Client.findByPk(id, {
             include: [{
                 model: models.Contract,
@@ -73,29 +74,27 @@ clientsApp.get('/:id/investments', async (c) => {
                 }
             });
         }
-        
+
         // Remove duplicates
         const uniqueInvestments = investments.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
 
         return c.json({ success: true, data: uniqueInvestments });
     } catch (error) {
-        console.error(`Error fetching investments for client ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to fetch investments' }, 500);
+        return handleRouteError(c, `Error fetching investments for client ${id}`, error);
     }
 });
 
 // GET a single client by ID
 clientsApp.get('/:id', async (c) => {
+    const { id } = c.req.param();
     try {
-        const { id } = c.req.param();
         const client = await models.Client.findByPk(id);
         if (!client) {
             return c.json({ success: false, message: 'Client not found' }, 404);
         }
         return c.json({ success: true, data: client });
     } catch (error) {
-        console.error(`Error fetching client ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to fetch client' }, 500);
+        return handleRouteError(c, `Error fetching client ${id}`, error);
     }
 });
 
@@ -113,27 +112,24 @@ clientsApp.post('/', uploadMiddleware('attachments', 'attachments'), async (c) =
 
 // PUT (update) a client
 clientsApp.put('/:id', uploadMiddleware('attachments', 'attachments'), async (c) => {
+    const { id } = c.req.param();
     try {
-        const { id } = c.req.param();
         const clientData = await c.req.parseBody();
-        
         const client = await models.Client.findByPk(id);
         if (!client) {
             return c.json({ success: false, message: 'Client not found' }, 404);
         }
-
         await client.update(clientData);
         return c.json({ success: true, message: 'Client updated successfully', data: client });
     } catch (error) {
-        console.error(`Error updating client ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to update client' }, 500);
+        return handleRouteError(c, `Error updating client ${id}`, error);
     }
 });
 
 // DELETE a client
 clientsApp.delete('/:id', async (c) => {
+    const { id } = c.req.param();
     try {
-        const { id } = c.req.param();
         const client = await models.Client.findByPk(id);
         if (!client) {
             return c.json({ success: false, message: 'Client not found' }, 404);
@@ -158,8 +154,7 @@ clientsApp.delete('/:id', async (c) => {
 
         return c.json({ success: true, message: 'Client deleted successfully' });
     } catch (error) {
-        console.error(`Error deleting client ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to delete client' }, 500);
+        return handleRouteError(c, `Error deleting client ${id}`, error);
     }
 });
 

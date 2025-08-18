@@ -1,6 +1,7 @@
 const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const serviceCategoriesApp = new Hono();
 
@@ -32,37 +33,32 @@ serviceCategoriesApp.post('/', authMiddleware, async (c) => {
 
 // PUT (update) a service category
 serviceCategoriesApp.put('/:id', authMiddleware, async (c) => {
+    const { id } = c.req.param();
     try {
-        const { id } = c.req.param();
         const { name, description } = await c.req.json();
-        
         const category = await models.ServiceCategory.findByPk(id);
         if (!category) {
             return c.json({ success: false, message: 'Service category not found' }, 404);
         }
-
         await category.update({ name, description });
         return c.json({ success: true, message: 'Service category updated successfully', data: category });
     } catch (error) {
-        console.error(`Error updating service category ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to update service category' }, 500);
+        return handleRouteError(c, `Error updating service category ${id}`, error);
     }
 });
 
 // DELETE a service category
 serviceCategoriesApp.delete('/:id', authMiddleware, async (c) => {
+    const { id } = c.req.param();
     try {
-        const { id } = c.req.param();
         const category = await models.ServiceCategory.findByPk(id);
         if (!category) {
             return c.json({ success: false, message: 'Service category not found' }, 404);
         }
-
         await category.destroy();
         return c.json({ success: true, message: 'Service category deleted successfully' });
     } catch (error) {
-        console.error(`Error deleting service category ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to delete service category' }, 500);
+        return handleRouteError(c, `Error deleting service category ${id}`, error);
     }
 });
 

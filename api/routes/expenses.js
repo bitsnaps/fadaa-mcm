@@ -3,6 +3,7 @@ const models = require('../models');
 const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
 const { createNotification } = require('../services/notificationService');
 const { Op } = require('sequelize');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const expensesApp = new Hono();
 
@@ -150,8 +151,7 @@ expensesApp.put('/:id', async (c) => {
       });
       return c.json({ success: true, message: 'Expense updated successfully', data: finalExpense });
     } catch (error) {
-      console.error(`Error updating expense:`, error);
-      return c.json({ success: false, message: 'Failed to update expense' }, 500);
+      return handleRouteError(c, 'Error updating expense', error);
     }
 });
 
@@ -167,8 +167,7 @@ expensesApp.delete('/:id', async (c) => {
       await expense.destroy();
       return c.json({ success: true, message: 'Expense deleted successfully' });
     } catch (error) {
-      console.error(`Error deleting expense:`, error);
-      return c.json({ success: false, message: 'Failed to delete expense' }, 500);
+      return handleRouteError(c, `Error deleting expense ${c.req.param('id')}`, error);
     }
 });
 

@@ -4,6 +4,7 @@ const models = require('../models');
 const { hashPassword, verifyPassword } = require('../lib/auth');
 const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
+const { handleRouteError } = require('../lib/errorHandler');
 
 const userApp = new Hono();
 
@@ -61,8 +62,7 @@ userApp.get('/:id', authMiddleware, async (c) => {
         }
         return c.json({ success: true, data: user });
     } catch (error) {
-        console.error(`Error fetching user ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to fetch user' }, 500);
+        return handleRouteError(c, `Error fetching user ${id}`, error);
     }
 });
 
@@ -120,8 +120,7 @@ userApp.put('/:id', authMiddleware, async (c) => {
 
         return c.json({ success: true, message: 'User updated successfully' });
     } catch (error) {
-        console.error(`Error updating user ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to update user' }, 500);
+        return handleRouteError(c, `Error updating user ${id}`, error);
     }
 });
 
@@ -143,8 +142,7 @@ userApp.put('/profile/:id', authMiddleware, async (c) => {
 
         return c.json({ success: true, message: 'User profile updated successfully' });
     } catch (error) {
-        console.error(`Error updating user profile ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to update user profile' }, 500);
+        return handleRouteError(c, `Error updating user profile ${id}`, error);
     }
 });
 
@@ -169,8 +167,7 @@ userApp.post('/change-password/:id', authMiddleware, async (c) => {
 
         return c.json({ success: true, message: 'Password changed successfully' });
     } catch (error) {
-        console.error(`Error changing password for user ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to change password' }, 500);
+        return handleRouteError(c, `Error changing password for user ${id}`, error);
     }
 });
 
@@ -189,8 +186,7 @@ userApp.post('/profile-picture/:id', authMiddleware, uploadMiddleware('avatars',
 
         return c.json({ success: true, message: 'Profile picture uploaded successfully', filePath });
     } catch (error) {
-        console.error(`Error updating profile picture for user ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to update profile picture' }, 500);
+        return handleRouteError(c, `Error updating profile picture for user ${id}`, error);
     }
 });
 
@@ -206,8 +202,7 @@ userApp.delete('/:id', authMiddleware, async (c) => {
         await user.destroy();
         return c.json({ success: true, message: 'User deleted successfully' });
     } catch (error) {
-        console.error(`Error deleting user ${id}:`, error);
-        return c.json({ success: false, message: 'Failed to delete user' }, 500);
+        return handleRouteError(c, `Error deleting user ${id}`, error);
     }
 });
 // Get available roles

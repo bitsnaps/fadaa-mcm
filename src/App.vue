@@ -7,10 +7,12 @@ import { useSidebarStore } from '@/stores/sidebar';
 import { useNotificationStore } from '@/stores/notification';
 import Navbar from '@/components/Navbar.vue';
 import Sidebar from '@/components/Sidebar.vue';
+import { useToast } from '@/helpers/toast';
 
 const route = useRoute();
 const authStore = useAuthStore();
 const sidebarStore = useSidebarStore();
+const { showErrorToast } = useToast();
 
 const userRole = computed(() => authStore.userRole);
 const isAuthenticated = computed(() => authStore.isAuthenticated);
@@ -23,8 +25,11 @@ const showSidebar = computed(() => {
 });
 
 watch(() => notificationStore.notification, (newNotification) => {
-  if (newNotification) {
+  if (newNotification && route.path !== '/login') {
+    // Avoid duplicate errors on login page (inline + toast)
     showErrorToast(newNotification.message);
+  }
+  if (newNotification) {
     notificationStore.clearNotification();
   }
 });

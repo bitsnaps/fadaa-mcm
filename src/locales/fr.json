@@ -22,7 +22,7 @@
       "title": "Performance des Assistants",
       "assistant1": "Assistant 1",
       "statusExcellent": "Excellent",
-      "statusActive": "Actif",      
+      "statusActive": "Actif",
       "assistant2": "Assistant 2",
       "statusGood": "Bon",
       "assistant3": "Assistant 3",
@@ -109,7 +109,7 @@
       "type": "Type",
       "investment_amount": "Montant",
       "starting_date": "Début",
-      "ending_date": "Fin",      
+      "ending_date": "Fin",
       "status": "Statut",
       "actions": "Actions",
       "description": "Description"
@@ -677,7 +677,7 @@
       "totalInvested": "Total investi",
       "totalProfitShare": "Partage des bénéfices totaux",
       "chartTitle": "Répartition des investissements par type"
-    }      
+    }
   },
   "complianceManagement": {
     "title": "Gestion de la Conformité",
@@ -1060,5 +1060,16 @@
         "desc": "Décroissant",
         "asc": "Croissant"
     }
+  }
+,
+  "errors": {
+    "network": "Erreur réseau. Veuillez vérifier votre connexion internet.",
+    "timeout": "La requête a expiré. Veuillez réessayer.",
+    "unauthorized": "Votre session a expiré. Veuillez vous reconnecter.",
+    "forbidden": "Vous n'avez pas l'autorisation d'effectuer cette action.",
+    "notFound": "La ressource demandée est introuvable.",
+    "validation": "Certains champs sont invalides. Veuillez vérifier vos saisies.",
+    "server": "Le serveur a rencontré une erreur. Veuillez réessayer plus tard.",
+    "unknown": "Un problème est survenu. Veuillez réessayer."
   }
 }

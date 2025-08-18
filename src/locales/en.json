@@ -726,7 +726,7 @@
       "totalInvested": "Total Invested",
       "totalProfitShare": "Total Profit Share",
       "chartTitle": "Investment Distribution by Type"
-    }    
+    }
   },
   "complianceManagement": {
     "title": "Compliance Management",
@@ -1117,5 +1117,16 @@
         "desc": "Descending",
         "asc": "Ascending"
     }
+  }
+,
+  "errors": {
+    "network": "Network error. Please check your internet connection.",
+    "timeout": "The request timed out. Please try again.",
+    "unauthorized": "Your session has expired. Please log in again.",
+    "forbidden": "You don’t have permission to perform this action.",
+    "notFound": "The requested resource was not found.",
+    "validation": "Some inputs are invalid. Please review your entries.",
+    "server": "The server encountered an error. Please try again later.",
+    "unknown": "Something went wrong. Please try again."
   }
 }
