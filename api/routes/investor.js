@@ -15,8 +15,9 @@ investorApp.use('*', authMiddleware, investorMiddleware);
 async function computeAccruedProfitShareToDate(investmentInstance) {
   const inv = investmentInstance.toJSON ? investmentInstance.toJSON() : investmentInstance;
   const calcInput = { ...inv, ending_date: new Date() };
-  const calculations = await getInvestmentCalculations(calcInput);
-  return calculations?.yourProfitShareSelectedPeriod || 0;
+  // getInvestmentCalculations expects an array and returns a map keyed by investment id
+  const calculations = await getInvestmentCalculations([calcInput]);
+  return calculations?.[inv.id]?.yourProfitShareSelectedPeriod || 0;
 }
 
 // Helper to sum committed withdrawals (pending + approved + paid)
@@ -34,8 +35,12 @@ async function sumCommittedWithdrawals(investmentId) {
 investorApp.get('/investments', async (c) => {
   try {
     const user = c.get('user');
+    const { profile_id } = c.req.query();
+    const where = { investor_id: user.id };
+    if (profile_id) where.profile_id = profile_id;
+
     const investments = await models.Investment.findAll({
-      where: { investor_id: user.id },
+      where,
       include: [{ model: models.Branch }, { model: models.Profile }],
       order: [['created_at', 'DESC']],
     });
@@ -45,14 +50,14 @@ investorApp.get('/investments', async (c) => {
         const accruedShare = await computeAccruedProfitShareToDate(inv);
         const committed = await sumCommittedWithdrawals(inv.id);
         const available = Math.max(accruedShare - committed, 0);
-        // Also compute branch net profit if useful to UI
         const calcInput = { ...(inv.toJSON ? inv.toJSON() : inv), ending_date: new Date() };
-        const calc = await getInvestmentCalculations(calcInput);
+        const calcMap = await getInvestmentCalculations([calcInput]);
+        const calc = calcMap?.[inv.id] || {};
 
         return {
           ...inv.toJSON(),
           yourProfitShareSelectedPeriod: accruedShare,
-          branchNetProfitSelectedPeriod: calc?.branchNetProfitSelectedPeriod || 0,
+          branchNetProfitSelectedPeriod: calc.branchNetProfitSelectedPeriod || 0,
           withdrawalsCommitted: committed,
           availableForWithdrawal: available,
         };
@@ -69,11 +74,12 @@ investorApp.get('/investments', async (c) => {
 investorApp.get('/withdrawals', async (c) => {
   try {
     const user = c.get('user');
-    const { status, investment_id } = c.req.query();
+    const { status, investment_id, profile_id } = c.req.query();
 
     const where = { investor_id: user.id };
     if (status) where.status = status;
     if (investment_id) where.investment_id = investment_id;
+    if (profile_id) where.profile_id = profile_id;
 
     const withdrawals = await models.Withdrawal.findAll({
       where,
@@ -86,6 +92,40 @@ investorApp.get('/withdrawals', async (c) => {
     return handleRouteError(c, 'Error fetching investor withdrawals', error);
   }
 });
+// GET /investor/documents - list current investor documents (optional filter: profile_id)
+investorApp.get('/documents', async (c) => {
+  try {
+    const user = c.get('user');
+    const { profile_id } = c.req.query();
+
+    const where = {};
+    const include = [
+      {
+        model: models.Investment,
+        attributes: ['id', 'name', 'profile_id', 'investor_id'],
+        where: { investor_id: user.id, ...(profile_id ? { profile_id } : {}) },
+        required: true,
+      },
+    ];
+
+    const documents = await models.Document.findAll({ where, include, order: [['created_at', 'DESC']] });
+
+    // Normalize shape for frontend
+    const data = documents.map((d) => ({
+      id: d.id,
+      title: d.title,
+      type: d.type,
+      file_path: d.file_path,
+      investment_id: d.investment_id,
+      created_at: d.created_at,
+    }));
+
+    return c.json({ success: true, data });
+  } catch (error) {
+    return handleRouteError(c, 'Error fetching investor documents', error);
+  }
+});
+
 
 // GET /investor/withdrawals/available/:investmentId - compute available amount for an investment
 investorApp.get('/withdrawals/available/:investmentId', async (c) => {

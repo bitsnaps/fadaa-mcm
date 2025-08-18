@@ -3,9 +3,11 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Line } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler } from 'chart.js';
+import { getRevenueSeries } from '@/services/RevenueService';
 import { formatCurrency } from '@/helpers/utils.js';
 import { getMyWithdrawals, createWithdrawal } from '@/services/WithdrawalService';
 import { getMyInvestments } from '@/services/InvestmentService';
+import { getMyDocuments } from '@/services/InvestorService';
 import profileService from '@/services/profileService';
 import { useToast } from '@/helpers/toast';
 
@@ -15,7 +17,7 @@ const { t, locale } = useI18n();
 const { showErrorToast, showSuccessToast } = useToast();
 
 const chartFilter = ref('monthly'); // monthly, bi-yearly, yearly
-const tableFilter = ref('monthly'); // Default to yearly to show all initially
+const revenueSeries = ref({ labels: [], values: [] });
 
 // --- Investor withdrawals integration (live data) ---
 const invIsLoading = ref(true);
@@ -65,6 +67,24 @@ async function loadInvestorData() {
     const resW = await getMyWithdrawals(params);
     if (resW.data?.success) {
       myWithdrawals.value = resW.data.data || [];
+    }
+    const resDocs = await getMyDocuments(params);
+    if (resDocs.data?.success) {
+      documents.value = (resDocs.data.data || []).map(d => ({
+        id: d.id,
+        name: d.title,
+        url: d.file_path,
+        icon: d.type === 'Contract' ? 'bi-file-earmark-pdf-fill text-danger' : 'bi-file-earmark-text'
+      }));
+    }
+    // Revenue series from backend (by month)
+    const today = new Date();
+    const year = today.getFullYear();
+    const resRev = await getRevenueSeries({ profile_id: activeProfileId.value, year });
+    if (resRev.data?.success) {
+      const d = resRev.data.data || {};
+      const months = locale.value === 'fr' ? ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'] : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      revenueSeries.value = { labels: months, values: (d.netRevenue || Array(12).fill(0)) };
     }
   } catch (e) {
     invError.value = e.message || 'Failed to load investor data';
@@ -125,154 +145,29 @@ async function initializeDashboard() {
 
 onMounted(initializeDashboard);
 
-// Yearly data (represents all current investments)
-const yearlyInvestments = ref([
-  {
-    id: 1,
-    branchName: 'Staoueli (Annuel)',
-    amount: 150000,
-    sharePercentage: 10,
-    NbrOfClients: 200,
-    contractStartDate: '01/01/2023',
-    contractEndDate: '31/12/2025',
-    status: 'active',
-  },
-  {
-    id: 2,
-    branchName: 'Cheraga (Annuel)',
-    amount: 100000,
-    sharePercentage: 8,
-    NbrOfClients: 200,
-    contractStartDate: '01/06/2022',
-    contractEndDate: '31/05/2025',
-    status: 'active',
-  },
-  {
-    id: 3,
-    branchName: 'Birkhadem (Annuel)',
-    amount: 75000,
-    sharePercentage: 12,
-    NbrOfClients: 450,
-    contractStartDate: '01/03/2024',
-    contractEndDate: '28/02/2027',
-    status: 'pending',
-  },
-]);
+// Removed mock investment lists; investor sees live data only
 
-// Sample Monthly Data (e.g., for the current or a specific month)
-const monthlyInvestments = ref([
-  {
-    id: 1,
-    branchName: 'Staoueli (Mensuel)',
-    amount: 12500, // Monthly revenue portion
-    sharePercentage: 10,
-    NbrOfClients: 195, // Client count might fluctuate slightly
-    status: 'active',
-  },
-  {
-    id: 2,
-    branchName: 'Cheraga (Mensuel)',
-    amount: 8300,
-    sharePercentage: 8,
-    NbrOfClients: 198,
-    status: 'active',
-  },
-  // Birkhadem might not have monthly data if 'pending'
-]);
+// Removed mock investment lists; investor sees live data only
 
-// Sample Bi-Yearly Data (e.g., for the current or a specific semester)
-const biYearlyInvestments = ref([
-  {
-    id: 1,
-    branchName: 'Staoueli (Semestriel)',
-    amount: 75000, // Bi-yearly revenue portion
-    sharePercentage: 10,
-    NbrOfClients: 200,
-    status: 'active',
-  },
-  {
-    id: 2,
-    branchName: 'Cheraga (Semestriel)',
-    amount: 50000,
-    sharePercentage: 8,
-    NbrOfClients: 200,
-    status: 'active',
-  },
-  {
-    id: 3,
-    branchName: 'Birkhadem (Semestriel)',
-    amount: 37500, // Assuming it becomes active or has projected data for semester
-    sharePercentage: 12,
-    NbrOfClients: 450,
-    status: 'pending',
-  },
-]);
+// Removed mock investment lists; investor sees live data only
 
-const profitShares = ref([
-  {
-    id: 1,
-    date: '15/04/2024',
-    branchName: 'Staoueli',
-    amount: 3500,
-    period: 'T1 2024',
-  },
-  {
-    id: 2,
-    date: '15/04/2024',
-    branchName: 'Cheraga',
-    amount: 2800,
-    period: 'T1 2024',
-  },
-  {
-    id: 3,
-    date: '15/01/2024',
-    branchName: 'Birkhadem',
-    amount: 3200,
-    period: 'T4 2023',
-  },
-]);
+// Profit shares derived from paid withdrawals
+const paidWithdrawals = computed(() => myWithdrawals.value.filter(w => w.status === 'paid'));
 
-const documents = ref([
-  {
-    id: 1,
-    name: "Contrat d'investissement - Staoueli.pdf",
-    url: '#',
-    icon: 'bi-file-earmark-pdf-fill text-danger',
-  },
-  {
-    id: 2,
-    name: 'Rapport Annuel 2023.pdf',
-    url: '#',
-    icon: 'bi-file-earmark-bar-graph-fill text-primary',
-  },
-  {
-    id: 3,
-    name: 'Avenant Contrat - Cheraga.docx',
-    url: '#',
-    icon: 'bi-file-earmark-word-fill text-info',
-  },
-]);
+// Documents from backend
+const documents = ref([]);
 
-const filteredInvestmentDetails = computed(() => {
-  switch (tableFilter.value) {
-    case 'monthly':
-      return monthlyInvestments.value;
-    case 'bi-yearly':
-      return biYearlyInvestments.value;
-    case 'yearly':
-    default:
-      return yearlyInvestments.value;
-  }
-});
+// Deprecated table filter and mock data
+
 
 const monthLabels = computed(() => (
-    locale.value === 'fr' 
+    locale.value === 'fr'
     ? ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
     : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 ));
 
 const monthlyData = computed(() => ({
-  labels: monthLabels.value,
+  labels: revenueSeries.value.labels.length ? revenueSeries.value.labels : monthLabels.value,
   datasets: [
     {
       label: t('investorDashboard.chart.monthlyLabel'),
@@ -280,7 +175,7 @@ const monthlyData = computed(() => ({
       backgroundColor: 'rgba(13, 110, 253, 0.1)',
       tension: 0.4,
       fill: true,
-      data: [120, 150, 130, 160, 180, 170, 190, 210, 200, 220, 240, 230],
+      data: revenueSeries.value.values.length ? revenueSeries.value.values : [0,0,0,0,0,0,0,0,0,0,0,0],
     },
   ],
 }));
@@ -351,13 +246,10 @@ const chartOptions = computed(() => ({
   }
 }));
 
-const setChartFilter = (filter) => {
-  chartFilter.value = filter;
-};
+// Chart filter controls removed from UI; chart remains illustrative
 
-const setTableFilter = (filter) => {
-  tableFilter.value = filter;
-};
+// Removed table filter per requirement: investor sees only active profile data
+
 
 watch(chartFilter, (newFilter) => {
   const options = chartOptions.value;
@@ -499,7 +391,7 @@ watch(locale, () => {
                   </tr>
                   <tr v-for="w in myWithdrawals.slice(0,5)" :key="w.id">
                     <td>{{ new Date(w.requested_at || w.created_at).toLocaleString() }}</td>
-                    <td>{{ w.Investment?.name || w.investment_id }}</td>
+                    <td>{{ w.Investment?.name || (myInvestments.find(i => i.id===w.investment_id)?.name) || w.investment_id }}</td>
                     <td>{{ formatCurrency(w.amount) }}</td>
                     <td>
                       <span :class="['badge',
@@ -553,11 +445,6 @@ watch(locale, () => {
           <div class="card-header bg-fadaa-light-blue">
             <div class="d-flex justify-content-between align-items-center">
               <h5 class="mb-0"><i class="bi bi-briefcase-fill me-2"></i>{{ $t('investorDashboard.investmentDetails.title') }}</h5>
-              <div class="btn-group btn-group-sm" role="group" aria-label="Table Filters">
-                <button type="button" class="btn btn-outline-primary" @click="setTableFilter('monthly')" :class="{ active: tableFilter === 'monthly' }">{{ $t('investorDashboard.investmentDetails.monthly') }}</button>
-                <button type="button" class="btn btn-outline-primary" @click="setTableFilter('bi-yearly')" :class="{ active: tableFilter === 'bi-yearly' }">{{ $t('investorDashboard.investmentDetails.bi-yearly') }}</button>
-                <button type="button" class="btn btn-outline-primary" @click="setTableFilter('yearly')" :class="{ active: tableFilter === 'yearly' }">{{ $t('investorDashboard.investmentDetails.yearly') }}</button>
-              </div>
             </div>
           </div>
           <div class="card-body">
@@ -566,22 +453,24 @@ watch(locale, () => {
                 <thead>
                   <tr>
                     <th>{{ $t('investorDashboard.investmentDetails.table.branch') }}</th>
-                    <th>{{ $t('investorDashboard.investmentDetails.table.revenue') }}</th>
                     <th>{{ $t('investorDashboard.investmentDetails.table.share') }}</th>
-                    <th>{{ $t('investorDashboard.investmentDetails.table.clients') }}</th>
+                    <th>{{ $t('investorDashboard.withdrawals.kpis.accrued') }}</th>
+                    <th>{{ $t('investorDashboard.withdrawals.kpis.committed') }}</th>
+                    <th>{{ $t('investorDashboard.withdrawals.kpis.available') }}</th>
                     <th>{{ $t('investorDashboard.investmentDetails.table.status') }}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-if="filteredInvestmentDetails.length === 0">
-                    <td colspan="5" class="text-center">{{ $t('investorDashboard.investmentDetails.noData') }}</td>
+                  <tr v-if="myInvestments.length === 0">
+                    <td colspan="6" class="text-center">{{ $t('investorDashboard.investmentDetails.noData') }}</td>
                   </tr>
-                  <tr v-for="investment in filteredInvestmentDetails" :key="investment.id">
-                    <td>{{ investment.branchName }}</td>
-                    <td>{{ formatCurrency(investment.amount) }} </td>
-                    <td>{{ investment.sharePercentage }}%</td>
-                    <td>{{ investment.NbrOfClients }}</td>
-                    <td><span :class="`badge bg-${investment.status === 'active' ? 'success' : 'warning'}`">{{ $t(`investorDashboard.statuses.${investment.status}`) }}</span></td>
+                  <tr v-for="inv in myInvestments" :key="inv.id">
+                    <td>{{ inv.Branch?.name || inv.name }}</td>
+                    <td>{{ inv.percentage }}%</td>
+                    <td>{{ formatCurrency(inv.yourProfitShareSelectedPeriod || 0) }}</td>
+                    <td>{{ formatCurrency(inv.withdrawalsCommitted || 0) }}</td>
+                    <td>{{ formatCurrency(inv.availableForWithdrawal != null ? inv.availableForWithdrawal : Math.max((inv.yourProfitShareSelectedPeriod || 0) - (inv.withdrawalsCommitted || 0), 0)) }}</td>
+                    <td><span :class="['badge', (inv.status==='active' ? 'bg-success' : 'bg-warning')]">{{ $t(`investorDashboard.statuses.${inv.status || 'active'}`) }}</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -595,11 +484,7 @@ watch(locale, () => {
           <div class="card-header bg-fadaa-light-blue">
             <div class="d-flex justify-content-between align-items-center">
               <h5 class="mb-0"><i class="bi bi-activity me-2"></i>{{ $t('investorDashboard.revenueEvolution.title') }}</h5>
-              <div class="btn-group btn-group-sm" role="group" aria-label="Chart Filters">
-                <button type="button" class="btn btn-outline-primary" @click="setChartFilter('monthly')" :class="{ active: chartFilter === 'monthly' }">{{ $t('investorDashboard.revenueEvolution.monthly') }}</button>
-                <button type="button" class="btn btn-outline-primary" @click="setChartFilter('bi-yearly')" :class="{ active: chartFilter === 'bi-yearly' }">{{ $t('investorDashboard.revenueEvolution.bi-yearly') }}</button>
-                <button type="button" class="btn btn-outline-primary" @click="setChartFilter('yearly')" :class="{ active: chartFilter === 'yearly' }">{{ $t('investorDashboard.revenueEvolution.yearly') }}</button>
-              </div>
+              <!-- Chart filters removed to simplify investor view -->
             </div>
           </div>
           <div class="card-body">
@@ -610,7 +495,7 @@ watch(locale, () => {
     </div>
 
     <!-- Section 3: Recent Activities -->
-    <div class="row mb-4">
+    <!-- <div class="row mb-4">
       <div class="col-12">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
@@ -626,7 +511,7 @@ watch(locale, () => {
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Section 4: Profit Share History -->
     <div class="row mb-4">
@@ -647,11 +532,11 @@ watch(locale, () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="share in profitShares" :key="share.id">
-                    <td>{{ share.date }}</td>
-                    <td>{{ share.branchName }}</td>
-                    <td>{{ formatCurrency(share.amount) }}</td>
-                    <td>{{ share.period }}</td>
+                  <tr v-for="w in paidWithdrawals" :key="w.id">
+                    <td>{{ new Date(w.paid_at || w.updated_at || w.created_at).toLocaleString() }}</td>
+                    <td>{{ w.Investment?.name || w.investment_id }}</td>
+                    <td>{{ formatCurrency(w.amount) }}</td>
+                    <td>{{ $t('investorDashboard.revenueEvolution.monthly') }}</td>
                   </tr>
                 </tbody>
               </table>

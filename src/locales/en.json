@@ -934,13 +934,6 @@
       "bi-yearly": "Bi-Yearly",
       "yearly": "Yearly"
     },
-    "recentActivities": {
-      "title": "Recent Branch Activities",
-      "activity1": "New branch \"Staoueli\" successfully opened. Initial ROI: 12%.",
-      "activity2": "Additional investment of 50k in the \"Cheraga\" branch.",
-      "activity3": "Performance of the \"Birkhadem\" branch up by 5% this quarter.",
-      "activity4": "Recruitment of 3 new managers for regional expansion."
-    },
     "profitShareHistory": {
       "title": "Profit Share History",
       "table": {

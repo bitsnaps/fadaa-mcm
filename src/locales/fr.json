@@ -885,13 +885,6 @@
       "bi-yearly": "Semestriel",
       "yearly": "Annuel"
     },
-    "recentActivities": {
-      "title": "Activités Récentes des Agences",
-      "activity1": "Nouvelle agence \"Staoueli\" ouverte avec succès. ROI initial: 12%.",
-      "activity2": "Investissement supplémentaire de 50k dans l'agence \"Cheraga\".",
-      "activity3": "Performance de l'agence \"Birkhadem\" en hausse de 5% ce trimestre.",
-      "activity4": "Recrutement de 3 nouveaux gestionnaires pour l'expansion régionale."
-    },
     "profitShareHistory": {
       "title": "Historique des parts de bénéfices",
       "table": {
