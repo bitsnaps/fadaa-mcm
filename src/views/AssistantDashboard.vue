@@ -133,8 +133,10 @@
 <script setup>
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import { useToast } from '@/helpers/toast';
 
 const authStore = useAuthStore();
+const { showSuccessToast } = useToast();
 
 const mockData = ref({
   renewals: [
@@ -191,7 +193,7 @@ const exportData = (format) => {
     filename = `assistant_dashboard_export.csv`;
   } else {
     // For Excel and PDF, we'll just show an alert as true generation is complex without libraries
-    alert(`Simulating export of dashboard data to ${format.toUpperCase()}.\nData (JSON preview):\n${JSON.stringify(dataToExport, null, 2).substring(0, 200)}...`);
+    showSuccessToast(`Simulating export of dashboard data to ${format.toUpperCase()}.`);
     console.log(`Simulated export data for ${format.toUpperCase()}:`, dataToExport);
     return;
   }
@@ -205,7 +207,7 @@ const exportData = (format) => {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(link.href);
-  alert(`Data exported as ${filename}. Check your browser downloads or console for details.`);
+  showSuccessToast(`Data exported as ${filename}.`);
   console.log(`Exported ${filename} with content:`, content);
 };
 

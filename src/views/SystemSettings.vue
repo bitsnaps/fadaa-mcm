@@ -90,8 +90,10 @@
 <script setup>
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useToast } from '@/helpers/toast';
 
 const { t } = useI18n();
+const { showSuccessToast } = useToast();
 
 const generalSettings = ref({
   siteName: 'FADAA Platform',
@@ -114,19 +116,19 @@ const apiKeys = ref({
 const saveGeneralSettings = () => {
   // Placeholder for actual save logic
   console.log('General Settings Saved:', generalSettings.value);
-  alert(t('systemSettings.generalSettings.alert'));
+  showSuccessToast(t('systemSettings.generalSettings.alert'));
 };
 
 const saveEmailSettings = () => {
   // Placeholder for actual save logic
   console.log('Email Settings Saved:', emailSettings.value);
-  alert(t('systemSettings.emailSettings.alert'));
+  showSuccessToast(t('systemSettings.emailSettings.alert'));
 };
 
 const saveApiKeys = () => {
   // Placeholder for actual save logic
   console.log('API Keys Saved:', apiKeys.value);
-  alert(t('systemSettings.apiKeys.alert'));
+  showSuccessToast(t('systemSettings.apiKeys.alert'));
 };
 
 </script>

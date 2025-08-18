@@ -7,10 +7,12 @@ import { formatCurrency } from '@/helpers/utils.js';
 import { getMyWithdrawals, createWithdrawal } from '@/services/WithdrawalService';
 import { getMyInvestments } from '@/services/InvestmentService';
 import profileService from '@/services/profileService';
+import { useToast } from '@/helpers/toast';
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler);
 
 const { t, locale } = useI18n();
+const { showErrorToast, showSuccessToast } = useToast();
 
 const chartFilter = ref('monthly'); // monthly, bi-yearly, yearly
 const tableFilter = ref('monthly'); // Default to yearly to show all initially
@@ -76,11 +78,11 @@ async function submitWithdrawal() {
   try {
     const amt = Number(withdrawalForm.value.amount);
     if (!withdrawalForm.value.investment_id || !amt || amt <= 0) {
-      alert(t('investorDashboard.withdrawals.form.validationRequired'));
+      showErrorToast(t('investorDashboard.withdrawals.form.validationRequired'));
       return;
     }
     if (amt > selectedInvestmentAvailable.value) {
-      alert(t('investorDashboard.withdrawals.form.validationExceeds'));
+      showErrorToast(t('investorDashboard.withdrawals.form.validationExceeds'));
       return;
     }
     const payload = {
@@ -96,13 +98,13 @@ async function submitWithdrawal() {
       withdrawalForm.value.payment_method = '';
       withdrawalForm.value.notes = '';
       await loadInvestorData();
-      alert(t('investorDashboard.withdrawals.form.success'));
+      showSuccessToast(t('investorDashboard.withdrawals.form.success'));
     } else {
       throw new Error(res.data?.message || 'Request failed');
     }
   } catch (e) {
     console.error('Withdrawal submit failed:', e);
-    alert(t('investorDashboard.withdrawals.form.error'));
+    showErrorToast(t('investorDashboard.withdrawals.form.error'));
   }
 }
 

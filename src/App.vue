@@ -1,8 +1,10 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { BToastOrchestrator } from 'bootstrap-vue-next';
 import { useAuthStore } from '@/stores/auth';
 import { useSidebarStore } from '@/stores/sidebar';
+import { useNotificationStore } from '@/stores/notification';
 import Navbar from '@/components/Navbar.vue';
 import Sidebar from '@/components/Sidebar.vue';
 
@@ -13,16 +15,24 @@ const sidebarStore = useSidebarStore();
 const userRole = computed(() => authStore.userRole);
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const isSidebarCollapsed = computed(() => sidebarStore.isCollapsed);
+const notificationStore = useNotificationStore();
 
 const showSidebar = computed(() => {
   // Show sidebar only for admin and assistant roles and if authenticated
   return isAuthenticated.value && ['admin', 'assistant'].includes(userRole.value) && route.path !== '/login';
 });
 
+watch(() => notificationStore.notification, (newNotification) => {
+  if (newNotification) {
+    showErrorToast(newNotification.message);
+    notificationStore.clearNotification();
+  }
+});
 </script>
 
 <template>
   <div id="app" class="d-flex flex-column min-vh-100">
+    <BToastOrchestrator />
     <header>
       <Navbar />
     </header>

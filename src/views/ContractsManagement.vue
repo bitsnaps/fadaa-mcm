@@ -9,7 +9,9 @@ import { Modal } from 'bootstrap';
 import { format } from 'date-fns';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import { formatCurrency } from '@/helpers/utils.js';
+import { useToast } from '@/helpers/toast';
 const { t } = useI18n();
+const { showErrorToast, showSuccessToast } = useToast();
 
 const contracts = ref([]);
 const searchTerm = ref('');
@@ -291,11 +293,11 @@ const submitNewContract = async () => {
       modalInstance.hide();
       fetchContracts(activeProfileId.value);
     } else {
-      alert(`Failed to ${isEditMode.value ? 'update' : 'add'} contract: ` + response.data.message);
+      showErrorToast(`Failed to ${isEditMode.value ? 'update' : 'add'} contract: ` + response.data.message);
     }
   } catch (error) {
     console.error(`Error submitting ${isEditMode.value ? 'updated' : 'new'} contract:`, error);
-    alert(`An error occurred while ${isEditMode.value ? 'updating' : 'adding'} the contract.`);
+    showErrorToast(`An error occurred while ${isEditMode.value ? 'updating' : 'adding'} the contract.`);
   } finally {
     isSubmitting.value = false;
   }
@@ -313,7 +315,7 @@ const handleDocumentFileChange = (event) => {
 
 const submitDocumentUpload = async () => {
   if (!documentToUpload.value) {
-    alert('Please select a document to upload.');
+    showErrorToast('Please select a document to upload.');
     return;
   }
 
@@ -332,13 +334,13 @@ const submitDocumentUpload = async () => {
       const modalInstance = Modal.getInstance(uploadDocumentModal.value);
       modalInstance.hide();
       fetchContracts(activeProfileId.value); // Refresh the list
-      alert('Document uploaded successfully.');
+      showSuccessToast('Document uploaded successfully.');
     } else {
-      alert('Failed to upload document: ' + response.data.message);
+      showErrorToast('Failed to upload document: ' + response.data.message);
     }
   } catch (error) {
     console.error('Error uploading document:', error);
-    alert('An error occurred while uploading the document.');
+    showErrorToast('An error occurred while uploading the document.');
   } finally {
     isUploading.value = false;
     documentToUpload.value = null;

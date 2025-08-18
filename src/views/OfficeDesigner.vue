@@ -126,8 +126,10 @@ import { ref, reactive, onMounted, onUnmounted, nextTick, computed, watch } from
 import interact from 'interactjs';
 import { Modal } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
+import { useToast } from '@/helpers/toast';
 
 const { t } = useI18n();
+const { showSuccessToast } = useToast();
 
 // State
 const projectInitialized = ref(false);
@@ -271,7 +273,7 @@ const saveDesign = async () => {
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     isSaving.value = false;
-    alert(t('officeDesigner.main.designSaved'));
+    showSuccessToast(t('officeDesigner.main.designSaved'));
 };
 
 const loadDesign = () => {

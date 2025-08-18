@@ -82,7 +82,6 @@ documentApp.delete('/:id', async (c) => {
             return c.json({ success: false, message: 'Document not found' }, 404);
         }
 
-        // TODO:
         // Optional: Delete the file from storage as well
         // const filePath = path.join(__dirname, '../public', document.file_path);
         // if (fs.existsSync(filePath)) {

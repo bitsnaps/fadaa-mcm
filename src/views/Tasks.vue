@@ -1,10 +1,12 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useToast } from '@/helpers/toast';
 
 const searchQuery = ref('');
 const filterStatus = ref('');
 const filterPriority = ref('');
+const { showSuccessToast, showErrorToast } = useToast();
 
 // Hardcoded tasks data for now
 const tasks = ref([
@@ -88,25 +90,23 @@ const getStatusBadge = (status) => {
 
 const openCreateTaskModal = () => {
   // Logic to open create task modal
-  alert('Ouvrir le modal de création de tâche');
+  showSuccessToast('Ouvrir le modal de création de tâche');
 };
 
 const openViewTaskModal = (task) => {
   // Logic to open view task modal
-  alert(`Voir la tâche: ${task.title}`);
+  showSuccessToast(`Voir la tâche: ${task.title}`);
 };
 
 const openEditTaskModal = (task) => {
   // Logic to open edit task modal
-  alert(`Modifier la tâche: ${task.title}`);
+  showSuccessToast(`Modifier la tâche: ${task.title}`);
 };
 
 const deleteTask = (taskId) => {
   // Logic to delete task
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
-    tasks.value = tasks.value.filter(task => task.id !== taskId);
-    alert(`Tâche ${taskId} supprimée`);
-  }
+  tasks.value = tasks.value.filter(task => task.id !== taskId);
+  showSuccessToast(`Tâche ${taskId} supprimée`);
 };
 
 </script>

@@ -4,9 +4,11 @@ import { ref, reactive, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useI18n } from 'vue-i18n';
 import { updateUserProfile, changePassword, uploadProfilePicture } from '@/services/UserService';
+import { useToast } from '@/helpers/toast';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
+const { showErrorToast, showSuccessToast } = useToast();
 
 const user = computed(() => authStore.user || { firstName: '', lastName: '', email: '', /*phone: '',*/ role: '', profile_picture: '' });
 
@@ -53,7 +55,7 @@ const onFileChange = (event) => {
 
 const handleUploadProfilePicture = async () => {
   if (!selectedFile.value) {
-    alert(t('userProfile.alerts.selectFile'));
+    showErrorToast(t('userProfile.alerts.selectFile'));
     return;
   }
   
@@ -63,16 +65,16 @@ const handleUploadProfilePicture = async () => {
   try {
     const { data: response } = await uploadProfilePicture(user.value.id, formData);
     if (response.success) {
-      alert(t('userProfile.alerts.pictureUpdated'));
+      showSuccessToast(t('userProfile.alerts.pictureUpdated'));
       authStore.updateUserProfilePicture(response.filePath);
       profileImageUrl.value = `${import.meta.env.VITE_PUBLIC_URL|| ''}${response.filePath}`;
       selectedFile.value = null;
     } else {
-      alert(response.message || t('userProfile.alerts.pictureUpdateFailed'));
+      showErrorToast(response.message || t('userProfile.alerts.pictureUpdateFailed'));
     }
   } catch (error) {
     console.error('Error uploading profile picture:', error);
-    alert(t('userProfile.alerts.pictureUpdateFailed'));
+    showErrorToast(t('userProfile.alerts.pictureUpdateFailed'));
   }
 };
 
@@ -84,27 +86,27 @@ const handleUpdateProfile = async () => {
       // phone: editableUser.phone,
     });
     if (response.success) {
-      alert(t('userProfile.alerts.profileUpdated'));
+      showSuccessToast(t('userProfile.alerts.profileUpdated'));
       authStore.updateUser({
         first_name: editableUser.firstName,
         last_name: editableUser.lastName,
       });
     } else {
-      alert(t('userProfile.alerts.profileUpdateFailed'));
+      showErrorToast(t('userProfile.alerts.profileUpdateFailed'));
     }
   } catch (error) {
     console.error('Error updating profile:', error);
-    alert(t('userProfile.alerts.profileUpdateFailed'));
+    showErrorToast(t('userProfile.alerts.profileUpdateFailed'));
   }
 };
 
 const handleChangePassword = async () => {
   if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-    alert(t('userProfile.alerts.passwordsDoNotMatch'));
+    showErrorToast(t('userProfile.alerts.passwordsDoNotMatch'));
     return;
   }
   if (passwordForm.newPassword.length < 6) {
-    alert(t('userProfile.alerts.passwordTooShort'));
+    showErrorToast(t('userProfile.alerts.passwordTooShort'));
     return;
   }
 
@@ -114,16 +116,16 @@ const handleChangePassword = async () => {
       newPassword: passwordForm.newPassword,
     });
     if (response.success) {
-      alert(t('userProfile.alerts.passwordChanged'));
+      showSuccessToast(t('userProfile.alerts.passwordChanged'));
       passwordForm.currentPassword = '';
       passwordForm.newPassword = '';
       passwordForm.confirmPassword = '';
     } else {
-      alert(response.message || t('userProfile.alerts.passwordChangeFailed'));
+      showErrorToast(response.message || t('userProfile.alerts.passwordChangeFailed'));
     }
   } catch (error) {
     console.error('Error changing password:', error);
-    alert(t('userProfile.alerts.passwordChangeFailed'));
+    showErrorToast(t('userProfile.alerts.passwordChangeFailed'));
   }
 };
 

@@ -188,6 +188,7 @@ import { ref, computed, onMounted } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, Filler } from 'chart.js';
 import { formatCurrency } from '@/helpers/utils.js';
+import { useToast } from '@/helpers/toast';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import { getTotalClients } from '@/services/ClientService';
 import { getActivityLogs } from '@/services/ActivityLogService';
@@ -200,6 +201,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, Filler);
+
+const { showErrorToast } = useToast();
 
 const kpis = ref({
   clients: 0,
@@ -347,7 +350,7 @@ const filterOffices = () => {
 
 const exportData = async (format) => {
   if (!activeProfileId.value) {
-    alert('Please select a profile first.');
+    showErrorToast('Please select a profile first.');
     return;
   }
 
@@ -379,7 +382,7 @@ const exportData = async (format) => {
 
   } catch (error) {
     console.error(`Failed to export data to ${format}:`, error);
-    alert(`Failed to export data. Please try again.`);
+    showErrorToast(`Failed to export data. Please try again.`);
   } finally {
     isExporting.value[format] = false;
   }

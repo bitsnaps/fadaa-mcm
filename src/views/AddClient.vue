@@ -3,9 +3,11 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import apiClient from '@/services/ApiClient';
+import { useToast } from '@/helpers/toast';
 
 const { t } = useI18n();
 const router = useRouter();
+const { showErrorToast } = useToast();
 const route = useRoute();
 const clientId = ref(route.params.clientId || null);
 
@@ -128,7 +130,7 @@ const submitForm = async () => {
         if (error.response && error.response.data && error.response.data.message) {
             // Display backend validation errors
             // This is a simple implementation; a more robust solution would map errors to fields
-            alert(`Error: ${error.response.data.message}`);
+            showErrorToast(`Error: ${error.response.data.message}`);
         }
     }
 };

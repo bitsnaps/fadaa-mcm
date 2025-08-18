@@ -145,6 +145,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useToast } from '@/helpers/toast';
 
 const contracts = ref([
   { id: 'C001', service: 'Suite Bureaux Privée A', startDate: '15/01/2023', endDate: '14/01/2024', status: 'Actif', documentUrl: '#' },
@@ -168,6 +169,8 @@ const newRequest = ref({
   type: '',
   description: ''
 });
+
+const { showErrorToast, showSuccessToast } = useToast();
 
 const getContractStatusClass = (status) => {
   if (status === 'Actif') return 'success';
@@ -194,7 +197,7 @@ const getServiceRequestStatusClass = (status) => {
 
 const submitServiceRequest = () => {
   if (!newRequest.value.type || !newRequest.value.description) {
-    alert('Veuillez remplir tous les champs pour la demande de service.');
+    showErrorToast('Veuillez remplir tous les champs pour la demande de service.');
     return;
   }
   // Simulate submission
@@ -205,7 +208,7 @@ const submitServiceRequest = () => {
     description: newRequest.value.description,
     status: 'Nouveau'
   });
-  alert('Demande de service soumise !');
+  showSuccessToast('Demande de service soumise !');
   newRequest.value.type = '';
   newRequest.value.description = '';
 };
