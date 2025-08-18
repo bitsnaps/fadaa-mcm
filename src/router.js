@@ -228,7 +228,7 @@ const routes = [
     path: '/manage-withdrawals',
     name: 'ManageWithdrawals',
     components: { default: ManageWithdrawals, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+    meta: { requiresAuth: true, roles: ['admin'] }
   },
   {
     path: '/manage-profiles',
