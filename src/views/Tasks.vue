@@ -1,56 +1,31 @@
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useToast } from '@/helpers/toast';
+import { getTasks as apiGetTasks, createTask as apiCreateTask, updateTask as apiUpdateTask, deleteTask as apiDeleteTask } from '@/services/TaskService';
 
 const searchQuery = ref('');
 const filterStatus = ref('');
 const filterPriority = ref('');
+const isLoading = ref(false);
 const { showSuccessToast, showErrorToast } = useToast();
 
-// Hardcoded tasks data for now
-const tasks = ref([
-  {
-    id: 1,
-    title: 'Préparer le rapport financier mensuel',
-    assignedTo: 'Assistant A',
-    clientName: 'Client Alpha',
-    dueDate: '2024-07-15',
-    priority: 'Haute',
-    status: 'En cours',
-    description: 'Compiler toutes les transactions et préparer le rapport financier pour le client Alpha.'
-  },
-  {
-    id: 2,
-    title: 'Suivi des renouvellements de contrat',
-    assignedTo: 'Assistant B',
-    clientName: 'Client Beta',
-    dueDate: '2024-07-20',
-    priority: 'Moyenne',
-    status: 'En attente',
-    description: 'Contacter le client Beta concernant le renouvellement de son contrat de service.'
-  },
-  {
-    id: 3,
-    title: 'Organiser la réunion trimestrielle des investisseurs',
-    assignedTo: 'Assistant A',
-    clientName: 'N/A',
-    dueDate: '2024-08-01',
-    priority: 'Haute',
-    status: 'En attente',
-    description: 'Planifier et coordonner la logistique pour la réunion trimestrielle des investisseurs.'
-  },
-  {
-    id: 4,
-    title: 'Mettre à jour la base de données clients',
-    assignedTo: 'Assistant C',
-    clientName: 'Tous les clients',
-    dueDate: '2024-07-10',
-    priority: 'Basse',
-    status: 'Terminée',
-    description: 'Vérifier et mettre à jour les informations de contact pour tous les clients actifs.'
+const tasks = ref([]);
+
+const fetchTasks = async () => {
+  isLoading.value = true;
+  try {
+    const { data } = await apiGetTasks();
+    // API returns array per controller
+    tasks.value = Array.isArray(data) ? data : (data?.data || []);
+  } catch (e) {
+    showErrorToast('Failed to fetch tasks');
+  } finally {
+    isLoading.value = false;
   }
-]);
+};
+
+onMounted(fetchTasks);
 
 const filteredTasks = computed(() => {
   return tasks.value.filter(task => {
@@ -114,6 +89,8 @@ const deleteTask = (taskId) => {
 <template>
   <div class="container mt-4">
     <h1 class="mb-4">Gérer les Tâches</h1>
+
+    <div v-if="isLoading" class="alert alert-info">Chargement des tâches…</div>
 
     <!-- Filters and Search -->
     <div class="row mb-3">

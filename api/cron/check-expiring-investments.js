@@ -27,11 +27,12 @@ const checkExpiringInvestments = async () => {
     }
 
     const adminsAndAssistants = await models.User.findAll({
-      where: {
-        role_id: {
-          [Op.in]: [1, 2], // Assuming 1 is admin and 2 is assistant
-        },
-      },
+      include: [{
+        model: models.Role,
+        as: 'role',
+        where: { name: { [Op.in]: ['Admin', 'Assistant'] } },
+        attributes: [],
+      }],
     });
 
     for (const investment of expiringInvestments) {

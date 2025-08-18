@@ -21,11 +21,3 @@ export const formatDate = (dateString) => {
     day: 'numeric'
   }).format(date);
 };
-// export const formatCurrency = (value) => {
-//   const number = parseFloat(value);
-//   if (isNaN(number)) {
-//     return t('documents.notApplicable');
-//   }
-//   // Assuming DZD currency for Algeria, based on user timezone.
-//   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'DZD' }).format(number);
-// };

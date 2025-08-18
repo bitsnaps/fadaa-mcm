@@ -68,51 +68,30 @@ incomesApp.get('/monthly-by-branch', async (c) => {
         order: [[models.Sequelize.literal('month'), 'ASC']],
       });
 
-      // Transform data for chart.js format
-      const chartData = {
-        labels: [],
-        datasets: {},
-      };
+      // Transform data for chart.js format using robust (month, branch) mapping
+      const monthSet = new Set();
+      const branchSet = new Set();
+      const valueMap = {}; // { [branchName]: { [month]: total } }
 
-      incomes.forEach(item => {
+      incomes.forEach((item) => {
         const month = item.dataValues.month;
         const branchName = item.dataValues.branch_name;
-        const totalAmount = item.dataValues.total_amount;
-
-        if (!chartData.labels.includes(month)) {
-          chartData.labels.push(month);
-        }
-
-        if (!chartData.datasets[branchName]) {
-          chartData.datasets[branchName] = {
-            label: branchName,
-            data: [],
-            backgroundColor: getRandomColor(), // You might want to define specific colors
-            stack: 'Stack 0',
-          };
-        }
-        chartData.datasets[branchName].data.push(totalAmount);
+        const totalAmount = Number(item.dataValues.total_amount) || 0;
+        monthSet.add(month);
+        branchSet.add(branchName);
+        if (!valueMap[branchName]) valueMap[branchName] = {};
+        valueMap[branchName][month] = totalAmount;
       });
 
-      // Ensure all datasets have data for all months, filling with 0 if no sales
-      chartData.labels.sort(); // Ensure months are in order
-      for (const branchName in chartData.datasets) {
-        const branchData = chartData.datasets[branchName].data;
-        const fullData = [];
-        let dataIndex = 0;
-        chartData.labels.forEach(month => {
-          // This part needs to be more robust if the order of data in the raw incomes array doesn't match sorted labels
-          // For simplicity, assuming it does for now, or will need a more complex mapping
-          fullData.push(branchData[dataIndex] || 0); // This is a simplification, needs proper mapping
-          dataIndex++;
-        });
-        chartData.datasets[branchName].data = fullData;
-      }
+      const labels = Array.from(monthSet).sort();
+      const datasets = Array.from(branchSet).map((branchName) => ({
+        label: branchName,
+        data: labels.map((m) => (valueMap[branchName]?.[m] ?? 0)),
+        backgroundColor: getRandomColor(),
+        stack: 'Stack 0',
+      }));
 
-      // Convert datasets object to array
-      chartData.datasets = Object.values(chartData.datasets);
-
-      return c.json({ success: true, data: chartData });
+      return c.json({ success: true, data: { labels, datasets } });
     } catch (error) {
       console.error('Error fetching monthly income by branch:', error);
       return c.json({ success: false, message: 'Failed to fetch monthly income by branch' }, 500);
@@ -178,11 +157,12 @@ incomesApp.post('/', async (c) => {
       const HIGH_VALUE_THRESHOLD = 10000;
       if (newIncome.amount > HIGH_VALUE_THRESHOLD) {
         const admins = await models.User.findAll({
-            where: {
-                role_id: {
-                    [Op.in]: [1], // Assuming 1 is admin
-                },
-            },
+            include: [{
+                model: models.Role,
+                as: 'role',
+                where: { name: { [Op.in]: ['Admin'] } },
+                attributes: [],
+            }],
         });
         const message = `A high-value income of ${newIncome.amount} was recorded by ${c.get('user').email}.`;
         for (const admin of admins) {

@@ -97,7 +97,7 @@ const { showSuccessToast } = useToast();
 
 const generalSettings = ref({
   siteName: 'FADAA Platform',
-  siteLogo: '/logo.png', // Assuming logo is in public folder
+  siteLogo: '/logo.png', // Path under /public. You can change it via this setting.
   defaultTheme: 'light',
 });
 

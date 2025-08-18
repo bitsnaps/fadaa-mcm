@@ -84,7 +84,7 @@ const seedDatabase = async () => {
                 company_name: 'Main Client',
                 first_name: 'Main',
                 last_name: 'Client',
-                managed_by_user_id: 1, // Assuming admin user with ID 1 exists
+                managed_by_user_id: adminUser.id,
                 status: 'active'
             }
         });

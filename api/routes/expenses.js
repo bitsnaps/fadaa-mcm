@@ -100,11 +100,12 @@ expensesApp.post('/', async (c) => {
       const HIGH_VALUE_THRESHOLD = 10000;
       if (newExpense.amount > HIGH_VALUE_THRESHOLD) {
         const admins = await models.User.findAll({
-            where: {
-                role_id: {
-                    [Op.in]: [1], // Assuming 1 is admin
-                },
-            },
+            include: [{
+                model: models.Role,
+                as: 'role',
+                where: { name: { [Op.in]: ['Admin'] } },
+                attributes: [],
+            }],
         });
         const message = `A high-value expense of ${newExpense.amount} was recorded by ${c.get('user').email}.`;
         for (const admin of admins) {

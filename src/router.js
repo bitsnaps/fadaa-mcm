@@ -76,8 +76,7 @@ const routes = [
   {
     path: '/manage-clients',
     name: 'ManageClients',
-    component: ManageClients, // Placeholder for future component
-    // redirect: '/assistant-dashboard', // Redirect for now
+    component: ManageClients,
     meta: { requiresAuth: true, roles: ['admin','assistant'] }
   },
   {
@@ -133,7 +132,7 @@ const routes = [
     path: '/client-portal',
     name: 'ClientPortal',
     components: { default: ClientPortal, header: Navbar },
-    meta: { requiresAuth: true, roles: ['client'] } // Assuming 'client' role for now
+    meta: { requiresAuth: true, roles: ['client'] }
   },
   {
     path: '/manage-notifications',

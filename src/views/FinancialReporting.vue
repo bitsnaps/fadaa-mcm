@@ -338,7 +338,7 @@ const fetchExpenseBreakdownData = async () => {
     expenseSummary.value = expenseCategories.map((category, index) => ({
       category,
       amount: expenseData[index],
-      icon: getCategoryIcon(category), // Assuming getCategoryIcon can handle the new categories
+      icon: getCategoryIcon(category),
       color: expenseColors[index % expenseColors.length],
     }));
 
