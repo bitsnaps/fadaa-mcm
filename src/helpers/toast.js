@@ -23,9 +23,14 @@ export function useToast() {
     showToast(message, { variant: 'success', title });
   };
 
+  const showInfoToast = (message, title = 'Info') => {
+    showToast(message, { variant: 'info', title });
+  };
+
   return {
     showToast,
     showErrorToast,
     showSuccessToast,
+    showInfoToast,
   };
 }

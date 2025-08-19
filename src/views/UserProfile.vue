@@ -8,15 +8,15 @@ import { useToast } from '@/helpers/toast';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
-const { showErrorToast, showSuccessToast } = useToast();
+const { showErrorToast } = useToast();
 
-const user = computed(() => authStore.user || { firstName: '', lastName: '', email: '', /*phone: '',*/ role: '', profile_picture: '' });
+const user = computed(() => authStore.user || { firstName: '', lastName: '', email: '', phone: '', role: '', profile_picture: '' });
 
 const editableUser = reactive({
   firstName: '',
   lastName: '',
   email: '',
-  // phone: '',
+  phone: '',
 });
 
 const passwordForm = reactive({
@@ -33,7 +33,7 @@ onMounted(() => {
     editableUser.firstName = user.value.first_name;
     editableUser.lastName = user.value.last_name;
     editableUser.email = user.value.email;
-    // editableUser.phone = user.value.phone;
+    editableUser.phone = user.value.phone;
     if (user.value.profile_picture) {
         profileImageUrl.value = `${[import.meta.env.VITE_PUBLIC_URL || '',user.value.profile_picture].join('/')}`;
     }
@@ -65,7 +65,7 @@ const handleUploadProfilePicture = async () => {
   try {
     const { data: response } = await uploadProfilePicture(user.value.id, formData);
     if (response.success) {
-      showSuccessToast(t('userProfile.alerts.pictureUpdated'));
+      // Success message will be handled by the global response interceptor
       authStore.updateUserProfilePicture(response.filePath);
       profileImageUrl.value = `${import.meta.env.VITE_PUBLIC_URL|| ''}${response.filePath}`;
       selectedFile.value = null;
@@ -74,7 +74,7 @@ const handleUploadProfilePicture = async () => {
     }
   } catch (error) {
     console.error('Error uploading profile picture:', error);
-    showErrorToast(t('userProfile.alerts.pictureUpdateFailed'));
+    // Error message will be handled by the global error interceptor
   }
 };
 
@@ -83,20 +83,21 @@ const handleUpdateProfile = async () => {
     const { data: response } = await updateUserProfile(user.value.id, {
       first_name: editableUser.firstName,
       last_name: editableUser.lastName,
-      // phone: editableUser.phone,
+      phone: editableUser.phone,
     });
     if (response.success) {
-      showSuccessToast(t('userProfile.alerts.profileUpdated'));
+      // Success message will be handled by the global response interceptor
       authStore.updateUser({
         first_name: editableUser.firstName,
         last_name: editableUser.lastName,
+        phone: editableUser.phone,
       });
     } else {
       showErrorToast(t('userProfile.alerts.profileUpdateFailed'));
     }
   } catch (error) {
     console.error('Error updating profile:', error);
-    showErrorToast(t('userProfile.alerts.profileUpdateFailed'));
+    // Error message will be handled by the global error interceptor
   }
 };
 
@@ -116,7 +117,7 @@ const handleChangePassword = async () => {
       newPassword: passwordForm.newPassword,
     });
     if (response.success) {
-      showSuccessToast(t('userProfile.alerts.passwordChanged'));
+      // Success message will be handled by the global response interceptor
       passwordForm.currentPassword = '';
       passwordForm.newPassword = '';
       passwordForm.confirmPassword = '';
@@ -125,7 +126,7 @@ const handleChangePassword = async () => {
     }
   } catch (error) {
     console.error('Error changing password:', error);
-    showErrorToast(t('userProfile.alerts.passwordChangeFailed'));
+    // Error message will be handled by the global error interceptor
   }
 };
 
@@ -178,12 +179,12 @@ const handleChangePassword = async () => {
                    <small class="form-text text-muted">{{ $t('userProfile.emailCannotBeChanged') }}</small>
                 </div>
               </div>
-              <!-- <div class="mb-3 row">
+              <div class="mb-3 row">
                 <label for="phone" class="col-sm-3 col-form-label">{{ $t('userProfile.phone') }}</label>
                 <div class="col-sm-9">
                   <input type="tel" class="form-control" id="phone" v-model="editableUser.phone">
                 </div>
-              </div> -->
+              </div>
               <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary">{{ $t('userProfile.saveChanges') }}</button>
               </div>

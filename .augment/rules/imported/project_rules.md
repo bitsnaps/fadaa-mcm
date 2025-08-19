@@ -22,3 +22,4 @@ type: "manual"
 8. We use `Hono` with Node for the backend api in this project.
 9. We do not manage migrations for this project, so you wont need to create them.
 10. Do not make assumption about what could be available in the code, you even have to it lookup or ask the user.
+11. We do not manage migrations for this project, so you don't have to create them unless the user asks explicity to do so.

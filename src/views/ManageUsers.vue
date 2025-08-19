@@ -77,6 +77,10 @@
                   <label for="userEmail" class="form-label">{{ $t('manageUsers.emailAddress') }} <span class="text-danger">*</span></label>
                   <input type="email" class="form-control" id="userEmail" v-model="currentUser.email" required>
                 </div>
+                <div class="mb-3">
+                  <label for="userPhone" class="form-label">{{ $t('manageUsers.phone') }}</label>
+                  <input type="tel" class="form-control" id="userPhone" v-model="currentUser.phone">
+                </div>
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label for="userRole" class="form-label">{{ $t('manageUsers.role') }} <span class="text-danger">*</span></label>
@@ -155,6 +159,7 @@ const defaultUser = {
   first_name: '',
   last_name: '',
   email: '',
+  phone: '',
   role_id: null,
   branch_id: null,
   password: '',

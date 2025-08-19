@@ -340,6 +340,7 @@
     "lastName": "Nom",
     "email": "Email",
     "emailAddress": "Adresse Email",
+    "phone": "Téléphone",
     "role": "Rôle",
     "status": "Statut",
     "createdAt": "Date de Création",

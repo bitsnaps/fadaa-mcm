@@ -102,8 +102,8 @@ userApp.post('/', authMiddleware, async (c) => {
 userApp.put('/:id', authMiddleware, async (c) => {
     const { id } = c.req.param();
     try {
-        const { first_name, last_name, email, role_id, branch_id, is_active } = await c.req.json();
-        
+        const { first_name, last_name, email, phone, role_id, branch_id, is_active } = await c.req.json();
+
         const user = await models.User.findByPk(id);
         if (!user) {
             return c.json({ success: false, message: 'User not found' }, 404);
@@ -113,6 +113,7 @@ userApp.put('/:id', authMiddleware, async (c) => {
             first_name,
             last_name,
             email,
+            phone,
             role_id,
             branch_id,
             is_active
@@ -128,8 +129,8 @@ userApp.put('/:id', authMiddleware, async (c) => {
 userApp.put('/profile/:id', authMiddleware, async (c) => {
     const { id } = c.req.param();
     try {
-        const { first_name, last_name } = await c.req.json();
-        
+        const { first_name, last_name, phone } = await c.req.json();
+
         const user = await models.User.findByPk(id);
         if (!user) {
             return c.json({ success: false, message: 'User not found' }, 404);
@@ -138,6 +139,7 @@ userApp.put('/profile/:id', authMiddleware, async (c) => {
         await user.update({
             first_name,
             last_name,
+            phone,
         });
 
         return c.json({ success: true, message: 'User profile updated successfully' });

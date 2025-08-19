@@ -33,6 +33,7 @@ apiClient.interceptors.response.use(
       const method = (response.config?.method || '').toLowerCase();
       const isWrite = method === 'post' || method === 'put' || method === 'delete' || method === 'patch';
       const msg = response.data?.message;
+
       if (isWrite && msg) {
         notificationStore.setNotification({ message: msg, type: 'success' });
       }

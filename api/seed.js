@@ -30,6 +30,7 @@ const seedDatabase = async () => {
             defaults: {
                 first_name: 'admin',
                 last_name: 'admin',
+                phone: '+213555000001',
                 role_id: adminRole.id,
                 branch_id: mainBranch.id,
                 password_hash: '$2b$10$E2v.3E.6K2.a9jZ5l.8X.uY.8aJ5.j.J.j5.j.J.j5.j.J'
@@ -40,6 +41,7 @@ const seedDatabase = async () => {
             defaults: {
                 first_name: 'assistant',
                 last_name: 'assistant',
+                phone: '+213555000002',
                 role_id: assistantRole.id,
                 branch_id: mainBranch.id,
                 password_hash: '$2b$10$E2v.3E.6K2.a9jZ5l.8X.uY.8aJ5.j.J.j5.j.J.j5.j.J'
@@ -50,6 +52,7 @@ const seedDatabase = async () => {
             defaults: {
                 first_name: 'investor',
                 last_name: 'investor',
+                phone: '+213555000003',
                 role_id: investorRole.id,
                 branch_id: mainBranch.id,
                 password_hash: '$2b$10$E2v.3E.6K2.a9jZ5l.8X.uY.8aJ5.j.J.j5.j.J.j5.j.J'
