@@ -52,6 +52,8 @@
   },
   "common": {
     "view": "Voir",
+    "edit": "Modifier",
+    "details": "Détails",
     "daysLeft": "jours restants",
     "na": "N/D"
   },
@@ -1010,19 +1012,30 @@
     }
   },
   "assistantDashboard": {
+    "title": "Tableau de Bord Assistant",
     "renewals": {
-      "title": "Renouvellements de Contrats Client"
+      "title": "Renouvellements de Contrats Client",
+      "empty": "Aucun renouvellement en attente."
     },
     "expiringContracts": {
-      "title": "Contrats expirant (30 prochains jours)"
+      "title": "Contrats expirant (30 prochains jours)",
+      "empty": "Aucun contrat n'expire bientôt."
     },
     "prospects": {
       "title": "Liste de Prospects",
-      "contact": "Contacter"
+      "contact": "Contacter",
+      "empty": "Aucun prospect dans la liste."
     },
     "offices": {
       "title": "Aperçu de l'état des bureaux",
-      "empty": "Aucune donnée d'état des bureaux."
+      "empty": "Aucune donnée d'état des bureaux.",
+      "table": {
+        "name": "Nom du Bureau",
+        "status": "Statut",
+        "capacity": "Capacité",
+        "branch": "Succursale",
+        "actions": "Actions"
+      }
     },
     "tasksApprovals": {
       "title": "Tâches / Approbations",

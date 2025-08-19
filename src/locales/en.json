@@ -52,6 +52,8 @@
   },
   "common": {
     "view": "View",
+    "edit": "Edit",
+    "details": "Details",
     "daysLeft": "days left",
     "na": "N/A"
   },
@@ -914,19 +916,30 @@
     }
   },
   "assistantDashboard": {
+    "title": "Assistant Dashboard",
     "renewals": {
-      "title": "Client Contract Renewals"
+      "title": "Client Contract Renewals",
+      "empty": "No pending renewals."
     },
     "expiringContracts": {
-      "title": "Expiring Contracts (Next 30 Days)"
+      "title": "Expiring Contracts (Next 30 Days)",
+      "empty": "No contracts expiring soon."
     },
     "prospects": {
       "title": "Prospect List",
-      "contact": "Contact"
+      "contact": "Contact",
+      "empty": "No prospects in the list."
     },
     "offices": {
       "title": "Office Status Overview",
-      "empty": "No office status data available."
+      "empty": "No office status data available.",
+      "table": {
+        "name": "Office Name",
+        "status": "Status",
+        "capacity": "Capacity",
+        "branch": "Branch",
+        "actions": "Actions"
+      }
     },
     "tasksApprovals": {
       "title": "Tasks / Approvals",

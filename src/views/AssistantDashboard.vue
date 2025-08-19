@@ -1,8 +1,11 @@
 <template>
   <div class="dashboard-container container-fluid">
-    <h2 class="mb-4">Dashboard | {{ authStore.userRole }}</h2>
+    <h2 class="mb-4">{{ t('assistantDashboard.title') }} | {{ authStore.userRole }}</h2>
 
-    <div class="row gy-4">
+    <ProfileTabs @update:activeProfile="handleProfileUpdate">
+      <template #default="{ profileId }">
+        <div v-if="profileId">
+          <div class="row gy-4">
       <!-- Client Contract Renewals -->
       <div class="col-md-6 col-lg-4">
         <div class="card h-100 shadow-sm">
@@ -16,7 +19,7 @@
                 <button class="btn btn-sm btn-fadaa-orange"><i class="bi bi-eye-fill me-1"></i>{{ t('common.view') }}</button>
               </li>
             </ul>
-            <div v-if="!mockData.renewals.length" class="text-center text-muted mt-2">No pending renewals.</div>
+            <div v-if="renewals.length === 0" class="text-center text-muted mt-2">{{ t('assistantDashboard.renewals.empty') }}</div>
           </div>
         </div>
       </div>
@@ -33,7 +36,7 @@
                 {{ contract.client }} ({{ contract.office }})
               </li>
             </ul>
-            <div v-if="!mockData.expiringContracts.length" class="text-center text-muted mt-2">No contracts expiring soon.</div>
+            <div v-if="expiringContracts.length === 0" class="text-center text-muted mt-2">{{ t('assistantDashboard.expiringContracts.empty') }}</div>
           </div>
         </div>
       </div>
@@ -51,7 +54,7 @@
                 <button class="btn btn-sm btn-outline-fadaa-orange"><i class="bi bi-telephone-fill me-1"></i>{{ t('assistantDashboard.prospects.contact') }}</button>
               </li>
             </ul>
-            <div v-if="!mockData.prospects.length" class="text-center text-muted mt-2">No prospects in the list.</div>
+            <div v-if="prospects.length === 0" class="text-center text-muted mt-2">{{ t('assistantDashboard.prospects.empty') }}</div>
           </div>
         </div>
       </div>
@@ -67,20 +70,22 @@
               <table class="table table-sm table-hover">
                 <thead class="table-light">
                   <tr>
-                    <th>Office ID</th>
-                    <th>Status</th>
-                    <th>Occupancy</th>
-                    <th>Actions</th>
+                    <th>{{ t('assistantDashboard.offices.table.name') }}</th>
+                    <th>{{ t('assistantDashboard.offices.table.status') }}</th>
+                    <th>{{ t('assistantDashboard.offices.table.capacity') }}</th>
+                    <th>{{ t('assistantDashboard.offices.table.branch') }}</th>
+                    <th>{{ t('assistantDashboard.offices.table.actions') }}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="office in offices" :key="office.id">
-                    <td>{{ office.id }}</td>
-                    <td><span :class="statusBadge(office.status)">{{ office.status }}</span></td>
-                    <td>{{ office.occupancy }}</td>
+                    <td>{{ office.name || office.id }}</td>
+                    <td><span :class="statusBadge(office.status)">{{ office.status || 'Active' }}</span></td>
+                    <td>{{ office.capacity || '—' }}</td>
+                    <td>{{ office.branch?.name || '—' }}</td>
                     <td>
-                      <button class="btn btn-sm btn-fadaa-orange me-1"><i class="bi bi-pencil-square me-1"></i>Edit</button>
-                      <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-info-circle-fill me-1"></i>Details</button>
+                      <button class="btn btn-sm btn-fadaa-orange me-1"><i class="bi bi-pencil-square me-1"></i>{{ t('common.edit') }}</button>
+                      <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-info-circle-fill me-1"></i>{{ t('common.details') }}</button>
                     </td>
                   </tr>
                 </tbody>
@@ -135,6 +140,9 @@
         </div>
       </div>
     </div>
+        </div>
+      </template>
+    </ProfileTabs>
   </div>
 </template>
 
@@ -148,6 +156,7 @@ import { getContracts } from '@/services/ContractService';
 import { getClients } from '@/services/ClientService';
 import { getOffices } from '@/services/OfficeService';
 import { useRouter } from 'vue-router';
+import ProfileTabs from '@/components/ProfileTabs.vue';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -196,11 +205,14 @@ const renewals = ref([]);
 const expiringContracts = ref([]);
 const prospects = ref([]);
 const offices = ref([]);
+const activeProfileId = ref(null);
 
-const loadAssistantDashboard = async () => {
+const loadAssistantDashboard = async (profileId = null) => {
+  if (!profileId) return;
+
   try {
     // Renewals: approximate via contracts ending within next 15 days
-    const { data: contractsRes } = await getContracts();
+    const { data: contractsRes } = await getContracts(profileId);
     const contracts = contractsRes?.contracts || [];
     const now = new Date();
     const soon = new Date(); soon.setDate(now.getDate() + 15);
@@ -215,6 +227,7 @@ const loadAssistantDashboard = async () => {
       .map(c => ({ id: c.id, client: c.Client?.company_name || '—', office: c.Office?.name || '—' }));
 
     // Prospects: use clients with status = 'Lead'
+    // const { data: clientsRes } = await getClients({ profile_id: profileId });
     const { data: clientsRes } = await getClients();
     const clients = clientsRes?.data || [];
     prospects.value = clients
@@ -222,23 +235,32 @@ const loadAssistantDashboard = async () => {
       .map(cl => ({ id: cl.id, name: cl.company_name || `${cl.first_name} ${cl.last_name}`, status: 'Lead' }));
 
     // Offices list: basic overview
-    const { data: officesRes } = await getOffices({ page: 1, limit: 10 });
+    const { data: officesRes } = await getOffices({ page: 1, limit: 10, profile_id: profileId });
     offices.value = officesRes?.data || [];
   } catch (e) {
     // non-blocking; toasts already handled elsewhere if needed
   }
 };
 
-onMounted(() => { fetchTasks(); loadAssistantDashboard(); });
+const handleProfileUpdate = (profileId) => {
+  activeProfileId.value = profileId;
+  loadAssistantDashboard(profileId);
+  fetchTasks(); // Tasks don't need profile filtering
+};
+
+onMounted(() => {
+  // ProfileTabs will trigger handleProfileUpdate when ready
+  // fetchTasks will be called from handleProfileUpdate
+});
 
 const exportData = (format) => {
-  // Simulate data generation for export
+  // Export real dashboard data
   const dataToExport = {
-    renewals: mockData.value.renewals,
-    expiringContracts: mockData.value.expiringContracts,
-    prospects: mockData.value.prospects,
-    officeStatus: mockData.value.officeStatus,
-    approvals: mockData.value.approvals
+    renewals: renewals.value,
+    expiringContracts: expiringContracts.value,
+    prospects: prospects.value,
+    offices: offices.value,
+    tasks: pendingTasks.value
   };
 
   let content = '';
@@ -250,10 +272,10 @@ const exportData = (format) => {
     mimeType = 'application/json';
     filename = `assistant_dashboard_export.json`;
   } else if (format === 'csv') {
-    // Basic CSV conversion for officeStatus as an example
-    let csvString = 'Office ID,Status,Occupancy\n';
-    dataToExport.officeStatus.forEach(office => {
-      csvString += `${office.id},${office.status},${office.occupancy}\n`;
+    // Basic CSV conversion for offices as an example
+    let csvString = 'Office ID,Name,Status,Capacity,Branch\n';
+    dataToExport.offices.forEach(office => {
+      csvString += `${office.id},${office.name || ''},${office.status || ''},${office.capacity || ''},${office.branch?.name || ''}\n`;
     });
     content = csvString;
     mimeType = 'text/csv';

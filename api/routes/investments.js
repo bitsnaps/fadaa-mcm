@@ -1,12 +1,12 @@
 const { Hono } = require('hono');
 const models = require('../models');
-const { authMiddleware, adminMiddleware } = require('../middleware/auth');
+const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
 const { getInvestmentCalculations } = require('../controllers/investmentController');
 const { handleRouteError } = require('../lib/errorHandler');
 
 const investmentsApp = new Hono();
 
-investmentsApp.use('*', authMiddleware, adminMiddleware);
+investmentsApp.use('*', authMiddleware, adminOrAssistantMiddleware);
 
 // GET all investments with calculations
 investmentsApp.get('/', async (c) => {

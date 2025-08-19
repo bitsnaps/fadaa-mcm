@@ -1,10 +1,10 @@
 const { Hono } = require('hono');
 const models = require('../models');
-const { authMiddleware, adminMiddleware } = require('../middleware/auth');
+const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
 const { handleRouteError } = require('../lib/errorHandler');
 
 const taxApp = new Hono();
-taxApp.use('*', authMiddleware, adminMiddleware); // Protect all tax routes
+taxApp.use('*', authMiddleware, adminOrAssistantMiddleware); // Protect all tax routes
 
 // GET /api/taxes - Get all taxes
 taxApp.get('/', async (c) => {

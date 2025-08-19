@@ -1,6 +1,6 @@
 const { Hono } = require('hono');
 const profileController = require('../controllers/profileController');
-const { authMiddleware, adminMiddleware } = require('../middleware/auth');
+const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
 
 const profilesApp = new Hono();
 
@@ -9,7 +9,7 @@ const profilesApp = new Hono();
 profilesApp.get('/active-profile', profileController.getActiveProfile);
 
 // All profile routes should be protected and accessible only by authorized users (e.g., admins)
-profilesApp.use('*', authMiddleware, adminMiddleware);
+profilesApp.use('*', authMiddleware, adminOrAssistantMiddleware);
 
 // --- Global Profile Routes ---
 
