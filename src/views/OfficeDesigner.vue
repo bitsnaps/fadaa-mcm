@@ -22,6 +22,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-info" @click="() => $router.back()">{{ $t('common.cancel') }}</button>
                     <button type="button" class="btn btn-primary" @click="initializeProject">{{ $t('officeDesigner.setupModal.startDesigning') }}</button>
                 </div>
             </div>
