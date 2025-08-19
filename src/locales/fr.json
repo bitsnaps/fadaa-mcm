@@ -498,7 +498,9 @@
       "monthly": "Mensuel",
       "quarterly": "Trimestriel",
       "annually": "Annuel",
-      "assignOffice": "Assigner un Bureau (ID)",
+      "selectBranch": "Sélectionner une Agence",
+      "selectBranchPlaceholder": "Choisissez d'abord une agence",
+      "assignOffice": "Assigner un Bureau",
       "noOfficeAssigned": "Aucun bureau assigné",
       "attachments": "Pièces Jointes",
       "cancel": "Annuler"

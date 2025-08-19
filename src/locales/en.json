@@ -300,7 +300,6 @@
     "lastName": "Last Name",
     "email": "Email",
     "emailAddress": "Email Address",
-    "phone": "Phone",
     "role": "Role",
     "status": "Status",
     "createdAt": "Creation Date",
@@ -458,7 +457,9 @@
       "monthly": "Monthly",
       "quarterly": "Quarterly",
       "annually": "Annually",
-      "assignOffice": "Assign Office (ID)",
+      "selectBranch": "Select Branch",
+      "selectBranchPlaceholder": "Choose a branch first",
+      "assignOffice": "Assign Office",
       "noOfficeAssigned": "No office assigned",
       "attachments": "Attachments",
       "cancel": "Cancel"

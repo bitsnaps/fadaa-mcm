@@ -45,6 +45,22 @@ officesApp.get('/', authMiddleware, async (c) => {
     }
 });
 
+// GET single office by ID
+officesApp.get('/:id', authMiddleware, async (c) => {
+    const { id } = c.req.param();
+    try {
+        const office = await models.Office.findByPk(id, {
+            include: [{ model: models.Branch, as: 'branch' }],
+        });
+        if (!office) {
+            return c.json({ success: false, message: 'Office not found' }, 404);
+        }
+        return c.json({ success: true, data: office });
+    } catch (error) {
+        return handleRouteError(c, `Error fetching office ${id}`, error);
+    }
+});
+
 // POST a new office
 officesApp.post('/', authMiddleware, async (c) => {
     try {

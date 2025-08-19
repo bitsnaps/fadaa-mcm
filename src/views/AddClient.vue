@@ -41,15 +41,53 @@ const pageTitle = computed(() => clientId.value ? t('addClient.editTitle') : t('
 const submitButtonText = computed(() => clientId.value ? t('addClient.submitButtonUpdate') : t('addClient.submitButtonAdd'));
 const validationErrors = ref({});
 const availableOffices = ref([]);
+const availableBranches = ref([]);
+const selectedBranchId = ref(null);
 
-const fetchAvailableOffices = async () => {
+const fetchAvailableBranches = async () => {
     try {
-        const response = await apiClient.get('/misc/offices');
+        const response = await apiClient.get('/misc/branches');
+        if(response.data.success) {
+            availableBranches.value = response.data.branches;
+        }
+    } catch (error) {
+        console.error("Failed to fetch available branches:", error);
+    }
+};
+
+const fetchAvailableOffices = async (branchId = null) => {
+    try {
+        const params = branchId ? { branch_id: branchId } : {};
+        const response = await apiClient.get('/misc/offices', { params });
         if(response.data.success) {
             availableOffices.value = response.data.offices;
         }
     } catch (error) {
         console.error("Failed to fetch available offices:", error);
+    }
+};
+
+const ensureSelectedOfficeInOptions = async () => {
+    if (client.value.office_id && !availableOffices.value.some(o => o.id === client.value.office_id)) {
+        try {
+            const officeResp = await apiClient.get(`/offices/${client.value.office_id}`);
+            if (officeResp.data.success && officeResp.data.data) {
+                availableOffices.value = [...availableOffices.value, officeResp.data.data];
+            }
+        } catch (e) {
+            console.error('Failed to ensure selected office present in options:', e);
+        }
+    }
+};
+
+const onBranchChange = () => {
+    // Reset office selection when branch changes
+    client.value.office_id = null;
+    // Fetch offices for the selected branch
+    if (selectedBranchId.value) {
+        fetchAvailableOffices(selectedBranchId.value);
+    } else {
+        availableOffices.value = [];
     }
 };
 
@@ -65,12 +103,28 @@ const validateForm = () => {
 };
 
 onMounted(async () => {
-  fetchAvailableOffices();
+  await fetchAvailableBranches();
   if (clientId.value) {
     try {
         const response = await apiClient.get(`/clients/${clientId.value}`);
         if(response.data.success) {
             client.value = response.data.data;
+            // If client has an assigned office, infer the branch and load offices accordingly
+            if (client.value.office_id) {
+                try {
+                    const officeResp = await apiClient.get(`/offices/${client.value.office_id}`);
+                    if (officeResp.data.success && officeResp.data.data) {
+                        const office = officeResp.data.data;
+                        selectedBranchId.value = office.branch_id || (office.branch ? office.branch.id : null);
+                        if (selectedBranchId.value) {
+                            await fetchAvailableOffices(selectedBranchId.value);
+                            await ensureSelectedOfficeInOptions();
+                        }
+                    }
+                } catch (err) {
+                    console.error('Failed to fetch office for client to determine branch:', err);
+                }
+            }
         } else {
             console.error(t('addClient.messages.clientNotFound'));
             router.push('/manage-clients');
@@ -267,14 +321,25 @@ const handleFileUpload = (event) => {
             </select>
           </div>
         </div>
-        <div class="mb-3">
-          <label for="officeId" class="form-label">{{ t('addClient.form.assignOffice') }}</label>
-            <select class="form-select" id="officeId" v-model="client.office_id">
-                <option :value="null">{{ t('addClient.form.noOfficeAssigned') }}</option>
-                <option v-for="office in availableOffices" :key="office.id" :value="office.id">
-                    {{ office.name }}
-                </option>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="branchId" class="form-label">{{ t('addClient.form.selectBranch') }}</label>
+            <select class="form-select" id="branchId" v-model="selectedBranchId" @change="onBranchChange">
+              <option :value="null">{{ t('addClient.form.selectBranchPlaceholder') }}</option>
+              <option v-for="branch in availableBranches" :key="branch.id" :value="branch.id">
+                {{ branch.name }}
+              </option>
             </select>
+          </div>
+          <div class="col-md-6">
+            <label for="officeId" class="form-label">{{ t('addClient.form.assignOffice') }}</label>
+            <select class="form-select" id="officeId" v-model="client.office_id" :disabled="!selectedBranchId">
+              <option :value="null">{{ t('addClient.form.noOfficeAssigned') }}</option>
+              <option v-for="office in availableOffices" :key="office.id" :value="office.id">
+                {{ office.name }}
+              </option>
+            </select>
+          </div>
         </div>
         <div class="mb-3">
           <label for="attachments" class="form-label">{{ t('addClient.form.attachments') }}</label>
