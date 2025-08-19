@@ -248,12 +248,12 @@ const changePage = (page) => {
             <form @submit.prevent="saveOffice">
               <div class="mb-3">
                 <label for="officeName" class="form-label">{{ t('offices.addEditOfficeModal.officeName') }} <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" :class="{'is-invalid': validationErrors.name}" id="officeName" v-model="officeForm.name">
+                <input type="text" class="form-control" :class="{'is-invalid': validationErrors.name}" id="officeName" v-model="officeForm.name" required>
                 <div v-if="validationErrors.name" class="invalid-feedback">{{ validationErrors.name }}</div>
               </div>
               <div class="mb-3">
                 <label for="officeBranch" class="form-label">{{ t('offices.addEditOfficeModal.branch') }} <span class="text-danger">*</span></label>
-                <select class="form-select" :class="{'is-invalid': validationErrors.branch_id}" id="officeBranch" v-model="officeForm.branch_id">
+                <select class="form-select" :class="{'is-invalid': validationErrors.branch_id}" id="officeBranch" v-model="officeForm.branch_id" required>
                     <option :value="null" disabled>Select a branch</option>
                     <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
                 </select>
@@ -261,7 +261,7 @@ const changePage = (page) => {
               </div>
               <div class="mb-3">
                   <label for="officeType" class="form-label">{{ t('offices.tableHeaders.type') }} <span class="text-danger">*</span></label>
-                  <select class="form-select" :class="{'is-invalid': validationErrors.type}" v-model="officeForm.type">
+                  <select class="form-select" :class="{'is-invalid': validationErrors.type}" v-model="officeForm.type" required>
                       <option value="Private Suite">Private Suite</option>
                       <option value="Coworking Desk">Coworking Desk</option>
                       <option value="Virtual Office">Virtual Office</option>
@@ -274,7 +274,7 @@ const changePage = (page) => {
               </div>
               <div class="mb-3">
                 <label class="form-label">{{ t('offices.addEditOfficeModal.status') }} <span class="text-danger">*</span></label>
-                <select class="form-select" :class="{'is-invalid': validationErrors.status}" v-model="officeForm.status">
+                <select class="form-select" :class="{'is-invalid': validationErrors.status}" v-model="officeForm.status" required>
                   <option value="Available">{{ t('offices.status.available') }}</option>
                   <option value="Occupied">{{ t('offices.status.occupied') }}</option>
                   <option value="Maintenance">{{ t('offices.status.maintenance') }}</option>

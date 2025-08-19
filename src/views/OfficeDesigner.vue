@@ -9,8 +9,8 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">{{ $t('officeDesigner.setupModal.branchName') }}</label>
-                        <input type="text" class="form-control" v-model="setup.branchName" :placeholder="$t('officeDesigner.setupModal.branchNamePlaceholder')">
+                        <label class="form-label">{{ $t('officeDesigner.setupModal.branchName') }} <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" v-model="setup.branchName" :placeholder="$t('officeDesigner.setupModal.branchNamePlaceholder')" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ $t('officeDesigner.setupModal.numFloors') }}</label>
@@ -35,8 +35,8 @@
             <div class="modal-content">
                 <div class="modal-header"><h5 class="modal-title">{{ $t('officeDesigner.editNameModal.title') }}</h5></div>
                 <div class="modal-body">
-                    <label class="form-label">{{ $t('officeDesigner.editNameModal.newName') }}</label>
-                    <input type="text" class="form-control" v-model="editingName" @keyup.enter="saveOfficeName">
+                    <label class="form-label">{{ $t('officeDesigner.editNameModal.newName') }} <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" v-model="editingName" @keyup.enter="saveOfficeName" required>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('officeDesigner.editNameModal.cancel') }}</button>

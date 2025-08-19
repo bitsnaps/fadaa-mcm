@@ -65,21 +65,21 @@
               <div class="mb-3">
                 <div class="row">
                   <div class="col-md-6 mb-3">
-                    <label for="userFirstName" class="form-label">{{ $t('manageUsers.firstName') }}</label>
+                    <label for="userFirstName" class="form-label">{{ $t('manageUsers.firstName') }} <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="userFirstName" v-model="currentUser.first_name" required>
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="userLastName" class="form-label">{{ $t('manageUsers.lastName') }}</label>
+                    <label for="userLastName" class="form-label">{{ $t('manageUsers.lastName') }} <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="userLastName" v-model="currentUser.last_name" required>
                   </div>
                 </div>
                 <div class="mb-3">
-                  <label for="userEmail" class="form-label">{{ $t('manageUsers.emailAddress') }}</label>
+                  <label for="userEmail" class="form-label">{{ $t('manageUsers.emailAddress') }} <span class="text-danger">*</span></label>
                   <input type="email" class="form-control" id="userEmail" v-model="currentUser.email" required>
                 </div>
                 <div class="row">
                   <div class="col-md-6 mb-3">
-                    <label for="userRole" class="form-label">{{ $t('manageUsers.role') }}</label>
+                    <label for="userRole" class="form-label">{{ $t('manageUsers.role') }} <span class="text-danger">*</span></label>
                     <select class="form-select" id="userRole" v-model="currentUser.role_id" required>
                       <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
                     </select>
@@ -93,7 +93,7 @@
                   </div>
                 </div>
                 <div class="mb-3" v-if="!editingUser">
-                  <label for="userPassword" class="form-label">{{ $t('manageUsers.password') }}</label>
+                  <label for="userPassword" class="form-label">{{ $t('manageUsers.password') }} <span class="text-danger">*</span></label>
                   <input type="password" class="form-control" id="userPassword" v-model="currentUser.password" :required="!editingUser">
                 </div>
                 <div class="mb-3">

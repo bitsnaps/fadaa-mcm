@@ -322,11 +322,11 @@ const confirmDeleteDocument = async () => {
           <div class="modal-body">
             <form @submit.prevent="submitNewDocument">
               <div class="mb-3">
-                <label for="doc-title" class="form-label">{{ t('documents.tableHeaders.name') }}*</label>
+                <label for="doc-title" class="form-label">{{ t('documents.tableHeaders.name') }} <span class="text-danger">*</span></label>
                 <input type="text" id="doc-title" class="form-control" v-model="newDocument.title" required>
               </div>
               <div class="mb-3">
-                <label for="doc-client" class="form-label">{{ t('documents.tableHeaders.client') }}*</label>
+                <label for="doc-client" class="form-label">{{ t('documents.tableHeaders.client') }} <span class="text-danger">*</span></label>
                 <select id="doc-client" class="form-select" v-model="newDocument.client_id" required>
                   <option :value="null" disabled>-- {{ t('documents.selectClient') }} --</option>
                   <option v-for="client in clients" :key="client.id" :value="client.id">{{ client.company_name }}</option>
@@ -340,7 +340,7 @@ const confirmDeleteDocument = async () => {
                 </select>
               </div>
               <div class="mb-3">
-                <label for="doc-type" class="form-label">{{ t('documents.tableHeaders.type') }}</label>
+                <label for="doc-type" class="form-label">{{ t('documents.tableHeaders.type') }} <span class="text-danger">*</span></label>
                 <select id="doc-type" class="form-select" v-model="newDocument.type" required>
                   <option>Contract</option>
                   <option>Report</option>
@@ -349,7 +349,7 @@ const confirmDeleteDocument = async () => {
                 </select>
               </div>
               <div class="mb-3">
-                <label for="document-file" class="form-label">{{ t('documents.form.attachments') }}*</label>
+                <label for="document-file" class="form-label">{{ t('documents.form.attachments') }} <span class="text-danger">*</span></label>
                 <input type="file" id="document-file" class="form-control" @change="handleFileChange" required>
               </div>
             </form>
@@ -376,11 +376,11 @@ const confirmDeleteDocument = async () => {
           <div class="modal-body">
             <form @submit.prevent="submitUpdateDocument" v-if="editingDocument">
               <div class="mb-3">
-                <label for="edit-doc-title" class="form-label">{{ t('documents.tableHeaders.name') }}</label>
+                <label for="edit-doc-title" class="form-label">{{ t('documents.tableHeaders.name') }} <span class="text-danger">*</span></label>
                 <input type="text" id="edit-doc-title" class="form-control" v-model="editingDocument.title" required>
               </div>
               <div class="mb-3">
-                <label for="edit-doc-type" class="form-label">{{ t('documents.tableHeaders.type') }}</label>
+                <label for="edit-doc-type" class="form-label">{{ t('documents.tableHeaders.type') }} <span class="text-danger">*</span></label>
                 <select id="edit-doc-type" class="form-select" v-model="editingDocument.type" required>
                   <option>Contract</option>
                   <option>Report</option>

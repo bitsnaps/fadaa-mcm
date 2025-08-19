@@ -59,11 +59,11 @@
           <div class="modal-body">
             <form @submit.prevent="saveTax">
               <div class="mb-3">
-                <label for="taxName" class="form-label">{{ $t('manageTaxes.name') }}</label>
+                <label for="taxName" class="form-label">{{ $t('manageTaxes.name') }} <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="taxName" v-model="currentTax.name" required>
               </div>
               <div class="mb-3">
-                <label for="taxRate" class="form-label">{{ $t('manageTaxes.rate') }}</label>
+                <label for="taxRate" class="form-label">{{ $t('manageTaxes.rate') }} <span class="text-danger">*</span></label>
                 <input type="number" step="0.01" class="form-control" id="taxRate" v-model="currentTax.rate" required>
               </div>
               <div class="mb-3">

@@ -160,15 +160,15 @@ const handleChangePassword = async () => {
           <div class="card-body">
             <form @submit.prevent="handleUpdateProfile">
               <div class="mb-3 row">
-                <label for="firstName" class="col-sm-3 col-form-label">{{ $t('userProfile.firstName') }}</label>
+                <label for="firstName" class="col-sm-3 col-form-label">{{ $t('userProfile.firstName') }} <span class="text-danger">*</span></label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" id="firstName" v-model="editableUser.firstName">
+                  <input type="text" class="form-control" id="firstName" v-model="editableUser.firstName" required>
                 </div>
               </div>
               <div class="mb-3 row">
-                <label for="lastName" class="col-sm-3 col-form-label">{{ $t('userProfile.lastName') }}</label>
+                <label for="lastName" class="col-sm-3 col-form-label">{{ $t('userProfile.lastName') }} <span class="text-danger">*</span></label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" id="lastName" v-model="editableUser.lastName">
+                  <input type="text" class="form-control" id="lastName" v-model="editableUser.lastName" required>
                 </div>
               </div>
               <div class="mb-3 row">
@@ -199,15 +199,15 @@ const handleChangePassword = async () => {
           <div class="card-body">
             <form @submit.prevent="handleChangePassword">
               <div class="mb-3">
-                <label for="currentPassword" class="form-label">{{ $t('userProfile.currentPassword') }}</label>
+                <label for="currentPassword" class="form-label">{{ $t('userProfile.currentPassword') }} <span class="text-danger">*</span></label>
                 <input type="password" class="form-control" id="currentPassword" v-model="passwordForm.currentPassword" required>
               </div>
               <div class="mb-3">
-                <label for="newPassword" class="form-label">{{ $t('userProfile.newPassword') }}</label>
+                <label for="newPassword" class="form-label">{{ $t('userProfile.newPassword') }} <span class="text-danger">*</span></label>
                 <input type="password" class="form-control" id="newPassword" v-model="passwordForm.newPassword" required>
               </div>
               <div class="mb-3">
-                <label for="confirmPassword" class="form-label">{{ $t('userProfile.confirmNewPassword') }}</label>
+                <label for="confirmPassword" class="form-label">{{ $t('userProfile.confirmNewPassword') }} <span class="text-danger">*</span></label>
                 <input type="password" class="form-control" id="confirmPassword" v-model="passwordForm.confirmPassword" required>
               </div>
               <div class="d-flex justify-content-end">

@@ -239,16 +239,16 @@ const handleDelete = async (id) => {
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label for="inv-name" class="form-label">{{ t('investments.tableHeaders.name') }}</label>
-                                <input type="text" id="inv-name" class="form-control" v-model="currentInvestment.name">
+                                <label for="inv-name" class="form-label">{{ t('investments.tableHeaders.name') }} <span class="text-danger">*</span></label>
+                                <input type="text" id="inv-name" class="form-control" v-model="currentInvestment.name" required>
                             </div>
                             <div class="mb-3">
-                                <label for="inv-percentage" class="form-label">{{ t('investments.tableHeaders.percentage') }}</label>
-                                <input type="number" id="inv-percentage" class="form-control" v-model.number="currentInvestment.percentage">
+                                <label for="inv-percentage" class="form-label">{{ t('investments.tableHeaders.percentage') }} <span class="text-danger">*</span></label>
+                                <input type="number" id="inv-percentage" class="form-control" v-model.number="currentInvestment.percentage" required>
                             </div>
                             <div class="mb-3">
-                                <label for="inv-type" class="form-label">{{ t('investments.tableHeaders.type') }}</label>
-                                <select id="inv-type" class="form-select" v-model="currentInvestment.type">
+                                <label for="inv-type" class="form-label">{{ t('investments.tableHeaders.type') }} <span class="text-danger">*</span></label>
+                                <select id="inv-type" class="form-select" v-model="currentInvestment.type" required>
                                     <option value="Comprehensive">Comprehensive</option>
                                     <option value="Contractual">Contractual</option>
                                 </select>

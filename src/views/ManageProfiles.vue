@@ -52,7 +52,7 @@
           <div class="modal-body">
             <form @submit.prevent="saveProfile">
               <div class="mb-3">
-                <label for="profile-name" class="form-label">{{ $t('profiles.tableHeaders.name') }}</label>
+                <label for="profile-name" class="form-label">{{ $t('profiles.tableHeaders.name') }} <span class="text-danger">*</span></label>
                 <input type="text" id="profile-name" class="form-control" v-model="currentProfile.name" required>
               </div>
               <div class="mb-3">

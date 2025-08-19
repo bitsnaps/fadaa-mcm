@@ -60,7 +60,7 @@ function save() {
         <div class="modal-body">
           <form @submit.prevent="save">
             <div class="mb-3">
-              <label for="task-title" class="form-label">{{ t('tasks.tableHeaders.title') }}</label>
+              <label for="task-title" class="form-label">{{ t('tasks.tableHeaders.title') }} <span class="text-danger">*</span></label>
               <input id="task-title" type="text" v-model="form.title" class="form-control" required />
             </div>
             <div class="mb-3">
@@ -69,8 +69,8 @@ function save() {
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label for="task-priority" class="form-label">{{ t('tasks.tableHeaders.priority') }}</label>
-                <select id="task-priority" v-model="form.priority" class="form-select">
+                <label for="task-priority" class="form-label">{{ t('tasks.tableHeaders.priority') }} <span class="text-danger">*</span></label>
+                <select id="task-priority" v-model="form.priority" class="form-select" required>
                   <option value="low">{{ t('tasks.priorities.low') }}</option>
                   <option value="medium">{{ t('tasks.priorities.medium') }}</option>
                   <option value="high">{{ t('tasks.priorities.high') }}</option>
@@ -78,8 +78,8 @@ function save() {
                 </select>
               </div>
               <div class="col-md-6 mb-3">
-                <label for="task-status" class="form-label">{{ t('tasks.tableHeaders.status') }}</label>
-                <select id="task-status" v-model="form.status" class="form-select">
+                <label for="task-status" class="form-label">{{ t('tasks.tableHeaders.status') }} <span class="text-danger">*</span></label>
+                <select id="task-status" v-model="form.status" class="form-select" required>
                   <option value="pending">{{ t('tasks.statuses.pending') }}</option>
                   <option value="in_progress">{{ t('tasks.statuses.in_progress') }}</option>
                   <option value="completed">{{ t('tasks.statuses.completed') }}</option>

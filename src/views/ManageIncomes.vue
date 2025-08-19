@@ -209,11 +209,11 @@ const handleDelete = async (id) => {
                         <form @submit.prevent="handleSubmit">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="inc-amount" class="form-label">{{ t('incomes.tableHeaders.amount') }}</label>
+                                    <label for="inc-amount" class="form-label">{{ t('incomes.tableHeaders.amount') }} <span class="text-danger">*</span></label>
                                     <input type="number" id="inc-amount" class="form-control" v-model.number="currentIncome.amount" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="inc-branch" class="form-label">{{ t('incomes.tableHeaders.branch') }}</label>
+                                    <label for="inc-branch" class="form-label">{{ t('incomes.tableHeaders.branch') }} <span class="text-danger">*</span></label>
                                     <select id="inc-branch" class="form-select" v-model="currentIncome.branch_id" required>
                                         <option :value="null">Select a branch</option>
                                         <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
@@ -225,7 +225,7 @@ const handleDelete = async (id) => {
                                 <textarea id="inc-description" class="form-control" v-model="currentIncome.description"></textarea>
                             </div>
                             <div class="mb-3">
-                                <label for="inc-transaction-date" class="form-label">{{ t('incomes.tableHeaders.transaction_date') }}</label>
+                                <label for="inc-transaction-date" class="form-label">{{ t('incomes.tableHeaders.transaction_date') }} <span class="text-danger">*</span></label>
                                 <input type="date" id="inc-transaction-date" class="form-control" v-model="currentIncome.transaction_date" required>
                             </div>
                         </form>

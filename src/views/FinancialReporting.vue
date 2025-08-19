@@ -16,12 +16,12 @@
                   <form @submit.prevent="generateReport">
                     <div class="row g-3">
                       <div class="col-md-4">
-                        <label for="dateRangeStart" class="form-label">{{ $t('financialReporting.customReport.startDate') }}</label>
-                        <input type="date" id="dateRangeStart" class="form-control" v-model="reportConfig.startDate">
+                        <label for="dateRangeStart" class="form-label">{{ $t('financialReporting.customReport.startDate') }} <span class="text-danger">*</span></label>
+                        <input type="date" id="dateRangeStart" class="form-control" v-model="reportConfig.startDate" required>
                       </div>
                       <div class="col-md-4">
-                        <label for="dateRangeEnd" class="form-label">{{ $t('financialReporting.customReport.endDate') }}</label>
-                        <input type="date" id="dateRangeEnd" class="form-control" v-model="reportConfig.endDate">
+                        <label for="dateRangeEnd" class="form-label">{{ $t('financialReporting.customReport.endDate') }} <span class="text-danger">*</span></label>
+                        <input type="date" id="dateRangeEnd" class="form-control" v-model="reportConfig.endDate" required>
                       </div>
                       <div class="col-md-4">
                         <label for="reportFormat" class="form-label">{{ $t('financialReporting.customReport.format') }}</label>

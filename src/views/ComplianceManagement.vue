@@ -150,7 +150,7 @@
           <div class="modal-body">
             <form @submit.prevent="saveDeadline">
               <div class="mb-3">
-                <label for="deadline-title" class="form-label">{{ $t('complianceManagement.upcomingDeadlines.task') }}</label>
+                <label for="deadline-title" class="form-label">{{ $t('complianceManagement.upcomingDeadlines.task') }} <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="deadline-title" v-model="editingDeadline.title" required>
               </div>
               <div class="mb-3">
@@ -159,11 +159,11 @@
               </div>
               <div class="mb-3">
                 <label for="deadline-due-date" class="form-label">{{ $t('complianceManagement.upcomingDeadlines.dueDate') }}</label>
-                <input type="date" class="form-control" id="deadline-due-date" v-model="editingDeadline.due_date" required>
+                <input type="date" class="form-control" id="deadline-due-date" v-model="editingDeadline.due_date">
               </div>
               <div class="mb-3">
                 <label for="deadline-priority" class="form-label">{{ $t('complianceManagement.upcomingDeadlines.priority') }}</label>
-                <select class="form-select" id="deadline-priority" v-model="editingDeadline.priority" required>
+                <select class="form-select" id="deadline-priority" v-model="editingDeadline.priority">
                   <option value="Low">{{ $t('complianceManagement.upcomingDeadlines.priorities.low') }}</option>
                   <option value="Medium">{{ $t('complianceManagement.upcomingDeadlines.priorities.medium') }}</option>
                   <option value="High">{{ $t('complianceManagement.upcomingDeadlines.priorities.high') }}</option>
@@ -190,7 +190,7 @@
           <div class="modal-body">
             <form @submit.prevent="saveActivity">
               <div class="mb-3">
-                <label for="activity-action" class="form-label">{{ $t('complianceManagement.recentActivities.activity') }}</label>
+                <label for="activity-action" class="form-label">{{ $t('complianceManagement.recentActivities.activity') }} <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="activity-action" v-model="editingActivity.action" required>
               </div>
               <div class="mb-3">
@@ -199,7 +199,7 @@
               </div>
               <div class="mb-3">
                 <label for="activity-status" class="form-label">{{ $t('complianceManagement.recentActivities.status') }}</label>
-                <select class="form-select" id="activity-status" v-model="editingActivity.details.status" required>
+                <select class="form-select" id="activity-status" v-model="editingActivity.details.status">
                   <option value="In Progress">{{ $t('complianceManagement.recentActivities.statuses.in_progress') }}</option>
                   <option value="Completed">{{ $t('complianceManagement.recentActivities.statuses.completed') }}</option>
                   <option value="Pending">{{ $t('complianceManagement.recentActivities.statuses.pending') }}</option>

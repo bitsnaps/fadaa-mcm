@@ -465,14 +465,14 @@ const submitDocumentUpload = async () => {
                     <form @submit.prevent="submitNewContract">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="client" class="form-label">{{ t('contracts.tableHeaders.client') }}</label>
+                                <label for="client" class="form-label">{{ t('contracts.tableHeaders.client') }} <span class="text-danger">*</span></label>
                                 <select id="client" class="form-select" v-model="newContract.client_id" required>
                                     <option :value="null" disabled>-- Select Client --</option>
                                     <option v-for="client in clients" :key="client.id" :value="client.id">{{ client.company_name }}</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="office" class="form-label">{{ t('contracts.tableHeaders.office') }}</label>
+                                <label for="office" class="form-label">{{ t('contracts.tableHeaders.office') }} <span class="text-danger">*</span></label>
                                 <select id="office" class="form-select" v-model="newContract.office_id" required>
                                     <option :value="null" disabled>-- Select Office --</option>
                                     <option v-for="office in offices" :key="office.id" :value="office.id">{{ office.name }}</option>
@@ -481,21 +481,21 @@ const submitDocumentUpload = async () => {
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="start_date" class="form-label">{{ t('contracts.tableHeaders.startDate') }}</label>
+                                <label for="start_date" class="form-label">{{ t('contracts.tableHeaders.startDate') }} <span class="text-danger">*</span></label>
                                 <input type="date" id="start_date" class="form-control" v-model="newContract.start_date" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="end_date" class="form-label">{{ t('contracts.tableHeaders.endDate') }}</label>
+                                <label for="end_date" class="form-label">{{ t('contracts.tableHeaders.endDate') }} <span class="text-danger">*</span></label>
                                 <input type="date" id="end_date" class="form-control" v-model="newContract.end_date" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="monthly_rate" class="form-label">{{ t('contracts.tableHeaders.monthlyRate', 'Monthly Rate') }}</label>
-                                <input type="number" id="monthly_rate" class="form-control" v-model="newContract.monthly_rate" placeholder="e.g., 50000" required>
+                                <input type="number" id="monthly_rate" class="form-control" v-model="newContract.monthly_rate" placeholder="e.g., 50000">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="status" class="form-label">{{ t('contracts.tableHeaders.status') }}</label>
+                                <label for="status" class="form-label">{{ t('contracts.tableHeaders.status') }} <span class="text-danger">*</span></label>
                                 <select id="status" class="form-select" v-model="newContract.status" required>
                                     <option value="Active">{{ t('contracts.status.active', 'Active') }}</option>
                                     <option value="Pending">{{ t('contracts.status.pending', 'Pending') }}</option>
@@ -541,7 +541,7 @@ const submitDocumentUpload = async () => {
           <div class="modal-body">
             <form @submit.prevent="submitDocumentUpload">
               <div class="mb-3">
-                <label for="contractDocument" class="form-label">{{ t('addClient.form.attachments') }}</label>
+                <label for="contractDocument" class="form-label">{{ t('addClient.form.attachments') }} <span class="text-danger">*</span></label>
                 <input type="file" id="contractDocument" class="form-control" @change="handleDocumentFileChange" required>
               </div>
               <div class="modal-footer">

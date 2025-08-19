@@ -55,7 +55,7 @@ function save() {
         <div class="modal-body">
           <form @submit.prevent="save">
             <div class="mb-3">
-              <label class="form-label">{{ t('manageWithdrawals.modal.investor') }}</label>
+              <label class="form-label">{{ t('manageWithdrawals.modal.investor') }} <span class="text-danger">*</span></label>
               <select v-model="form.investor_id" class="form-select" required>
                 <option v-for="inv in investors" :key="inv.id" :value="inv.id">
                   {{ inv.first_name }} {{ inv.last_name }}
@@ -63,7 +63,7 @@ function save() {
               </select>
             </div>
             <div class="mb-3">
-              <label class="form-label">{{ t('manageWithdrawals.modal.investment') }}</label>
+              <label class="form-label">{{ t('manageWithdrawals.modal.investment') }} <span class="text-danger">*</span></label>
               <select v-model="form.investment_id" class="form-select" required>
                 <option v-for="inv in investments" :key="inv.id" :value="inv.id">
                   {{ inv.name }}
@@ -72,7 +72,7 @@ function save() {
             </div>
             <div class="mb-3">
               <label class="form-label">{{ t('manageWithdrawals.modal.amount') }}</label>
-              <input type="number" v-model="form.amount" class="form-control" required />
+              <input type="number" v-model="form.amount" class="form-control" />
             </div>
             <div class="mb-3">
               <label class="form-label">{{ t('manageWithdrawals.modal.paymentMethod') }}</label>

@@ -65,16 +65,16 @@
           <div class="modal-body">
             <form @submit.prevent="saveBranch">
               <div class="mb-3">
-                <label for="branchName" class="form-label">{{ $t('manageBranches.branchName') }}</label>
+                <label for="branchName" class="form-label">{{ $t('manageBranches.branchName') }} <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="branchName" v-model="branchForm.name" required>
               </div>
               <div class="mb-3">
                 <label for="branchLocation" class="form-label">{{ $t('manageBranches.location') }}</label>
-                <input type="text" class="form-control" id="branchLocation" v-model="branchForm.location" required>
+                <input type="text" class="form-control" id="branchLocation" v-model="branchForm.location">
               </div>
               <div class="mb-3" v-if="editingBranch">
-                <label for="branchStatus" class="form-label">{{ $t('manageBranches.status') }}</label>
-                <select class="form-select" id="branchStatus" v-model="branchForm.status">
+                <label for="branchStatus" class="form-label">{{ $t('manageBranches.status') }} <span class="text-danger">*</span></label>
+                <select class="form-select" id="branchStatus" v-model="branchForm.status" required>
                   <option value="active">{{ $t('manageBranches.active') }}</option>
                   <option value="inactive">{{ $t('manageBranches.inactive') }}</option>
                 </select>

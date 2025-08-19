@@ -147,27 +147,27 @@ const handleFileUpload = (event) => {
       <form @submit.prevent="submitForm">
         <div class="mb-3">
           <label for="companyName" class="form-label">{{ t('addClient.form.clientName') }} <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" :class="{'is-invalid': validationErrors.company_name}" id="companyName" v-model="client.company_name">
+          <input type="text" class="form-control" :class="{'is-invalid': validationErrors.company_name}" id="companyName" v-model="client.company_name" required>
           <div v-if="validationErrors.company_name" class="invalid-feedback">{{ validationErrors.company_name }}</div>
         </div>
-        
+
         <h5 class="mt-4">{{ t('addClient.form.contactPerson') }}</h5>
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="firstName" class="form-label">{{ t('userProfile.firstName') }} <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" :class="{'is-invalid': validationErrors.first_name}" id="firstName" v-model="client.first_name">
+                <input type="text" class="form-control" :class="{'is-invalid': validationErrors.first_name}" id="firstName" v-model="client.first_name" required>
                 <div v-if="validationErrors.first_name" class="invalid-feedback">{{ validationErrors.first_name }}</div>
             </div>
             <div class="col-md-6">
                 <label for="lastName" class="form-label">{{ t('userProfile.lastName') }} <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" :class="{'is-invalid': validationErrors.last_name}" id="lastName" v-model="client.last_name">
+                <input type="text" class="form-control" :class="{'is-invalid': validationErrors.last_name}" id="lastName" v-model="client.last_name" required>
                 <div v-if="validationErrors.last_name" class="invalid-feedback">{{ validationErrors.last_name }}</div>
             </div>
         </div>
 
         <div class="mb-3">
           <label for="clientEmail" class="form-label">{{ t('addClient.form.email') }} <span class="text-danger">*</span></label>
-          <input type="email" class="form-control" :class="{'is-invalid': validationErrors.email}" id="clientEmail" v-model="client.email">
+          <input type="email" class="form-control" :class="{'is-invalid': validationErrors.email}" id="clientEmail" v-model="client.email" required>
           <div v-if="validationErrors.email" class="invalid-feedback">{{ validationErrors.email }}</div>
         </div>
         <div class="mb-3">
