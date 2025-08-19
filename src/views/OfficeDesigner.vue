@@ -69,7 +69,7 @@
         <h5 class="mb-3">{{ $t('officeDesigner.main.floors') }}</h5>
         <ul class="nav nav-pills flex-column mb-3">
             <li v-for="(floor, index) in floors" :key="floor.id" class="nav-item mb-1">
-                <a href="#" class="nav-link d-flex justify-content-between align-items-center" :class="{ active: currentFloorIndex === index }" @click="switchFloor(index)">
+                <a href="#" class="nav-link d-flex justify-content-between align-items-center" :class="{ active: currentFloorIndex === index }" @click.prevent="switchFloor(index)">
                     <span>{{ floor.name }}</span>
                     <i class="bi bi-x-circle" @click.stop="deleteFloor(index)"></i>
                 </a>
