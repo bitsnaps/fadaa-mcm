@@ -1,18 +1,17 @@
-import { useToastController as useBvToast } from 'bootstrap-vue-next/composables';
+import { useToastController } from 'bootstrap-vue-next/composables';
 
 export function useToast() {
-  const toast = useBvToast();
+  const toast = useToastController();
 
   const showToast = (message, options = {}) => {
-    const { variant = 'success', title = 'Notification' } = options;
+    const { variant = 'info', title = 'Notification' } = options;
     toast.show({
-      props: {
-        title: title,
-        body: message,
-        variant: variant,
-        autoHide: true,
-        delay: 5000,
-      }
+      title: title,
+      body: message,
+      variant: variant,
+      pos: 'top-center',
+      autoHide: true,
+      value: 3000
     });
   };
 
