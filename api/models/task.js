@@ -21,14 +21,14 @@ module.exports = (sequelize) => {
       comment: 'Category to group tasks, e.g., "Compliance"',
     },
     status: {
-      type: DataTypes.ENUM('Pending', 'In Progress', 'Completed', 'Cancelled'),
+      type: DataTypes.ENUM('pending', 'in_progress', 'completed', 'cancelled'),
       allowNull: false,
-      defaultValue: 'Pending',
+      defaultValue: 'pending',
     },
     priority: {
-      type: DataTypes.ENUM('Low', 'Medium', 'High', 'Urgent'),
+      type: DataTypes.ENUM('low', 'medium', 'high', 'urgent'),
       allowNull: false,
-      defaultValue: 'Medium',
+      defaultValue: 'medium',
     },
     due_date: {
       type: DataTypes.DATE,

@@ -53,9 +53,12 @@
   "common": {
     "view": "Voir",
     "edit": "Modifier",
+    "delete": "Supprimer",
     "details": "Détails",
     "daysLeft": "jours restants",
-    "na": "N/D"
+    "na": "N/D",
+    "cancel": "Annuler",
+    "save": "Enregistrer"
   },
   "sidebar": {
     "adminDashboard": "Tableau de Bord Administrateur",
@@ -84,6 +87,47 @@
     "manageIncomes": "Gestion des Revenus",
     "manageExpenses": "Gestion des Dépenses",
     "manageProfiles": "Gestion des Profils"
+  },
+  "tasks": {
+    "title": "Gérer les Tâches",
+    "addTask": "Nouvelle Tâche",
+    "editTask": "Modifier la Tâche",
+    "searchPlaceholder": "Rechercher des tâches...",
+    "allStatuses": "Tous les statuts",
+    "allPriorities": "Toutes les priorités",
+    "noTasksFound": "Aucune tâche trouvée.",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette tâche ?",
+    "tableHeaders": {
+      "title": "Titre",
+      "description": "Description",
+      "due_date": "Date d'échéance",
+      "priority": "Priorité",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "statuses": {
+      "pending": "En attente",
+      "in_progress": "En cours",
+      "completed": "Terminée",
+      "cancelled": "Annulée"
+    },
+    "priorities": {
+      "low": "Basse",
+      "medium": "Moyenne",
+      "high": "Haute",
+      "urgent": "Urgente"
+    },
+    "success": {
+      "created": "Tâche créée avec succès.",
+      "updated": "Tâche mise à jour avec succès.",
+      "deleted": "Tâche supprimée avec succès."
+    },
+    "errors": {
+      "fetchFailed": "Échec de la récupération des tâches.",
+      "createFailed": "Échec de la création de la tâche.",
+      "updateFailed": "Échec de la mise à jour de la tâche.",
+      "deleteFailed": "Échec de la suppression de la tâche."
+    }
   },
   "profiles": {
     "addProfile": "Ajouter un Profil",
@@ -275,8 +319,8 @@
     "documents": {
       "title": "Accès aux Documents",
       "download": "Télécharger",
-      "investmentContract": "Contrat d'investissement",
-      "performanceReportQ2": "Rapport Performance Q2 2024",
+      "investmentContract": "Contrat d'Investissement",
+      "performanceReportQ2": "Rapport de Performance T2 2024",
       "allBranches": "Toutes les agences"
     },
     "statuses": {
@@ -291,16 +335,21 @@
     "userList": "Liste des Utilisateurs",
     "id": "ID",
     "name": "Nom",
+    "fullName": "Nom Complet",
+    "firstName": "Prénom",
+    "lastName": "Nom",
     "email": "Email",
+    "emailAddress": "Adresse Email",
     "role": "Rôle",
     "status": "Statut",
     "createdAt": "Date de Création",
     "actions": "Actions",
     "noUsersFound": "Aucun utilisateur trouvé.",
-    "editUser": "Modifier Utilisateur",
-    "addUserTitle": "Ajouter Utilisateur",
-    "fullName": "Nom Complet",
-    "password": "Mot de passe",
+    "editUser": "Modifier l'Utilisateur",
+    "addUserTitle": "Ajouter un Utilisateur",
+    "branch": "Agence",
+    "noBranch": "Aucune Agence Assignée",
+    "password": "Mot de Passe",
     "active": "Actif",
     "inactive": "Inactif",
     "cancel": "Annuler",
@@ -311,7 +360,7 @@
     "delete": "Supprimer",
     "userUpdatedSuccess": "Utilisateur mis à jour avec succès.",
     "userAddedSuccess": "Utilisateur ajouté avec succès.",
-    "userDeletedSuccess": "Utilisateur {userName} supprimé avec succès.",
+    "userDeletedSuccess": "L'utilisateur {userName} a été supprimé avec succès.",
     "roles": {
       "admin": "Admin",
       "assistant": "Assistant",
@@ -325,126 +374,138 @@
     "addBranch": "Ajouter une Agence",
     "branchList": "Liste des Agences",
     "branchName": "Nom de l'Agence",
-    "location": "Localisation",
+    "location": "Emplacement",
     "createdAt": "Date de Création",
     "status": "Statut",
     "actions": "Actions",
     "noBranchesFound": "Aucune agence trouvée.",
     "editBranch": "Modifier l'Agence",
     "addBranchTitle": "Ajouter une Agence",
-    "active": "Active",
-    "inactive": "Inactive",
+    "active": "Actif",
+    "inactive": "Inactif",
     "cancel": "Annuler",
     "save": "Enregistrer",
     "add": "Ajouter",
     "confirmDeleteTitle": "Confirmer la Suppression",
     "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer cette agence ?",
-    "branchUpdatedSuccess": "Agence modifiée avec succès!",
-    "branchAddedSuccess": "Agence ajoutée avec succès!",
-    "branchDeletedSuccess": "Agence supprimée avec succès!"
+    "branchUpdatedSuccess": "Agence mise à jour avec succès !",
+    "branchAddedSuccess": "Agence ajoutée avec succès !",
+    "branchDeletedSuccess": "Agence supprimée avec succès !"
   },
   "manageServiceCategories": {
-    "title": "Gérer les catégories de services",
+    "title": "Gérer les Catégories de Services",
     "description": "Les administrateurs peuvent définir des catégories pour les services offerts aux clients.",
-    "addNewCategory": "Ajouter une nouvelle catégorie",
+    "addNewCategory": "Ajouter une Nouvelle Catégorie",
     "loadingCategories": "Chargement des catégories...",
     "noServiceCategoriesFound": "Aucune catégorie de service trouvée.",
-    "categoryName": "Nom de la catégorie",
+    "categoryName": "Nom de la Catégorie",
     "descriptionHeader": "Description",
     "actions": "Actions",
     "edit": "Modifier",
     "delete": "Supprimer",
-    "addEditModalTitle": "{mode} une catégorie de service",
+    "addEditModalTitle": "{mode} Catégorie de Service",
     "addMode": "Ajouter",
     "editMode": "Modifier",
-    "categoryNameLabel": "Nom de la catégorie",
+    "categoryNameLabel": "Nom de la Catégorie",
     "descriptionLabel": "Description",
     "close": "Fermer",
     "add": "Ajouter",
-    "saveChanges": "Enregistrer les modifications",
+    "saveChanges": "Enregistrer les Modifications",
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette catégorie de service ?"
   },
   "manageClients": {
-    "title": "Gérer les Clients",
-    "addNewClient": "Ajouter un nouveau client",
+    "title": "Gestion des Clients",
+    "addNewClient": "Ajouter un Nouveau Client",
     "searchPlaceholder": "Rechercher des clients par nom, email, téléphone ou statut...",
     "idHeader": "#ID",
     "fullNameHeader": "Nom Complet",
+    "companyName": "Nom de l'Entreprise",
     "emailHeader": "Email",
     "phoneHeader": "Téléphone",
     "statusHeader": "Statut",
     "actionsHeader": "Actions",
     "statusActive": "Actif",
     "statusInactive": "Inactif",
-    "statusPending": "En Attente",
-    "viewDetails": "Voir les détails",
-    "editClient": "Modifier le client",
-    "manageServices": "Gérer les services",
-    "noClientsFoundSearch": "Aucun client trouvé correspondant à vos critères de recherche \"{searchTerm}\".",
+    "statusPending": "En attente",
+    "viewDetails": "Voir les Détails",
+    "editClient": "Modifier le Client",
+    "deleteClient": "Supprimer le Client",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce client ?",
+    "manageServices": "Gérer les Services",
+    "noClientsFoundSearch": "Aucun client trouvé correspondant à votre recherche \"{searchTerm}\".",
     "noClientsAvailable": "Aucun client disponible.",
     "addClientLink": "Ajouter un nouveau client",
-    "clientDetailsTitle": "Détails du client : {fullName}",
-    "detailsId": "ID:",
-    "detailsFullName": "Nom Complet:",
-    "detailsEmail": "Email:",
-    "detailsPhone": "Téléphone:",
-    "detailsStatus": "Statut:",
-    "detailsAddress": "Adresse:",
-    "detailsRegistrationDate": "Date d'inscription:",
-    "detailsClientType": "Type de client:",
-    "close": "Fermer"
+    "clientDetailsTitle": "Détails du Client : {companyName}",
+    "detailsId": "ID :",
+    "detailsFullName": "Nom Complet :",
+    "companyInformation": "Informations sur l'Entreprise",
+    "contactPersonInformation": "Informations sur la Personne de Contact",
+    "contactName": "Nom du Contact",
+    "detailsEmail": "Email :",
+    "detailsPhone": "Téléphone :",
+    "detailsStatus": "Statut :",
+    "detailsAddress": "Adresse :",
+    "detailsRegistrationDate": "Date d'Enregistrement :",
+    "detailsClientType": "Type de Client :",
+    "close": "Fermer",
+    "statuses": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "lead": "Prospect"
+    }
   },
   "addClient": {
-    "addTitle": "Ajouter un nouveau client",
-    "editTitle": "Modifier le client",
-    "submitButtonAdd": "Ajouter un client",
-    "submitButtonUpdate": "Mettre à jour le client",
+    "addTitle": "Ajouter un Nouveau Client",
+    "editTitle": "Modifier le Client",
+    "submitButtonAdd": "Ajouter le Client",
+    "submitButtonUpdate": "Mettre à Jour le Client",
     "form": {
-      "clientName": "Nom du client",
-      "email": "E-mail",
+      "clientName": "Nom du Client",
+      "email": "Email",
       "phone": "Téléphone",
       "address": "Adresse",
       "city": "Ville",
       "country": "Pays",
-      "clientType": "Type de client",
-      "selectType": "Sélectionner le type",
+      "clientType": "Type de Client",
+      "selectType": "Sélectionner un Type",
       "individual": "Particulier",
       "company": "Entreprise",
       "people": "personnes",
-      "serviceType": "Type de service",
-      "selectService": "Sélectionner le service",
+      "serviceType": "Type de Service",
+      "selectService": "Sélectionner un Service",
       "domiciliation": "Domiciliation",
-      "officeRental": "Location de bureau",
+      "officeRental": "Location de Bureau",
       "coworking": "Coworking",
-      "meetingRoom": "Salle de réunion",
-      "idType": "Type de pièce d'identité",
-      "selectIdType": "Sélectionner le type de pièce d'identité",
-      "nationalId": "Carte Nationale d'Identité",
+      "meetingRoom": "Salle de Réunion",
+      "idType": "Type de PI",
+      "selectIdType": "Sélectionner un Type de PI",
+      "nationalId": "Carte d'Identité Nationale",
       "passport": "Passeport",
-      "tradeRegister": "Registre du Commerce (RC)",
-      "idNumber": "Numéro de pièce d'identité",
-      "idExpiryDate": "Date d'expiration de la pièce d'identité",
-      "taxId": "Numéro d'identification fiscale (NIF)",
-      "nis": "NIS (pour les entreprises)",
-      "rcNumber": "Numéro RC (pour les entreprises)",
-      "contactPerson": "Personne à contacter",
+      "tradeRegister": "Registre de Commerce (RC)",
+      "idNumber": "Numéro de PI",
+      "idExpiryDate": "Date d'Expiration de la PI",
+      "taxId": "NIF",
+      "nis": "NIS (pour les Entreprises)",
+      "rcNumber": "Numéro RC (pour les Entreprises)",
+      "contactPerson": "Personne de Contact",
       "name": "Nom",
-      "contractDetails": "Détails du contrat",
-      "contractStartDate": "Date de début du contrat",
-      "contractEndDate": "Date de fin du contrat",
-      "paymentTerms": "Conditions de paiement",
-      "selectTerms": "Sélectionner les conditions",
+      "contractDetails": "Détails du Contrat",
+      "contractStartDate": "Date de Début du Contrat",
+      "contractEndDate": "Date de Fin du Contrat",
+      "paymentTerms": "Conditions de Paiement",
+      "selectTerms": "Sélectionner les Conditions",
       "monthly": "Mensuel",
       "quarterly": "Trimestriel",
       "annually": "Annuel",
-      "assignOffice": "Attribuer un bureau (ID)",
-      "attachments": "Pièces jointes",
+      "assignOffice": "Assigner un Bureau (ID)",
+      "noOfficeAssigned": "Aucun bureau assigné",
+      "attachments": "Pièces Jointes",
       "cancel": "Annuler"
     },
     "messages": {
-      "clientNotFound": "Données client introuvables. Redirection vers la liste des clients.",
+      "clientNotFound": "Données du client non trouvées. Redirection vers la liste des clients.",
       "fetchError": "Erreur lors de la récupération des détails du client :",
-      "loadError": "Échec du chargement des données client pour la modification.",
+      "loadError": "Échec du chargement des données du client pour modification.",
       "updateSuccess": "Client mis à jour avec succès !",
       "addSuccess": "Client ajouté avec succès !",
       "updateError": "Échec de la mise à jour du client.",
@@ -453,14 +514,14 @@
   },
   "documents": {
     "title": "Gestion des Documents",
-    "uploadNewDocument": "Télécharger un Nouveau Document",
+    "uploadNewDocument": "Téléverser un Nouveau Document",
     "searchPlaceholder": "Rechercher par nom, type ou client...",
     "tableHeaders": {
       "name": "Nom",
       "client": "Client",
       "investment": "Investissement",
       "type": "Type",
-      "uploadDate": "Date de Téléchargement",
+      "uploadDate": "Date de Téléversement",
       "actions": "Actions"
     },
     "noDocumentsFound": "Aucun document trouvé.",
@@ -468,32 +529,34 @@
     "download": "Télécharger",
     "edit": "Modifier",
     "delete": "Supprimer",
-    "selectInvestment": "Sélectionner l'investissement (Facultatif)",
+    "selectInvestment": "Sélectionner un Investissement (Optionnel)",
     "selectClient": "-- Sélectionner un Client --",
-    "editDocument": "Modifier le document",
-    "deleteDocument": "Supprimer le document",
+    "editDocument": "Modifier le Document",
+    "deleteDocument": "Supprimer le Document",
     "deleteConfirmation": "Êtes-vous sûr de vouloir supprimer ce document ? Cette action est irréversible.",
-    "updateButton": "Mettre à jour",
-    "addButton": "Ajouter le document",
-    "submitting": "Soumission...",
-    "updating": "Mise à jour...",
-    "deleting": "Suppression...",
+    "updateButton": "Mettre à Jour",
+    "addButton": "Ajouter le Document",
+    "submitting": "Envoi en cours...",
+    "updating": "Mise à jour en cours...",
+    "deleting": "Suppression en cours...",
     "cancel": "Annuler",
     "form": {
-        "attachments": "Pièce jointe"
+        "attachments": "Pièce Jointe"
     }
   },
   "contracts": {
     "title": "Gestion des Contrats",
     "addNewContract": "Ajouter un Nouveau Contrat",
-    "searchPlaceholder": "Rechercher par client, bureau, ou statut...",
+    "searchPlaceholder": "Rechercher par client, bureau ou statut...",
     "tableHeaders": {
       "client": "Client",
       "office": "Bureau",
       "status": "Statut",
       "startDate": "Date de Début",
       "endDate": "Date de Fin",
-      "actions": "Actions"
+      "actions": "Actions",
+      "monthlyRate": "Tarif Mensuel",
+      "totalAmount": "Montant Total"
     },
     "status": {
       "active": "Actif",
@@ -503,10 +566,18 @@
     },
     "viewContract": "Voir le Contrat",
     "downloadContract": "Télécharger le Contrat",
+    "editContract": "Modifier le Contrat",
+    "editContractTitle": "Modifier le Contrat",
     "archiveContract": "Archiver le Contrat",
+    "deleteContract": "Supprimer le Contrat",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce contrat ?",
     "noContractsFound": "Aucun contrat trouvé.",
     "uploadDocument": "Téléverser un document",
-    "upload": "Téléverser"
+    "upload": "Téléverser",
+    "taxSelectionNote": "Les taxes sont appliquées au tarif mensuel pour calculer le montant total.",
+    "submitting": "Envoi en cours...",
+    "updateButton": "Mettre à Jour",
+    "addButton": "Ajouter le Contrat"
   },
   "offices": {
     "manageOffices": "Gérer les Bureaux de Coworking",
@@ -518,7 +589,8 @@
       "branch": "Agence",
       "status": "Statut",
       "capacity": "Capacité",
-      "actions": "Actions"
+      "actions": "Actions",
+      "type": "Type"
     },
     "status": {
       "available": "Disponible",
@@ -536,7 +608,7 @@
       "branch": "Agence",
       "status": "Statut",
       "capacity": "Capacité",
-      "amenities": "Commodités"
+      "amenities": "Équipements"
     },
     "amenities": {
       "wifi": "Wi-Fi",
@@ -551,7 +623,7 @@
       "officeName": "Nom du Bureau",
       "branch": "Agence",
       "capacity": "Capacité",
-      "amenities": "Commodités",
+      "amenities": "Équipements",
       "status": "Statut",
       "close": "Fermer",
       "save": "Enregistrer les Modifications",
@@ -608,32 +680,47 @@
   },
   "clientServices": {
     "title": "Gérer les Services Client",
-    "description": "Attribuer et gérer les services pour chaque client.",
-    "selectClient": "Sélectionnez un client",
+    "description": "Assignez et gérez les services pour chaque client.",
+    "selectClient": "Sélectionner un Client",
     "searchClientPlaceholder": "Rechercher un client par nom ou entreprise...",
     "servicesFor": "Services pour",
-    "addNewService": "Ajouter un nouveau service",
-    "serviceCategory": "Catégorie de service",
-    "selectCategoryPlaceholder": "Sélectionnez une catégorie",
-    "paymentType": "Type de paiement",
+    "addNewService": "Ajouter un Nouveau Service",
+    "serviceCategory": "Catégorie de Service",
+    "selectCategoryPlaceholder": "Sélectionner une catégorie",
+    "paymentType": "Type de Paiement",
     "recurrent": "Récurrent",
-    "oneShot": "Unique",
+    "oneShot": "Ponctuel",
     "price": "Prix",
-    "notes": "Remarques",
-    "addService": "Ajouter un service",
-    "editService": "Modifier un service",
-    "currentServices": "Services actuels",
+    "notes": "Notes",
+    "addService": "Ajouter le Service",
+    "editService": "Modifier le Service",
+    "currentServices": "Services Actuels",
     "service": "Service",
     "type": "Type",
     "status": "Statut",
     "actions": "Actions",
     "active": "Actif",
     "inactive": "Inactif",
+    "loading": "Chargement...",
+    "loadingClientData": "Chargement des données du client...",
     "noServices": "Ce client n'a aucun service souscrit.",
-    "addSuccess": "Service ajouté avec succès (maquette).",
-    "removeSuccess": "Service supprimé avec succès (maquette).",
+    "addSuccess": "Service ajouté avec succès (simulé).",
+    "removeSuccess": "Service supprimé avec succès (simulé).",
     "confirmRemove": "Êtes-vous sûr de vouloir supprimer ce service du client ?",
-    "selectClientAndService": "Veuillez sélectionner un client et une catégorie de service."
+    "selectClientAndService": "Veuillez sélectionner un client et une catégorie de service.",
+    "noServicesYet": "Ce client n'a aucun service actif.",
+    "noClientSelected": "Veuillez sélectionner un client pour voir et gérer ses services.",
+    "clients": "Clients",
+    "noClientsFound": "Aucun client trouvé.",
+    "viewServices": "Voir les Services"
+  },
+  "client": {
+    "companyName": "Nom de l'Entreprise",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Email",
+    "phoneNumber": "Numéro de Téléphone",
+    "status": "Statut"
   },
   "financialReporting": {
     "title": "Rapports Financiers",
@@ -641,10 +728,10 @@
       "title": "Rapport Personnalisé",
       "reportType": "Type de Rapport",
       "types": {
-        "profit_loss": "Compte de Résultat",
+        "profit_loss": "Pertes & Profits",
         "balance_sheet": "Bilan",
         "cash_flow": "Flux de Trésorerie",
-        "expense_details": "Détail des Dépenses"
+        "expense_details": "Détails des Dépenses"
       },
       "startDate": "Date de Début",
       "endDate": "Date de Fin",
@@ -668,22 +755,22 @@
     "expenseBreakdown": {
       "title": "Répartition des Dépenses (Annuel)",
       "chartTitle": "Répartition des Dépenses par Catégorie (Annuel)",
-      "summaryTitle": "Sommaire des Dépenses",
+      "summaryTitle": "Résumé des Dépenses",
       "categories": {
         "rent": "Loyer",
         "salaries": "Salaires",
         "marketing": "Marketing",
         "supplies": "Fournitures",
         "utilities": "Services Publics",
-        "other": "Autres"
+        "other": "Autre"
       }
     },
     "investmentBreakdown": {
-      "title": "Répartition des investissements par type",
+      "title": "Répartition des Investissements par Type",
       "type": "Type",
-      "totalInvested": "Total investi",
-      "totalProfitShare": "Partage des bénéfices totaux",
-      "chartTitle": "Répartition des investissements par type"
+      "totalInvested": "Total Investi",
+      "totalProfitShare": "Part de Bénéfice Totale",
+      "chartTitle": "Distribution des Investissements par Type"
     }
   },
   "complianceManagement": {
@@ -693,7 +780,7 @@
     "save": "Enregistrer",
     "cancel": "Annuler",
     "overview": {
-      "overallStatus": "Statut Global",
+      "overallStatus": "Statut Général",
       "compliant": "Conforme",
       "lastChecked": "Dernière vérification",
       "activeDocuments": "Documents Actifs",
@@ -742,11 +829,11 @@
   },
   "officeDesigner": {
     "setupModal": {
-      "title": "Créer un Nouveau Design de Succursale",
-      "branchName": "Nom de la Succursale",
+      "title": "Créer un Nouveau Design d'Agence",
+      "branchName": "Nom de l'Agence",
       "branchNamePlaceholder": "ex., Centre-ville",
-      "numFloors": "Nombre d'étages",
-      "floorName": "Nom de l'étage {floorNum}",
+      "numFloors": "Nombre d'Étages",
+      "floorName": "Nom de l'Étage {floorNum}",
       "floorNamePlaceholder": "ex., Rez-de-chaussée",
       "startDesigning": "Commencer la Conception"
     },
@@ -757,9 +844,9 @@
       "save": "Enregistrer"
     },
     "main": {
-      "title": "Concepteur de Plan d'étage",
+      "title": "Concepteur de Plan d'Étage",
       "floors": "Étages",
-      "addFloor": "Ajouter un Étage",
+      "addFloor": "Ajouter un Nouvel Étage",
       "tools": "Outils",
       "addOffice": "Ajouter un Bureau",
       "addDesk": "Ajouter un Poste de Travail",
@@ -774,8 +861,8 @@
       "noSelection": "Sélectionnez un bureau pour voir ses propriétés.",
       "saveDesign": "Enregistrer le Design",
       "saving": "Enregistrement...",
-      "resetDesign": "Réinitialiser & Commencer",
-      "confirmReset": "Êtes-vous sûr de vouloir effacer le design sauvegardé et recommencer ?",
+      "resetDesign": "Réinitialiser & Recommencer",
+      "confirmReset": "Êtes-vous sûr de vouloir effacer le design enregistré et recommencer ?",
       "designSaved": "Design enregistré avec succès !",
       "newFloorPrompt": "Entrez le nom du nouvel étage :",
       "deleteFloorConfirm": "Êtes-vous sûr de vouloir supprimer l'étage \"{floorName}\" ?"
@@ -783,7 +870,7 @@
   },
   "userProfile": {
     "title": "Mon Profil",
-    "uploadPicture": "Télécharger Photo",
+    "uploadPicture": "Téléverser une Photo",
     "personalInformation": "Informations Personnelles",
     "firstName": "Prénom",
     "lastName": "Nom",
@@ -807,7 +894,7 @@
     }
   },
   "userSettings": {
-    "title": "Paramètres de l'utilisateur",
+    "title": "Paramètres Utilisateur",
     "preferences": {
       "title": "Préférences",
       "language": "Langue",
@@ -824,12 +911,12 @@
       "dark": "Sombre"
     },
     "notifications": {
-      "title": "Préférences de notification",
+      "title": "Préférences de Notification",
       "desc": "Gérez la manière dont vous recevez les notifications du système.",
-      "email": "Notifications par e-mail",
-      "push": "Notifications push (via le navigateur)"
+      "email": "Notifications par Email",
+      "push": "Notifications Push (via le navigateur)"
     },
-    "saveChanges": "Enregistrer les modifications",
+    "saveChanges": "Enregistrer les Modifications",
     "saving": "Enregistrement..."
   },
   "navbar": {
@@ -853,20 +940,58 @@
   },
   "login": {
     "title": "Connexion",
-    "emailLabel": "Adresse e-mail",
+    "emailLabel": "Adresse email",
     "emailPlaceholder": "Votre email",
     "passwordLabel": "Mot de passe",
     "passwordPlaceholder": "Votre mot de passe",
-    "loginButton": "Se connecter",
-    "success": "Vous vous êtes connecté avec succès",    
+    "loginButton": "Connexion",
+    "success": "Vous vous êtes connecté avec succès",
     "error": {
-      "missingCredentials": "Veuillez saisir l'e-mail et le mot de passe.",
+      "missingCredentials": "Veuillez saisir l'email et le mot de passe.",
       "invalidCredentials": "Identifiants invalides. Veuillez réessayer.",
-      "backendError": "Une erreur s'est produite : {message}",
-      "unknown": "Une erreur inconnue s'est produite. Veuillez réessayer plus tard."
+      "backendError": "Une erreur est survenue : {message}",
+      "unknown": "Une erreur inconnue est survenue. Veuillez réessayer plus tard."
     }
   },
-    "investorDashboard": {
+  "assistantDashboard": {
+    "title": "Tableau de Bord Assistant",
+    "renewals": {
+      "title": "Renouvellements de Contrats Clients",
+      "empty": "Aucun renouvellement en attente."
+    },
+    "expiringContracts": {
+      "title": "Contrats Expirant (Prochains 30 Jours)",
+      "empty": "Aucun contrat n'expire bientôt."
+    },
+    "prospects": {
+      "title": "Liste des Prospects",
+      "contact": "Contacter",
+      "empty": "Aucun prospect dans la liste."
+    },
+    "offices": {
+      "title": "Aperçu de l'État des Bureaux",
+      "empty": "Aucune donnée sur l'état des bureaux disponible.",
+      "table": {
+        "name": "Nom du Bureau",
+        "status": "Statut",
+        "capacity": "Capacité",
+        "branch": "Agence",
+        "actions": "Actions"
+      }
+    },
+    "tasksApprovals": {
+      "title": "Tâches / Approbations",
+      "loading": "Chargement des tâches...",
+      "noPending": "Aucune tâche en attente.",
+      "due": "Échéance",
+      "priority": "Priorité",
+      "status": "Statut",
+      "complete": "Terminer",
+      "viewAll": "Voir Tout",
+      "completedMsg": "Tâche marquée comme terminée."
+    }
+  },
+  "investorDashboard": {
     "title": "Tableau de Bord Investisseur",
     "kpis": {
       "roi": "Retour sur Investissement",
@@ -874,14 +999,14 @@
       "activeClients": "Nombre de Clients Actifs"
     },
     "investmentDetails": {
-      "title": "Détails des Investissements",
+      "title": "Détails de l'Investissement",
       "monthly": "Mensuel",
       "bi-yearly": "Semestriel",
       "yearly": "Annuel",
       "table": {
         "branch": "Agence",
         "revenue": "Revenu",
-        "share": "Taux",
+        "share": "Part",
         "clients": "Clients",
         "status": "Statut"
       },
@@ -894,7 +1019,7 @@
       "yearly": "Annuel"
     },
     "profitShareHistory": {
-      "title": "Historique des parts de bénéfices",
+      "title": "Historique des Parts de Bénéfice",
       "table": {
         "date": "Date",
         "branch": "Agence",
@@ -912,39 +1037,47 @@
       "requestBranch": "Demander une Nouvelle Agence",
       "investMore": "Investir Davantage"
     },
-     "chart": {
+    "chart": {
         "title": "Évolution des Revenus",
-        "monthlyTitle": "Évolution des Revenus Mensuels",
-        "biYearlyTitle": "Évolution des Revenus Semestriels",
-        "yearlyTitle": "Évolution des Revenus Annuels",
-        "monthlyLabel": "Revenus Mensuels",
-        "biYearlyLabel": "Revenus Semestriels",
-        "yearlyLabel": "Revenus Annuels",
-        "revenue": "Revenus (en k)"
+        "monthlyTitle": "Évolution Mensuelle des Revenus",
+        "biYearlyTitle": "Évolution Semestrielle des Revenus",
+        "yearlyTitle": "Évolution Annuelle des Revenus",
+        "monthlyLabel": "Revenu Mensuel",
+        "biYearlyLabel": "Revenu Semestriel",
+        "yearlyLabel": "Revenu Annuel",
+        "revenue": "Revenu (en k)"
     },
-"withdrawals": {
+    "addContract": {
+        "submitButtonAdd": "Ajouter le Contrat"
+    }
+  },
+  "pagination": {
+    "previous": "Précédent",
+    "next": "Suivant"
+  },
+  "withdrawals": {
       "title": "Retraits",
       "kpis": {
-        "accrued": "Bénéfice net accumulé (à ce jour)",
+        "accrued": "Bénéfice Net Accumulé (à ce jour)",
         "withdrawnPaid": "Retiré (Payé)",
         "committed": "Engagé (En attente + Approuvé)",
         "available": "Disponible"
       },
       "form": {
         "title": "Demander un Retrait",
-        "selectInvestment": "Sélectionner un investissement",
+        "selectInvestment": "Sélectionner un Investissement",
         "availableForThisInvestment": "Disponible pour cet investissement",
         "amount": "Montant",
-        "paymentMethod": "Moyen de paiement (optionnel)",
+        "paymentMethod": "Méthode de Paiement (optionnel)",
         "notes": "Notes (optionnel)",
-        "submit": "Envoyer la demande",
-        "validationRequired": "Veuillez sélectionner un investissement et saisir un montant positif.",
-        "validationExceeds": "Le montant demandé dépasse le solde disponible pour l’investissement sélectionné.",
+        "submit": "Soumettre la Demande",
+        "validationRequired": "Veuillez sélectionner un investissement et entrer un montant positif.",
+        "validationExceeds": "Le montant demandé dépasse le solde disponible pour l'investissement sélectionné.",
         "success": "Demande de retrait soumise.",
-        "error": "Échec de l’envoi de la demande de retrait."
+        "error": "Échec de la soumission de la demande de retrait."
       },
       "history": {
-        "title": "Retraits récents",
+        "title": "Retraits Récents",
         "date": "Demandé le",
         "investment": "Investissement",
         "amount": "Montant",
@@ -956,16 +1089,15 @@
         "paid": "Payé",
         "rejected": "Rejeté"
       }
-    },
+  },
     "statuses":{
       "active": "Actif",
       "pending": "En attente"
-    }
   },
   "manageWithdrawals": {
     "title": "Gérer les Retraits",
     "add": "Ajouter un Retrait",
-    "refresh": "Rafraîchir",
+    "refresh": "Actualiser",
     "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce retrait ?",
     "approveConfirm": "Approuver ce retrait ?",
     "rejectConfirm": "Rejeter ce retrait ?",
@@ -985,7 +1117,7 @@
       "investor": "Investisseur",
       "investment": "Investissement",
       "amount": "Montant",
-      "paymentMethod": "Moyen de Paiement",
+      "paymentMethod": "Méthode de Paiement",
       "status": "Statut",
       "actions": "Actions",
       "noWithdrawals": "Aucun retrait trouvé."
@@ -1003,50 +1135,12 @@
       "investor": "Investisseur",
       "investment": "Investissement",
       "amount": "Montant",
-      "paymentMethod": "Moyen de Paiement",
-      "selectPaymentMethod": "Sélectionner un moyen de paiement",
+      "paymentMethod": "Méthode de Paiement",
+      "selectPaymentMethod": "Sélectionner la Méthode",
       "status": "Statut",
       "notes": "Notes",
       "close": "Fermer",
       "save": "Enregistrer"
-    }
-  },
-  "assistantDashboard": {
-    "title": "Tableau de Bord Assistant",
-    "renewals": {
-      "title": "Renouvellements de Contrats Client",
-      "empty": "Aucun renouvellement en attente."
-    },
-    "expiringContracts": {
-      "title": "Contrats expirant (30 prochains jours)",
-      "empty": "Aucun contrat n'expire bientôt."
-    },
-    "prospects": {
-      "title": "Liste de Prospects",
-      "contact": "Contacter",
-      "empty": "Aucun prospect dans la liste."
-    },
-    "offices": {
-      "title": "Aperçu de l'état des bureaux",
-      "empty": "Aucune donnée d'état des bureaux.",
-      "table": {
-        "name": "Nom du Bureau",
-        "status": "Statut",
-        "capacity": "Capacité",
-        "branch": "Succursale",
-        "actions": "Actions"
-      }
-    },
-    "tasksApprovals": {
-      "title": "Tâches / Approbations",
-      "loading": "Chargement des tâches...",
-      "noPending": "Aucune tâche en attente.",
-      "due": "Échéance",
-      "priority": "Priorité",
-      "status": "Statut",
-      "complete": "Terminer",
-      "viewAll": "Voir tout",
-      "completedMsg": "Tâche marquée comme terminée."
     }
   },
   "withdrawalStatuses": {
@@ -1088,7 +1182,7 @@
     },
     "markAllAsRead": "Marquer tout comme lu",
     "editModalTitle": "Modifier la Notification",
-    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette notification?",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette notification ?",
     "searchPlaceholder": "Rechercher par message...",
     "sortBy": {
         "date": "Trier par Date",
@@ -1099,16 +1193,15 @@
         "desc": "Décroissant",
         "asc": "Croissant"
     }
-  }
-,
+  },
   "errors": {
     "network": "Erreur réseau. Veuillez vérifier votre connexion internet.",
     "timeout": "La requête a expiré. Veuillez réessayer.",
     "unauthorized": "Votre session a expiré. Veuillez vous reconnecter.",
-    "forbidden": "Vous n'avez pas l'autorisation d'effectuer cette action.",
-    "notFound": "La ressource demandée est introuvable.",
-    "validation": "Certains champs sont invalides. Veuillez vérifier vos saisies.",
+    "forbidden": "Vous n'avez pas la permission d'effectuer cette action.",
+    "notFound": "La ressource demandée n'a pas été trouvée.",
+    "validation": "Certaines entrées sont invalides. Veuillez vérifier vos saisies.",
     "server": "Le serveur a rencontré une erreur. Veuillez réessayer plus tard.",
-    "unknown": "Un problème est survenu. Veuillez réessayer."
+    "unknown": "Une erreur inconnue est survenue. Veuillez réessayer."
   }
 }
