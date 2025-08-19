@@ -6,7 +6,7 @@ const createTestInvestment = async () => {
         const investorUser = await User.findOne({ where: { email: 'investor@fadaa.dz' } });
         const mainBranch = await Branch.findOne({ where: { name: 'Main Branch' } });
         const realValuesProfile = await Profile.findOne({ where: { name: 'Real Values' } });
-        const mainClient = await Client.findOne({ where: { email: 'main.client@example.com' } });
+        const mainClient = await Client.findOne({ where: { company_name: 'Main Client' } });
 
         if (!investorUser || !mainBranch || !realValuesProfile || !mainClient) {
             console.error('Could not find required seed data. Please run the seeder first.');

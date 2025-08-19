@@ -60,7 +60,6 @@ const editClient = (clientId) => {
 };
 
 const manageClientServices = (clientId) => {
-  console.log('Manage services for client:', clientId);
   router.push({ name: 'ManageClientServices', query: { clientId } });
 };
 

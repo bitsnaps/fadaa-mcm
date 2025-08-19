@@ -58,8 +58,8 @@ const validateForm = () => {
     if (!client.value.company_name) errors.company_name = 'Company name is required.';
     if (!client.value.first_name) errors.first_name = 'First name is required.';
     if (!client.value.last_name) errors.last_name = 'Last name is required.';
-    if (!client.value.email) errors.email = 'Email is required.';
-    
+    if (!client.value.phone_number) errors.phone_number = 'Phone number is required.';
+
     validationErrors.value = errors;
     return Object.keys(errors).length === 0;
 };
@@ -166,13 +166,14 @@ const handleFileUpload = (event) => {
         </div>
 
         <div class="mb-3">
-          <label for="clientEmail" class="form-label">{{ t('addClient.form.email') }} <span class="text-danger">*</span></label>
-          <input type="email" class="form-control" :class="{'is-invalid': validationErrors.email}" id="clientEmail" v-model="client.email" required>
+          <label for="clientEmail" class="form-label">{{ t('addClient.form.email') }}</label>
+          <input type="email" class="form-control" :class="{'is-invalid': validationErrors.email}" id="clientEmail" v-model="client.email">
           <div v-if="validationErrors.email" class="invalid-feedback">{{ validationErrors.email }}</div>
         </div>
         <div class="mb-3">
-          <label for="clientPhone" class="form-label">{{ t('addClient.form.phone') }}</label>
-          <input type="tel" class="form-control" id="clientPhone" v-model="client.phone_number">
+          <label for="clientPhone" class="form-label">{{ t('addClient.form.phone') }} <span class="text-danger">*</span></label>
+          <input type="tel" class="form-control" :class="{'is-invalid': validationErrors.phone_number}" id="clientPhone" v-model="client.phone_number" required>
+          <div v-if="validationErrors.phone_number" class="invalid-feedback">{{ validationErrors.phone_number }}</div>
         </div>
         <div class="mb-3">
           <label for="clientAddress" class="form-label">{{ t('addClient.form.address') }}</label>

@@ -79,11 +79,13 @@ const seedDatabase = async () => {
 
         // Create a default client for the main branch
         const [mainClient] = await Client.findOrCreate({
-            where: { email: 'main.client@example.com' },
+            where: { company_name: 'Main Client' },
             defaults: {
                 company_name: 'Main Client',
                 first_name: 'Main',
                 last_name: 'Client',
+                email: 'main.client@example.com',
+                phone_number: '+1234567890',
                 managed_by_user_id: adminUser.id,
                 status: 'active'
             }

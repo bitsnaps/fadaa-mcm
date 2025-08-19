@@ -23,11 +23,12 @@ module.exports = (sequelize) => {
     },
     email: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
       unique: true,
     },
     phone_number: {
       type: DataTypes.STRING(50),
+      allowNull: false,
     },
     address: {
       type: DataTypes.TEXT,

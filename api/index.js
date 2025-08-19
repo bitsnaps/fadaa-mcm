@@ -352,22 +352,26 @@ app.post('/api/create-profile', async (c) => {
 });
 
 // Create a new client
-// curl -X POST http://localhost:3000/api/create-client -H "Content-Type: application/json" -d '{ "email": "main.client@example.com", "company_name": "Main Client", "first_name": "Main", "last_name": "Client", "managed_by_user_id": 1, "status": "active" }'
+// curl -X POST http://localhost:3000/api/create-client -H "Content-Type: application/json" -d '{ "phone_number": "+1234567890", "company_name": "Main Client", "first_name": "Main", "last_name": "Client", "managed_by_user_id": 1, "status": "active" }'
 app.post('/api/create-client', async (c) => {
     try {
-        const { email, company_name, first_name, last_name, managed_by_user_id, status } = await c.req.json();
+        const { email, phone_number, company_name, first_name, last_name, managed_by_user_id, status } = await c.req.json();
 
-        if (!email || !company_name || !first_name || !last_name || !managed_by_user_id) {
+        if (!phone_number || !company_name || !first_name || !last_name || !managed_by_user_id) {
             return c.json({ success: false, message: 'Missing required fields' }, 400);
         }
 
-        const existingClient = await models.Client.findOne({ where: { email } });
-        if (existingClient) {
-            return c.json({ success: false, message: 'Client already exists' }, 409);
+        // Check for existing client by email only if email is provided
+        if (email) {
+            const existingClient = await models.Client.findOne({ where: { email } });
+            if (existingClient) {
+                return c.json({ success: false, message: 'Client with this email already exists' }, 409);
+            }
         }
 
         const newClient = await models.Client.create({
             email,
+            phone_number,
             company_name,
             first_name,
             last_name,
