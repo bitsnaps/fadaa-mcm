@@ -13,7 +13,7 @@
                   <h5 class="mb-0 text-white"><i class="bi bi-file-earmark-settings-fill me-2"></i>{{ $t('financialReporting.customReport.title') }}</h5>
                 </div>
                 <div class="card-body">
-                  <form @submit.prevent="generateReport">
+                  <form @submit.prevent="downloadReport">
                     <div class="row g-3">
                       <div class="col-md-4">
                         <label for="dateRangeStart" class="form-label">{{ $t('financialReporting.customReport.startDate') }} <span class="text-danger">*</span></label>
@@ -33,7 +33,7 @@
                       </div>
                     </div>
                     <div class="mt-3 text-end">
-                      <button type="submit" class="btn btn-fadaa-primary"><i class="bi bi-download me-2"></i>{{ $t('financialReporting.customReport.generate') }}</button>
+                      <button type="submit" class="btn btn-fadaa-primary"><i class="bi bi-download me-2"></i>{{ $t('financialReporting.customReport.downloadReport') }}</button>
                     </div>
                   </form>
                   <div v-if="reportGeneratedMessage" class="alert alert-success mt-3" role="alert">
@@ -185,7 +185,7 @@ const generateReport = async () => {
   });
 
   try {
-    const response = await ReportService.generateReport(config);
+    const response = await ReportService.downloadReport(config);
     const blob = new Blob([response.data], { type: response.headers['content-type'] });
     saveAs(blob, `financial-report-${config.profile_id}.${config.format}`);
     reportGeneratedMessage.value = 'Report generated successfully!';

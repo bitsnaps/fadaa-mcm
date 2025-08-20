@@ -6,12 +6,14 @@ export function useToast() {
   const showToast = (message, options = {}) => {
     const { variant = 'info', title = 'Notification' } = options;
     toast.show({
-      title: title,
-      body: message,
-      variant: variant,
-      pos: 'top-center',
-      autoHide: true,
-      value: 3000
+        title,
+        body: message,
+        variant,
+        pos: 'top-center',
+        autoHide: true,
+        noCloseButton: true,
+        noHoverPause: false,
+        value: 1000
     });
   };
 

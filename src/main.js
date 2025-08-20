@@ -9,11 +9,11 @@ import './style.css'
 
 
 
-const app = createApp(App)
-const pinia = createPinia()
+const pinia = createPinia();
+const app = createApp(App);
 
-app.use(pinia)
-app.use(router)
-app.use(i18n)
-app.use(createBootstrap())
-app.mount('#app')
+app.use(pinia);
+app.use(router);
+app.use(i18n);
+app.use(createBootstrap());
+app.mount('#app');

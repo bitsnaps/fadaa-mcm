@@ -230,7 +230,7 @@
       "branch": "Agence",
       "allClients": "Tous les clients",
       "allBranches": "Toutes les agences",
-      "generate": "Générer le rapport"
+      "generate": "Générer"
     },
     "report": {
       "title": "Résumé mensuel",
@@ -254,7 +254,7 @@
       "year": "Année",
       "branch": "Agence",
       "allBranches": "Toutes les agences",
-      "generate": "Générer le rapport"
+      "generate": "Générer"
     },
     "report": {
       "title": "Résumé financier annuel",
@@ -739,7 +739,7 @@
       "startDate": "Date de Début",
       "endDate": "Date de Fin",
       "format": "Format",
-      "generate": "Générer le Rapport",
+      "downloadReport": "Télécharger le Rapport",
       "generatingMessage": "Rapport ({type}) pour la période du {startDate} au {endDate} au format {format} généré avec succès."
     },
     "revenueVsExpenses": {

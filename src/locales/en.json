@@ -187,7 +187,7 @@
       "branch": "Branch",
       "allClients": "All Clients",
       "allBranches": "All Branches",
-      "generate": "Generate Report"
+      "generate": "Generate"
     },
     "report": {
       "title": "Monthly Summary",
@@ -211,7 +211,7 @@
       "year": "Year",
       "branch": "Branch",
       "allBranches": "All Branches",
-      "generate": "Generate Report"
+      "generate": "Generate"
     },
     "report": {
       "title": "Annual Financial Summary",
@@ -698,7 +698,7 @@
       "startDate": "Start Date",
       "endDate": "End Date",
       "format": "Format",
-      "generate": "Generate Report",
+      "downloadReport": "Download Report",
       "generatingMessage": "Report ({type}) for the period from {startDate} to {endDate} in {format} format generated successfully."
     },
     "revenueVsExpenses": {
