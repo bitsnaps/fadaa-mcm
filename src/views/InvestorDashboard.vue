@@ -14,7 +14,7 @@ import { useToast } from '@/helpers/toast';
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler);
 
 const { t, locale } = useI18n();
-const { showErrorToast, showSuccessToast } = useToast();
+const { showErrorToast } = useToast();
 
 const chartFilter = ref('monthly'); // monthly, bi-yearly, yearly
 const revenueSeries = ref({ labels: [], values: [] });
@@ -118,13 +118,13 @@ async function submitWithdrawal() {
       withdrawalForm.value.payment_method = '';
       withdrawalForm.value.notes = '';
       await loadInvestorData();
-      showSuccessToast(t('investorDashboard.withdrawals.form.success'));
+      // Success toast comes from interceptor when backend sends a message
     } else {
       throw new Error(res.data?.message || 'Request failed');
     }
   } catch (e) {
     console.error('Withdrawal submit failed:', e);
-    showErrorToast(t('investorDashboard.withdrawals.form.error'));
+    // Error toast is handled globally by ApiClient interceptor
   }
 }
 

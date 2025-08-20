@@ -8,7 +8,7 @@ import { useToast } from '@/helpers/toast';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
-const { showErrorToast } = useToast();
+const { showErrorToast } = useToast(); // Keep page-level validation errors only; API toasts handled globally
 
 const user = computed(() => authStore.user || { firstName: '', lastName: '', email: '', phone: '', role: '', profile_picture: '' });
 

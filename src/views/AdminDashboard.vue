@@ -202,7 +202,7 @@ import { fr } from 'date-fns/locale';
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, Filler);
 
-const { showErrorToast } = useToast();
+const { showErrorToast } = useToast(); // keep for client-side validation and local errors only
 
 const kpis = ref({
   clients: 0,
@@ -382,7 +382,7 @@ const exportData = async (format) => {
 
   } catch (error) {
     console.error(`Failed to export data to ${format}:`, error);
-    showErrorToast(`Failed to export data. Please try again.`);
+    // API errors will toast globally; this is a local export flow, keep console only
   } finally {
     isExporting.value[format] = false;
   }

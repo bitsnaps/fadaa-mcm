@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useToast } from '@/helpers/toast';
+
 import { getDocuments, addDocument, updateDocument, deleteDocument } from '@/services/DocumentService';
 import { getClients, getClientInvestments } from '@/services/ClientService';
 import { getInvestmentsList } from '@/services/InvestmentService';
@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
-const { showErrorToast, showSuccessToast } = useToast();
+
 
 const documents = ref([]);
 const searchTerm = ref('');
@@ -179,13 +179,12 @@ const submitNewDocument = async () => {
       const modalInstance = Modal.getInstance(addDocumentModal.value);
       modalInstance.hide();
       fetchDocuments(currentPage.value); // Refresh the list
-      showSuccessToast('Document added successfully!');
     } else {
-      showErrorToast('Failed to add document: ' + response.data.message);
+
     }
   } catch (error) {
     console.error('Error submitting new document:', error);
-    showErrorToast('An error occurred while adding the document.');
+
   } finally {
     isSubmitting.value = false;
   }
@@ -199,13 +198,12 @@ const submitUpdateDocument = async () => {
       const modalInstance = Modal.getInstance(editDocumentModal.value);
       modalInstance.hide();
       fetchDocuments(currentPage.value);
-      showSuccessToast('Document updated successfully!');
     } else {
-      showErrorToast('Failed to update document: ' + response.data.message);
+
     }
   } catch (error) {
     console.error('Error updating document:', error);
-    showErrorToast('An error occurred while updating the document.');
+
   } finally {
     isSubmitting.value = false;
   }
@@ -219,13 +217,12 @@ const confirmDeleteDocument = async () => {
       const deleteModal = Modal.getInstance(document.getElementById('deleteDocumentModal'));
       deleteModal.hide();
       fetchDocuments(currentPage.value);
-      showSuccessToast('Document deleted successfully!');
     } else {
-      showErrorToast('Failed to delete document: ' + response.data.message);
+
     }
   } catch (error) {
     console.error('Error deleting document:', error);
-    showErrorToast('An error occurred while deleting the document.');
+
   } finally {
     isSubmitting.value = false;
   }

@@ -81,10 +81,8 @@ import { ref, onMounted } from 'vue';
 import { Modal } from 'bootstrap';
 import profileService from '@/services/profileService';
 import { useI18n } from 'vue-i18n';
-import { useToast } from '@/helpers/toast';
 
 const { t } = useI18n();
-const { showErrorToast, showSuccessToast } = useToast();
 const profiles = ref([]);
 const currentProfile = ref({ id: null, name: '', description: '' });
 const isEditMode = ref(false);
@@ -153,7 +151,7 @@ async function confirmDelete(profileId) {
       await fetchProfiles();
     } catch (error) {
       console.error('Error deleting profile:', error);
-      showErrorToast(error.response?.data?.message || 'Failed to delete profile.');
+      // Error toast is handled globally by ApiClient interceptor
     }
   }
 }

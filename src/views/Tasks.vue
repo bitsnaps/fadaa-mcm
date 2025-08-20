@@ -7,7 +7,7 @@ import { getTasks as apiGetTasks, createTask as apiCreateTask, updateTask as api
 import AddEditTaskModal from '@/components/AddEditTaskModal.vue';
 
 const { t } = useI18n();
-const { showSuccessToast, showErrorToast } = useToast();
+const { showSuccessToast } = useToast();
 
 const searchQuery = ref('');
 const filterStatus = ref('');
@@ -37,7 +37,7 @@ const fetchTasks = async () => {
     const { data } = await apiGetTasks();
     tasks.value = Array.isArray(data) ? data : (data?.data || []);
   } catch (e) {
-    showErrorToast(t('tasks.errors.fetchFailed'));
+    // Error toast is handled globally by ApiClient interceptor
   } finally {
     isLoading.value = false;
   }
@@ -114,7 +114,7 @@ const handleSaveTask = async (taskData) => {
     }
     await fetchTasks();
   } catch {
-    showErrorToast(taskData.id ? t('tasks.errors.updateFailed') : t('tasks.errors.createFailed'));
+    // Error toast is handled globally by ApiClient interceptor
   } finally {
     isModalVisible.value = false;
   }
@@ -124,10 +124,9 @@ const handleDeleteTask = async (taskId) => {
   if (!confirm(t('tasks.confirmDelete'))) return;
   try {
     await apiDeleteTask(taskId);
-    showSuccessToast(t('tasks.success.deleted'));
     await fetchTasks();
   } catch {
-    showErrorToast(t('tasks.errors.deleteFailed'));
+    // Error toast is handled globally by ApiClient interceptor
   }
 };
 

@@ -3,11 +3,9 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import apiClient from '@/services/ApiClient';
-import { useToast } from '@/helpers/toast';
 
 const { t } = useI18n();
 const router = useRouter();
-const { showErrorToast } = useToast();
 const route = useRoute();
 const clientId = ref(route.params.clientId || null);
 
@@ -181,10 +179,9 @@ const submitForm = async () => {
         router.push('/manage-clients');
     } catch (error) {
         console.error(`${clientId.value ? 'Update' : 'Add'} client error:`, error);
+        // API error toasts are handled globally by ApiClient interceptor
         if (error.response && error.response.data && error.response.data.message) {
-            // Display backend validation errors
-            // This is a simple implementation; a more robust solution would map errors to fields
-            showErrorToast(`Error: ${error.response.data.message}`);
+            // Optionally map backend validation errors to form fields here
         }
     }
 };

@@ -33,7 +33,7 @@ const password = ref(import.meta.env.DEV?import.meta.env.VITE_DEFAULT_PASSWORD:'
 
 const router = useRouter();
 const authStore = useAuthStore();
-const { showErrorToast, showSuccessToast } = useToast();
+const { showErrorToast } = useToast();
 
 const handleLogin = async () => {
     if (!email.value || !password.value) {
@@ -47,7 +47,7 @@ const handleLogin = async () => {
             password: password.value,
         });
         if (success) {
-          showSuccessToast(t('login.success'));
+          // Success toast comes from interceptor (Login successful)
           switch (authStore.userRole) {
               case 'admin':
                   router.push('/admin-dashboard');

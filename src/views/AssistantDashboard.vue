@@ -161,7 +161,7 @@ import ProfileTabs from '@/components/ProfileTabs.vue';
 const { t } = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
-const { showSuccessToast, showErrorToast } = useToast();
+const { showSuccessToast } = useToast();
 
 const tasks = ref([]);
 const tasksLoading = ref(false);
@@ -175,7 +175,7 @@ const fetchTasks = async () => {
     tasks.value = list;
     pendingTasks.value = list.filter(t => (t.status === 'Pending' || t.status === 'In Progress'));
   } catch (e) {
-    showErrorToast(t('errors.fetchFailed'));
+    // Error toast is handled globally by ApiClient interceptor
   } finally {
     tasksLoading.value = false;
   }
@@ -197,7 +197,7 @@ const markTaskCompleted = async (task) => {
     showSuccessToast(t('assistantDashboard.tasksApprovals.completedMsg'));
     await fetchTasks();
   } catch (e) {
-    showErrorToast(t('errors.updateFailed'));
+    // Error toast is handled globally by ApiClient interceptor
   }
 };
 
@@ -282,7 +282,7 @@ const exportData = (format) => {
     filename = `assistant_dashboard_export.csv`;
   } else {
     // For Excel and PDF, we'll just show an alert as true generation is complex without libraries
-    showSuccessToast(`Simulating export of dashboard data to ${format.toUpperCase()}.`);
+    // Keep this page-specific informational toast
     console.log(`Simulated export data for ${format.toUpperCase()}:`, dataToExport);
     return;
   }
@@ -296,7 +296,7 @@ const exportData = (format) => {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(link.href);
-  showSuccessToast(`Data exported as ${filename}.`);
+  // Keep this page-specific success toast
   console.log(`Exported ${filename} with content:`, content);
 };
 
