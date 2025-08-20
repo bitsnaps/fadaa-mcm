@@ -1187,6 +1187,10 @@
     "editModalTitle": "Modifier la Notification",
     "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette notification ?",
     "searchPlaceholder": "Rechercher par message...",
+    "assignedTo": "Assigné à",
+    "assignTo": "Assigner à",
+    "selectUser": "Sélectionner un utilisateur",
+    "unassigned": "Non assigné",
     "sortBy": {
         "date": "Trier par Date",
         "type": "Trier par Type",

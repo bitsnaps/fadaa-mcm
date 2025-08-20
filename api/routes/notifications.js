@@ -14,23 +14,42 @@ notificationApp.get('/', async (c) => {
   const { page = 1, limit = 10, search = '', sort = 'created_at', order = 'DESC' } = c.req.query();
   const offset = (page - 1) * limit;
 
-        const whereClause = search ? {
-            [Op.and]: [
-                { message: { [Op.like]: `%${search}%` } },
-                // { user_id: user.id }
-            ]
-        } : {user_id: user.id};
+  // Check if user is admin
+  const userRole = await models.Role.findOne({ where: { id: user.role_id } });
+  const isAdmin = userRole && userRole.name.toLowerCase() === 'admin';
 
-  // const whereClause = {
-  //     user_id: user.id,
-  // };
-  // if (search) {
-  //     whereClause.message = { [Op.iLike]: `%${search}%` };
-  // }
+  // Admin can see all notifications, others only see their own
+  let whereClause;
+  if (isAdmin) {
+    whereClause = search ? {
+      message: { [Op.like]: `%${search}%` }
+    } : {};
+  } else {
+    whereClause = search ? {
+      [Op.and]: [
+        { message: { [Op.like]: `%${search}%` } },
+        { user_id: user.id }
+      ]
+    } : { user_id: user.id };
+  }
 
   try {
     const { count, rows: notifications } = await models.Notification.findAndCountAll({
       where: whereClause,
+      include: isAdmin ? [
+        {
+          model: models.User,
+          as: 'user',
+          attributes: ['id', 'first_name', 'last_name', 'email'],
+          include: [
+            {
+              model: models.Role,
+              as: 'role',
+              attributes: ['name']
+            }
+          ]
+        }
+      ] : [],
       order: [[sort, order]],
       limit: parseInt(limit),
       offset: parseInt(offset),
@@ -49,13 +68,25 @@ notificationApp.get('/', async (c) => {
 
 notificationApp.post('/', async (c) => {
   const user = c.get('user');
-  const { type, message, relatedEntityType, relatedEntityId } = await c.req.json();
+  const { type, message, relatedEntityType, relatedEntityId, user_id } = await c.req.json();
   if (!type || !message) {
     return c.json({ success: false, message: 'Missing required fields: type, message' }, 400);
   }
+
+  // Check if user is admin
+  const userRole = await models.Role.findOne({ where: { id: user.role_id } });
+  const isAdmin = userRole && userRole.name.toLowerCase() === 'admin';
+
+  // Determine target user ID
+  let targetUserId = user.id; // Default to current user
+  if (isAdmin && user_id) {
+    // Admin can assign notification to any user
+    targetUserId = user_id;
+  }
+
   try {
     await createNotification({
-      userId: user.id,
+      userId: targetUserId,
       type,
       message,
       relatedEntityType,
@@ -84,13 +115,28 @@ notificationApp.post('/mark-read', async (c) => {
 
 notificationApp.put('/:id', async (c) => {
   const { id } = c.req.param();
-  const { message, type } = await c.req.json();
+  const user = c.get('user');
+  const { message, type, user_id } = await c.req.json();
+
   try {
     const notification = await models.Notification.findByPk(id);
     if (!notification) {
       return c.json({ success: false, message: 'Notification not found' }, 404);
     }
-    await notification.update({ message, type });
+
+    // Check if user is admin
+    const userRole = await models.Role.findOne({ where: { id: user.role_id } });
+    const isAdmin = userRole && userRole.name.toLowerCase() === 'admin';
+
+    // Prepare update data
+    const updateData = { message, type };
+
+    // Admin can change user assignment
+    if (isAdmin && user_id !== undefined) {
+      updateData.user_id = user_id;
+    }
+
+    await notification.update(updateData);
     return c.json({ success: true, message: 'Notification updated successfully' });
   } catch (error) {
     return handleRouteError(c, `Error updating notification ${id}`, error);

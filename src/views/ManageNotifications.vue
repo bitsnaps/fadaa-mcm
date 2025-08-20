@@ -19,19 +19,6 @@
             <div class="col-md-4">
                 <input type="text" class="form-control" :placeholder="$t('notifications.searchPlaceholder')" v-model="searchQuery" @input="searchNotifications">
             </div>
-            <!-- <div class="col-md-3">
-                <select class="form-select" v-model="sortKey" @change="sortNotifications">
-                    <option value="created_at">{{ $t('notifications.sortBy.date') }}</option>
-                    <option value="type">{{ $t('notifications.sortBy.type') }}</option>
-                    <option value="is_read">{{ $t('notifications.sortBy.status') }}</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select class="form-select" v-model="sortOrder" @change="sortNotifications">
-                    <option value="DESC">{{ $t('notifications.sortOrder.desc') }}</option>
-                    <option value="ASC">{{ $t('notifications.sortOrder.asc') }}</option>
-                </select>
-            </div> -->
         </div>
         <div class="table-responsive">
           <table class="table table-bordered" width="100%" cellspacing="0">
@@ -40,6 +27,7 @@
                 <th @click="setSortKey('id')">{{ $t('notifications.id') }} <i class="bi" :class="getSortIcon('id')"></i></th>
                 <th @click="setSortKey('message')">{{ $t('notifications.message') }} <i class="bi" :class="getSortIcon('message')"></i></th>
                 <th @click="setSortKey('type')">{{ $t('notifications.type') }} <i class="bi" :class="getSortIcon('type')"></i></th>
+                <th v-if="isAdmin">{{ $t('notifications.assignedTo') }}</th>
                 <th @click="setSortKey('is_read')">{{ $t('notifications.status') }} <i class="bi" :class="getSortIcon('is_read')"></i></th>
                 <th @click="setSortKey('created_at')">{{ $t('notifications.date') }} <i class="bi" :class="getSortIcon('created_at')"></i></th>
                 <th>{{ $t('notifications.actions') }}</th>
@@ -47,12 +35,19 @@
             </thead>
             <tbody>
               <tr v-if="notifications.length === 0">
-                <td colspan="6" class="text-center">{{ $t('notifications.noNotifications') }}</td>
+                <td :colspan="isAdmin ? 7 : 6" class="text-center">{{ $t('notifications.noNotifications') }}</td>
               </tr>
               <tr v-for="notification in notifications" :key="notification.id" :class="{ 'fw-bold': !notification.is_read }">
                 <td>{{ notification.id }}</td>
                 <td>{{ notification.message }}</td>
                 <td><span class="badge bg-info">{{ notification.type }}</span></td>
+                <td v-if="isAdmin">
+                  <span v-if="notification.user" class="badge bg-secondary">
+                    {{ notification.user.first_name }} {{ notification.user.last_name }}
+                    <small class="text-muted">({{ notification.user.role?.name }})</small>
+                  </span>
+                  <span v-else class="text-muted">{{ $t('notifications.unassigned') }}</span>
+                </td>
                 <td>
                   <span :class="['badge', notification.is_read ? 'bg-success' : 'bg-warning']">
                     {{ notification.is_read ? $t('notifications.read') : $t('notifications.unread') }}
@@ -101,6 +96,15 @@
                     <option value="ClientDeletion">{{ $t('notifications.types.ClientDeletion') }}</option>
                 </select>
             </div>
+            <div class="mb-3" v-if="isAdmin">
+                <label for="notificationUser" class="form-label">{{ $t('notifications.assignTo') }}</label>
+                <select class="form-select" id="notificationUser" v-model="newNotification.user_id">
+                    <option :value="null">{{ $t('notifications.selectUser') }}</option>
+                    <option v-for="user in users" :key="user.id" :value="user.id">
+                        {{ user.first_name }} {{ user.last_name }} ({{ user.role?.name }})
+                    </option>
+                </select>
+            </div>
             <div class="mb-3">
                 <label for="notificationMessage" class="form-label">{{ $t('notifications.message') }}</label>
                 <textarea class="form-control" id="notificationMessage" rows="3" v-model="newNotification.message"></textarea>
@@ -124,6 +128,15 @@
                     <option value="ClientDeletion">{{ $t('notifications.types.ClientDeletion') }}</option>
                 </select>
             </div>
+            <div class="mb-3" v-if="isAdmin">
+                <label for="editNotificationUser" class="form-label">{{ $t('notifications.assignTo') }}</label>
+                <select class="form-select" id="editNotificationUser" v-model="editingNotification.user_id">
+                    <option :value="null">{{ $t('notifications.selectUser') }}</option>
+                    <option v-for="user in users" :key="user.id" :value="user.id">
+                        {{ user.first_name }} {{ user.last_name }} ({{ user.role?.name }})
+                    </option>
+                </select>
+            </div>
             <div class="mb-3">
                 <label for="notificationMessage" class="form-label">{{ $t('notifications.message') }}</label>
                 <textarea class="form-control" id="notificationMessage" rows="3" v-model="editingNotification.message"></textarea>
@@ -140,10 +153,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { getNotifications, markNotificationsAsRead } from '@/services/notificationService';
 import apiClient from '@/services/ApiClient';
 import { BModal, BPagination } from 'bootstrap-vue-next';
+import { useAuthStore } from '@/stores/auth';
+import { getUsers } from '@/services/UserService';
+
+const authStore = useAuthStore();
+const isAdmin = computed(() => authStore.userRole === 'admin');
 
 const notifications = ref([]);
 const currentPage = ref(1);
@@ -159,11 +177,16 @@ const notificationToDelete = ref(null);
 const editingNotification = ref({});
 const newNotification = ref({
     type: 'SystemAlert',
-    message: ''
+    message: '',
+    user_id: null
 });
+const users = ref([]);
 
 const showEditModal = (notification) => {
-    editingNotification.value = { ...notification };
+    editingNotification.value = {
+        ...notification,
+        user_id: notification.user_id || (notification.user ? notification.user.id : null)
+    };
     showEditNotificationModal.value = true;
 };
 
@@ -213,6 +236,7 @@ const handleCreateNotification = async () => {
         await apiClient.post('/notifications', newNotification.value);
         showCreateModal.value = false;
         newNotification.value.message = '';
+        newNotification.value.user_id = null;
         fetchNotifications(currentPage.value);
     } catch (error) {
         console.error('Failed to create notification:', error);
@@ -222,10 +246,17 @@ const handleCreateNotification = async () => {
 const handleUpdateNotification = async () => {
     if (!editingNotification.value) return;
     try {
-        await apiClient.put(`/notifications/${editingNotification.value.id}`, {
+        const updateData = {
             message: editingNotification.value.message,
             type: editingNotification.value.type,
-        });
+        };
+
+        // Add user_id if admin is editing
+        if (isAdmin.value) {
+            updateData.user_id = editingNotification.value.user_id;
+        }
+
+        await apiClient.put(`/notifications/${editingNotification.value.id}`, updateData);
         showEditNotificationModal.value = false;
         fetchNotifications(currentPage.value);
     } catch (error) {
@@ -254,9 +285,7 @@ const searchNotifications = () => {
     fetchNotifications(1);
 };
 
-const sortNotifications = () => {
-    fetchNotifications(1);
-};
+
 
 const setSortKey = (key) => {
     if (sortKey.value === key) {
@@ -275,8 +304,22 @@ const getSortIcon = (key) => {
     return sortOrder.value === 'ASC' ? 'bi-sort-up' : 'bi-sort-down';
 };
 
+const fetchUsers = async () => {
+  if (isAdmin.value) {
+    try {
+      const response = await getUsers();
+      if (response.data.success) {
+        users.value = response.data.data;
+      }
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    }
+  }
+};
+
 onMounted(() => {
   fetchNotifications(currentPage.value);
+  fetchUsers();
 });
 </script>
 

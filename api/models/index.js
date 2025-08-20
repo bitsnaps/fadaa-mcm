@@ -117,7 +117,7 @@ Task.belongsTo(Client, { foreignKey: 'client_id' });
 Client.hasMany(Task, { foreignKey: 'client_id' });
 
 // Notification associations
-Notification.belongsTo(User, { foreignKey: 'user_id' });
+Notification.belongsTo(User, { as: 'user', foreignKey: 'user_id' });
 User.hasMany(Notification, { foreignKey: 'user_id' });
 
 // FinancialReport associations

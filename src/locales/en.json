@@ -916,6 +916,7 @@
     }
   },
   "assistantDashboard": {
+    "title": "Assistant Dashboard",
     "renewals": {
       "title": "Client Contract Renewals"
     },
@@ -1136,6 +1137,10 @@
     "editModalTitle": "Edit Notification",
     "deleteConfirm": "Are you sure you want to delete this notification?",
     "searchPlaceholder": "Search by message...",
+    "assignedTo": "Assigned To",
+    "assignTo": "Assign To",
+    "selectUser": "Select a user",
+    "unassigned": "Unassigned",
     "sortBy": {
         "date": "Sort by Date",
         "type": "Sort by Type",
