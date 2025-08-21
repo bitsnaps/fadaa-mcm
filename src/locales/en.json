@@ -53,7 +53,12 @@
   "common": {
     "view": "View",
     "daysLeft": "days left",
-    "na": "N/A"
+    "na": "N/A",
+    "edit": "Edit",
+    "delete": "Delete",
+    "details": "Details",
+    "cancel": "Cancel",
+    "save": "Save"
   },
   "sidebar": {
     "adminDashboard": "Admin Dashboard",
@@ -1193,8 +1198,7 @@
         "desc": "Descending",
         "asc": "Ascending"
     }
-  }
-,
+  },
   "errors": {
     "network": "Network error. Please check your internet connection.",
     "timeout": "The request timed out. Please try again.",
