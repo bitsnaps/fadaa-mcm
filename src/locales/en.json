@@ -81,7 +81,9 @@
     "manageWithdrawals": "Withdrawal Management",
     "manageIncomes": "Income Management",
     "manageExpenses": "Expense Management",
-    "manageProfiles": "Accounts Management"
+    "manageProfiles": "Accounts Management",
+    "managementOperations": "Management & Operations",
+    "financialAnalytics": "Financial Analytics & Tracking"
   },
   "profiles": {
     "addProfile": "Add Account",

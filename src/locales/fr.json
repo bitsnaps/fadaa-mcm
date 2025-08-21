@@ -86,7 +86,9 @@
     "manageWithdrawals": "Gestion des Retraits",
     "manageIncomes": "Gestion des Revenus",
     "manageExpenses": "Gestion des Dépenses",
-    "manageProfiles": "Gestion des Profils"
+    "manageProfiles": "Gestion des Profils",
+    "managementOperations": "Gestion & Opérations",
+    "financialAnalytics": "Analyses Financières & Suivi"
   },
   "tasks": {
     "title": "Gérer les Tâches",
