@@ -95,7 +95,7 @@
             <label for="branchFilter" class="sr-only">{{ $t('investmentTracking.breakdown.filter') }}</label>
             <select id="branchFilter" class="form-select form-select-sm">
               <option selected>{{ $t('investmentTracking.breakdown.allBranches') }}</option>
-              <option v-for="branch in branchInvestments" :key="branch.id" :value="branch.id">{{ branch.branchName }}</option>
+              <option v-for="branch in uniqueBranches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
             </select>
           </div>
         </div>
@@ -135,6 +135,21 @@
                   <td><span :class="['badge', getStatusClass(branch.status)]">{{ getStatusTranslation(branch.status) }}</span></td>
                 </tr>
               </tbody>
+              <tfoot v-if="branchInvestments.length > 0" class="table-light">
+                <tr class="fw-bold">
+                  <td>{{ $t('investmentTracking.breakdown.totals') }}</td>
+                  <td>{{ formatCurrency(investmentTotals.totalInvested) }}</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>{{ formatCurrency(investmentTotals.totalIncome) }}</td>
+                  <td>{{ formatCurrency(investmentTotals.totalExpenses) }}</td>
+                  <td>{{ formatCurrency(investmentTotals.totalBranchNetProfit) }}</td>
+                  <td>{{ formatCurrency(investmentTotals.totalYourProfitShare) }}</td>
+                  <td>-</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>
@@ -307,12 +322,45 @@ const branchInvestments = computed(() => {
       contractStartDate: formatDate(inv.starting_date),
       contractEndDate: formatDate(inv.ending_date),
       daysRemaining: calculateDaysRemaining(inv.ending_date),
-      branchNetProfitSelectedPeriod: inv.branchNetProfitSelectedPeriod,
-      yourProfitShareSelectedPeriod: inv.yourProfitShareSelectedPeriod,
-      totalIncome: inv.totalIncome,
-      totalExpenses: inv.totalExpenses,
+      branchNetProfitSelectedPeriod: inv.branchNetProfitSelectedPeriod || 0,
+      yourProfitShareSelectedPeriod: inv.yourProfitShareSelectedPeriod || 0,
+      totalIncome: inv.totalIncome || 0,
+      totalExpenses: inv.totalExpenses || 0,
       status: status,
     };
+  });
+});
+
+// Get unique branches for the filter dropdown
+const uniqueBranches = computed(() => {
+  const branches = investments.value.map(inv => ({
+    id: inv.Branch?.id || 'unknown',
+    name: inv.Branch?.name || 'N/A'
+  }));
+
+  // Remove duplicates based on branch id
+  const unique = branches.filter((branch, index, self) =>
+    index === self.findIndex(b => b.id === branch.id)
+  );
+
+  return unique;
+});
+
+// Calculate totals for the investments table
+const investmentTotals = computed(() => {
+  return branchInvestments.value.reduce((totals, inv) => {
+    totals.totalInvested += inv.investmentAmount || 0;
+    totals.totalIncome += inv.totalIncome || 0;
+    totals.totalExpenses += inv.totalExpenses || 0;
+    totals.totalBranchNetProfit += inv.branchNetProfitSelectedPeriod || 0;
+    totals.totalYourProfitShare += inv.yourProfitShareSelectedPeriod || 0;
+    return totals;
+  }, {
+    totalInvested: 0,
+    totalIncome: 0,
+    totalExpenses: 0,
+    totalBranchNetProfit: 0,
+    totalYourProfitShare: 0
   });
 });
 

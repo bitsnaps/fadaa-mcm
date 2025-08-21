@@ -314,7 +314,8 @@
       "yourProfitShare": "Votre Part de Bénéfice (Période)",
       "status": "Statut",
       "daysRemaining": "jours restants",
-      "noInvestments": "Aucun investissement trouvé pour les critères sélectionnés."
+      "noInvestments": "Aucun investissement trouvé pour les critères sélectionnés.",
+      "totals": "TOTAUX"
     },
     "charts": {
       "yourProfitShareOverTime": "Votre Part de Bénéfice au Fil du Temps",

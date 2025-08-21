@@ -312,7 +312,8 @@
       "yourProfitShare": "Your Profit Share (Period)",
       "status": "Status",
       "daysRemaining": "days remaining",
-      "noInvestments": "No investments found for the selected criteria."
+      "noInvestments": "No investments found for the selected criteria.",
+      "totals": "TOTALS"
     },
     "charts": {
       "yourProfitShareOverTime": "Your Profit Share Over Time",
