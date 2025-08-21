@@ -111,13 +111,15 @@
       "pending": "Pending",
       "in_progress": "In Progress",
       "completed": "Completed",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "": "Unknown Status"
     },
     "priorities": {
       "low": "Low",
       "medium": "Medium",
       "high": "High",
-      "urgent": "Urgent"
+      "urgent": "Urgent",
+      "": "No Priority"
     },
     "success": {
       "created": "Task created successfully.",
@@ -284,6 +286,7 @@
   },
   "investmentTracking": {
     "title": "Investment Tracking",
+    "selectProfilePrompt": "Please select a profile to view investment tracking.",
     "summary": {
       "title": "Investment Summary",
       "totalInvested": "Total Amount Invested",
@@ -308,7 +311,8 @@
       "totalExpenses": "Total Expenses (Period)",
       "yourProfitShare": "Your Profit Share (Period)",
       "status": "Status",
-      "daysRemaining": "days remaining"
+      "daysRemaining": "days remaining",
+      "noInvestments": "No investments found for the selected criteria."
     },
     "charts": {
       "yourProfitShareOverTime": "Your Profit Share Over Time",
@@ -358,6 +362,7 @@
     "branch": "Branch",
     "noBranch": "No Branch Assigned",
     "password": "Password",
+    "phone": "Phone Number",
     "active": "Active",
     "inactive": "Inactive",
     "cancel": "Cancel",
@@ -550,6 +555,7 @@
     "updating": "Updating...",
     "deleting": "Deleting...",
     "cancel": "Cancel",
+    "notApplicable": "N/A",
     "form": {
         "attachments": "Attachment"
     }
@@ -704,6 +710,7 @@
     "notes": "Notes",
     "addService": "Add Service",
     "editService": "Edit Service",
+    "saveChanges": "Save Changes",
     "currentServices": "Current Services",
     "service": "Service",
     "type": "Type",
@@ -734,6 +741,7 @@
   },
   "financialReporting": {
     "title": "Financial Reporting",
+    "noProfileSelected": "Please select a profile to view financial reports.",
     "customReport": {
       "title": "Custom Report",
       "reportType": "Report Type",
@@ -900,7 +908,8 @@
       "pictureUpdateFailed": "Profile picture update failed.",
       "passwordsDoNotMatch": "The new passwords do not match.",
       "passwordTooShort": "The new password must be at least 6 characters long.",
-      "passwordChanged": "Password changed successfully."
+      "passwordChanged": "Password changed successfully.",
+      "passwordChangeFailed": "Failed to change password. Please try again."
     }
   },
   "userSettings": {
@@ -966,18 +975,28 @@
   "assistantDashboard": {
     "title": "Assistant Dashboard",
     "renewals": {
-      "title": "Client Contract Renewals"
+      "title": "Client Contract Renewals",
+      "empty": "No contract renewals available."
     },
     "expiringContracts": {
-      "title": "Expiring Contracts (Next 30 Days)"
+      "title": "Expiring Contracts (Next 30 Days)",
+      "empty": "No expiring contracts found."
     },
     "prospects": {
       "title": "Prospect List",
-      "contact": "Contact"
+      "contact": "Contact",
+      "empty": "No prospects available."
     },
     "offices": {
       "title": "Office Status Overview",
-      "empty": "No office status data available."
+      "empty": "No office status data available.",
+      "table": {
+        "name": "Office Name",
+        "branch": "Branch",
+        "status": "Status",
+        "capacity": "Capacity",
+        "actions": "Actions"
+      }
     },
     "tasksApprovals": {
       "title": "Tasks / Approvals",
@@ -1027,6 +1046,13 @@
         "period": "Concerned Period"
       }
     },
+    "recentActivities": {
+      "title": "Recent Activities",
+      "activity1": "New investment opportunity in Downtown Branch",
+      "activity2": "Quarterly profit share distributed",
+      "activity3": "Contract renewal for Uptown Branch",
+      "activity4": "Monthly performance report available"
+    },
     "documents": {
       "title": "Documents",
       "download": "Download"
@@ -1046,16 +1072,44 @@
         "biYearlyLabel": "Bi-Yearly Revenue",
         "yearlyLabel": "Annual Revenue",
         "revenue": "Revenue (in k)"
-,
+    },
     "addContract": {
         "submitButtonAdd": "Add Contract"
+    },
+    "withdrawals": {
+      "title": "Withdrawals",
+      "kpis": {
+        "accrued": "Accrued Net Profit (to date)",
+        "withdrawnPaid": "Withdrawn (Paid)",
+        "committed": "Committed (Pending + Approved)",
+        "available": "Available"
+      },
+      "form": {
+        "title": "Request a Withdrawal",
+        "selectInvestment": "Select Investment",
+        "availableForThisInvestment": "Available for this investment",
+        "amount": "Amount",
+        "paymentMethod": "Payment Method (optional)",
+        "notes": "Notes (optional)",
+        "submit": "Submit Request",
+        "validationRequired": "Please select an investment and enter a positive amount.",
+        "validationExceeds": "Requested amount exceeds available balance for the selected investment."
+      },
+      "history": {
+        "title": "Recent Withdrawals",
+        "date": "Requested At",
+        "investment": "Investment",
+        "amount": "Amount",
+        "status": "Status"
+      }
     }
   },
   "pagination": {
     "previous": "Previous",
     "next": "Next"
   },
-"withdrawals": {
+  "locale": "en",
+  "withdrawals": {
       "title": "Withdrawals",
       "kpis": {
         "accrued": "Accrued Net Profit (to date)",
@@ -1090,11 +1144,6 @@
         "rejected": "Rejected"
       }
     },
-    "statuses":{
-      "active": "Active",
-      "pending": "Pending"
-    }
-  },
   "manageWithdrawals": {
     "title": "Manage Withdrawals",
     "add": "Add Withdrawal",

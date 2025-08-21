@@ -111,13 +111,15 @@
       "pending": "En attente",
       "in_progress": "En cours",
       "completed": "Terminée",
-      "cancelled": "Annulée"
+      "cancelled": "Annulée",
+      "": "Statut Inconnu"
     },
     "priorities": {
       "low": "Basse",
       "medium": "Moyenne",
       "high": "Haute",
-      "urgent": "Urgente"
+      "urgent": "Urgente",
+      "": "Aucune Priorité"
     },
     "success": {
       "created": "Tâche créée avec succès.",
@@ -158,7 +160,9 @@
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet investissement ?",
     "tableHeaders": {
       "investor": "Investisseur",
+      "branch": "Branche",
       "name": "Nom",
+      "percentage": "Pourcentage",
       "type": "Type",
       "investment_amount": "Montant",
       "starting_date": "Début",
@@ -220,7 +224,10 @@
     "cancel": "Annuler",
     "save": "Enregistrer",
     "confirmDeleteTax": "Êtes-vous sûr de vouloir supprimer cette taxe ?",
-    "selectTax": "Sélectionnez une taxe"
+    "selectTax": "Sélectionnez une taxe",
+    "bearer": "Porteur",
+    "client": "Client",
+    "company": "Entreprise"
   },
   "monthlyReport": {
     "title": "Rapport Mensuel",
@@ -281,6 +288,7 @@
   },
   "investmentTracking": {
     "title": "Suivi des Investissements",
+    "selectProfilePrompt": "Veuillez sélectionner un profil pour voir le suivi des investissements.",
     "summary": {
       "title": "Résumé des Investissements",
       "totalInvested": "Montant Total Investi",
@@ -297,12 +305,16 @@
       "branchName": "Nom de l'Agence",
       "yourInvestment": "Votre Investissement",
       "yourStake": "Votre Participation (%)",
+      "type": "Type",
       "contractStart": "Début Contrat",
       "contractEnd": "Fin Contrat",
       "branchNetProfit": "Bénéfice Net Agence (Période)",
+      "totalIncome": "Revenus Totaux (Période)",
+      "totalExpenses": "Dépenses Totales (Période)",
       "yourProfitShare": "Votre Part de Bénéfice (Période)",
       "status": "Statut",
-      "daysRemaining": "jours restants"
+      "daysRemaining": "jours restants",
+      "noInvestments": "Aucun investissement trouvé pour les critères sélectionnés."
     },
     "charts": {
       "yourProfitShareOverTime": "Votre Part de Bénéfice au Fil du Temps",
@@ -545,6 +557,7 @@
     "updating": "Mise à jour en cours...",
     "deleting": "Suppression en cours...",
     "cancel": "Annuler",
+    "notApplicable": "N/A",
     "form": {
         "attachments": "Pièce Jointe"
     }
@@ -699,6 +712,7 @@
     "notes": "Notes",
     "addService": "Ajouter le Service",
     "editService": "Modifier le Service",
+    "saveChanges": "Enregistrer les Modifications",
     "currentServices": "Services Actuels",
     "service": "Service",
     "type": "Type",
@@ -729,6 +743,7 @@
   },
   "financialReporting": {
     "title": "Rapports Financiers",
+    "noProfileSelected": "Veuillez sélectionner un profil pour voir les rapports financiers.",
     "customReport": {
       "title": "Rapport Personnalisé",
       "reportType": "Type de Rapport",
@@ -895,7 +910,8 @@
       "pictureUpdateFailed": "La mise à jour de la photo de profil a échoué.",
       "passwordsDoNotMatch": "Les nouveaux mots de passe ne correspondent pas.",
       "passwordTooShort": "Le nouveau mot de passe doit comporter au moins 6 caractères.",
-      "passwordChanged": "Mot de passe changé avec succès."
+      "passwordChanged": "Mot de passe changé avec succès.",
+      "passwordChangeFailed": "Échec du changement de mot de passe. Veuillez réessayer."
     }
   },
   "userSettings": {
@@ -1030,6 +1046,40 @@
         "branch": "Agence",
         "amountReceived": "Montant Reçu",
         "period": "Période Concernée"
+      }
+    },
+    "recentActivities": {
+      "title": "Activités Récentes",
+      "activity1": "Nouvelle opportunité d'investissement dans l'Agence Centre-ville",
+      "activity2": "Part de bénéfice trimestrielle distribuée",
+      "activity3": "Renouvellement de contrat pour l'Agence Uptown",
+      "activity4": "Rapport de performance mensuel disponible"
+    },
+    "withdrawals": {
+      "title": "Retraits",
+      "kpis": {
+        "accrued": "Bénéfice Net Accumulé (à ce jour)",
+        "withdrawnPaid": "Retiré (Payé)",
+        "committed": "Engagé (En attente + Approuvé)",
+        "available": "Disponible"
+      },
+      "form": {
+        "title": "Demander un Retrait",
+        "selectInvestment": "Sélectionner un Investissement",
+        "availableForThisInvestment": "Disponible pour cet investissement",
+        "amount": "Montant",
+        "paymentMethod": "Méthode de Paiement (optionnel)",
+        "notes": "Notes (optionnel)",
+        "submit": "Soumettre la Demande",
+        "validationRequired": "Veuillez sélectionner un investissement et entrer un montant positif.",
+        "validationExceeds": "Le montant demandé dépasse le solde disponible pour l'investissement sélectionné."
+      },
+      "history": {
+        "title": "Retraits Récents",
+        "date": "Demandé le",
+        "investment": "Investissement",
+        "amount": "Montant",
+        "status": "Statut"
       }
     },
     "documents": {
@@ -1212,5 +1262,6 @@
     "validation": "Certaines entrées sont invalides. Veuillez vérifier vos saisies.",
     "server": "Le serveur a rencontré une erreur. Veuillez réessayer plus tard.",
     "unknown": "Une erreur inconnue est survenue. Veuillez réessayer."
-  }
+  },
+  "locale": "fr"
 }
