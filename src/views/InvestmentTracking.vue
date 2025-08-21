@@ -147,23 +147,48 @@
         <div class="card shadow mb-4">
           <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">{{ $t('investmentTracking.charts.yourProfitShareOverTime') }}</h6>
-            <!-- Add chart controls here if needed -->
+            <div class="dropdown no-arrow">
+              <label for="yearFilter" class="sr-only">{{ $t('investmentTracking.charts.selectYear') }}</label>
+              <select id="yearFilter" v-model="selectedYear" @change="onYearChange(selectedYear)" class="form-select form-select-sm">
+                <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+              </select>
+            </div>
           </div>
           <div class="card-body">
             <div class="chart-area" style="height: 320px;">
-              <p class="text-center p-5">{{ $t('investmentTracking.charts.profitShareChartPlaceholder') }}</p>
+              <div v-if="isChartLoading" class="text-center p-5">
+                <div class="spinner-border" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+              <div v-else-if="chartError" class="alert alert-danger">
+                {{ chartError }}
+              </div>
+              <Line v-else :data="chartData.profitShare" :options="lineChartOptions" />
             </div>
           </div>
         </div>
       </div>
       <div class="col-xl-4 col-lg-5">
         <div class="card shadow mb-4">
-          <div class="card-header py-3">
+          <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">{{ $t('investmentTracking.charts.branchNetProfitTrend') }}</h6>
+            <button @click="refreshCharts" class="btn btn-sm btn-outline-primary" :disabled="isChartLoading">
+              <i class="fas fa-sync-alt" :class="{ 'fa-spin': isChartLoading }"></i>
+              {{ $t('investmentTracking.charts.refresh') }}
+            </button>
           </div>
           <div class="card-body">
              <div class="chart-pie pt-4 pb-2" style="height: 320px;">
-                <p class="text-center p-5">{{ $t('investmentTracking.charts.netProfitTrendChartPlaceholder') }}</p>
+               <div v-if="isChartLoading" class="text-center p-5">
+                 <div class="spinner-border" role="status">
+                   <span class="visually-hidden">Loading...</span>
+                 </div>
+               </div>
+               <div v-else-if="chartError" class="alert alert-danger">
+                 {{ chartError }}
+               </div>
+               <Doughnut v-else :data="chartData.branchBreakdown" :options="doughnutChartOptions" />
             </div>
           </div>
         </div>
@@ -224,9 +249,13 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { Line, Doughnut } from 'vue-chartjs';
+import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, ArcElement, Filler } from 'chart.js';
 import { formatCurrency, formatDate } from "@/helpers/utils.js";
 import ApiClient from '@/services/ApiClient.js';
 import ProfileTabs from '@/components/ProfileTabs.vue';
+
+ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, ArcElement, Filler);
 
 const { t } = useI18n();
 
@@ -292,6 +321,90 @@ const profitSharePayouts = ref([]); // Placeholder - Requires a dedicated endpoi
 
 const documents = ref([]); // Placeholder - Requires a dedicated endpoint
 
+// Chart data
+const chartData = ref({
+  profitShare: { labels: [], datasets: [] },
+  branchBreakdown: { labels: [], datasets: [] }
+});
+
+const isChartLoading = ref(false);
+const chartError = ref(null);
+const selectedYear = ref(new Date().getFullYear());
+
+// Generate available years (current year and 4 previous years)
+const availableYears = computed(() => {
+  const currentYear = new Date().getFullYear();
+  return Array.from({ length: 5 }, (_, i) => currentYear - i);
+});
+
+// Chart options
+const lineChartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: true,
+      position: 'top',
+    },
+    title: {
+      display: false,
+    },
+    tooltip: {
+      mode: 'index',
+      intersect: false,
+      callbacks: {
+        label: function(context) {
+          return `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`;
+        }
+      }
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      title: {
+        display: true,
+        text: t('investmentTracking.charts.profitShareAmount')
+      },
+      ticks: {
+        callback: function(value) {
+          return formatCurrency(value);
+        }
+      }
+    },
+    x: {
+      grid: {
+        display: false
+      }
+    }
+  }
+}));
+
+const doughnutChartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: true,
+      position: 'bottom',
+    },
+    title: {
+      display: false,
+    },
+    tooltip: {
+      callbacks: {
+        label: function(context) {
+          const label = context.label || '';
+          const value = formatCurrency(context.parsed);
+          const total = context.dataset.data.reduce((a, b) => a + b, 0);
+          const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+          return `${label}: ${value} (${percentage}%)`;
+        }
+      }
+    }
+  }
+}));
+
 const fetchInvestments = async (profileId) => {
   if (!profileId) return;
   try {
@@ -312,6 +425,72 @@ const fetchInvestments = async (profileId) => {
   }
 };
 
+const fetchChartData = async (profileId, year = null) => {
+  if (!profileId) return;
+  try {
+    isChartLoading.value = true;
+    chartError.value = null;
+
+    const params = { profile_id: profileId };
+    if (year) params.year = year;
+
+    const { data: response } = await ApiClient.get('/investor/profit-share-series', { params });
+    if (response.success) {
+      const { labels, profitShare, branchBreakdown } = response.data;
+
+      // Update profit share line chart data
+      chartData.value.profitShare = {
+        labels,
+        datasets: [
+          {
+            label: t('investmentTracking.charts.yourProfitShare'),
+            borderColor: '#0D6EFD',
+            backgroundColor: 'rgba(13, 110, 253, 0.1)',
+            tension: 0.4,
+            fill: true,
+            data: profitShare,
+          },
+        ],
+      };
+
+      // Update branch breakdown doughnut chart data
+      if (branchBreakdown && branchBreakdown.length > 0) {
+        const colors = ['#0D6EFD', '#198754', '#FFC107', '#DC3545', '#6F42C1', '#FD7E14', '#20C997'];
+        chartData.value.branchBreakdown = {
+          labels: branchBreakdown.map(b => b.branchName),
+          datasets: [
+            {
+              data: branchBreakdown.map(b => b.totalProfit),
+              backgroundColor: colors.slice(0, branchBreakdown.length),
+              borderWidth: 2,
+              borderColor: '#fff',
+            },
+          ],
+        };
+      } else {
+        // Empty state for branch breakdown
+        chartData.value.branchBreakdown = {
+          labels: [t('investmentTracking.charts.noData')],
+          datasets: [
+            {
+              data: [1],
+              backgroundColor: ['#E9ECEF'],
+              borderWidth: 0,
+            },
+          ],
+        };
+      }
+    } else {
+      throw new Error(response.message || 'Failed to fetch chart data');
+    }
+  } catch (err) {
+    chartError.value = err.message;
+    console.error('Error fetching chart data:', err);
+  } finally {
+    isChartLoading.value = false;
+  }
+};
+
 onMounted(() => {
   // Initial fetch will be triggered by the watcher once activeProfileId is set by ProfileTabs
 });
@@ -319,8 +498,25 @@ onMounted(() => {
 watch(activeProfileId, (newProfileId) => {
   if (newProfileId) {
     fetchInvestments(newProfileId);
+    fetchChartData(newProfileId, selectedYear.value);
   }
 }, { immediate: true });
+
+watch(selectedYear, (newYear) => {
+  if (activeProfileId.value) {
+    fetchChartData(activeProfileId.value, newYear);
+  }
+});
+
+const onYearChange = (year) => {
+  selectedYear.value = year;
+};
+
+const refreshCharts = () => {
+  if (activeProfileId.value) {
+    fetchChartData(activeProfileId.value, selectedYear.value);
+  }
+};
 
 
 function calculateDaysRemaining(endDateString) {

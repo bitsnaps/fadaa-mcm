@@ -1,6 +1,6 @@
 const { Hono } = require('hono');
 const models = require('../models');
-const { authMiddleware, investorMiddleware } = require('../middleware/auth');
+const { authMiddleware, adminOrInvestorMiddleware } = require('../middleware/auth');
 const { getInvestmentCalculations } = require('../controllers/investmentController');
 const { handleRouteError } = require('../lib/errorHandler');
 
@@ -9,7 +9,7 @@ const Op = models.Sequelize.Op;
 const investorApp = new Hono();
 
 // Protect all endpoints: authenticated investors only
-investorApp.use('*', authMiddleware, investorMiddleware);
+investorApp.use('*', authMiddleware, adminOrInvestorMiddleware);
 
 // Helper to compute accrued profit share to date for an investment
 async function computeAccruedProfitShareToDate(investmentInstance) {
@@ -126,6 +126,89 @@ investorApp.get('/documents', async (c) => {
   }
 });
 
+
+// GET /investor/profit-share-series - get profit share time series data for charts
+investorApp.get('/profit-share-series', async (c) => {
+  try {
+    const user = c.get('user');
+    const { profile_id, year } = c.req.query();
+    const yearNum = parseInt(year, 10) || new Date().getFullYear();
+
+    const where = { investor_id: user.id };
+    if (profile_id) where.profile_id = profile_id;
+
+    const investments = await models.Investment.findAll({
+      where,
+      include: [{ model: models.Branch }, { model: models.Profile }],
+    });
+
+    if (investments.length === 0) {
+      return c.json({
+        success: true,
+        data: {
+          labels: Array.from({ length: 12 }, (_, i) => new Date(0, i).toLocaleString('en', { month: 'short' })),
+          profitShare: Array(12).fill(0),
+          branchBreakdown: []
+        }
+      });
+    }
+
+    const labels = Array.from({ length: 12 }, (_, i) => new Date(0, i).toLocaleString('en', { month: 'short' }));
+    const profitShare = [];
+    const branchData = {};
+
+    for (let month = 0; month < 12; month++) {
+      const start = new Date(yearNum, month, 1);
+      const end = new Date(yearNum, month + 1, 0, 23, 59, 59, 999);
+
+      let monthlyProfitShare = 0;
+
+      for (const investment of investments) {
+        // Create a calculation input for this specific month
+        const calcInput = {
+          ...investment.toJSON(),
+          starting_date: start > new Date(investment.starting_date) ? start : new Date(investment.starting_date),
+          ending_date: end < new Date(investment.ending_date) ? end : new Date(investment.ending_date)
+        };
+
+        // Only calculate if the investment was active during this month
+        if (new Date(investment.starting_date) <= end && new Date(investment.ending_date) >= start) {
+          const calculations = await getInvestmentCalculations([calcInput]);
+          const calc = calculations?.[investment.id] || {};
+          const investmentProfitShare = calc.yourProfitShareSelectedPeriod || 0;
+
+          monthlyProfitShare += investmentProfitShare;
+
+          // Track by branch for breakdown chart
+          const branchName = investment.Branch?.name || 'Unknown';
+          if (!branchData[branchName]) {
+            branchData[branchName] = 0;
+          }
+          branchData[branchName] += investmentProfitShare;
+        }
+      }
+
+      profitShare.push(monthlyProfitShare);
+    }
+
+    // Prepare branch breakdown data for pie chart
+    const branchBreakdown = Object.entries(branchData).map(([branchName, totalProfit]) => ({
+      branchName,
+      totalProfit
+    }));
+
+    return c.json({
+      success: true,
+      data: {
+        labels,
+        profitShare,
+        branchBreakdown
+      }
+    });
+  } catch (error) {
+    return handleRouteError(c, 'Error fetching profit share series', error);
+  }
+});
 
 // GET /investor/withdrawals/available/:investmentId - compute available amount for an investment
 investorApp.get('/withdrawals/available/:investmentId', async (c) => {

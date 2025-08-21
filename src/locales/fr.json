@@ -320,7 +320,12 @@
       "yourProfitShareOverTime": "Votre Part de Bénéfice au Fil du Temps",
       "profitShareChartPlaceholder": "Graphique de la part de bénéfice à venir.",
       "branchNetProfitTrend": "Tendance Bénéfice Net Agence",
-      "netProfitTrendChartPlaceholder": "Graphique de tendance du bénéfice net à venir."
+      "netProfitTrendChartPlaceholder": "Graphique de tendance du bénéfice net à venir.",
+      "yourProfitShare": "Votre Part de Bénéfice",
+      "profitShareAmount": "Montant Part de Bénéfice",
+      "noData": "Aucune Donnée Disponible",
+      "selectYear": "Sélectionner l'Année",
+      "refresh": "Actualiser les Graphiques"
     },
     "payoutHistory": {
       "title": "Historique des Paiements (Part de Bénéfice)",

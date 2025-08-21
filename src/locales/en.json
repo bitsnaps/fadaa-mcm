@@ -318,7 +318,12 @@
       "yourProfitShareOverTime": "Your Profit Share Over Time",
       "profitShareChartPlaceholder": "Profit share chart coming soon.",
       "branchNetProfitTrend": "Branch Net Profit Trend",
-      "netProfitTrendChartPlaceholder": "Net profit trend chart coming soon."
+      "netProfitTrendChartPlaceholder": "Net profit trend chart coming soon.",
+      "yourProfitShare": "Your Profit Share",
+      "profitShareAmount": "Profit Share Amount",
+      "noData": "No Data Available",
+      "selectYear": "Select Year",
+      "refresh": "Refresh Charts"
     },
     "payoutHistory": {
       "title": "Payout History (Profit Share)",
