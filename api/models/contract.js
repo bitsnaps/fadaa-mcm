@@ -39,6 +39,23 @@ module.exports = (sequelize) => {
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+    hooks: {
+      afterFind: (contracts, options) => {
+        if (contracts) {
+          if (Array.isArray(contracts)) {
+            contracts.forEach(contract => {
+              if (!contract.taxes) {
+                contract.setDataValue('taxes', []);
+              }
+            });
+          } else {
+            if (!contracts.taxes) {
+              contracts.setDataValue('taxes', []);
+            }
+          }
+        }
+      }
+    }
   });
 
   return Contract;

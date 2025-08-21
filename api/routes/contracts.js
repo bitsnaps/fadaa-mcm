@@ -56,7 +56,7 @@ contractApp.get('/:id', async (c) => {
 contractApp.post('/', uploadMiddleware('contracts', 'document'), async (c) => {
     try {
         const body = await c.req.parseBody();
-        const { client_id, office_id, start_date, end_date, monthly_rate, tax_ids, profile_id } = body;
+        const { client_id, office_id, start_date, end_date, monthly_rate, profile_id } = body;
         const documentUrl = c.req.filePath;
 
         if (!client_id || !office_id || !start_date || !end_date || !monthly_rate || !profile_id) {
@@ -74,10 +74,16 @@ contractApp.post('/', uploadMiddleware('contracts', 'document'), async (c) => {
             document_url: documentUrl,
         });
 
-        if (tax_ids) {
-            const taxIdArray = Array.isArray(tax_ids) ? tax_ids : [tax_ids];
-            if (taxIdArray.length > 0) {
-              const taxes = await models.Tax.findAll({ where: { id: taxIdArray } });
+        // Support both 'tax_ids' and 'tax_ids[]' from multipart form data
+        const rawTaxIds = body['tax_ids'] ?? body['tax_ids[]'];
+        if (rawTaxIds !== undefined) {
+            const taxIdArray = Array.isArray(rawTaxIds) ? rawTaxIds : (rawTaxIds ? [rawTaxIds] : []);
+            const parsedIds = taxIdArray
+              .filter(v => v !== '' && v !== null && v !== undefined)
+              .map(id => parseInt(id, 10))
+              .filter(n => !Number.isNaN(n));
+            if (parsedIds.length > 0) {
+              const taxes = await models.Tax.findAll({ where: { id: parsedIds } });
               await newContract.setTaxes(taxes);
             }
         }
@@ -98,7 +104,7 @@ contractApp.put('/:id', uploadMiddleware('contracts', 'document'), async (c) => 
     const { id } = c.req.param();
     try {
         const body = await c.req.parseBody();
-        const { client_id, office_id, start_date, end_date, monthly_rate, tax_ids, status } = body;
+        const { client_id, office_id, start_date, end_date, monthly_rate, status } = body;
 
         const contract = await models.Contract.findByPk(id);
         if (!contract) {
@@ -117,12 +123,18 @@ contractApp.put('/:id', uploadMiddleware('contracts', 'document'), async (c) => 
             document_url: documentUrl,
         });
 
-        if (tax_ids) {
-            const taxIdArray = Array.isArray(tax_ids) ? tax_ids.map(id => parseInt(id, 10)) : [parseInt(tax_ids, 10)];
-            const taxes = await models.Tax.findAll({ where: { id: taxIdArray } });
+        // Support both 'tax_ids' and 'tax_ids[]' from multipart form data.
+        // Only update taxes if the parameter is present; don't clear implicitly.
+        const hasTaxIdsParam = Object.prototype.hasOwnProperty.call(body, 'tax_ids') || Object.prototype.hasOwnProperty.call(body, 'tax_ids[]');
+        if (hasTaxIdsParam) {
+            const rawTaxIds = body['tax_ids'] ?? body['tax_ids[]'];
+            const taxIdArray = Array.isArray(rawTaxIds) ? rawTaxIds : (rawTaxIds ? [rawTaxIds] : []);
+            const parsedIds = taxIdArray
+              .filter(v => v !== '' && v !== null && v !== undefined)
+              .map(id => parseInt(id, 10))
+              .filter(n => !Number.isNaN(n));
+            const taxes = parsedIds.length > 0 ? await models.Tax.findAll({ where: { id: parsedIds } }) : [];
             await contract.setTaxes(taxes);
-        } else {
-            await contract.setTaxes([]);
         }
 
         if (body.original_office_id && office_id !== body.original_office_id) {

@@ -121,11 +121,7 @@ const calculateTotalAmount = (contract) => {
   if (isNaN(monthlyRate)) return 0;
 
   // Support both API include alias 'taxes' and potential 'Taxes'
-  const taxes = Array.isArray(contract?.taxes)
-    ? contract.taxes
-    : Array.isArray(contract?.Taxes)
-      ? contract.Taxes
-      : [];
+  const taxes = contract.taxes || [];
 
   if (taxes.length === 0) {
     return monthlyRate;
@@ -235,7 +231,7 @@ const openEditContractModal = async (contract) => {
     end_date: formatDate(contractData.end_date),
     monthly_rate: contractData.monthly_rate,
     document: null, // Don't pre-fill file input
-    tax_ids: contractData.taxes ? contractData.taxes.map(t => t.id) : [],
+    tax_ids: contractData.taxes ? contractData.taxes.map(t => Number(t.id)) : [],
     profile_id: contractData.profile_id,
     status: contractData.status,
     original_office_id: contractData.office_id // Keep track of the original office
@@ -247,6 +243,7 @@ const openEditContractModal = async (contract) => {
       getAvailableOffices(),
       apiClient.get('/taxes')
     ]);
+    
     if (clientsResponse.data.success) clients.value = clientsResponse.data.data;
     if (officesResponse.data.success) offices.value = officesResponse.data.data;
     if (taxesResponse.data.success) availableTaxes.value = taxesResponse.data.taxes;
@@ -279,6 +276,7 @@ const submitNewContract = async () => {
       formData.append(key, contractData[key]);
     }
   });
+    console.log(contractData.taxes);
 
   try {
     let response;
