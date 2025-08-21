@@ -112,7 +112,7 @@ const handleChangePassword = async () => {
   }
 
   try {
-    const response = await changePassword(user.value.id, {
+    const { data: response } = await changePassword(user.value.id, {
       currentPassword: passwordForm.currentPassword,
       newPassword: passwordForm.newPassword,
     });
