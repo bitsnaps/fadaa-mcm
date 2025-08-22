@@ -30,7 +30,15 @@
               <template #empty>
                 <div class="text-center my-2">{{ $t('clientServices.noClientsFound') }}</div>
               </template>
-              
+
+              <template #cell(total_services)="row">
+                <span class="badge bg-primary">{{ row.item.total_services || 0 }}</span>
+              </template>
+
+              <template #cell(total_amount_with_taxes)="row">
+                <span class="fw-bold text-success">{{ formatCurrency(row.item.total_amount_with_taxes || 0) }}</span>
+              </template>
+
               <template #cell(actions)="row">
                 <button class="btn btn-sm btn-primary me-2" @click="openAddServiceModal(row.item)">
                   <i class="bi bi-plus-circle"></i> {{ $t('clientServices.addService') }}
@@ -57,13 +65,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useModal } from 'bootstrap-vue-next';
 import apiClient from '@/services/ApiClient';
 import AddServiceModal from '@/components/AddServiceModal.vue';
 import ClientServicesModal from '@/components/ClientServicesModal.vue';
 import ProfileTabs from '@/components/ProfileTabs.vue';
+import { formatCurrency } from '@/helpers/utils.js';
 
 const { t } = useI18n();
 const addServiceModal = useModal('add-service-modal');
@@ -84,12 +93,18 @@ const fields = computed(() => [
   { key: 'email', label: t('client.email'), sortable: true },
   { key: 'phone_number', label: t('client.phoneNumber'), sortable: true },
   { key: 'status', label: t('client.status'), sortable: true },
+  { key: 'total_services', label: t('clientServices.totalServices'), sortable: true },
+  { key: 'total_amount_with_taxes', label: t('clientServices.totalAmountWithTaxes'), sortable: true },
   { key: 'actions', label: t('clientServices.actions') }
 ]);
 
 const fetchClients = async () => {
   try {
-    const response = await apiClient.get('/clients');
+    const params = {};
+    if (activeProfileId.value) {
+      params.profile_id = activeProfileId.value;
+    }
+    const response = await apiClient.get('/clients', { params });
     clients.value = response.data.data;
   } catch (error) {
     console.error('Failed to fetch clients:', error);
@@ -113,6 +128,7 @@ const handleServiceAdded = () => {
 
 const onProfileChange = (profileId) => {
   activeProfileId.value = profileId;
+  fetchClients();
   // Data related to a specific profile is in the modals, not on this main page
 };
 

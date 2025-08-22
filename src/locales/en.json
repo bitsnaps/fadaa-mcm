@@ -735,7 +735,9 @@
     "noClientSelected": "Please select a client to view and manage their services.",
     "clients": "Clients",
     "noClientsFound": "No clients found.",
-    "viewServices": "View Services"
+    "viewServices": "View Services",
+    "totalServices": "Total Services",
+    "totalAmountWithTaxes": "Total Amount (incl. taxes)"
   },
   "client": {
     "companyName": "Company Name",

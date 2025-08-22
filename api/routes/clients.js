@@ -24,6 +24,24 @@ clientsApp.get('/total', async (c) => {
 // GET all clients
 clientsApp.get('/', async (c) => {
     try {
+        const { profile_id } = c.req.query();
+
+        const clientServiceInclude = {
+            model: models.ClientService,
+            attributes: ['id', 'price', 'taxId', 'profile_id'],
+            include: [
+                {
+                    model: models.Tax,
+                    attributes: ['rate', 'bearer']
+                }
+            ],
+            required: false // keep clients even if they have no services for this profile
+        };
+
+        if (profile_id) {
+            clientServiceInclude.where = { profile_id };
+        }
+
         const clients = await models.Client.findAll({
             attributes: [
                 'id',
@@ -39,10 +57,41 @@ clientsApp.get('/', async (c) => {
             include: [
                 { model: models.User, as: 'managed_by', attributes: ['id', 'first_name', 'last_name'] },
                 { model: models.Office, as: 'office', attributes: ['id', 'name'] },
+                clientServiceInclude
             ],
             order: [['company_name', 'ASC']],
         });
-        return c.json({ success: true, data: clients });
+
+        // Calculate service count and total amount for each client
+        const clientsWithStats = clients.map(client => {
+            const clientData = client.toJSON();
+            const services = clientData.ClientServices || [];
+
+            // Calculate total service count
+            clientData.total_services = services.length;
+
+            // Calculate total amount including taxes
+            let totalAmount = 0;
+            services.forEach(service => {
+                let serviceAmount = parseFloat(service.price) || 0;
+                // Add tax if applicable
+                if (service.Tax && service.Tax.rate) {
+                    const taxRate = parseFloat(service.Tax.rate) || 0;
+                    const taxAmount = serviceAmount * (taxRate / 100);
+                    serviceAmount += taxAmount;
+                }
+                totalAmount += serviceAmount;
+            });
+
+            clientData.total_amount_with_taxes = totalAmount;
+
+            // Remove the ClientServices array from response to keep it clean
+            delete clientData.ClientServices;
+
+            return clientData;
+        });
+
+        return c.json({ success: true, data: clientsWithStats });
     } catch (error) {
         console.error('Error fetching clients:', error);
         return c.json({ success: false, message: 'Failed to fetch clients' }, 500);
