@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { BTable, BPagination } from 'bootstrap-vue-next';
 import { getInvestments, addInvestment, updateInvestment, deleteInvestment } from '@/services/InvestmentService';
 import { getInvestors } from '@/services/UserService';
 import { getBranches } from '@/services/BranchService';
@@ -16,6 +17,12 @@ const isLoading = ref(true);
 const searchTerm = ref('');
 const isSubmitting = ref(false);
 const activeProfileId = ref(null);
+
+// Table state
+const currentPage = ref(1);
+const perPage = ref(10);
+const sortBy = ref(['starting_date']);
+const sortDesc = ref(true);
 
 const modalInstance = ref(null);
 const addInvestmentModal = ref(null);
@@ -74,6 +81,31 @@ const filteredInvestments = computed(() => {
         (inv.Branch && inv.Branch.name.toLowerCase().includes(searchTerm.value.toLowerCase()))
     );
 });
+
+const tableFields = computed(() => [
+    { key: 'investor_name', label: t('investments.tableHeaders.investor'), sortable: true },
+    { key: 'branch_name', label: t('investments.tableHeaders.branch'), sortable: true },
+    { key: 'name', label: t('investments.tableHeaders.name'), sortable: true },
+    { key: 'percentage', label: t('investments.tableHeaders.percentage'), sortable: true },
+    { key: 'investment_amount', label: t('investments.tableHeaders.investment_amount'), sortable: true },
+    { key: 'type', label: t('investments.tableHeaders.type'), sortable: true },
+    { key: 'starting_date', label: t('investments.tableHeaders.starting_date'), sortable: true },
+    { key: 'ending_date', label: t('investments.tableHeaders.ending_date'), sortable: true },
+    { key: 'actions', label: t('investments.tableHeaders.actions') }
+]);
+
+const tableItems = computed(() =>
+    filteredInvestments.value.map(inv => ({
+        ...inv,
+        investor_name: inv.investor ? `${inv.investor.first_name} ${inv.investor.last_name}` : 'N/A',
+        branch_name: inv.Branch ? inv.Branch.name : 'N/A',
+        starting_date: inv.starting_date ? (typeof inv.starting_date === 'string' ? inv.starting_date.slice(0, 10) : '') : '',
+        ending_date: inv.ending_date ? (typeof inv.ending_date === 'string' ? inv.ending_date.slice(0, 10) : '') : ''
+    }))
+);
+
+const totalRows = computed(() => tableItems.value.length);
+
 
 const openAddModal = () => {
     isEditMode.value = false;
@@ -146,7 +178,7 @@ const handleDelete = async (id) => {
 <template>
     <div class="container mt-4">
         <h2>{{ t('investments.title') }}</h2>
-        
+
         <ProfileTabs @update:activeProfile="onProfileChange">
             <template #default="{ profileId }">
                 <div class="d-flex justify-content-between align-items-center my-4">
@@ -169,42 +201,48 @@ const handleDelete = async (id) => {
                     </div>
                 </div>
 
-                <div v-else-if="filteredInvestments.length > 0" class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th scope="col">{{ t('investments.tableHeaders.investor') }}</th>
-                                <th scope="col">{{ t('investments.tableHeaders.branch') }}</th>
-                                <th scope="col">{{ t('investments.tableHeaders.name') }}</th>
-                                <th scope="col">{{ t('investments.tableHeaders.percentage') }}</th>
-                                <th scope-="col">{{ t('investments.tableHeaders.investment_amount') }}</th>
-                                <th scope-="col">{{ t('investments.tableHeaders.type') }}</th>
-                                <th scope="col">{{ t('investments.tableHeaders.starting_date') }}</th>
-                                <th scope="col">{{ t('investments.tableHeaders.ending_date') }}</th>
-                                <th scope="col" class="text-center">{{ t('investments.tableHeaders.actions') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="investment in filteredInvestments" :key="investment.id">
-                                <td>{{ investment.investor ? investment.investor.first_name + ' ' + investment.investor.last_name : 'N/A' }}</td>
-                                <td>{{ investment.Branch ? investment.Branch.name : 'N/A' }}</td>
-                                <td>{{ investment.name }}</td>
-                                <td>{{ investment.percentage }}%</td>
-                                <td>{{ investment.investment_amount }}</td>
-                                <td>{{ investment.type }}</td>
-                                <td>{{ investment.starting_date ? new Date(investment.starting_date).toLocaleDateString() : 'N/A' }}</td>
-                                <td>{{ investment.ending_date ? new Date(investment.ending_date).toLocaleDateString() : 'N/A' }}</td>
-                                <td class="text-center">
-                                    <button @click="openEditModal(investment)" class="btn btn-sm btn-outline-info me-1" :title="t('investments.edit')">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button @click="handleDelete(investment.id)" class="btn btn-sm btn-outline-danger" :title="t('investments.delete')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div v-else-if="tableItems.length > 0">
+                    <BTable
+                        :items="tableItems"
+                        :fields="tableFields"
+                        :current-page="currentPage"
+                        :per-page="perPage"
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
+                        responsive
+                        striped
+                        hover
+                        show-empty
+                        :empty-text="t('investments.noInvestmentsFound')"
+                    >
+                        <template #cell(percentage)="data">
+                            {{ data.value }}%
+                        </template>
+                        <template #cell(starting_date)="data">
+                            {{ data.value ? new Date(data.value).toLocaleDateString() : 'N/A' }}
+                        </template>
+                        <template #cell(ending_date)="data">
+                            {{ data.value ? new Date(data.value).toLocaleDateString() : 'N/A' }}
+                        </template>
+                        <template #cell(actions)="data">
+                            <div class="text-center">
+                                <button @click="openEditModal(data.item)" class="btn btn-sm btn-outline-info me-1" :title="t('investments.edit')">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button @click="handleDelete(data.item.id)" class="btn btn-sm btn-outline-danger" :title="t('investments.delete')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </template>
+                    </BTable>
+
+                    <div class="d-flex justify-content-center mt-3">
+                        <BPagination
+                            v-model="currentPage"
+                            :total-rows="totalRows"
+                            :per-page="perPage"
+                        />
+                    </div>
                 </div>
                 <div v-else class="alert alert-info text-center" role="alert">
                     {{ t('investments.noInvestmentsFound') }}

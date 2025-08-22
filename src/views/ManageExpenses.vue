@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { BTable, BPagination } from 'bootstrap-vue-next';
 import { getExpenses, addExpense, updateExpense, deleteExpense } from '@/services/ExpenseService';
 import { getBranches } from '@/services/BranchService';
 import { useAuthStore } from '@/stores/auth'; // To get registered_by user ID
@@ -16,6 +17,12 @@ const isLoading = ref(true);
 const searchTerm = ref('');
 const isSubmitting = ref(false);
 const activeProfileId = ref(null);
+
+// Table state
+const currentPage = ref(1);
+const perPage = ref(10);
+const sortBy = ref(['transaction_date']);
+const sortDesc = ref(true);
 
 const modalInstance = ref(null);
 const addExpenseModal = ref(null);
@@ -72,6 +79,27 @@ const filteredExpenses = computed(() => {
         (exp.registered_by_user && `${exp.registered_by_user.first_name} ${exp.registered_by_user.last_name}`.toLowerCase().includes(searchTerm.value.toLowerCase()))
     );
 });
+
+const tableFields = computed(() => [
+    { key: 'amount', label: t('expenses.tableHeaders.amount'), sortable: true },
+    { key: 'description', label: t('expenses.tableHeaders.description'), sortable: true },
+    { key: 'transaction_date', label: t('expenses.tableHeaders.transaction_date'), sortable: true },
+    { key: 'branch_name', label: t('expenses.tableHeaders.branch'), sortable: true },
+    { key: 'registered_by_name', label: t('expenses.tableHeaders.registered_by'), sortable: true },
+    { key: 'actions', label: t('expenses.tableHeaders.actions') }
+]);
+
+const tableItems = computed(() =>
+    filteredExpenses.value.map(exp => ({
+        ...exp,
+        branch_name: exp.Branch ? exp.Branch.name : 'N/A',
+        registered_by_name: exp.registered_by_user ? `${exp.registered_by_user.first_name} ${exp.registered_by_user.last_name}` : 'N/A',
+        transaction_date: exp.transaction_date ? (typeof exp.transaction_date === 'string' ? exp.transaction_date.slice(0, 10) : '') : ''
+    }))
+);
+
+const totalRows = computed(() => tableItems.value.length);
+
 
 const openAddModal = () => {
     isEditMode.value = false;

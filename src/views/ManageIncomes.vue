@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { BTable, BPagination } from 'bootstrap-vue-next';
 import { getIncomes, addIncome, updateIncome, deleteIncome } from '@/services/IncomeService';
 import { getBranches } from '@/services/BranchService';
 import { useAuthStore } from '@/stores/auth'; // To get registered_by user ID
@@ -16,6 +17,12 @@ const isLoading = ref(true);
 const searchTerm = ref('');
 const isSubmitting = ref(false);
 const activeProfileId = ref(null);
+
+// Table state
+const currentPage = ref(1);
+const perPage = ref(10);
+const sortBy = ref(['transaction_date']);
+const sortDesc = ref(true);
 
 const modalInstance = ref(null);
 const addIncomeModal = ref(null);
@@ -72,6 +79,27 @@ const filteredIncomes = computed(() => {
         (inc.registered_by_user && `${inc.registered_by_user.first_name} ${inc.registered_by_user.last_name}`.toLowerCase().includes(searchTerm.value.toLowerCase()))
     );
 });
+
+const tableFields = computed(() => [
+    { key: 'amount', label: t('incomes.tableHeaders.amount'), sortable: true },
+    { key: 'description', label: t('incomes.tableHeaders.description'), sortable: true },
+    { key: 'transaction_date', label: t('incomes.tableHeaders.transaction_date'), sortable: true },
+    { key: 'branch_name', label: t('incomes.tableHeaders.branch'), sortable: true },
+    { key: 'registered_by_name', label: t('incomes.tableHeaders.registered_by'), sortable: true },
+    { key: 'actions', label: t('incomes.tableHeaders.actions') }
+]);
+
+const tableItems = computed(() =>
+    filteredIncomes.value.map(inc => ({
+        ...inc,
+        branch_name: inc.Branch ? inc.Branch.name : 'N/A',
+        registered_by_name: inc.registered_by_user ? `${inc.registered_by_user.first_name} ${inc.registered_by_user.last_name}` : 'N/A',
+        transaction_date: inc.transaction_date ? (typeof inc.transaction_date === 'string' ? inc.transaction_date.slice(0, 10) : '') : ''
+    }))
+);
+
+const totalRows = computed(() => tableItems.value.length);
+
 
 const openAddModal = () => {
     isEditMode.value = false;
@@ -160,36 +188,42 @@ const handleDelete = async (id) => {
                     </div>
                 </div>
 
-                <div v-else-if="filteredIncomes.length > 0" class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th scope="col">{{ t('incomes.tableHeaders.amount') }}</th>
-                                <th scope="col">{{ t('incomes.tableHeaders.description') }}</th>
-                                <th scope="col">{{ t('incomes.tableHeaders.transaction_date') }}</th>
-                                <th scope="col">{{ t('incomes.tableHeaders.branch') }}</th>
-                                <th scope="col">{{ t('incomes.tableHeaders.registered_by') }}</th>
-                                <th scope="col" class="text-center">{{ t('incomes.tableHeaders.actions') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="income in filteredIncomes" :key="income.id">
-                                <td>{{ income.amount }}</td>
-                                <td>{{ income.description }}</td>
-                                <td>{{ income.transaction_date ? new Date(income.transaction_date).toLocaleDateString() : 'N/A' }}</td>
-                                <td>{{ income.Branch ? income.Branch.name : 'N/A' }}</td>
-                                <td>{{ income.registered_by_user ? `${income.registered_by_user.first_name} ${income.registered_by_user.last_name}` : 'N/A' }}</td>
-                                <td class="text-center">
-                                    <button @click="openEditModal(income)" class="btn btn-sm btn-outline-info me-1" :title="t('incomes.edit')">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button @click="handleDelete(income.id)" class="btn btn-sm btn-outline-danger" :title="t('incomes.delete')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div v-else-if="tableItems.length > 0">
+                    <BTable
+                        :items="tableItems"
+                        :fields="tableFields"
+                        :current-page="currentPage"
+                        :per-page="perPage"
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
+                        responsive
+                        striped
+                        hover
+                        show-empty
+                        :empty-text="t('incomes.noIncomesFound')"
+                    >
+                        <template #cell(transaction_date)="data">
+                            {{ data.value ? new Date(data.value).toLocaleDateString() : 'N/A' }}
+                        </template>
+                        <template #cell(actions)="data">
+                            <div class="text-center">
+                                <button @click="openEditModal(data.item)" class="btn btn-sm btn-outline-info me-1" :title="t('incomes.edit')">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button @click="handleDelete(data.item.id)" class="btn btn-sm btn-outline-danger" :title="t('incomes.delete')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </template>
+                    </BTable>
+
+                    <div class="d-flex justify-content-center mt-3">
+                        <BPagination
+                            v-model="currentPage"
+                            :total-rows="totalRows"
+                            :per-page="perPage"
+                        />
+                    </div>
                 </div>
                 <div v-else class="alert alert-info text-center" role="alert">
                     {{ t('incomes.noIncomesFound') }}
