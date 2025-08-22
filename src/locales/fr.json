@@ -740,7 +740,7 @@
     "noClientsFound": "Aucun client trouvé.",
     "viewServices": "Voir les Services",
     "totalServices": "Total Services",
-    "totalAmountWithTaxes": "Montant Total (taxes incluses)"
+    "totalAmountWithTaxes": "Montant Total"
   },
   "client": {
     "companyName": "Nom de l'Entreprise",

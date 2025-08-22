@@ -738,7 +738,7 @@
     "noClientsFound": "No clients found.",
     "viewServices": "View Services",
     "totalServices": "Total Services",
-    "totalAmountWithTaxes": "Total Amount (incl. taxes)"
+    "totalAmountWithTaxes": "Total Amount"
   },
   "client": {
     "companyName": "Company Name",

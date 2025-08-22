@@ -7,12 +7,12 @@ export function getPreferredLanguage() {
 }
 
 export const formatCurrency = (value, currency = 'DZD') => {
-    const number = parseFloat(value);
-    if (typeof value !== 'number') return '-';
+    const number = typeof value === 'number' ? value : parseFloat(value);
+    if (!Number.isFinite(number)) return '-';
     if (currency){
       return new Intl.NumberFormat(getPreferredLanguage(), { style: 'currency', currency }).format(number);
     }
-    return new Intl.NumberFormat(getPreferredLanguage(), { style: 'decimal'}).format(number);
+    return new Intl.NumberFormat(getPreferredLanguage(), { style: 'decimal' }).format(number);
 };
 
 export const formatDate = (dateString) => {

@@ -1,14 +1,15 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { BTable, BPagination } from 'bootstrap-vue-next';
 import apiClient from '@/services/ApiClient';
 import { getContracts, addContract, updateContract } from '@/services/ContractService';
 import { getClients } from '@/services/ClientService';
 import { getAvailableOffices } from '@/services/OfficeService';
 import { Modal } from 'bootstrap';
-import { format } from 'date-fns';
+
 import ProfileTabs from '@/components/ProfileTabs.vue';
-import { formatCurrency } from '@/helpers/utils.js';
+import { formatCurrency, formatDate } from '@/helpers/utils.js';
 import { useToast } from '@/helpers/toast';
 const { t } = useI18n();
 const { showErrorToast } = useToast();
@@ -22,6 +23,18 @@ const activeProfileId = ref(null);
 // Pagination state
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
+
+// Table configuration
+const tableFields = computed(() => [
+  { key: 'client_name', label: t('contracts.tableHeaders.client'), sortable: true },
+  { key: 'office_name', label: t('contracts.tableHeaders.office'), sortable: true },
+  { key: 'status', label: t('contracts.tableHeaders.status'), sortable: true },
+  { key: 'start_date', label: t('contracts.tableHeaders.startDate'), sortable: true, formatter: formatDateContract },
+  { key: 'end_date', label: t('contracts.tableHeaders.endDate'), sortable: true, formatter: formatDateContract },
+  { key: 'monthly_rate', label: t('contracts.tableHeaders.monthlyRate', 'Monthly Rate'), sortable: true, formatter: (value) => { const n = typeof value === 'number' ? value : parseFloat(value); return Number.isFinite(n) ? formatCurrency(n) : 'N/A'; } },
+  { key: 'total_amount', label: t('contracts.tableHeaders.totalAmount', 'Total Amount'), sortable: false },
+  { key: 'actions', label: t('contracts.tableHeaders.actions'), class: 'text-center' }
+]);
 
 // Modal state
 const addContractModal = ref(null);
@@ -70,6 +83,8 @@ const fetchContracts = async (profileId) => {
 
 const onProfileChange = (profileId) => {
   activeProfileId.value = profileId;
+  currentPage.value = 1;
+  searchTerm.value = '';
   fetchContracts(profileId);
 };
 
@@ -82,42 +97,38 @@ watch(searchTerm, () => {
 });
 
 const filteredContracts = computed(() => {
-  if (!searchTerm.value) {
-    return contracts.value;
+  let filtered = contracts.value;
+
+  if (searchTerm.value) {
+    const lowerCaseSearchTerm = searchTerm.value.toLowerCase();
+    filtered = contracts.value.filter(contract =>
+      (contract.Client?.company_name.toLowerCase() || '').includes(lowerCaseSearchTerm) ||
+      (contract.Office?.name.toLowerCase() || '').includes(lowerCaseSearchTerm) ||
+      (contract.monthly_rate?.toString() || '').includes(lowerCaseSearchTerm) ||
+      contract.status.toLowerCase().includes(lowerCaseSearchTerm)
+    );
   }
-  const lowerCaseSearchTerm = searchTerm.value.toLowerCase();
-  return contracts.value.filter(contract =>
-    (contract.Client?.company_name.toLowerCase() || '').includes(lowerCaseSearchTerm) ||
-    (contract.Office?.name.toLowerCase() || '').includes(lowerCaseSearchTerm) ||
-    (contract.monthly_rate?.toString() || '').includes(lowerCaseSearchTerm) ||
-    contract.status.toLowerCase().includes(lowerCaseSearchTerm)
-  );
+
+  // Transform data for BTable
+  return filtered.map(contract => ({
+    ...contract,
+    client_name: contract.Client?.company_name || 'N/A',
+    office_name: contract.Office?.name || 'N/A',
+    total_amount: calculateTotalAmount(contract)
+  }));
 });
 
-const paginatedContracts = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value;
-  const end = start + itemsPerPage.value;
-  return filteredContracts.value.slice(start, end);
-});
+// For BTable, we don't need paginatedContracts as BTable handles pagination internally
+const totalRows = computed(() => filteredContracts.value.length);
 
-const totalPages = computed(() => {
-  if (filteredContracts.value.length === 0) return 1;
-  return Math.ceil(filteredContracts.value.length / itemsPerPage.value);
-});
-
-const changePage = (page) => {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page;
-  }
-};
-
-const formatDate = (date) => {
+const formatDateContract = (date) => {
   if (!date) return t('documents.notApplicable');
-  return format(new Date(date), 'yyyy-MM-dd');
+  return formatDate(date);
 };
 
 const calculateTotalAmount = (contract) => {
   const monthlyRate = parseFloat(contract.monthly_rate);
+  
   if (isNaN(monthlyRate)) return 0;
 
   // Support both API include alias 'taxes' and potential 'Taxes'
@@ -179,7 +190,7 @@ const deleteContract = async (contractId) => {
     }
 };
 
-const openAddContractModal = async () => {
+const openAddContractModal = async (profileIdFromSlot = null) => {
   isEditMode.value = false;
   newContract.value = {
     id: null,
@@ -187,10 +198,10 @@ const openAddContractModal = async () => {
     office_id: null,
     start_date: '',
     end_date: '',
-    monthly_rate: '',
+    monthly_rate: 0,
     document: null,
     tax_ids: [],
-    profile_id: activeProfileId.value,
+    profile_id: profileIdFromSlot || activeProfileId.value,
     status: 'Active'
   };
   try {
@@ -227,9 +238,9 @@ const openEditContractModal = async (contract) => {
     id: contractData.id,
     client_id: contractData.client_id,
     office_id: contractData.office_id,
-    start_date: formatDate(contractData.start_date),
-    end_date: formatDate(contractData.end_date),
-    monthly_rate: contractData.monthly_rate,
+    start_date: contractData.start_date ? new Date(contractData.start_date).toISOString().split('T')[0] : '',
+    end_date: contractData.end_date ? new Date(contractData.end_date).toISOString().split('T')[0] : '',
+    monthly_rate: contractData.monthly_rate ? Number(contractData.monthly_rate) : 0,
     document: null, // Don't pre-fill file input
     tax_ids: contractData.taxes ? contractData.taxes.map(t => Number(t.id)) : [],
     profile_id: contractData.profile_id,
@@ -276,7 +287,6 @@ const submitNewContract = async () => {
       formData.append(key, contractData[key]);
     }
   });
-    console.log(contractData.taxes);
 
   try {
     let response;
@@ -362,7 +372,7 @@ const submitDocumentUpload = async () => {
               :placeholder="t('contracts.searchPlaceholder')"
             />
           </div>
-          <button class="btn btn-primary" @click="openAddContractModal">
+          <button class="btn btn-primary" @click="openAddContractModal(profileId)">
             <i class="bi bi-plus-lg me-2"></i>{{ t('contracts.addNewContract') }}
           </button>
         </div>
@@ -373,76 +383,69 @@ const submitDocumentUpload = async () => {
             </div>
         </div>
 
-        <div v-else-if="filteredContracts.length > 0" class="table-responsive">
-          <table class="table table-hover align-middle">
-            <thead class="table-light">
-              <tr>
-                <th scope="col">{{ t('contracts.tableHeaders.client') }}</th>
-                <th scope="col">{{ t('contracts.tableHeaders.office') }}</th>
-                <th scope="col">{{ t('contracts.tableHeaders.status') }}</th>
-                <th scope="col">{{ t('contracts.tableHeaders.startDate') }}</th>
-                <th scope="col">{{ t('contracts.tableHeaders.endDate') }}</th>
-                <th scope="col">{{ t('contracts.tableHeaders.monthlyRate', 'Monthly Rate') }}</th>
-                <th scope="col">{{ t('contracts.tableHeaders.totalAmount', 'Total Amount') }}</th>
-                <th scope="col" class="text-center">{{ t('contracts.tableHeaders.actions') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="contract in paginatedContracts" :key="contract.id">
-                <td>{{ contract.Client?.company_name || 'N/A' }}</td>
-                <td>{{ contract.Office?.name || 'N/A' }}</td>
-                <td>
-                  <span
-                    :class="['badge', {
-                      'bg-success': contract.status === 'Active',
-                      'bg-warning text-dark': contract.status === 'Pending',
-                      'bg-danger': contract.status === 'Expired',
-                      'bg-secondary': contract.status === 'Terminated'
-                    }]">
-                    {{ t(`contracts.status.${contract.status.toLowerCase()}`) }}
-                  </span>
-                </td>
-                <td>{{ formatDate(contract.start_date) }}</td>
-                <td>{{ formatDate(contract.end_date) }}</td>
-                <td>{{ formatCurrency(contract.monthly_rate) }}</td>
-                <td>{{ formatCurrency(calculateTotalAmount(contract)) }}</td>
-                <td class="text-center">
-                  <button @click="viewDocument(contract.document_url)" :disabled="!contract.document_url" class="btn btn-sm btn-outline-info me-1" :title="t('contracts.viewContract')">
-                    <i class="bi bi-eye"></i>
-                  </button>
-                  <button @click="downloadDocument(contract.document_url)" :disabled="!contract.document_url" class="btn btn-sm btn-outline-primary me-1" :title="t('contracts.downloadContract')">
-                    <i class="bi bi-download"></i>
-                  </button>
-                  <button v-if="!contract.document_url" @click="openUploadDocumentModal(contract.id)" class="btn btn-sm btn-outline-success me-1" :title="t('contracts.uploadDocument')">
-                    <i class="bi bi-upload"></i>
-                  </button>
-                  <button @click="openEditContractModal(contract)" class="btn btn-sm btn-outline-secondary me-1" :title="t('contracts.editContract', 'Edit Contract')">
-                      <i class="bi bi-pencil"></i>
-                  </button>
-                  <button v-if="contract.status === 'Active'" @click="archiveContract(contract.id)" class="btn btn-sm btn-outline-warning" :title="t('contracts.archiveContract')">
-                    <i class="bi bi-archive"></i>
-                  </button>
-                  <button @click="deleteContract(contract.id)" class="btn btn-sm btn-outline-danger ms-1" :title="t('contracts.deleteContract')">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div v-if="totalPages > 1" class="d-flex justify-content-center mt-4">
-              <nav aria-label="Page navigation">
-                  <ul class="pagination">
-                      <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                          <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">{{ t('pagination.previous', 'Previous') }}</a>
-                      </li>
-                      <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
-                          <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
-                      </li>
-                      <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                          <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">{{ t('pagination.next', 'Next') }}</a>
-                      </li>
-                  </ul>
-              </nav>
+        <div v-else-if="filteredContracts.length > 0">
+          <BTable
+            :items="filteredContracts"
+            :fields="tableFields"
+            :current-page="currentPage"
+            :per-page="itemsPerPage"
+            responsive
+            striped
+            hover
+            show-empty
+            :empty-text="t('contracts.noContractsFound')"
+          >
+            <template #cell(status)="data">
+              <span
+                :class="['badge', {
+                  'bg-success': data.value === 'Active',
+                  'bg-warning text-dark': data.value === 'Pending',
+                  'bg-danger': data.value === 'Expired',
+                  'bg-secondary': data.value === 'Terminated'
+                }]">
+                {{ t(`contracts.status.${data.value.toLowerCase()}`) }}
+              </span>
+            </template>
+
+            <template #cell(monthly_rate)="data">
+              {{ formatCurrency(data.value) }}
+            </template>
+
+            <template #cell(total_amount)="data">
+              {{ formatCurrency(data.value, '') }}
+            </template>
+
+            <template #cell(actions)="data">
+              <div class="text-center">
+                <button @click="viewDocument(data.item.document_url)" :disabled="!data.item.document_url" class="btn btn-sm btn-outline-info me-1" :title="t('contracts.viewContract')">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button @click="downloadDocument(data.item.document_url)" :disabled="!data.item.document_url" class="btn btn-sm btn-outline-primary me-1" :title="t('contracts.downloadContract')">
+                  <i class="bi bi-download"></i>
+                </button>
+                <button v-if="!data.item.document_url" @click="openUploadDocumentModal(data.item.id)" class="btn btn-sm btn-outline-success me-1" :title="t('contracts.uploadDocument')">
+                  <i class="bi bi-upload"></i>
+                </button>
+                <button @click="openEditContractModal(data.item)" class="btn btn-sm btn-outline-secondary me-1" :title="t('contracts.editContract', 'Edit Contract')">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button v-if="data.item.status === 'Active'" @click="archiveContract(data.item.id)" class="btn btn-sm btn-outline-warning" :title="t('contracts.archiveContract')">
+                  <i class="bi bi-archive"></i>
+                </button>
+                <button @click="deleteContract(data.item.id)" class="btn btn-sm btn-outline-danger ms-1" :title="t('contracts.deleteContract')">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </template>
+          </BTable>
+
+          <div class="d-flex justify-content-center mt-4">
+            <BPagination
+              v-model="currentPage"
+              :total-rows="totalRows"
+              :per-page="itemsPerPage"
+              aria-controls="contracts-table"
+            />
           </div>
         </div>
         <div v-else class="alert alert-info text-center" role="alert">
@@ -490,13 +493,15 @@ const submitDocumentUpload = async () => {
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="monthly_rate" class="form-label">{{ t('contracts.tableHeaders.monthlyRate', 'Monthly Rate') }}</label>
-                                <input type="number" id="monthly_rate" class="form-control" v-model="newContract.monthly_rate" placeholder="e.g., 50000">
+                                <input type="number" id="monthly_rate" class="form-control" v-model.number="newContract.monthly_rate" step="0.01" min="0" placeholder="e.g., 50000.00">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="status" class="form-label">{{ t('contracts.tableHeaders.status') }} <span class="text-danger">*</span></label>
                                 <select id="status" class="form-select" v-model="newContract.status" required>
                                     <option value="Active">{{ t('contracts.status.active', 'Active') }}</option>
                                     <option value="Pending">{{ t('contracts.status.pending', 'Pending') }}</option>
+                                    <option value="Expired">{{ t('contracts.status.expired', 'Expired') }}</option>
+                                    <option value="Terminated">{{ t('contracts.status.terminated', 'Terminated') }}</option>
                                 </select>
                             </div>
                         </div>
