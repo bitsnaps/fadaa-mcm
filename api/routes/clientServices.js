@@ -44,10 +44,10 @@ clientServicesApp.get('/:clientId', async (c) => {
 clientServicesApp.post('/:clientId', async (c) => {
     const { clientId } = c.req.param();
     try {
-        const { categoryId, paymentType, price, notes, tax_ids, profile_id } = await c.req.json();
-        
-        if (!categoryId || !paymentType || !price || !profile_id) {
-            return c.json({ success: false, message: 'Missing required fields, including profile_id' }, 400);
+        const { categoryId, paymentType, price, notes, taxId, profile_id, status } = await c.req.json();
+
+        if (!categoryId || !paymentType || !price || !profile_id || !status) {
+            return c.json({ success: false, message: 'Missing required fields, including profile_id and status' }, 400);
         }
 
         const newService = await models.ClientService.create({
@@ -56,12 +56,10 @@ clientServicesApp.post('/:clientId', async (c) => {
             service_category_id: categoryId,
             payment_type: paymentType,
             price,
-            notes
+            notes,
+            status,
+            taxId
         });
-
-        if (tax_ids && tax_ids.length > 0) {
-            await newService.setTaxes(tax_ids);
-        }
 
         return c.json({ success: true, message: 'Service added successfully', service: newService }, 201);
     } catch (error) {
@@ -73,9 +71,9 @@ clientServicesApp.post('/:clientId', async (c) => {
 clientServicesApp.put('/:serviceId', async (c) => {
     const { serviceId } = c.req.param();
     try {
-        const { categoryId, paymentType, price, notes, taxId } = await c.req.json();
-        
-        if (!categoryId || !paymentType || !price) {
+        const { categoryId, paymentType, price, notes, taxId, status } = await c.req.json();
+
+        if (!categoryId || !paymentType || !price || !status) {
             return c.json({ success: false, message: 'Missing required fields' }, 400);
         }
 
@@ -89,7 +87,8 @@ clientServicesApp.put('/:serviceId', async (c) => {
             payment_type: paymentType,
             price,
             notes,
-            taxId
+            taxId,
+            status
         });
 
         return c.json({ success: true, message: 'Service updated successfully', service });

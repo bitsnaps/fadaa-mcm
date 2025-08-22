@@ -74,11 +74,16 @@ clientsApp.get('/', async (c) => {
             let totalAmount = 0;
             services.forEach(service => {
                 let serviceAmount = parseFloat(service.price) || 0;
-                // Add tax if applicable
                 if (service.Tax && service.Tax.rate) {
                     const taxRate = parseFloat(service.Tax.rate) || 0;
                     const taxAmount = serviceAmount * (taxRate / 100);
-                    serviceAmount += taxAmount;
+                    if (service.Tax.bearer === 'Company') {
+                        // Company-borne taxes are included (added)
+                        serviceAmount += taxAmount;
+                    } else if (service.Tax.bearer === 'Client') {
+                        // Client-borne taxes are excluded from revenue: subtract
+                        serviceAmount -= taxAmount;
+                    }
                 }
                 totalAmount += serviceAmount;
             });

@@ -6,10 +6,13 @@ export function getPreferredLanguage() {
     return import.meta.env.VITE_LOCALE || defaultLocale;
 }
 
-export const formatCurrency = (value) => {
+export const formatCurrency = (value, currency = 'DZD') => {
     const number = parseFloat(value);
     if (typeof value !== 'number') return '-';
-    return new Intl.NumberFormat(getPreferredLanguage(), { style: 'currency', currency: 'DZD' }).format(number);
+    if (currency){
+      return new Intl.NumberFormat(getPreferredLanguage(), { style: 'currency', currency }).format(number);
+    }
+    return new Intl.NumberFormat(getPreferredLanguage(), { style: 'decimal'}).format(number);
 };
 
 export const formatDate = (dateString) => {
@@ -17,7 +20,7 @@ export const formatDate = (dateString) => {
   const date = new Date(dateString);
   return new Intl.DateTimeFormat(getPreferredLanguage(), {
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric'
   }).format(date);
 };

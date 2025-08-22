@@ -724,6 +724,7 @@
     "actions": "Actions",
     "active": "Active",
     "inactive": "Inactive",
+    "cancelled": "Cancelled",
     "loading": "Loading...",
     "loadingClientData": "Loading client data...",
     "noServices": "This client has no subscribed services.",

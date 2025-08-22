@@ -726,6 +726,7 @@
     "actions": "Actions",
     "active": "Actif",
     "inactive": "Inactif",
+    "cancelled": "Annulé",
     "loading": "Chargement...",
     "loadingClientData": "Chargement des données du client...",
     "noServices": "Ce client n'a aucun service souscrit.",

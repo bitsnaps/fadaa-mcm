@@ -36,7 +36,7 @@
               </template>
 
               <template #cell(total_amount_with_taxes)="row">
-                <span class="fw-bold text-success">{{ formatCurrency(row.item.total_amount_with_taxes || 0) }}</span>
+                <span class="fw-bold text-success">{{ formatCurrency(row.item.total_amount_with_taxes || 0, '') }}</span>
               </template>
 
               <template #cell(actions)="row">

@@ -31,6 +31,14 @@
         </select>
       </div>
       <div class="mb-3">
+        <label for="status" class="form-label">{{ $t('clientServices.status') }} <span class="text-danger">*</span></label>
+        <select class="form-select" id="status" v-model="newService.status" required>
+          <option value="Active">{{ $t('clientServices.active') }}</option>
+          <option value="Inactive">{{ $t('clientServices.inactive') }}</option>
+          <option value="Cancelled">{{ $t('clientServices.cancelled') }}</option>
+        </select>
+      </div>
+      <div class="mb-3">
         <label for="serviceNotes" class="form-label">{{ $t('clientServices.notes') }}</label>
         <textarea class="form-control" id="serviceNotes" v-model="newService.notes" rows="2"></textarea>
       </div>
@@ -73,6 +81,7 @@ const newService = ref({
   paymentType: 'recurrent',
   price: 0,
   notes: '',
+  status: 'Active',
   taxId: null
 });
 
@@ -117,6 +126,7 @@ const resetModal = () => {
       paymentType: 'recurrent',
       price: 0,
       notes: '',
+      status: 'Active',
       taxId: null
     };
   }
@@ -125,6 +135,7 @@ const resetModal = () => {
 defineExpose({
   show: () => modal.value.show()
 });
+
 const handleSubmit = async () => {
   if (!isFormValid.value) return;
 
@@ -165,6 +176,7 @@ watch(() => props.editingService, (newVal) => {
       paymentType: newVal.payment_type,
       price: newVal.price,
       notes: newVal.notes,
+      status: newVal.status,
       taxId: newVal.taxId
     };
   } else {
