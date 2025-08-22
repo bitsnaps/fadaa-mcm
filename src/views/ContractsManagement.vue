@@ -31,7 +31,7 @@ const tableFields = computed(() => [
   { key: 'status', label: t('contracts.tableHeaders.status'), sortable: true },
   { key: 'start_date', label: t('contracts.tableHeaders.startDate'), sortable: true, formatter: formatDateContract },
   { key: 'end_date', label: t('contracts.tableHeaders.endDate'), sortable: true, formatter: formatDateContract },
-  { key: 'monthly_rate', label: t('contracts.tableHeaders.monthlyRate', 'Monthly Rate'), sortable: true, formatter: (value) => { const n = typeof value === 'number' ? value : parseFloat(value); return Number.isFinite(n) ? formatCurrency(n) : 'N/A'; } },
+  { key: 'monthly_rate', label: t('contracts.tableHeaders.monthlyRate', 'Monthly Rate'), sortable: true, formatter: (value) => { const n = typeof value === 'number' ? value : parseFloat(value); return Number.isFinite(n) ? n : 'N/A'; } },
   { key: 'total_amount', label: t('contracts.tableHeaders.totalAmount', 'Total Amount'), sortable: false },
   { key: 'actions', label: t('contracts.tableHeaders.actions'), class: 'text-center' }
 ]);
@@ -408,7 +408,7 @@ const submitDocumentUpload = async () => {
             </template>
 
             <template #cell(monthly_rate)="data">
-              {{ formatCurrency(data.value) }}
+              {{ formatCurrency(data.value, '') }}
             </template>
 
             <template #cell(total_amount)="data">
