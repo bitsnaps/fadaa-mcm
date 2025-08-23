@@ -37,6 +37,7 @@ import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import apiClient from '@/services/ApiClient';
 import AddServiceModal from '@/components/AddServiceModal.vue';
+import { formatDate } from '../helpers/utils';
 
 const { t } = useI18n();
 
@@ -60,6 +61,7 @@ const fields = computed(() => [
   { key: 'ServiceCategory.name', label: t('clientServices.service'), sortable: true },
   { key: 'payment_type', label: t('clientServices.paymentType'), sortable: true },
   { key: 'price', label: t('clientServices.price'), sortable: true },
+  { key: 'transaction_date', label: t('clientServices.transactionDate'), sortable: true, formatter: formatDate },
   { key: 'status', label: t('clientServices.status'), sortable: true },
   { key: 'notes', label: t('clientServices.notes'), sortable: true },
   { key: 'Tax.name', label: t('manageTaxes.title'), sortable: true },

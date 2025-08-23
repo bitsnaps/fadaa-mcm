@@ -39,6 +39,10 @@
         </select>
       </div>
       <div class="mb-3">
+        <label for="transactionDate" class="form-label">{{ $t('clientServices.transactionDate') }}</label>
+        <input type="date" class="form-control" id="transactionDate" v-model="newService.transaction_date" />
+      </div>
+      <div class="mb-3">
         <label for="serviceNotes" class="form-label">{{ $t('clientServices.notes') }}</label>
         <textarea class="form-control" id="serviceNotes" v-model="newService.notes" rows="2"></textarea>
       </div>
@@ -82,7 +86,8 @@ const newService = ref({
   price: 0,
   notes: '',
   status: 'Active',
-  taxId: null
+  taxId: null,
+  transaction_date: new Date().toISOString().split('T')[0]
 });
 
 const availableServiceCategories = ref([]);
@@ -127,7 +132,8 @@ const resetModal = () => {
       price: 0,
       notes: '',
       status: 'Active',
-      taxId: null
+      taxId: null,
+      transaction_date: new Date().toISOString().split('T')[0]
     };
   }
 };
@@ -142,7 +148,8 @@ const handleSubmit = async () => {
   try {
     const payload = {
       ...newService.value,
-      profile_id: props.profileId
+      profile_id: props.profileId,
+      transaction_date: newService.value.transaction_date
     };
     if (props.editingService) {
       await apiClient.put(`/client-services/${props.editingService.id}`, payload);
@@ -177,7 +184,8 @@ watch(() => props.editingService, (newVal) => {
       price: newVal.price,
       notes: newVal.notes,
       status: newVal.status,
-      taxId: newVal.taxId
+      taxId: newVal.taxId,
+      transaction_date: newVal.transaction_date ? newVal.transaction_date.split('T')[0] : new Date().toISOString().split('T')[0]
     };
   } else {
     resetModal();

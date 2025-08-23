@@ -18,6 +18,11 @@ module.exports = (sequelize) => {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+    transaction_date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
     status: {
       type: DataTypes.ENUM('Active', 'Inactive', 'Cancelled'),
       allowNull: false,

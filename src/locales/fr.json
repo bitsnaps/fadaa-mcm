@@ -1,6 +1,10 @@
 {
   "dashboard": {
     "title": "Tableau de Bord Administrateur",
+    "filter": {
+      "thisMonth": "Ce mois",
+      "apply": "Appliquer"
+    },
     "kpis": {
       "clients": "Nombre de Clients",
       "monthlyRevenue": "Revenu Mensuel",
@@ -740,7 +744,8 @@
     "noClientsFound": "Aucun client trouvé.",
     "viewServices": "Voir les Services",
     "totalServices": "Total Services",
-    "totalAmountWithTaxes": "Montant Total"
+    "totalAmountWithTaxes": "Montant Total",
+    "transactionDate": "Date de transaction"
   },
   "client": {
     "companyName": "Nom de l'Entreprise",

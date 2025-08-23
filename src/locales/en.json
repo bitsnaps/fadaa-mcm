@@ -6,6 +6,10 @@
       "monthlyRevenue": "Monthly Revenue",
       "monthlyNet": "Monthly Net"
     },
+    "filter": {
+      "thisMonth": "This Month",
+      "apply": "Apply"
+    },
     "charts": {
       "monthlySales": "Monthly Sales (Total vs. Net)"
     },
@@ -738,7 +742,8 @@
     "noClientsFound": "No clients found.",
     "viewServices": "View Services",
     "totalServices": "Total Services",
-    "totalAmountWithTaxes": "Total Amount"
+    "totalAmountWithTaxes": "Total Amount",
+    "transactionDate": "Transaction Date"
   },
   "client": {
     "companyName": "Company Name",

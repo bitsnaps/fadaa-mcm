@@ -8,8 +8,8 @@ export const getTotalExpense = (params) => {
     return apiClient.get('/expenses/total', { params });
 };
 
-export const getMonthlyIncomeByBranch = () => {
-    return apiClient.get('/incomes/monthly-by-branch');
+export const getMonthlyIncomeByBranch = (params) => {
+    return apiClient.get('/incomes/monthly-by-branch', { params });
 };
 
 export const getRevenueSummary = (params) => {

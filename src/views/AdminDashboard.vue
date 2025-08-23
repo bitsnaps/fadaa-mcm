@@ -4,6 +4,23 @@
 
     <ProfileTabs @update:activeProfile="onProfileChange">
       <template #default="{ profileId }">
+        <!-- Date Range Filter -->
+        <div class="card shadow-sm mb-3">
+          <div class="card-body d-flex flex-wrap align-items-end gap-3">
+            <div>
+              <label class="form-label mb-1">From</label>
+              <input type="date" class="form-control" v-model="fromDate" />
+            </div>
+            <div>
+              <label class="form-label mb-1">To</label>
+              <input type="date" class="form-control" v-model="toDate" />
+            </div>
+            <div class="ms-auto">
+              <button class="btn btn-fadaa-orange me-2" @click="applyDateFilter" :disabled="!activeProfileId">{{ $t('dashboard.filter.apply') }}</button>
+              <button class="btn btn-outline-secondary" @click="resetToThisMonth">{{ $t('dashboard.filter.thisMonth') }}</button>
+            </div>
+          </div>
+        </div>
         <!-- Section 1: Major KPIs -->
         <div class="row gy-4 mb-4">
           <div class="col-md-4">
@@ -216,6 +233,10 @@ const recentActivities = ref([]);
 const assistants = ref([]);
 const offices = ref([]);
 
+// Date range state
+const fromDate = ref('');
+const toDate = ref('');
+
 const searchTerm = ref('');
 const sortKey = ref('id');
 const sortAsc = ref(true);
@@ -233,6 +254,24 @@ const chartData = ref({
   datasets: [],
 });
 
+const initThisMonth = () => {
+  const now = new Date();
+  const s = new Date(now.getFullYear(), now.getMonth(), 1);
+  const e = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+  fromDate.value = s.toISOString().split('T')[0];
+  toDate.value = e.toISOString().split('T')[0];
+};
+
+const resetToThisMonth = () => {
+  initThisMonth();
+  if (activeProfileId.value) applyDateFilter();
+};
+
+const applyDateFilter = async () => {
+  if (!activeProfileId.value) return;
+  await fetchDashboardData(activeProfileId.value);
+};
+
 const fetchDashboardData = async (profileId) => {
   if (!profileId) return;
   try {
@@ -240,11 +279,12 @@ const fetchDashboardData = async (profileId) => {
     const clientsRes = await getTotalClients();
     kpis.value.clients = clientsRes.data.data;
 
-    const now = new Date();
-    const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-    const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
+    // Use explicit date range from UI
+    const startDate = fromDate.value ? new Date(fromDate.value).toISOString() : null;
+    const endDate = toDate.value ? new Date(toDate.value).toISOString() : null;
 
     const revenueSummaryRes = await getRevenueSummary({ startDate, endDate, profile_id: profileId });
+    
     kpis.value.monthlyRevenue = revenueSummaryRes.data.data.netRevenue;
     kpis.value.monthlyNet = revenueSummaryRes.data.data.netProfit;
 
@@ -294,6 +334,7 @@ const fetchOffices = async () => {
 };
 
 onMounted(() => {
+  initThisMonth();
   // fetchDashboardData is now called by onProfileChange
 });
 
@@ -356,16 +397,23 @@ const exportData = async (format) => {
 
   isExporting.value[format] = true;
   try {
-    const now = new Date();
-    const startDate = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0]; // Start of year
-    const endDate = now.toISOString().split('T')[0]; // Today
+    // Use UI date range; default to current month if missing
+    let s = fromDate.value;
+    let e = toDate.value;
+    if (!s || !e) {
+      const now = new Date();
+      const sDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      const eDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      s = sDate.toISOString().split('T')[0];
+      e = eDate.toISOString().split('T')[0];
+    }
 
     const config = {
       format: format,
       type: 'financial',
       profile_id: activeProfileId.value,
-      startDate,
-      endDate,
+      startDate: s,
+      endDate: e,
     };
     
     const response = await ReportService.generateReport(config);

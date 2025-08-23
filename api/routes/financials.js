@@ -12,20 +12,27 @@ financialsApp.get('/revenue-summary', async (c) => {
     try {
         const { startDate, endDate, profile_id } = c.req.query();
 
-        const whereClause = {};
+        // Normalize provided dates to cover entire days
+        let start = null;
+        let end = null;
         if (startDate && endDate) {
-            whereClause.created_at = {
-                [Op.between]: [new Date(startDate), new Date(endDate)],
-            };
+            start = new Date(startDate);
+            end = new Date(endDate);
+            // Ensure inclusive range across whole days
+            start.setHours(0, 0, 0, 0);
+            end.setHours(23, 59, 59, 999);
         }
 
+        // 1. Calculate revenue from Client Services (use explicit transaction_date)
+        const csWhere = {};
+        if (start && end) {
+            csWhere.transaction_date = { [Op.between]: [start, end] };
+        }
         if (profile_id) {
-            whereClause.profile_id = profile_id;
+            csWhere.profile_id = profile_id;
         }
-
-        // 1. Calculate revenue from Client Services
         const clientServices = await models.ClientService.findAll({
-            where: whereClause,
+            where: csWhere,
             include: [{ model: models.Tax }]
         });
 
@@ -39,13 +46,25 @@ financialsApp.get('/revenue-summary', async (c) => {
             servicesRevenue += serviceRevenue;
         });
 
-        // 2. Calculate revenue from Contracts
+        // 2. Calculate revenue from Contracts (filter by explicit contract dates, not created_at)
+        const contractWhere = {};
+        if (profile_id) {
+            contractWhere.profile_id = profile_id;
+        }
+        if (start && end) {
+            // Count contracts active at any point within the range (overlap)
+            contractWhere[Op.and] = [
+                { start_date: { [Op.lte]: end } },
+                { end_date: { [Op.gte]: start } }
+            ];
+        }
         const contracts = await models.Contract.findAll({
-            where: whereClause,
+            where: contractWhere,
             include: [{ model: models.Tax, as: 'taxes', through: { model: models.ContractTax } }]
         });
 
         let contractsRevenue = 0;
+
         contracts.forEach(contract => {
             let contractRevenue = parseFloat(contract.monthly_rate);
             if (contract.Taxes) {
@@ -57,18 +76,24 @@ financialsApp.get('/revenue-summary', async (c) => {
                 });
             }
             contractsRevenue += contractRevenue;
-        });
+        });        
 
-        // 3. Calculate revenue from other Incomes
-        const incomeWhere = { transaction_date: whereClause.created_at };
+        // 3. Calculate revenue from other Incomes (filter by explicit transaction_date)
+        const incomeWhere = {};
+        if (start && end) {
+            incomeWhere.transaction_date = { [Op.between]: [start, end] };
+        }
         if (profile_id) {
             incomeWhere.profile_id = profile_id;
         }
         const incomes = await models.Income.findAll({ where: incomeWhere });
         const incomeRevenue = incomes.reduce((sum, income) => sum + parseFloat(income.amount), 0);
 
-        // 4. Calculate total Expenses
-        const expenseWhere = { transaction_date: whereClause.created_at };
+        // 4. Calculate total Expenses (filter by explicit transaction_date)
+        const expenseWhere = {};
+        if (start && end) {
+            expenseWhere.transaction_date = { [Op.between]: [start, end] };
+        }
         if (profile_id) {
             expenseWhere.profile_id = profile_id;
         }
@@ -118,8 +143,10 @@ financialsApp.get('/revenue-series', async (c) => {
         whereTrans.profile_id = profile_id;
       }
 
-      // Client Services
-      const clientServices = await models.ClientService.findAll({ where: whereCreated, include: [{ model: models.Tax }] });
+      // Client Services (use transaction_date)
+      const whereClientServiceTrans = { transaction_date: { [Op.between]: [start, end] } };
+      if (profile_id) whereClientServiceTrans.profile_id = profile_id;
+      const clientServices = await models.ClientService.findAll({ where: whereClientServiceTrans, include: [{ model: models.Tax }] });
       let servicesRevenue = 0;
       clientServices.forEach((service) => {
         let serviceRevenue = parseFloat(service.price);
@@ -130,8 +157,15 @@ financialsApp.get('/revenue-series', async (c) => {
         servicesRevenue += serviceRevenue;
       });
 
-      // Contracts
-      const contracts = await models.Contract.findAll({ where: whereCreated, include: [{ model: models.Tax, as: 'taxes', through: { model: models.ContractTax } }] });
+      // Contracts (active within month by start/end date overlap)
+      const contractWhere = {
+        [Op.and]: [
+          { start_date: { [Op.lte]: end } },
+          { end_date: { [Op.gte]: start } }
+        ]
+      };
+      if (profile_id) contractWhere.profile_id = profile_id;
+      const contracts = await models.Contract.findAll({ where: contractWhere, include: [{ model: models.Tax, as: 'taxes', through: { model: models.ContractTax } }] });
       let contractsRevenue = 0;
       contracts.forEach((contract) => {
         let contractRevenue = parseFloat(contract.monthly_rate);

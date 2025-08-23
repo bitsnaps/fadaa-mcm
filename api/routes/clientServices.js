@@ -44,7 +44,7 @@ clientServicesApp.get('/:clientId', async (c) => {
 clientServicesApp.post('/:clientId', async (c) => {
     const { clientId } = c.req.param();
     try {
-        const { categoryId, paymentType, price, notes, taxId, profile_id, status } = await c.req.json();
+        const { categoryId, paymentType, price, notes, taxId, profile_id, status, transaction_date } = await c.req.json();
 
         if (!categoryId || !paymentType || !price || !profile_id || !status) {
             return c.json({ success: false, message: 'Missing required fields, including profile_id and status' }, 400);
@@ -58,7 +58,8 @@ clientServicesApp.post('/:clientId', async (c) => {
             price,
             notes,
             status,
-            taxId
+            taxId,
+            transaction_date: transaction_date ? new Date(transaction_date) : new Date()
         });
 
         return c.json({ success: true, message: 'Service added successfully', service: newService }, 201);
@@ -71,7 +72,7 @@ clientServicesApp.post('/:clientId', async (c) => {
 clientServicesApp.put('/:serviceId', async (c) => {
     const { serviceId } = c.req.param();
     try {
-        const { categoryId, paymentType, price, notes, taxId, status } = await c.req.json();
+        const { categoryId, paymentType, price, notes, taxId, status, transaction_date } = await c.req.json();
 
         if (!categoryId || !paymentType || !price || !status) {
             return c.json({ success: false, message: 'Missing required fields' }, 400);
@@ -88,7 +89,8 @@ clientServicesApp.put('/:serviceId', async (c) => {
             price,
             notes,
             taxId,
-            status
+            status,
+            transaction_date: transaction_date ? new Date(transaction_date) : service.transaction_date
         });
 
         return c.json({ success: true, message: 'Service updated successfully', service });
