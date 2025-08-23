@@ -1,5 +1,6 @@
 const { Hono } = require('hono');
 const models = require('../models');
+const { Op } = require('sequelize');
 const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
 const { getInvestmentCalculations } = require('../controllers/investmentController');
 const { handleRouteError } = require('../lib/errorHandler');
@@ -11,11 +12,17 @@ investmentsApp.use('*', authMiddleware, adminOrAssistantMiddleware);
 // GET all investments with calculations
 investmentsApp.get('/', async (c) => {
     try {
-        const { profile_id } = c.req.query();
+        const { profile_id, startDate, endDate } = c.req.query();
         let whereClause = {};
 
         if (profile_id) {
             whereClause.profile_id = profile_id;
+        }
+        if (startDate && endDate) {
+            whereClause[Op.and] = [
+                { starting_date: { [Op.lte]: new Date(endDate) } },
+                { ending_date: { [Op.gte]: new Date(startDate) } }
+            ];
         }
 
         const investments = await models.Investment.findAll({
@@ -30,10 +37,26 @@ investmentsApp.get('/', async (c) => {
 
         const enrichedInvestments = await Promise.all(
             investments.map(async (investment) => {
-                const calculations = await getInvestmentCalculations([investment]);
+                const invJson = investment.toJSON();
+                let calcInput;
+                if (startDate && endDate) {
+                    const rangeStart = new Date(startDate);
+                    const rangeEnd = new Date(endDate);
+                    const invStart = invJson.starting_date ? new Date(invJson.starting_date) : new Date(0);
+                    const invEnd = invJson.ending_date ? new Date(invJson.ending_date) : new Date();
+                    const clippedStart = new Date(Math.max(invStart.getTime(), rangeStart.getTime()));
+                    const clippedEnd = new Date(Math.min(invEnd.getTime(), rangeEnd.getTime()));
+                    calcInput = { ...invJson, starting_date: clippedStart, ending_date: clippedEnd };
+                } else {
+                    const s = invJson.starting_date ? new Date(invJson.starting_date) : new Date(0);
+                    const e = invJson.ending_date ? new Date(invJson.ending_date) : new Date();
+                    calcInput = { ...invJson, starting_date: s, ending_date: e };
+                }
+                const calculations = await getInvestmentCalculations([calcInput]);
+                const comp = (calculations && calculations[invJson.id]) ? calculations[invJson.id] : {};
                 return {
-                    ...investment.toJSON(),
-                    ...calculations[investment.id],
+                    ...invJson,
+                    ...comp,
                 };
             })
         );

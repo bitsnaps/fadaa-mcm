@@ -17,6 +17,10 @@ const isLoading = ref(true);
 const error = ref(null);
 const activeProfileId = ref(null);
 
+// Date range filter
+const fromDate = ref('');
+const toDate = ref('');
+
 const updateActiveProfile = (profileId) => {
   activeProfileId.value = profileId;
 };
@@ -115,13 +119,6 @@ const chartData = ref({
 
 const isChartLoading = ref(false);
 const chartError = ref(null);
-const selectedYear = ref(new Date().getFullYear());
-
-// Generate available years (current year and 4 previous years)
-const availableYears = computed(() => {
-  const currentYear = new Date().getFullYear();
-  return Array.from({ length: 5 }, (_, i) => currentYear - i);
-});
 
 // Chart options
 const lineChartOptions = computed(() => ({
@@ -140,7 +137,7 @@ const lineChartOptions = computed(() => ({
       intersect: false,
       callbacks: {
         label: function(context) {
-          return `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`;
+          return `${context.dataset.label}: ${formatCurrency(context.parsed.y, '')}`;
         }
       }
     }
@@ -154,7 +151,7 @@ const lineChartOptions = computed(() => ({
       },
       ticks: {
         callback: function(value) {
-          return formatCurrency(value);
+          return formatCurrency(value, '');
         }
       }
     },
@@ -181,7 +178,7 @@ const doughnutChartOptions = computed(() => ({
       callbacks: {
         label: function(context) {
           const label = context.label || '';
-          const value = formatCurrency(context.parsed);
+          const value = formatCurrency(context.parsed, '');
           const total = context.dataset.data.reduce((a, b) => a + b, 0);
           const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
           return `${label}: ${value} (${percentage}%)`;
@@ -197,7 +194,12 @@ const fetchInvestments = async (profileId) => {
     isLoading.value = true;
     error.value = null;
     investments.value = []; // Reset on new fetch
-    const { data: response } = await ApiClient.get('/investments', { params: { profile_id: profileId } });
+    const params = { profile_id: profileId };
+    if (fromDate.value && toDate.value) {
+      params.startDate = fromDate.value;
+      params.endDate = toDate.value;
+    }
+    const { data: response } = await ApiClient.get('/investments', { params });
     if (response.success) {
       investments.value = response.data;
     } else {
@@ -211,14 +213,17 @@ const fetchInvestments = async (profileId) => {
   }
 };
 
-const fetchChartData = async (profileId, year = null) => {
+const fetchChartData = async (profileId) => {
   if (!profileId) return;
   try {
     isChartLoading.value = true;
     chartError.value = null;
 
     const params = { profile_id: profileId };
-    if (year) params.year = year;
+    if (fromDate.value && toDate.value) {
+      params.startDate = fromDate.value;
+      params.endDate = toDate.value;
+    }
 
     const { data: response } = await ApiClient.get('/investor/profit-share-series', { params });
     if (response.success) {
@@ -283,20 +288,22 @@ onMounted(() => {
 
 watch(activeProfileId, (newProfileId) => {
   if (newProfileId) {
+    // default date range to this month on profile switch if empty
+    if (!fromDate.value || !toDate.value) {
+      const now = new Date();
+      const s = new Date(now.getFullYear(), now.getMonth(), 1);
+      const e = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      fromDate.value = s.toISOString().split('T')[0];
+      toDate.value = e.toISOString().split('T')[0];
+    }
     fetchInvestments(newProfileId);
-    fetchChartData(newProfileId, selectedYear.value);
+    fetchChartData(newProfileId);
   }
 }, { immediate: true });
 
-watch(selectedYear, (newYear) => {
-  if (activeProfileId.value) {
-    fetchChartData(activeProfileId.value, newYear);
-  }
-});
 
-const onYearChange = (year) => {
-  selectedYear.value = year;
-};
+
+
 
 const refreshCharts = () => {
   if (activeProfileId.value) {
@@ -365,6 +372,23 @@ const getStatusTranslation = (status) => {
     <h1 class="h3 mb-4 text-gray-800">{{ $t('investmentTracking.title') }}</h1>
     <ProfileTabs @update:active-profile="updateActiveProfile" />
 
+    <!-- Global Date Range Filter for the whole page -->
+    <div class="card shadow-sm mb-3" v-if="activeProfileId">
+      <div class="card-body d-flex flex-wrap align-items-end gap-3">
+        <div>
+          <label class="form-label mb-1">{{ $t('investmentTracking.filters.from') }}</label>
+          <input type="date" class="form-control" v-model="fromDate" />
+        </div>
+        <div>
+          <label class="form-label mb-1">{{ $t('investmentTracking.filters.to') }}</label>
+          <input type="date" class="form-control" v-model="toDate" />
+        </div>
+        <div class="ms-auto">
+          <button class="btn btn-fadaa-orange me-2" @click="fetchInvestments(activeProfileId)" :disabled="isLoading">{{ $t('investmentTracking.filters.apply') }}</button>
+        </div>
+      </div>
+    </div>
+
     <div v-if="activeProfileId">
       <div v-if="isLoading" class="text-center">
         <div class="spinner-border" role="status">
@@ -390,7 +414,7 @@ const getStatusTranslation = (status) => {
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ $t('investmentTracking.summary.totalInvested') }}</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ formatCurrency(investmentSummary.totalInvested) }}</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ formatCurrency(investmentSummary.totalInvested, '') }}</div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-piggy-bank fa-2x text-gray-300"></i>
@@ -405,7 +429,7 @@ const getStatusTranslation = (status) => {
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ $t('investmentTracking.summary.totalProfitShare') }}</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ formatCurrency(investmentSummary.totalProfitShare) }}</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ formatCurrency(investmentSummary.totalProfitShare, '') }}</div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-hand-holding-usd fa-2x text-gray-300"></i>
@@ -485,30 +509,30 @@ const getStatusTranslation = (status) => {
               <tbody>
                 <tr v-for="branch in branchInvestments" :key="branch.id">
                   <td>{{ branch.branchName }}</td>
-                  <td>{{ formatCurrency(branch.investmentAmount) }}</td>
+                  <td>{{ formatCurrency(branch.investmentAmount, '') }}</td>
                   <td>{{ branch.participationPercentage }}%</td>
                   <td>{{ branch.type }}</td>
                   <td>{{ branch.contractStartDate }}</td>
                   <td>{{ branch.contractEndDate }} ({{ branch.daysRemaining }} {{ $t('investmentTracking.breakdown.daysRemaining') }})</td>
-                  <td>{{ formatCurrency(branch.totalIncome) }}</td>
-                  <td>{{ formatCurrency(branch.totalExpenses) }}</td>
-                  <td>{{ formatCurrency(branch.branchNetProfitSelectedPeriod) }}</td>
-                  <td>{{ formatCurrency(branch.yourProfitShareSelectedPeriod) }}</td>
+                  <td>{{ formatCurrency(branch.totalIncome, '') }}</td>
+                  <td>{{ formatCurrency(branch.totalExpenses, '') }}</td>
+                  <td>{{ formatCurrency(branch.branchNetProfitSelectedPeriod, '') }}</td>
+                  <td>{{ formatCurrency(branch.yourProfitShareSelectedPeriod, '') }}</td>
                   <td><span :class="['badge', getStatusClass(branch.status)]">{{ getStatusTranslation(branch.status) }}</span></td>
                 </tr>
               </tbody>
               <tfoot v-if="branchInvestments.length > 0" class="table-light">
                 <tr class="fw-bold">
                   <td>{{ $t('investmentTracking.breakdown.totals') }}</td>
-                  <td>{{ formatCurrency(investmentTotals.totalInvested) }}</td>
+                  <td>{{ formatCurrency(investmentTotals.totalInvested, '') }}</td>
                   <td>-</td>
                   <td>-</td>
                   <td>-</td>
                   <td>-</td>
-                  <td>{{ formatCurrency(investmentTotals.totalIncome) }}</td>
-                  <td>{{ formatCurrency(investmentTotals.totalExpenses) }}</td>
-                  <td>{{ formatCurrency(investmentTotals.totalBranchNetProfit) }}</td>
-                  <td>{{ formatCurrency(investmentTotals.totalYourProfitShare) }}</td>
+                  <td>{{ formatCurrency(investmentTotals.totalIncome, '') }}</td>
+                  <td>{{ formatCurrency(investmentTotals.totalExpenses, '') }}</td>
+                  <td>{{ formatCurrency(investmentTotals.totalBranchNetProfit, '') }}</td>
+                  <td>{{ formatCurrency(investmentTotals.totalYourProfitShare, '') }}</td>
                   <td>-</td>
                 </tr>
               </tfoot>
@@ -524,12 +548,7 @@ const getStatusTranslation = (status) => {
         <div class="card shadow mb-4">
           <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">{{ $t('investmentTracking.charts.yourProfitShareOverTime') }}</h6>
-            <div class="dropdown no-arrow">
-              <label for="yearFilter" class="sr-only">{{ $t('investmentTracking.charts.selectYear') }}</label>
-              <select id="yearFilter" v-model="selectedYear" @change="onYearChange(selectedYear)" class="form-select form-select-sm">
-                <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
-              </select>
-            </div>
+
           </div>
           <div class="card-body">
             <div class="chart-area" style="height: 320px;">
@@ -593,7 +612,7 @@ const getStatusTranslation = (status) => {
               <tr v-for="payout in profitSharePayouts" :key="payout.id">
                 <td>{{ payout.payoutDate }}</td>
                 <td>{{ payout.branchName }}</td>
-                <td>{{ formatCurrency(payout.amountPaid) }}</td>
+                <td>{{ formatCurrency(payout.amountPaid, '') }}</td>
                 <td>{{ payout.transactionId }}</td>
               </tr>
             </tbody>

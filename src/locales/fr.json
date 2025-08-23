@@ -292,6 +292,11 @@
   },
   "investmentTracking": {
     "title": "Suivi des Investissements",
+    "filters": {
+      "from": "De",
+      "to": "À",
+      "apply": "Appliquer"
+    },
     "selectProfilePrompt": "Veuillez sélectionner un profil pour voir le suivi des investissements.",
     "summary": {
       "title": "Résumé des Investissements",

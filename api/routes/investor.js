@@ -131,9 +131,7 @@ investorApp.get('/documents', async (c) => {
 investorApp.get('/profit-share-series', async (c) => {
   try {
     const user = c.get('user');
-    const { profile_id, year } = c.req.query();
-    const yearNum = parseInt(year, 10) || new Date().getFullYear();
-
+    const { profile_id, year, startDate, endDate } = c.req.query();
     const where = { investor_id: user.id };
     if (profile_id) where.profile_id = profile_id;
 
@@ -142,15 +140,75 @@ investorApp.get('/profit-share-series', async (c) => {
       include: [{ model: models.Branch }, { model: models.Profile }],
     });
 
-    if (investments.length === 0) {
-      return c.json({
-        success: true,
-        data: {
-          labels: Array.from({ length: 12 }, (_, i) => new Date(0, i).toLocaleString('en', { month: 'short' })),
-          profitShare: Array(12).fill(0),
-          branchBreakdown: []
+    // If no investments, return empty series
+    const emptyResp = (labels) => c.json({ success: true, data: { labels, profitShare: labels.map(() => 0), branchBreakdown: [] } });
+
+    // If explicit date range provided, compute monthly series across that range
+    if (startDate && endDate) {
+      const rangeStart = new Date(startDate);
+      const rangeEnd = new Date(endDate);
+      if (investments.length === 0) {
+        // Build labels even if empty investments
+        const labels = [];
+        let cur = new Date(rangeStart.getFullYear(), rangeStart.getMonth(), 1);
+        const endMarker = new Date(rangeEnd.getFullYear(), rangeEnd.getMonth(), 1);
+        while (cur <= endMarker) {
+          labels.push(cur.toLocaleString('en', { month: 'short' }));
+          cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
         }
-      });
+        return emptyResp(labels);
+      }
+
+      const labels = [];
+      const profitShare = [];
+      const branchData = {};
+
+      let cur = new Date(rangeStart.getFullYear(), rangeStart.getMonth(), 1);
+      const endMarker = new Date(rangeEnd.getFullYear(), rangeEnd.getMonth(), 1);
+      while (cur <= endMarker) {
+        const monthStart = new Date(cur.getFullYear(), cur.getMonth(), 1);
+        const monthEnd = new Date(cur.getFullYear(), cur.getMonth() + 1, 0, 23, 59, 59, 999);
+
+        // Clip month to range
+        const start = monthStart < rangeStart ? rangeStart : monthStart;
+        const end = monthEnd > rangeEnd ? rangeEnd : monthEnd;
+
+        let monthlyProfitShare = 0;
+
+        for (const investment of investments) {
+          const invStart = new Date(investment.starting_date);
+          const invEnd = new Date(investment.ending_date);
+          if (invStart <= end && invEnd >= start) {
+            const calcInput = {
+              ...investment.toJSON(),
+              starting_date: start > invStart ? start : invStart,
+              ending_date: end < invEnd ? end : invEnd,
+            };
+            const calculations = await getInvestmentCalculations([calcInput]);
+            const calc = calculations?.[investment.id] || {};
+            const investmentProfitShare = calc.yourProfitShareSelectedPeriod || 0;
+            monthlyProfitShare += investmentProfitShare;
+
+            const branchName = investment.Branch?.name || 'Unknown';
+            if (!branchData[branchName]) branchData[branchName] = 0;
+            branchData[branchName] += investmentProfitShare;
+          }
+        }
+
+        labels.push(cur.toLocaleString('en', { month: 'short' }));
+        profitShare.push(monthlyProfitShare);
+        cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+      }
+
+      const branchBreakdown = Object.entries(branchData).map(([branchName, totalProfit]) => ({ branchName, totalProfit }));
+      return c.json({ success: true, data: { labels, profitShare, branchBreakdown } });
+    }
+
+    // Fallback: by year
+    const yearNum = parseInt(year, 10) || new Date().getFullYear();
+    if (investments.length === 0) {
+      const labels = Array.from({ length: 12 }, (_, i) => new Date(0, i).toLocaleString('en', { month: 'short' }));
+      return emptyResp(labels);
     }
 
     const labels = Array.from({ length: 12 }, (_, i) => new Date(0, i).toLocaleString('en', { month: 'short' }));
@@ -191,20 +249,12 @@ investorApp.get('/profit-share-series', async (c) => {
       profitShare.push(monthlyProfitShare);
     }
 
-    // Prepare branch breakdown data for pie chart
     const branchBreakdown = Object.entries(branchData).map(([branchName, totalProfit]) => ({
       branchName,
       totalProfit
     }));
 
-    return c.json({
-      success: true,
-      data: {
-        labels,
-        profitShare,
-        branchBreakdown
-      }
-    });
+    return c.json({ success: true, data: { labels, profitShare, branchBreakdown } });
   } catch (error) {
     return handleRouteError(c, 'Error fetching profit share series', error);
   }

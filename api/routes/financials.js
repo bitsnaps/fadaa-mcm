@@ -104,6 +104,18 @@ financialsApp.get('/revenue-summary', async (c) => {
         const netRevenue = servicesRevenue + contractsRevenue + incomeRevenue;
         const netProfit = netRevenue - totalExpense;
 
+        console.log('------------------------');
+        // For debugging purposes
+        console.log(`Net Revenue: ${netRevenue}`);
+        console.log(`Net Profit: ${netProfit}`);
+        console.log(`Total Expense: ${totalExpense}`);
+        console.log(`Services Revenue: ${servicesRevenue}`);
+        console.log(`Contracts Revenue: ${contractsRevenue}`);
+        console.log(`Income Revenue: ${incomeRevenue}`);
+        console.log('------------------------');
+        console.log('[Net Revenue]: 100000+(20000*.81)+40000=156,200.00');
+        console.log('[Net Profit]=[Net Revenue]-20000=136,200.000');
+        console.log('------------------------');
 
         return c.json({
             success: true,
@@ -192,6 +204,14 @@ financialsApp.get('/revenue-series', async (c) => {
       const monthNetProfit = monthNetRevenue - totalExpense;
       netRevenue.push(monthNetRevenue);
       netProfit.push(monthNetProfit);
+      // console.log('------------------------');
+      // console.log(`Month ${month} net profit: ${monthNetProfit}`);
+      // console.log(`Month ${month} net revenue: ${monthNetRevenue}`);
+      // console.log(`Month ${month} services revenue: ${servicesRevenue}`);
+      // console.log(`Month ${month} contracts revenue: ${contractsRevenue}`);
+      // console.log(`Month ${month} income revenue: ${incomeRevenue}`);
+      // console.log(`Month ${month} total expense: ${totalExpense}`);
+      // console.log('------------------------');
     }
 
     return c.json({ success: true, data: { labels, netRevenue, netProfit } });

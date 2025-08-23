@@ -290,6 +290,11 @@
   },
   "investmentTracking": {
     "title": "Investment Tracking",
+    "filters": {
+      "from": "From",
+      "to": "To",
+      "apply": "Apply"
+    },
     "selectProfilePrompt": "Please select a profile to view investment tracking.",
     "summary": {
       "title": "Investment Summary",

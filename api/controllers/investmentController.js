@@ -53,7 +53,7 @@ const calculateContractualProfits = async (investments) => {
   const calculations = {};
 
   for (const investment of investments) {
-    const { percentage, starting_date, ending_date, profile_id, id } = investment;
+    const { percentage, starting_date, ending_date, profile_id, id, branch_id } = investment;
 
     if (!profile_id) {
       calculations[id] = {
@@ -63,16 +63,16 @@ const calculateContractualProfits = async (investments) => {
       continue;
     }
 
-    const whereClause = {
-      profile_id,
-      created_at: {
-        [Op.between]: [new Date(starting_date), new Date(ending_date)],
-      },
-    };
+    const start = new Date(starting_date);
+    const end = new Date(ending_date);
 
-    // 1. Calculate revenue from Client Services
+    // 1. Calculate revenue from Client Services (explicit transaction_date)
+    const csWhere = {
+      profile_id,
+      transaction_date: { [Op.between]: [start, end] },
+    };
     const clientServices = await models.ClientService.findAll({
-      where: whereClause,
+      where: csWhere,
       include: [{ model: models.Tax }]
     });
 
@@ -86,9 +86,16 @@ const calculateContractualProfits = async (investments) => {
       servicesRevenue += serviceRevenue;
     });
 
-    // 2. Calculate revenue from Contracts
+    // 2. Calculate revenue from Contracts (active overlap within range)
+    const contractWhere = {
+      profile_id,
+      [Op.and]: [
+        { start_date: { [Op.lte]: end } },
+        { end_date: { [Op.gte]: start } }
+      ]
+    };
     const contracts = await models.Contract.findAll({
-      where: whereClause,
+      where: contractWhere,
       include: [{ model: models.Tax, as: 'taxes', through: { model: models.ContractTax } }]
     });
 
