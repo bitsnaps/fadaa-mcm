@@ -41,6 +41,7 @@ const investmentSummary = computed(() => {
 
   // Placeholder for profit share and ROI calculation
   const totalProfitShare = investments.value.reduce((sum, inv) => sum + (inv.yourProfitShareSelectedPeriod || 0), 0);
+  
   const overallROI = totalInvested > 0 ? (totalProfitShare / totalInvested) * 100 : 0;
 
   return {
@@ -301,16 +302,11 @@ watch(activeProfileId, (newProfileId) => {
   }
 }, { immediate: true });
 
-
-
-
-
 const refreshCharts = () => {
   if (activeProfileId.value) {
     fetchChartData(activeProfileId.value, selectedYear.value);
   }
 };
-
 
 function calculateDaysRemaining(endDateString) {
   if (!endDateString) return 0;
@@ -351,16 +347,6 @@ const getStatusTranslation = (status) => {
   const statusKey = status.replace(/\s+/g, '').toLowerCase();
   return t(`investmentTracking.statuses.${statusKey}`);
 };
-
-// const getDocumentNameTranslation = (docName) => {
-//   if (docName === 'Investment Contract') {
-//     return t('investmentTracking.documents.investmentContract');
-//   }
-//   if (docName === 'Q2 2024 Performance Report') {
-//     return t('investmentTracking.documents.performanceReportQ2');
-//   }
-//   return docName;
-// }
 
 // Placeholder for chart data and logic (e.g., using Chart.js)
 // onMounted(() => { /* Initialize charts here */ });
@@ -499,8 +485,8 @@ const getStatusTranslation = (status) => {
                   <th>{{ $t('investmentTracking.breakdown.type') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.contractStart') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.contractEnd') }}</th>
-                  <th>{{ $t('investmentTracking.breakdown.totalIncome') }}</th>
-                  <th>{{ $t('investmentTracking.breakdown.totalExpenses') }}</th>
+                  <!-- <th>{{ $t('investmentTracking.breakdown.totalIncome') }}</th>
+                  <th>{{ $t('investmentTracking.breakdown.totalExpenses') }}</th> -->
                   <th>{{ $t('investmentTracking.breakdown.branchNetProfit') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.yourProfitShare') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.status') }}</th>
@@ -514,8 +500,8 @@ const getStatusTranslation = (status) => {
                   <td>{{ branch.type }}</td>
                   <td>{{ branch.contractStartDate }}</td>
                   <td>{{ branch.contractEndDate }} ({{ branch.daysRemaining }} {{ $t('investmentTracking.breakdown.daysRemaining') }})</td>
-                  <td>{{ formatCurrency(branch.totalIncome, '') }}</td>
-                  <td>{{ formatCurrency(branch.totalExpenses, '') }}</td>
+                  <!-- <td>{{ formatCurrency(branch.totalIncome, '') }}</td>
+                  <td>{{ formatCurrency(branch.totalExpenses, '') }}</td> -->
                   <td>{{ formatCurrency(branch.branchNetProfitSelectedPeriod, '') }}</td>
                   <td>{{ formatCurrency(branch.yourProfitShareSelectedPeriod, '') }}</td>
                   <td><span :class="['badge', getStatusClass(branch.status)]">{{ getStatusTranslation(branch.status) }}</span></td>
@@ -529,8 +515,8 @@ const getStatusTranslation = (status) => {
                   <td>-</td>
                   <td>-</td>
                   <td>-</td>
-                  <td>{{ formatCurrency(investmentTotals.totalIncome, '') }}</td>
-                  <td>{{ formatCurrency(investmentTotals.totalExpenses, '') }}</td>
+                  <!-- <td>{{ formatCurrency(investmentTotals.totalIncome, '') }}</td>
+                  <td>{{ formatCurrency(investmentTotals.totalExpenses, '') }}</td> -->
                   <td>{{ formatCurrency(investmentTotals.totalBranchNetProfit, '') }}</td>
                   <td>{{ formatCurrency(investmentTotals.totalYourProfitShare, '') }}</td>
                   <td>-</td>
@@ -629,7 +615,7 @@ const getStatusTranslation = (status) => {
       <div class="card-body">
         <ul class="list-group">
           <li v-for="doc in documents" :key="doc.id" class="list-group-item d-flex justify-content-between align-items-center">
-            {{ getDocumentNameTranslation(doc.name) }} ({{ doc.branchName === 'Toutes les agences' ? $t('investmentTracking.documents.allBranches') : doc.branchName }})
+            {{ doc.name }} ({{ doc.branchName === 'Toutes les agences' ? $t('investmentTracking.documents.allBranches') : doc.branchName }})
             <a :href="doc.url" class="btn btn-sm btn-primary" download><i class="fas fa-download"></i> {{ $t('investmentTracking.documents.download') }}</a>
           </li>
         </ul>

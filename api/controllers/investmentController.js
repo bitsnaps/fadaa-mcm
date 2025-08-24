@@ -38,6 +38,12 @@ const calculateComprehensiveProfits = async (investments) => {
       return sum + (grossProfitShare * (tax.rate / 100));
     }, 0);
 
+    // console.log('totalIncome = ', totalIncome);
+    // console.log('totalExpense = ', totalExpense);
+    // console.log(`totalNetProfit = [totalIncome] - [totalExpense] = ${totalIncome} - ${totalExpense} =`, totalNetProfit);
+    // console.log('totalTaxAmount = ', totalTaxAmount);
+    // console.log(`grossProfitShare = [totalNetProfit] * [percentage] = ${totalNetProfit} * ${percentage}% = `, grossProfitShare);
+    
     const netProfitShare = grossProfitShare - totalTaxAmount;
 
     calculations[id] = {
@@ -45,6 +51,13 @@ const calculateComprehensiveProfits = async (investments) => {
       yourProfitShareSelectedPeriod: netProfitShare,
     };
   }
+
+  console.log('\n**** calculateComprehensiveProfits:\n');  
+  Object.keys(calculations).forEach( key => {
+    console.log(`calculations[${key}]:\n`);
+    console.log(`[branchNetProfitSelectedPeriod] = [totalIncome] - [totalExpense] = `, calculations[key]['branchNetProfitSelectedPeriod']);
+    console.log(`[yourProfitShareSelectedPeriod] = [grossProfitShare] - [totalTaxAmount] = `, calculations[key]['yourProfitShareSelectedPeriod']);
+  });
 
   return calculations;
 };
@@ -60,7 +73,7 @@ const calculateContractualProfits = async (investments) => {
         branchNetProfitSelectedPeriod: 0,
         yourProfitShareSelectedPeriod: 0,
       };
-      continue;
+      break;
     }
 
     const start = new Date(starting_date);
@@ -116,11 +129,21 @@ const calculateContractualProfits = async (investments) => {
     const totalNetProfit = servicesRevenue + contractsRevenue;
     const netProfitShare = totalNetProfit * (percentage / 100);
 
+    // console.log(`totalNetProfit = [servicesRevenue] + [servicesRevenue] = ${servicesRevenue} + ${contractsRevenue} =`, totalNetProfit);
+    // console.log(`netProfitShare = [totalNetProfit] * [percentage] = ${totalNetProfit} * ${percentage}% = `, netProfitShare);
+
     calculations[id] = {
       branchNetProfitSelectedPeriod: totalNetProfit,
       yourProfitShareSelectedPeriod: netProfitShare,
     };
   }
+
+  console.log('\n**** calculateContractualProfits:\n');
+  Object.keys(calculations).forEach( key => {
+    console.log(`calculations[${key}]:\n`);
+    console.log(`[branchNetProfitSelectedPeriod] = [servicesRevenue] + [contractsRevenue] = `, calculations[key]['branchNetProfitSelectedPeriod']);
+    console.log(`[yourProfitShareSelectedPeriod] = [totalNetProfit] * [percentage] = `, calculations[key]['yourProfitShareSelectedPeriod']);
+  });
 
   return calculations;
 };

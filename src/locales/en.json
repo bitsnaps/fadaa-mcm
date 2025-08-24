@@ -352,6 +352,7 @@
     },
     "statuses": {
       "active": "Active",
+      "pending": "Pending",
       "expiringsoon": "Expiring Soon",
       "expired": "Expired"
     }

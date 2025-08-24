@@ -354,6 +354,7 @@
     },
     "statuses": {
       "active": "Actif",
+      "pending": "En attente",
       "expiringsoon": "Expire Bientôt",
       "expired": "Expiré"
     }
