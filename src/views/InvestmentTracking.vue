@@ -18,8 +18,8 @@ const error = ref(null);
 const activeProfileId = ref(null);
 
 // Date range filter
-const fromDate = ref('');
-const toDate = ref('');
+const fromDate = ref(localStorage.getItem('investmentTracking-fromDate') || '');
+const toDate = ref(localStorage.getItem('investmentTracking-toDate') || '');
 
 const updateActiveProfile = (profileId) => {
   activeProfileId.value = profileId;
@@ -199,6 +199,8 @@ const fetchInvestments = async (profileId) => {
     if (fromDate.value && toDate.value) {
       params.startDate = fromDate.value;
       params.endDate = toDate.value;
+      localStorage.setItem('investmentTracking-fromDate', fromDate.value);
+      localStorage.setItem('investmentTracking-toDate', toDate.value);
     }
     const { data: response } = await ApiClient.get('/investments', { params });
     if (response.success) {
@@ -291,11 +293,7 @@ watch(activeProfileId, (newProfileId) => {
   if (newProfileId) {
     // default date range to this month on profile switch if empty
     if (!fromDate.value || !toDate.value) {
-      const now = new Date();
-      const s = new Date(now.getFullYear(), now.getMonth(), 1);
-      const e = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      fromDate.value = s.toISOString().split('T')[0];
-      toDate.value = e.toISOString().split('T')[0];
+      setFilterToCurrentMonth();
     }
     fetchInvestments(newProfileId);
     fetchChartData(newProfileId);
@@ -304,8 +302,28 @@ watch(activeProfileId, (newProfileId) => {
 
 const refreshCharts = () => {
   if (activeProfileId.value) {
-    fetchChartData(activeProfileId.value, selectedYear.value);
+    fetchChartData(activeProfileId.value);
   }
+};
+
+const setFilterToCurrentMonth = () => {
+  const now = new Date();
+  const s = new Date(now.getFullYear(), now.getMonth(), 1);
+  const e = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  fromDate.value = s.toISOString().split('T')[0];
+  toDate.value = e.toISOString().split('T')[0];
+  fetchInvestments(activeProfileId.value);
+  fetchChartData(activeProfileId.value);
+};
+
+const setFilterToCurrentYear = () => {
+  const now = new Date();
+  const s = new Date(now.getFullYear(), 0, 1);
+  const e = new Date(now.getFullYear(), 11, 31);
+  fromDate.value = s.toISOString().split('T')[0];
+  toDate.value = e.toISOString().split('T')[0];
+  fetchInvestments(activeProfileId.value);
+  fetchChartData(activeProfileId.value);
 };
 
 function calculateDaysRemaining(endDateString) {
@@ -369,8 +387,12 @@ const getStatusTranslation = (status) => {
           <label class="form-label mb-1">{{ $t('investmentTracking.filters.to') }}</label>
           <input type="date" class="form-control" v-model="toDate" />
         </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary" @click="setFilterToCurrentMonth" :disabled="isLoading">{{ $t('investmentTracking.filters.currentMonth') }}</button>
+          <button class="btn btn-outline-secondary" @click="setFilterToCurrentYear" :disabled="isLoading">{{ $t('investmentTracking.filters.currentYear') }}</button>
+        </div>
         <div class="ms-auto">
-          <button class="btn btn-fadaa-orange me-2" @click="fetchInvestments(activeProfileId)" :disabled="isLoading">{{ $t('investmentTracking.filters.apply') }}</button>
+          <button class="btn btn-fadaa-orange" @click="fetchInvestments(activeProfileId)" :disabled="isLoading">{{ $t('investmentTracking.filters.apply') }}</button>
         </div>
       </div>
     </div>

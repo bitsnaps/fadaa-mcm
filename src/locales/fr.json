@@ -295,7 +295,9 @@
     "filters": {
       "from": "De",
       "to": "À",
-      "apply": "Appliquer"
+      "apply": "Appliquer",
+      "currentMonth": "Mois en cours",
+      "currentYear": "Année en cours"
     },
     "selectProfilePrompt": "Veuillez sélectionner un profil pour voir le suivi des investissements.",
     "summary": {

@@ -293,7 +293,10 @@
     "filters": {
       "from": "From",
       "to": "To",
-      "apply": "Apply"
+      "apply": "Apply",
+      "currentMonth": "This month",
+      "currentYear": "This year"
+
     },
     "selectProfilePrompt": "Please select a profile to view investment tracking.",
     "summary": {
