@@ -345,7 +345,8 @@
       "payoutDate": "Payout Date",
       "branch": "Branch",
       "amountPaid": "Amount Paid",
-      "transactionId": "Transaction ID"
+      "transactionId": "Transaction ID",
+      "noPayouts": "No payout."
     },
     "documents": {
       "title": "Document Access",

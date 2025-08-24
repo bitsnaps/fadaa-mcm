@@ -110,7 +110,7 @@ const investmentTotals = computed(() => {
 
 const profitSharePayouts = ref([]); // Placeholder - Requires a dedicated endpoint
 
-const documents = ref([]); // Placeholder - Requires a dedicated endpoint
+// const documents = ref([]); // Placeholder - Requires a dedicated endpoint
 
 // Chart data
 const chartData = ref({
@@ -216,6 +216,32 @@ const fetchInvestments = async (profileId) => {
   }
 };
 
+const fetchProfitSharePayouts = async (profileId) => {
+  if (!profileId) return;
+  try {
+    const params = {
+      profile_id: profileId,
+      status: 'paid', // We only want the paid ones
+    };
+    const { data: response } = await ApiClient.get('/investor/withdrawals', { params });
+    if (response.success) {
+      profitSharePayouts.value = response.data.map(p => ({
+        id: p.id,
+        payoutDate: formatDate(p.paid_at || p.updated_at),
+        branchName: p.Investment?.Branch?.name || 'N/A',
+        amountPaid: p.amount,
+        transactionId: p.transaction_id || `WID-${p.id}`,
+      }));
+    } else {
+      console.error('Failed to fetch profit share payouts:', response.message);
+      profitSharePayouts.value = [];
+    }
+  } catch (err) {
+    console.error('Error fetching profit share payouts:', err);
+    profitSharePayouts.value = []; // Reset on error
+  }
+};
+
 const fetchChartData = async (profileId) => {
   if (!profileId) return;
   try {
@@ -297,6 +323,7 @@ watch(activeProfileId, (newProfileId) => {
     }
     fetchInvestments(newProfileId);
     fetchChartData(newProfileId);
+    fetchProfitSharePayouts(newProfileId);
   }
 }, { immediate: true });
 
@@ -314,6 +341,7 @@ const setFilterToCurrentMonth = () => {
   toDate.value = e.toISOString().split('T')[0];
   fetchInvestments(activeProfileId.value);
   fetchChartData(activeProfileId.value);
+  fetchProfitSharePayouts(activeProfileId.value);
 };
 
 const setFilterToCurrentYear = () => {
@@ -324,6 +352,7 @@ const setFilterToCurrentYear = () => {
   toDate.value = e.toISOString().split('T')[0];
   fetchInvestments(activeProfileId.value);
   fetchChartData(activeProfileId.value);
+  fetchProfitSharePayouts(activeProfileId.value);
 };
 
 function calculateDaysRemaining(endDateString) {
@@ -603,7 +632,7 @@ const getStatusTranslation = (status) => {
     <div class="card shadow mb-4">
       <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">{{ $t('investmentTracking.payoutHistory.title') }}</h6>
-        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download fa-sm text-white-50"></i> {{ $t('investmentTracking.payoutHistory.export') }}</button>
+        <!-- <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download fa-sm text-white-50"></i> {{ $t('investmentTracking.payoutHistory.export') }}</button> -->
       </div>
       <div class="card-body">
         <div class="table-responsive">
@@ -617,6 +646,9 @@ const getStatusTranslation = (status) => {
               </tr>
             </thead>
             <tbody>
+              <tr v-if="profitSharePayouts.length === 0">
+                <td colspan="4" class="text-center">{{ $t('investmentTracking.payoutHistory.noPayouts') }}</td>
+              </tr>
               <tr v-for="payout in profitSharePayouts" :key="payout.id">
                 <td>{{ payout.payoutDate }}</td>
                 <td>{{ payout.branchName }}</td>

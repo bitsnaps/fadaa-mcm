@@ -346,7 +346,8 @@
       "payoutDate": "Date de Paiement",
       "branch": "Agence",
       "amountPaid": "Montant Payé",
-      "transactionId": "ID Transaction"
+      "transactionId": "ID Transaction",
+      "noPayouts": "Aucune transaction."
     },
     "documents": {
       "title": "Accès aux Documents",
