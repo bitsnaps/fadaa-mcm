@@ -3,6 +3,7 @@
     "title": "Tableau de Bord Administrateur",
     "filter": {
       "thisMonth": "Ce mois",
+      "thisYear": "Cette année",
       "apply": "Appliquer"
     },
     "kpis": {
@@ -296,8 +297,8 @@
       "from": "De",
       "to": "À",
       "apply": "Appliquer",
-      "currentMonth": "Mois en cours",
-      "currentYear": "Année en cours"
+      "thisMonth": "Mois en cours",
+      "thisYear": "Année en cours"
     },
     "selectProfilePrompt": "Veuillez sélectionner un profil pour voir le suivi des investissements.",
     "summary": {

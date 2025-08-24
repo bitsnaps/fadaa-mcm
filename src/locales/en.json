@@ -8,6 +8,7 @@
     },
     "filter": {
       "thisMonth": "This Month",
+      "thisYear": "This Year",
       "apply": "Apply"
     },
     "charts": {
@@ -294,8 +295,8 @@
       "from": "From",
       "to": "To",
       "apply": "Apply",
-      "currentMonth": "This month",
-      "currentYear": "This year"
+      "thisMonth": "This Month",
+      "thisYear": "This Year"
 
     },
     "selectProfilePrompt": "Please select a profile to view investment tracking.",

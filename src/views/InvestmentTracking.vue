@@ -388,8 +388,8 @@ const getStatusTranslation = (status) => {
           <input type="date" class="form-control" v-model="toDate" />
         </div>
         <div class="d-flex gap-2">
-          <button class="btn btn-outline-secondary" @click="setFilterToCurrentMonth" :disabled="isLoading">{{ $t('investmentTracking.filters.currentMonth') }}</button>
-          <button class="btn btn-outline-secondary" @click="setFilterToCurrentYear" :disabled="isLoading">{{ $t('investmentTracking.filters.currentYear') }}</button>
+          <button class="btn btn-outline-secondary" @click="setFilterToCurrentMonth" :disabled="isLoading">{{ $t('investmentTracking.filters.thisMonth') }}</button>
+          <button class="btn btn-outline-secondary" @click="setFilterToCurrentYear" :disabled="isLoading">{{ $t('investmentTracking.filters.thisYear') }}</button>
         </div>
         <div class="ms-auto">
           <button class="btn btn-fadaa-orange" @click="fetchInvestments(activeProfileId)" :disabled="isLoading">{{ $t('investmentTracking.filters.apply') }}</button>

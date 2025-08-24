@@ -15,9 +15,10 @@
               <label class="form-label mb-1">To</label>
               <input type="date" class="form-control" v-model="toDate" />
             </div>
-            <div class="ms-auto">
-              <button class="btn btn-fadaa-orange me-2" @click="applyDateFilter" :disabled="!activeProfileId">{{ $t('dashboard.filter.apply') }}</button>
+            <div class="ms-auto d-flex gap-2">
+              <button class="btn btn-fadaa-orange" @click="applyDateFilter" :disabled="!activeProfileId">{{ $t('dashboard.filter.apply') }}</button>
               <button class="btn btn-outline-secondary" @click="resetToThisMonth">{{ $t('dashboard.filter.thisMonth') }}</button>
+              <button class="btn btn-outline-secondary" @click="setToThisYear">{{ $t('dashboard.filter.thisYear') }}</button>
             </div>
           </div>
         </div>
@@ -234,8 +235,8 @@ const assistants = ref([]);
 const offices = ref([]);
 
 // Date range state
-const fromDate = ref('');
-const toDate = ref('');
+const fromDate = ref(localStorage.getItem('adminDashboard-fromDate') || '');
+const toDate = ref(localStorage.getItem('adminDashboard-toDate') || '');
 
 const searchTerm = ref('');
 const sortKey = ref('id');
@@ -269,7 +270,18 @@ const resetToThisMonth = () => {
 
 const applyDateFilter = async () => {
   if (!activeProfileId.value) return;
+  localStorage.setItem('adminDashboard-fromDate', fromDate.value);
+  localStorage.setItem('adminDashboard-toDate', toDate.value);
   await fetchDashboardData(activeProfileId.value);
+};
+
+const setToThisYear = () => {
+  const now = new Date();
+  const s = new Date(now.getFullYear(), 0, 1);
+  const e = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+  fromDate.value = s.toISOString().split('T')[0];
+  toDate.value = e.toISOString().split('T')[0];
+  if (activeProfileId.value) applyDateFilter();
 };
 
 const fetchDashboardData = async (profileId) => {
