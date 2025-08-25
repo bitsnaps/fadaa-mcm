@@ -32,9 +32,13 @@
                         </select>
                       </div>
                     </div>
-                    <div class="mt-3 text-end">
-                      <button type="submit" class="btn btn-fadaa-primary"><i class="bi bi-download me-2"></i>{{ $t('financialReporting.customReport.downloadReport') }}</button>
-                    </div>
+                    <div class="d-flex justify-content-between mt-3">
+                        <div>
+                          <button type="button" class="btn btn-outline-secondary me-2" @click="setFilterToCurrentMonth">{{ $t('investmentTracking.filters.thisMonth') }}</button>
+                          <button type="button" class="btn btn-outline-secondary" @click="setFilterToCurrentYear">{{ $t('investmentTracking.filters.thisYear') }}</button>
+                        </div>
+                        <button type="submit" class="btn btn-fadaa-primary"><i class="bi bi-download me-2"></i>{{ $t('financialReporting.customReport.downloadReport') }}</button>
+                      </div>
                   </form>
                   <div v-if="reportGeneratedMessage" class="alert alert-success mt-3" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i>{{ reportGeneratedMessage }}
@@ -197,6 +201,22 @@ const downloadReport = async () => {
       reportGeneratedMessage.value = '';
     }, 5000);
   }
+};
+
+const setFilterToCurrentMonth = () => {
+  const now = new Date();
+  const s = new Date(now.getFullYear(), now.getMonth(), 1);
+  const e = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  reportConfig.value.startDate = s.toISOString().split('T')[0];
+  reportConfig.value.endDate = e.toISOString().split('T')[0];
+};
+
+const setFilterToCurrentYear = () => {
+  const now = new Date();
+  const s = new Date(now.getFullYear(), 0, 1);
+  const e = new Date(now.getFullYear(), 11, 31);
+  reportConfig.value.startDate = s.toISOString().split('T')[0];
+  reportConfig.value.endDate = e.toISOString().split('T')[0];
 };
 
 // --- Chart Data & Options ---
