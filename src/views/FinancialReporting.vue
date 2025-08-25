@@ -170,7 +170,7 @@ const reportConfig = ref({
 });
 const reportGeneratedMessage = ref('');
 
-const generateReport = async () => {
+const downloadReport = async () => {
   if (!activeProfileId.value) {
     reportGeneratedMessage.value = 'Please select a profile first.';
     return;
