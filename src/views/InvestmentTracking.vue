@@ -1,4 +1,3 @@
-
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -533,7 +532,6 @@ const getStatusTranslation = (status) => {
                   <th>{{ $t('investmentTracking.breakdown.branchName') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.yourInvestment') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.yourStake') }}</th>
-                  <th>{{ $t('investmentTracking.breakdown.type') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.contractStart') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.contractEnd') }}</th>
                   <!-- <th>{{ $t('investmentTracking.breakdown.totalIncome') }}</th>
@@ -548,7 +546,6 @@ const getStatusTranslation = (status) => {
                   <td>{{ branch.branchName }}</td>
                   <td>{{ formatCurrency(branch.investmentAmount, '') }}</td>
                   <td>{{ branch.participationPercentage }}%</td>
-                  <td>{{ branch.type }}</td>
                   <td>{{ branch.contractStartDate }}</td>
                   <td>{{ branch.contractEndDate }} ({{ branch.daysRemaining }} {{ $t('investmentTracking.breakdown.daysRemaining') }})</td>
                   <!-- <td>{{ formatCurrency(branch.totalIncome, '') }}</td>
@@ -562,7 +559,6 @@ const getStatusTranslation = (status) => {
                 <tr class="fw-bold">
                   <td>{{ $t('investmentTracking.breakdown.totals') }}</td>
                   <td>{{ formatCurrency(investmentTotals.totalInvested, '') }}</td>
-                  <td>-</td>
                   <td>-</td>
                   <td>-</td>
                   <td>-</td>
