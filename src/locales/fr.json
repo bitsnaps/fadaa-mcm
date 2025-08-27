@@ -392,6 +392,7 @@
     "active": "Actif",
     "inactive": "Inactif",
     "cancel": "Annuler",
+    "close": "Fermer",
     "save": "Enregistrer",
     "add": "Ajouter",
     "confirmDeleteTitle": "Confirmer la Suppression",
@@ -619,7 +620,11 @@
     "taxSelectionNote": "Les taxes sont appliquées au tarif mensuel pour calculer le montant total.",
     "submitting": "Envoi en cours...",
     "updateButton": "Mettre à Jour",
-    "addButton": "Ajouter le Contrat"
+    "addButton": "Ajouter le Contrat",
+    "notes": "Notes",
+    "viewContractTitle": "Détails du Contrat",
+    "viewCurrentDocument": "Voir le Document Actuel",
+    "viewDocument": "Voir le Document"
   },
   "offices": {
     "manageOffices": "Gérer les Bureaux de Coworking",

@@ -26,6 +26,10 @@ module.exports = (sequelize) => {
     document_url: {
       type: DataTypes.STRING(255),
     },
+    notes: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
    profile_id: {
      type: DataTypes.INTEGER,
      allowNull: false,

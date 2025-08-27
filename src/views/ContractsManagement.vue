@@ -49,17 +49,46 @@ const newContract = ref({
   document: null,
   tax_ids: [],
   profile_id: null,
-  status: 'Active'
+  status: 'Active',
+  notes: ''
 });
 
 const clients = ref([]);
 const offices = ref([]);
 const availableTaxes = ref([]);
 
+const viewContractModal = ref(null);
+const selectedContract = ref(null);
+ 
 const uploadDocumentModal = ref(null);
 const selectedContractId = ref(null);
 const documentToUpload = ref(null);
 const isUploading = ref(false);
+
+const openViewContractModal = (contract) => {
+  selectedContract.value = contract;
+  const modalInstance = Modal.getOrCreateInstance(viewContractModal.value);
+  modalInstance.show();
+};
+
+const getStatusClass = (status) => {
+  switch (status) {
+    case 'Active':
+      return 'badge bg-success';
+    case 'Pending':
+      return 'badge bg-warning text-dark';
+    case 'Expired':
+      return 'badge bg-danger';
+    case 'Terminated':
+      return 'badge bg-secondary';
+    default:
+      return 'badge bg-light text-dark';
+  }
+};
+
+const getFullUrl = (url) => {
+  return url.startsWith('http') ? url : `${apiClient.defaults.baseURL}/${url}`;
+};
 
 
 const fetchContracts = async (profileId) => {
@@ -245,6 +274,7 @@ const openEditContractModal = async (contract) => {
     tax_ids: contractData.taxes ? contractData.taxes.map(t => Number(t.id)) : [],
     profile_id: contractData.profile_id,
     status: contractData.status,
+    notes: contractData.notes || '',
     original_office_id: contractData.office_id // Keep track of the original office
   };
 
@@ -417,7 +447,7 @@ const submitDocumentUpload = async () => {
 
             <template #cell(actions)="data">
               <div class="text-center">
-                <button @click="viewDocument(data.item.document_url)" :disabled="!data.item.document_url" class="btn btn-sm btn-outline-info me-1" :title="t('contracts.viewContract')">
+                <button @click="openViewContractModal(data.item)" class="btn btn-sm btn-outline-info me-1" :title="t('contracts.viewContract')">
                   <i class="bi bi-eye"></i>
                 </button>
                 <button @click="downloadDocument(data.item.document_url)" :disabled="!data.item.document_url" class="btn btn-sm btn-outline-primary me-1" :title="t('contracts.downloadContract')">
@@ -521,6 +551,10 @@ const submitDocumentUpload = async () => {
                             <label for="document" class="form-label">{{ t('addClient.form.attachments') }}</label>
                             <input type="file" id="document" class="form-control" @change="handleFileChange">
                         </div>
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">{{ t('contracts.notes') }}</label>
+                            <textarea id="notes" class="form-control" v-model="newContract.notes" rows="3"></textarea>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -532,6 +566,42 @@ const submitDocumentUpload = async () => {
                 </div>
             </div>
         </div>
+    </div>
+    <!-- View Contract Modal -->
+    <div class="modal fade" ref="viewContractModal" tabindex="-1" aria-labelledby="viewContractModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="viewContractModalLabel">{{ t('contracts.viewContractTitle', 'Contract Details') }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" v-if="selectedContract">
+            <p><strong>{{ t('contracts.tableHeaders.client') }}:</strong> {{ selectedContract.Client.company_name }}</p>
+            <p><strong>{{ t('contracts.tableHeaders.office') }}:</strong> {{ selectedContract.Office.name }}</p>
+            <p><strong>{{ t('contracts.tableHeaders.startDate') }}:</strong> {{ formatDate(selectedContract.start_date) }}</p>
+            <p><strong>{{ t('contracts.tableHeaders.endDate') }}:</strong> {{ formatDate(selectedContract.end_date) }}</p>
+            <p><strong>{{ t('contracts.tableHeaders.monthlyRate') }}:</strong> {{ formatCurrency(selectedContract.monthly_rate) }}</p>
+            <p><strong>{{ t('contracts.tableHeaders.status') }}:</strong> <span :class="getStatusClass(selectedContract.status)">{{ selectedContract.status }}</span></p>
+            <div v-if="selectedContract.notes">
+              <p><strong>{{ t('contracts.notes') }}:</strong></p>
+              <p>{{ selectedContract.notes }}</p>
+            </div>
+            <div v-if="selectedContract.taxes && selectedContract.taxes.length > 0">
+                <strong>{{ t('manageTaxes.title') }}:</strong>
+                <ul>
+                    <li v-for="tax in selectedContract.taxes" :key="tax.id">{{ tax.name }} ({{ tax.rate }}%)</li>
+                </ul>
+            </div>
+            <!-- <p v-if="selectedContract.document_url">
+              <strong>{{ t('addClient.form.attachments') }}:</strong>
+              <a :href="getFullUrl(selectedContract.document_url)" target="_blank" class="btn btn-sm btn-outline-primary ms-2">{{ t('contracts.viewDocument') }}</a>
+            </p> -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('manageUsers.close') }}</button>
+          </div>
+        </div>
+      </div>
     </div>
 <!-- Upload Document Modal -->
     <div class="modal fade" ref="uploadDocumentModal" tabindex="-1" aria-labelledby="uploadDocumentModalLabel" aria-hidden="true">

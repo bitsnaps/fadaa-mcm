@@ -391,6 +391,7 @@
     "active": "Active",
     "inactive": "Inactive",
     "cancel": "Cancel",
+    "close": "Close",
     "save": "Save",
     "add": "Add",
     "confirmDeleteTitle": "Confirm Deletion",
@@ -618,7 +619,11 @@
     "taxSelectionNote": "Taxes are applied to the monthly rate to calculate the total amount.",
     "submitting": "Submitting...",
     "updateButton": "Update",
-    "addButton": "Add Contract"
+    "addButton": "Add Contract",
+    "notes": "Notes",
+    "viewContractTitle": "Contract Details",
+    "viewCurrentDocument": "View Current Document",
+    "viewDocument": "View Document"
   },
   "offices": {
     "manageOffices": "Manage Coworking Offices",
