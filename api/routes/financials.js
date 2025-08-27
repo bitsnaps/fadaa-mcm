@@ -3,6 +3,7 @@ const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { Op } = require('sequelize');
 const { handleRouteError } = require('../lib/errorHandler');
+const { calculateServiceRevenue } = require('../lib/revenueCalculator');
 
 const financialsApp = new Hono();
 
@@ -23,27 +24,12 @@ financialsApp.get('/revenue-summary', async (c) => {
             end.setHours(23, 59, 59, 999);
         }
 
-        // 1. Calculate revenue from Client Services (use explicit transaction_date)
-        const csWhere = {};
-        if (start && end) {
-            csWhere.transaction_date = { [Op.between]: [start, end] };
-        }
-        if (profile_id) {
-            csWhere.profile_id = profile_id;
-        }
-        const clientServices = await models.ClientService.findAll({
-            where: csWhere,
-            include: [{ model: models.Tax }]
-        });
-
-        let servicesRevenue = 0;
-        clientServices.forEach(service => {
-            let serviceRevenue = parseFloat(service.price);
-            if (service.Tax && service.Tax.bearer === 'Company') {
-                const taxAmount = serviceRevenue * (parseFloat(service.Tax.rate) / 100);
-                serviceRevenue -= taxAmount;
-            }
-            servicesRevenue += serviceRevenue;
+        // 1. Calculate revenue from Client Services
+        const servicesRevenue = await calculateServiceRevenue({
+            startDate: start,
+            endDate: end,
+            profile_id,
+            withTaxes: false // Per original logic, revenue is price before tax adjustment
         });
 
         // 2. Calculate revenue from Contracts (filter by explicit contract dates, not created_at)
@@ -155,18 +141,12 @@ financialsApp.get('/revenue-series', async (c) => {
         whereTrans.profile_id = profile_id;
       }
 
-      // Client Services (use transaction_date)
-      const whereClientServiceTrans = { transaction_date: { [Op.between]: [start, end] } };
-      if (profile_id) whereClientServiceTrans.profile_id = profile_id;
-      const clientServices = await models.ClientService.findAll({ where: whereClientServiceTrans, include: [{ model: models.Tax }] });
-      let servicesRevenue = 0;
-      clientServices.forEach((service) => {
-        let serviceRevenue = parseFloat(service.price);
-        if (service.Tax && service.Tax.bearer === 'Company') {
-          const taxAmount = serviceRevenue * (parseFloat(service.Tax.rate) / 100);
-          serviceRevenue -= taxAmount;
-        }
-        servicesRevenue += serviceRevenue;
+      // Client Services
+      const servicesRevenue = await calculateServiceRevenue({
+          startDate: start,
+          endDate: end,
+          profile_id,
+          withTaxes: false // Per original logic, revenue is price before tax adjustment
       });
 
       // Contracts (active within month by start/end date overlap)

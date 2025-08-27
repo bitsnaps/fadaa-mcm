@@ -80,9 +80,6 @@ clientsApp.get('/', async (c) => {
                     if (service.Tax.bearer === 'Company') {
                         // Company-borne taxes are included (added)
                         serviceAmount += taxAmount;
-                    } else if (service.Tax.bearer === 'Client') {
-                        // Client-borne taxes are excluded from revenue: subtract
-                        serviceAmount -= taxAmount;
                     }
                 }
                 totalAmount += serviceAmount;
