@@ -763,7 +763,8 @@
     "noClientsFound": "Aucun client trouvé.",
     "viewServices": "Voir les Services",
     "totalServices": "Total Services",
-    "totalAmountWithTaxes": "Montant Total",
+    "totalAmountWithTaxes": "Total TTC",
+    "totalAmountWithoutTaxes": "Total (HT)",
     "transactionDate": "Date de transaction"
   },
   "client": {

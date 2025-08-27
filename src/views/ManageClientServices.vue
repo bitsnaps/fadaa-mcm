@@ -35,6 +35,10 @@
                 <span class="badge bg-primary">{{ row.item.total_services || 0 }}</span>
               </template>
 
+              <template #cell(total_amount_without_taxes)="row">
+                <span class="fw-bold text-info">{{ formatCurrency(row.item.total_amount_without_taxes || 0, '') }}</span>
+              </template>
+
               <template #cell(total_amount_with_taxes)="row">
                 <span class="fw-bold text-success">{{ formatCurrency(row.item.total_amount_with_taxes || 0, '') }}</span>
               </template>
@@ -59,8 +63,8 @@
       </template>
     </ProfileTabs>
 
-    <AddServiceModal :client="selectedClient" :profileId="activeProfileId" @service-added="handleServiceAdded" />
-    <ClientServicesModal :client="selectedClient" :profileId="activeProfileId" />
+    <AddServiceModal :client="selectedClient" :profileId="activeProfileId" @service-added="fetchClients" />
+    <ClientServicesModal :client="selectedClient" :profileId="activeProfileId" @service-updated="fetchClients" />
   </div>
 </template>
 
@@ -94,6 +98,7 @@ const fields = computed(() => [
   { key: 'phone_number', label: t('client.phoneNumber'), sortable: true },
   { key: 'status', label: t('client.status'), sortable: true },
   { key: 'total_services', label: t('clientServices.totalServices'), sortable: true },
+  { key: 'total_amount_without_taxes', label: t('clientServices.totalAmountWithoutTaxes'), sortable: true },
   { key: 'total_amount_with_taxes', label: t('clientServices.totalAmountWithTaxes'), sortable: true },
   { key: 'actions', label: t('clientServices.actions') }
 ]);
@@ -123,7 +128,7 @@ const openViewServicesModal = (client) => {
 };
 
 const handleServiceAdded = () => {
-  // No need to refetch clients, as the service is just added to one
+  fetchClients();
 };
 
 const onProfileChange = (profileId) => {

@@ -29,7 +29,7 @@
       <b-button @click="cancel()">{{ $t('manageUsers.cancel') }}</b-button>
     </template>
   </b-modal>
-  <AddServiceModal ref="addServiceModalRef" :client="client" :editingService="serviceToEdit" :profileId="profileId" @service-added="fetchClientServices(client.id, profileId)" @service-updated="fetchClientServices(client.id, profileId)" />
+  <AddServiceModal ref="addServiceModalRef" :client="client" :editingService="serviceToEdit" :profileId="profileId" @service-added="handleServiceUpdate" @service-updated="handleServiceUpdate" />
 </template>
 
 <script setup>
@@ -56,6 +56,7 @@ const services = ref([]);
 const loading = ref(false);
 const serviceToEdit = ref(null);
 const addServiceModalRef = ref(null);
+const emit = defineEmits(['service-updated']);
 
 const fields = computed(() => [
   { key: 'ServiceCategory.name', label: t('clientServices.service'), sortable: true },
@@ -94,7 +95,8 @@ const confirmRemoveService = (serviceId) => {
 const removeService = async (serviceId) => {
   try {
     await apiClient.delete(`/client-services/${serviceId}`);
-    fetchClientServices(props.client.id, props.profileId);
+    await fetchClientServices(props.client.id, props.profileId);
+    emit('service-updated');
   } catch (error) {
     console.error('Failed to remove service:', error);
   }
@@ -111,5 +113,9 @@ watch(() => [props.client, props.profileId], ([newClient, newProfileId]) => {
 const openEditServiceModal = (service) => {
   serviceToEdit.value = service;
   addServiceModalRef.value.show();
+};
+const handleServiceUpdate = () => {
+  fetchClientServices(props.client.id, props.profileId);
+  emit('service-updated');
 };
 </script>

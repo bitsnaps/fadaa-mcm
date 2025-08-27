@@ -70,22 +70,26 @@ clientsApp.get('/', async (c) => {
             // Calculate total service count
             clientData.total_services = services.length;
 
-            // Calculate total amount including taxes
-            let totalAmount = 0;
+            // Calculate total amount with and without taxes
+            let totalAmountWithTaxes = 0;
+            let totalAmountWithoutTaxes = 0;
             services.forEach(service => {
-                let serviceAmount = parseFloat(service.price) || 0;
+                const servicePrice = parseFloat(service.price) || 0;
+                totalAmountWithoutTaxes += servicePrice;
+
+                let serviceAmountWithTax = servicePrice;
                 if (service.Tax && service.Tax.rate) {
                     const taxRate = parseFloat(service.Tax.rate) || 0;
-                    const taxAmount = serviceAmount * (taxRate / 100);
+                    const taxAmount = servicePrice * (taxRate / 100);
                     if (service.Tax.bearer === 'Company') {
-                        // Company-borne taxes are included (added)
-                        serviceAmount += taxAmount;
+                        serviceAmountWithTax += taxAmount;
                     }
                 }
-                totalAmount += serviceAmount;
+                totalAmountWithTaxes += serviceAmountWithTax;
             });
 
-            clientData.total_amount_with_taxes = totalAmount;
+            clientData.total_amount_with_taxes = totalAmountWithTaxes;
+            clientData.total_amount_without_taxes = totalAmountWithoutTaxes;
 
             // Remove the ClientServices array from response to keep it clean
             delete clientData.ClientServices;
