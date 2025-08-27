@@ -61,11 +61,14 @@ const calculateComprehensiveProfits = async (investments) => {
       return sum + (grossProfitShare * (tax.rate / 100));
     }, 0);
 
-    // console.log('totalIncome = [incomeAmount] + [serviceRevenue] + [contractRevenue] =', totalIncome);
-    // console.log('totalExpense = ', totalExpense);
-    // console.log(`totalNetProfit = [totalIncome] - [totalExpense] = ${totalIncome} - ${totalExpense} =`, totalNetProfit);
-    // console.log('totalTaxAmount = ', totalTaxAmount);
-    // console.log(`grossProfitShare = [totalNetProfit] * [percentage] = ${totalNetProfit} * ${percentage}% = `, grossProfitShare);
+    console.log('incomeAmount = ', incomeAmount);
+    console.log('serviceRevenue = ', serviceRevenue);
+    console.log('contractRevenue = ', contractRevenue);
+    console.log('totalIncome = [incomeAmount] + [serviceRevenue] + [contractRevenue] =', totalIncome);
+    console.log('totalExpense = ', totalExpense);
+    console.log(`totalNetProfit = [totalIncome] - [totalExpense] = ${totalIncome} - ${totalExpense} =`, totalNetProfit);
+    console.log('totalTaxAmount = ', totalTaxAmount);
+    console.log(`grossProfitShare = [totalNetProfit] * [percentage] = ${totalNetProfit} * ${percentage}% = `, grossProfitShare);
     
     const netProfitShare = grossProfitShare - totalTaxAmount;
 

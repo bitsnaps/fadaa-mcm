@@ -194,6 +194,9 @@
       "registered_by": "Enregistré par",
       "actions": "Actions"
     },
+    "description": {
+      "placeholder": "Veuillez introduire le nom de l'entité"
+    },
     "edit": "Modifier",
     "delete": "Supprimer"
   },
@@ -315,7 +318,8 @@
       "filter": "Filtrer par agence",
       "allBranches": "Toutes les agences",
       "branchName": "Nom de l'Agence",
-      "yourInvestment": "Votre Investissement",
+      "investmentAmount": "Montant d'investissement",
+      "typeOfInvestment": "Type d'investment",
       "yourStake": "Votre Participation (%)",
       "type": "Type",
       "contractStart": "Début Contrat",

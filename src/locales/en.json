@@ -192,6 +192,9 @@
       "registered_by": "Registered By",
       "actions": "Actions"
     },
+    "description": {
+      "placeholder": "Please enter the entity name"
+    },
     "edit": "Edit",
     "delete": "Delete"
   },
@@ -314,7 +317,8 @@
       "filter": "Filter by branch",
       "allBranches": "All branches",
       "branchName": "Branch Name",
-      "yourInvestment": "Your Investment",
+      "investmentAmount": "Investment Amount",
+      "typeOfInvestment": "Type of Investment",
       "yourStake": "Your Stake (%)",
       "type": "Type",
       "contractStart": "Contract Start",

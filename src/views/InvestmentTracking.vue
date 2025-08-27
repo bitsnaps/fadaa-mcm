@@ -530,7 +530,8 @@ const getStatusTranslation = (status) => {
               <thead>
                 <tr>
                   <th>{{ $t('investmentTracking.breakdown.branchName') }}</th>
-                  <th>{{ $t('investmentTracking.breakdown.yourInvestment') }}</th>
+                  <th>{{ $t('investmentTracking.breakdown.investmentAmount') }}</th>
+                  <th>{{ $t('investmentTracking.breakdown.typeOfInvestment') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.yourStake') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.contractStart') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.contractEnd') }}</th>
@@ -545,6 +546,7 @@ const getStatusTranslation = (status) => {
                 <tr v-for="branch in branchInvestments" :key="branch.id">
                   <td>{{ branch.branchName }}</td>
                   <td>{{ formatCurrency(branch.investmentAmount, '') }}</td>
+                  <td>{{ branch.type }}</td>
                   <td>{{ branch.participationPercentage }}%</td>
                   <td>{{ branch.contractStartDate }}</td>
                   <td>{{ branch.contractEndDate }} ({{ branch.daysRemaining }} {{ $t('investmentTracking.breakdown.daysRemaining') }})</td>

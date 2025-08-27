@@ -256,7 +256,7 @@ const handleDelete = async (id) => {
                             </div>
                             <div class="mb-3">
                                 <label for="inc-description" class="form-label">{{ t('incomes.tableHeaders.description') }}</label>
-                                <textarea id="inc-description" class="form-control" v-model="currentIncome.description"></textarea>
+                                <textarea id="inc-description" class="form-control" :placeholder="t('incomes.description.placeholder','Please enter the name of the entity')" v-model="currentIncome.description"></textarea>
                             </div>
                             <div class="mb-3">
                                 <label for="inc-transaction-date" class="form-label">{{ t('incomes.tableHeaders.transaction_date') }} <span class="text-danger">*</span></label>
