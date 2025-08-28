@@ -879,13 +879,10 @@
   },
   "officeDesigner": {
     "setupModal": {
-      "title": "Create New Branch Design",
-      "branchName": "Branch Name",
-      "branchNamePlaceholder": "e.g., Downtown Hub",
-      "numFloors": "Number of Floors",
-      "floorName": "Floor {floorNum} Name",
-      "floorNamePlaceholder": "e.g., Ground Floor",
-      "startDesigning": "Start Designing"
+      "title": "Select Branch to Design",
+      "branchName": "Branch",
+      "startDesigning": "Start Designing",
+      "noAvailableBranches": "All branches already have a design. Go to 'Branch Management' to add a new branch."
     },
     "editNameModal": {
       "title": "Edit Office Name",
@@ -894,9 +891,10 @@
       "save": "Save"
     },
     "main": {
-      "title": "Floor Plan Designer",
-      "floors": "Floors",
-      "addFloor": "Add New Floor",
+      "title": "Branch Layout Designer",
+      "branches": "Branches",
+      "addBranch": "Add Branch Design",
+      "deleteBranchConfirm": "Are you sure you want to delete the design for \"{branchName}\"? This action cannot be undone.",
       "tools": "Tools",
       "addOffice": "Add Office",
       "addDesk": "Add Desk",
@@ -909,13 +907,11 @@
       "duplicate": "Duplicate",
       "delete": "Delete Selected",
       "noSelection": "Select an office to see its properties.",
-      "saveDesign": "Save Design",
+      "saveDesign": "Save Designs",
       "saving": "Saving...",
-      "resetDesign": "Reset & Start New",
-      "confirmReset": "Are you sure you want to clear the saved design and start over?",
-      "designSaved": "Design saved successfully!",
-      "newFloorPrompt": "Enter new floor name:",
-      "deleteFloorConfirm": "Are you sure you want to delete floor \"{floorName}\"?"
+      "resetDesign": "Reset All Designs",
+      "confirmReset": "Are you sure you want to clear all saved designs and start over?",
+      "designSaved": "Designs saved successfully!"
     }
   },
   "userProfile": {
@@ -1288,6 +1284,7 @@
     "notFound": "The requested resource was not found.",
     "validation": "Some inputs are invalid. Please review your entries.",
     "server": "The server encountered an error. Please try again later.",
-    "unknown": "Something went wrong. Please try again."
+    "unknown": "Something went wrong. Please try again.",
+    "fetchFailed": "Failed to fetch {entity}."
   }
 }

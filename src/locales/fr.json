@@ -880,13 +880,10 @@
   },
   "officeDesigner": {
     "setupModal": {
-      "title": "Créer un Nouveau Design d'Agence",
-      "branchName": "Nom de l'Agence",
-      "branchNamePlaceholder": "ex., Centre-ville",
-      "numFloors": "Nombre d'Étages",
-      "floorName": "Nom de l'Étage {floorNum}",
-      "floorNamePlaceholder": "ex., Rez-de-chaussée",
-      "startDesigning": "Commencer la Conception"
+      "title": "Sélectionner une Agence à Concevoir",
+      "branchName": "Agence",
+      "startDesigning": "Commencer la Conception",
+      "noAvailableBranches": "Toutes les agences ont déjà un design. Allez dans 'Gestion des Agences' pour en ajouter une nouvelle."
     },
     "editNameModal": {
       "title": "Modifier le Nom du Bureau",
@@ -895,9 +892,10 @@
       "save": "Enregistrer"
     },
     "main": {
-      "title": "Concepteur de Plan d'Étage",
-      "floors": "Étages",
-      "addFloor": "Ajouter un Nouvel Étage",
+      "title": "Concepteur de Plan d'Agence",
+      "branches": "Agences",
+      "addBranch": "Ajouter un Design d'Agence",
+      "deleteBranchConfirm": "Êtes-vous sûr de vouloir supprimer le design pour l'agence \"{branchName}\" ? Cette action est irréversible.",
       "tools": "Outils",
       "addOffice": "Ajouter un Bureau",
       "addDesk": "Ajouter un Poste de Travail",
@@ -910,13 +908,11 @@
       "duplicate": "Dupliquer",
       "delete": "Supprimer la Sélection",
       "noSelection": "Sélectionnez un bureau pour voir ses propriétés.",
-      "saveDesign": "Enregistrer le Design",
+      "saveDesign": "Enregistrer les Designs",
       "saving": "Enregistrement...",
-      "resetDesign": "Réinitialiser & Recommencer",
-      "confirmReset": "Êtes-vous sûr de vouloir effacer le design enregistré et recommencer ?",
-      "designSaved": "Design enregistré avec succès !",
-      "newFloorPrompt": "Entrez le nom du nouvel étage :",
-      "deleteFloorConfirm": "Êtes-vous sûr de vouloir supprimer l'étage \"{floorName}\" ?"
+      "resetDesign": "Réinitialiser les Designs",
+      "confirmReset": "Êtes-vous sûr de vouloir effacer tous les designs enregistrés et recommencer ?",
+      "designSaved": "Designs enregistrés avec succès !"
     }
   },
   "userProfile": {
@@ -1292,7 +1288,8 @@
     "notFound": "La ressource demandée n'a pas été trouvée.",
     "validation": "Certaines entrées sont invalides. Veuillez vérifier vos saisies.",
     "server": "Le serveur a rencontré une erreur. Veuillez réessayer plus tard.",
-    "unknown": "Une erreur inconnue est survenue. Veuillez réessayer."
+    "unknown": "Une erreur inconnue est survenue. Veuillez réessayer.",
+    "fetchFailed": "Échec de la récupération de {entity}."
   },
   "locale": "fr"
 }

@@ -10,20 +10,15 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">{{ $t('officeDesigner.setupModal.branchName') }} <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" v-model="setup.branchName" :placeholder="$t('officeDesigner.setupModal.branchNamePlaceholder')" required>
+                        <select class="form-select" v-model="setup.branchId" required>
+                            <option v-for="branch in availableBranches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
+                        </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">{{ $t('officeDesigner.setupModal.numFloors') }}</label>
-                        <input type="number" class="form-control" v-model.number="setup.numFloors" min="1" max="10">
-                    </div>
-                    <div v-for="i in setup.numFloors" :key="i">
-                        <label class="form-label">{{ $t('officeDesigner.setupModal.floorName', { floorNum: i }) }}</label>
-                        <input type="text" class="form-control mb-2" v-model="setup.floorNames[i-1]" :placeholder="$t('officeDesigner.setupModal.floorNamePlaceholder')">
-                    </div>
+                    <p v-if="!availableBranches.length" class="text-danger">{{ $t('officeDesigner.setupModal.noAvailableBranches') }}</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-info" @click="() => $router.back()">{{ $t('common.cancel') }}</button>
-                    <button type="button" class="btn btn-primary" @click="initializeProject">{{ $t('officeDesigner.setupModal.startDesigning') }}</button>
+                    <button type="button" class="btn btn-primary" @click="addBranchDesign" :disabled="!setup.branchId">{{ $t('officeDesigner.setupModal.startDesigning') }}</button>
                 </div>
             </div>
         </div>
@@ -49,12 +44,12 @@
     <!-- MAIN APP STRUCTURE -->
     <div v-if="projectInitialized" class="main-canvas-area">
         <div class="canvas">
-            <div v-for="office in currentFloor.offices" :key="office.id"
-                class="office-object"
-                :class="[office.colorClass, `shape-${office.shape}`, { selected: selectedOfficeIds.includes(office.id) }]"
-                :style="officeStyle(office)"
-                :data-id="office.id"
-                @click="handleSelection($event, office.id)">
+            <div v-for="office in currentDesign.offices" :key="office.id"
+                 class="office-object"
+                 :class="[office.colorClass, `shape-${office.shape}`, { selected: selectedOfficeIds.includes(office.id) }]"
+                 :style="officeStyle(office)"
+                 :data-id="office.id"
+                 @click="handleSelection($event, office.id)">
                 {{ office.name }}
             </div>
         </div>
@@ -62,20 +57,20 @@
          
     <div v-if="projectInitialized" class="control-panel">
         <div class="mb-4">
-            <h4 class="mb-0">{{ branchName }}</h4>
+            <h4 class="mb-0">{{ currentDesign.branchName }}</h4>
             <small class="text-muted">{{ $t('officeDesigner.main.title') }}</small>
         </div>
 
-        <h5 class="mb-3">{{ $t('officeDesigner.main.floors') }}</h5>
+        <h5 class="mb-3">{{ $t('officeDesigner.main.branches') }}</h5>
         <ul class="nav nav-pills flex-column mb-3">
-            <li v-for="(floor, index) in floors" :key="floor.id" class="nav-item mb-1">
-                <a href="#" class="nav-link d-flex justify-content-between align-items-center" :class="{ active: currentFloorIndex === index }" @click.prevent="switchFloor(index)">
-                    <span>{{ floor.name }}</span>
-                    <i class="bi bi-x-circle" @click.stop="deleteFloor(index)"></i>
+            <li v-for="(design, index) in designs" :key="design.branchId" class="nav-item mb-1">
+                <a href="javascript:void(0)" class="nav-link d-flex justify-content-between align-items-center" :class="{ active: currentDesignIndex === index }" @click.prevent="switchBranch(index)">
+                    <span>{{ design.branchName }}</span>
+                    <i class="bi bi-x-circle" @click.stop="deleteBranchDesign(index)"></i>
                 </a>
             </li>
         </ul>
-        <button class="btn btn-sm btn-outline-secondary mb-4" @click="addFloor">{{ $t('officeDesigner.main.addFloor') }}</button>
+        <button class="btn btn-sm btn-outline-secondary mb-4" @click="openSetupModal">{{ $t('officeDesigner.main.addBranch') }}</button>
 
         <h5 class="mb-3">{{ $t('officeDesigner.main.tools') }}</h5>
         <div class="d-grid gap-2 mb-4">
@@ -86,6 +81,20 @@
         <div v-if="selectedOfficeIds.length > 0" class="flex-grow-1">
             <h5 class="mb-3">{{ $t('officeDesigner.main.selection', { count: selectedOfficeIds.length }) }}</h5>
             
+            <div class="mb-3" v-if="currentDesignIndex >= 0 && currentDesign.offices[0]?.id">
+                <div class="d-flex flex-1/2 gap-1 mb-1">
+                    <label class="form-label">x:</label>
+                    <input type="number" class="form-control" v-model="currentDesign.offices[0].x">
+                    <label class="form-label">y:</label>
+                    <input type="number" class="form-control" v-model="currentDesign.offices[0].y">
+                </div>
+                <div class="d-flex flex-1/2 gap-1 mb-1">
+                    <label class="form-label">w:</label>
+                    <input type="number" class="form-control" v-model="currentDesign.offices[0].width">
+                    <label class="form-label">h:</label>
+                    <input type="number" class="form-control" v-model="currentDesign.offices[0].height">
+                </div>
+            </div>
             <div class="mb-3">
                 <label class="form-label">{{ $t('officeDesigner.main.shape') }}</label>
                 <select class="form-select" @change="changeSelected('shape', $event.target.value)">
@@ -123,32 +132,43 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted, nextTick, computed, watch } from 'vue';
+import { ref, reactive, onMounted, onUnmounted, nextTick, computed } from 'vue';
 import interact from 'interactjs';
 import { Modal } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { useToast } from '@/helpers/toast';
+import { getBranches } from '@/services/BranchService';
 
 const { t } = useI18n();
-const { showSuccessToast } = useToast();
+const { showSuccessToast, showErrorToast } = useToast();
 
 // State
 const projectInitialized = ref(false);
-const branchName = ref('');
-const floors = ref([]);
-const currentFloorIndex = ref(0);
+const designs = ref([]);
+const currentDesignIndex = ref(-1);
+const allBranches = ref([]);
 const selectedOfficeIds = ref([]);
 const isShiftPressed = ref(false);
 const editingName = ref('');
 const isSaving = ref(false);
 
 let setupModal, editNameModal;
-const setup = reactive({ branchName: 'My Coworking Space', numFloors: 1, floorNames: ['Ground Floor'] });
+const setup = reactive({ branchId: null });
 
 const bootstrapColors = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'dark'];
 
 // Computed Properties
-const currentFloor = computed(() => floors.value[currentFloorIndex.value] || { offices: [] });
+const currentDesign = computed(() => {
+    if (currentDesignIndex.value >= 0 && designs.value[currentDesignIndex.value]) {
+        return designs.value[currentDesignIndex.value];
+    }
+    return { branchId: null, branchName: '', offices: [] };
+});
+
+const availableBranches = computed(() => {
+    const designedBranchIds = designs.value.map(d => d.branchId);
+    return allBranches.value.filter(b => !designedBranchIds.includes(b.id));
+});
 
 const officeStyle = (office) => ({
     width: `${office.width}px`,
@@ -158,47 +178,61 @@ const officeStyle = (office) => ({
 });
 
 // Methods
-const initializeProject = () => {
-    branchName.value = setup.branchName;
-    floors.value = Array.from({ length: setup.numFloors }, (_, i) => ({
-        id: Date.now() + i,
-        name: setup.floorNames[i] || `Floor ${i + 1}`,
-        offices: []
-    }));
-    projectInitialized.value = true;
-    setupModal.hide();
-    nextTick(initInteract);
-};
-
-const switchFloor = (index) => {
-    currentFloorIndex.value = index;
+const switchBranch = (index) => {
+    currentDesignIndex.value = index;
     selectedOfficeIds.value = [];
     nextTick(initInteract);
 };
 
-const addFloor = () => {
-    const newFloorName = prompt(t('officeDesigner.main.newFloorPrompt'), `Floor ${floors.value.length + 1}`);
-    if (newFloorName) {
-        floors.value.push({ id: Date.now(), name: newFloorName, offices: [] });
-        switchFloor(floors.value.length - 1);
+const openSetupModal = () => {
+    if (availableBranches.value.length === 0) {
+        showErrorToast(t('officeDesigner.setupModal.noAvailableBranches'));
+        return;
     }
+    setup.branchId = availableBranches.value[0]?.id || null;
+    setupModal.show();
+}
+
+const addBranchDesign = () => {
+    if (!setup.branchId) return;
+    const selectedBranch = allBranches.value.find(b => b.id === setup.branchId);
+    if (!selectedBranch) return;
+
+    designs.value.push({
+        branchId: selectedBranch.id,
+        branchName: selectedBranch.name,
+        offices: []
+    });
+    
+    if (!projectInitialized.value) {
+        projectInitialized.value = true;
+    }
+
+    switchBranch(designs.value.length - 1);
+    setupModal.hide();
 };
 
-const deleteFloor = (index) => {
-    if (confirm(t('officeDesigner.main.deleteFloorConfirm', { floorName: floors.value[index].name }))) {
-        floors.value.splice(index, 1);
-        if (currentFloorIndex.value >= floors.value.length) {
-            currentFloorIndex.value = Math.max(0, floors.value.length - 1);
+const deleteBranchDesign = (index) => {
+    const design = designs.value[index];
+    if (confirm(t('officeDesigner.main.deleteBranchConfirm', { branchName: design.branchName }))) {
+        designs.value.splice(index, 1);
+        if (currentDesignIndex.value >= designs.value.length) {
+            currentDesignIndex.value = Math.max(0, designs.value.length - 1);
         }
-        switchFloor(currentFloorIndex.value);
+        if (designs.value.length === 0) {
+            projectInitialized.value = false;
+            openSetupModal();
+        } else {
+            switchBranch(currentDesignIndex.value);
+        }
     }
 };
 
 const addOffice = (shape) => {
     const newId = Date.now();
-    currentFloor.value.offices.push({
+    currentDesign.value.offices.push({
         id: newId,
-        name: `Office ${newId.toString().slice(-4)}`,
+        name: `Office ${currentDesign.value.offices.length + 1}`,
         x: 50, y: 50, width: 150, height: 100, rotation: 0,
         shape: shape, colorClass: 'bg-primary', customColor: '#0d6efd'
     });
@@ -219,9 +253,19 @@ const handleSelection = (event, officeId) => {
     }
 };
 
+const handleSelectionFromList = (officeId) => {
+    // This allows clicking on the list item to select/deselect
+    const index = selectedOfficeIds.value.indexOf(officeId);
+    if (index > -1) {
+        selectedOfficeIds.value.splice(index, 1);
+    } else {
+        selectedOfficeIds.value.push(officeId);
+    }
+};
+
 const changeSelected = (property, value) => {
     selectedOfficeIds.value.forEach(id => {
-        const office = currentFloor.value.offices.find(o => o.id === id);
+        const office = currentDesign.value.offices.find(o => o.id === id);
         if (office) {
             office[property] = value;
             if(property === 'customColor') office.colorClass = 'custom';
@@ -231,14 +275,14 @@ const changeSelected = (property, value) => {
 
 const openEditNameModal = () => {
     if (selectedOfficeIds.value.length !== 1) return;
-    const office = currentFloor.value.offices.find(o => o.id === selectedOfficeIds.value[0]);
+    const office = currentDesign.value.offices.find(o => o.id === selectedOfficeIds.value[0]);
     editingName.value = office.name;
     editNameModal.show();
 };
 
 const saveOfficeName = () => {
     if (selectedOfficeIds.value.length !== 1) return;
-    const office = currentFloor.value.offices.find(o => o.id === selectedOfficeIds.value[0]);
+    const office = currentDesign.value.offices.find(o => o.id === selectedOfficeIds.value[0]);
     office.name = editingName.value;
     editNameModal.hide();
 };
@@ -246,29 +290,25 @@ const saveOfficeName = () => {
 const duplicateSelected = () => {
     const newOffices = [];
     selectedOfficeIds.value.forEach(id => {
-        const original = currentFloor.value.offices.find(o => o.id === id);
+        const original = currentDesign.value.offices.find(o => o.id === id);
         const newOffice = JSON.parse(JSON.stringify(original));
         newOffice.id = Date.now() + Math.random();
         newOffice.x += 20;
         newOffice.y += 20;
         newOffices.push(newOffice);
     });
-    currentFloor.value.offices.push(...newOffices);
+    currentDesign.value.offices.push(...newOffices);
     nextTick(initInteract);
 };
 
 const deleteSelected = () => {
-    currentFloor.value.offices = currentFloor.value.offices.filter(o => !selectedOfficeIds.value.includes(o.id));
+    currentDesign.value.offices = currentDesign.value.offices.filter(o => !selectedOfficeIds.value.includes(o.id));
     selectedOfficeIds.value = [];
 };
 
 const saveDesign = async () => {
     isSaving.value = true;
-    const designData = {
-        branchName: branchName.value,
-        floors: floors.value
-    };
-    localStorage.setItem('officeDesign', JSON.stringify(designData));
+    localStorage.setItem('branchDesigns', JSON.stringify(designs.value));
 
     // Mock API call
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -277,21 +317,21 @@ const saveDesign = async () => {
     showSuccessToast(t('officeDesigner.main.designSaved'));
 };
 
-const loadDesign = () => {
-    const savedDesign = localStorage.getItem('officeDesign');
-    if (savedDesign) {
+const loadDesigns = () => {
+    const savedDesigns = localStorage.getItem('branchDesigns');
+    if (savedDesigns) {
         try {
-            const designData = JSON.parse(savedDesign);
-            if (designData && designData.branchName && designData.floors) {
-                branchName.value = designData.branchName;
-                floors.value = designData.floors;
+            const parsedDesigns = JSON.parse(savedDesigns);
+            if (Array.isArray(parsedDesigns) && parsedDesigns.length > 0) {
+                designs.value = parsedDesigns;
+                currentDesignIndex.value = 0;
                 projectInitialized.value = true;
                 nextTick(initInteract);
                 return true;
             }
         } catch (e) {
-            console.error("Failed to parse saved design:", e);
-            localStorage.removeItem('officeDesign'); // Clear corrupted data
+            console.error("Failed to parse saved designs:", e);
+            localStorage.removeItem('branchDesigns');
         }
     }
     return false;
@@ -299,7 +339,7 @@ const loadDesign = () => {
 
 const clearDesign = () => {
     if (confirm(t('officeDesigner.main.confirmReset'))) {
-        localStorage.removeItem('officeDesign');
+        localStorage.removeItem('branchDesigns');
         window.location.reload();
     }
 };
@@ -322,7 +362,7 @@ const initInteract = () => {
                     if (!selectedOfficeIds.value.includes(targetId)) return;
                     
                     selectedOfficeIds.value.forEach(id => {
-                        const office = currentFloor.value.offices.find(o => o.id === id);
+                        const office = currentDesign.value.offices.find(o => o.id === id);
                         if(office){
                            office.x += event.dx;
                            office.y += event.dy;
@@ -344,7 +384,7 @@ const initInteract = () => {
                     if (!selectedOfficeIds.value.includes(targetId)) return;
                     
                     selectedOfficeIds.value.forEach(id => {
-                        const office = currentFloor.value.offices.find(o => o.id === id);
+                        const office = currentDesign.value.offices.find(o => o.id === id);
                         if (office) {
                             office.width = event.rect.width;
                             office.height = event.rect.height;
@@ -362,7 +402,7 @@ const initInteract = () => {
                     if (!selectedOfficeIds.value.includes(targetId)) return;
 
                     selectedOfficeIds.value.forEach(id => {
-                        const office = currentFloor.value.offices.find(o => o.id === id);
+                        const office = currentDesign.value.offices.find(o => o.id === id);
                         if (office) {
                            office.rotation = (office.rotation || 0) + event.da;
                         }
@@ -373,12 +413,28 @@ const initInteract = () => {
 };
 
 // Lifecycle and Event Listeners
-onMounted(() => {
-    editNameModal = new Modal(document.getElementById('editNameModal'));
+const fetchBranches = async () => {
+    try {
+        const { data: response} = await getBranches();
+        if (response.success){
+            allBranches.value = response.data;
+        } else {
+            console.error("Failed to fetch branches. Reponse: ", response);
+        }
+    } catch (error) {
+        console.error("Failed to fetch branches:", error);
+        showErrorToast(t('errors.fetchFailed', { entity: 'branches' }));
+    }
+};
 
-    if (!loadDesign()) {
-        setupModal = new Modal(document.getElementById('setupModal'));
-        setupModal.show();
+onMounted(async () => {
+    editNameModal = new Modal(document.getElementById('editNameModal'));
+    setupModal = new Modal(document.getElementById('setupModal'));
+
+    await fetchBranches();
+
+    if (!loadDesigns()) {
+        openSetupModal();
     }
     
     const handleKeyDown = (e) => { if (e.key === 'Shift') isShiftPressed.value = true; };
@@ -393,8 +449,6 @@ onMounted(() => {
         if (editNameModal) editNameModal.dispose();
     });
 });
-
-watch(currentFloorIndex, () => selectedOfficeIds.value = []);
 
 </script>
 
