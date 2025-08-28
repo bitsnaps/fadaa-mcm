@@ -61,14 +61,15 @@ const calculateComprehensiveProfits = async (investments) => {
       return sum + (grossProfitShare * (tax.rate / 100));
     }, 0);
 
-    console.log('incomeAmount = ', incomeAmount);
-    console.log('serviceRevenue = ', serviceRevenue);
-    console.log('contractRevenue = ', contractRevenue);
-    console.log('totalIncome = [incomeAmount] + [serviceRevenue] + [contractRevenue] =', totalIncome);
-    console.log('totalExpense = ', totalExpense);
-    console.log(`totalNetProfit = [totalIncome] - [totalExpense] = ${totalIncome} - ${totalExpense} =`, totalNetProfit);
-    console.log('totalTaxAmount = ', totalTaxAmount);
-    console.log(`grossProfitShare = [totalNetProfit] * [percentage] = ${totalNetProfit} * ${percentage}% = `, grossProfitShare);
+    // console.log('\n**** calculateComprehensiveProfits (for investment.id =', investment.id, '):\n');  
+    // console.log('incomeAmount = ', incomeAmount);
+    // console.log('serviceRevenue = ', serviceRevenue);
+    // console.log('contractRevenue = ', contractRevenue);
+    // console.log('totalIncome = [incomeAmount] + [serviceRevenue] + [contractRevenue] =', totalIncome);
+    // console.log('totalExpense = ', totalExpense);
+    // console.log(`totalNetProfit = [totalIncome] - [totalExpense] = ${totalIncome} - ${totalExpense} =`, totalNetProfit);
+    // console.log('totalTaxAmount = ', totalTaxAmount);
+    // console.log(`grossProfitShare = [totalNetProfit] * [percentage] = ${totalNetProfit} * ${percentage}% = `, grossProfitShare);
     
     const netProfitShare = grossProfitShare - totalTaxAmount;
 
@@ -78,7 +79,7 @@ const calculateComprehensiveProfits = async (investments) => {
     };
   }
 
-  console.log('\n**** calculateComprehensiveProfits:\n');  
+  console.log('\n**** calculateComprehensiveProfits (global):\n');  
   Object.keys(calculations).forEach( key => {
     console.log(`calculations[${key}]:\n`);
     console.log(`[branchNetProfitSelectedPeriod] = [totalIncome] - [totalExpense] = `, calculations[key]['branchNetProfitSelectedPeriod']);
@@ -88,9 +89,52 @@ const calculateComprehensiveProfits = async (investments) => {
   return calculations;
 };
 
+const calculateContractualProfits = async (investments) => {
+  const calculations = {};
+
+  for (const investment of investments) {
+    const { percentage, starting_date, ending_date, profile_id, id } = investment;
+
+    if (!profile_id) {
+      calculations[id] = {
+        branchNetProfitSelectedPeriod: 0,
+        yourProfitShareSelectedPeriod: 0,
+      };
+      continue;
+    }
+
+    const contractWhere = {
+      profile_id,
+      [Op.and]: [
+        { start_date: { [Op.lte]: new Date(ending_date) } },
+        { end_date: { [Op.gte]: new Date(starting_date) } }
+      ]
+    };
+    const contracts = await models.Contract.findAll({ where: contractWhere });
+    const contractRevenue = calculateContractRevenue(contracts, investment);
+
+    const totalNetProfit = contractRevenue; // For contractual, profit is just the revenue
+    const grossProfitShare = totalNetProfit * (percentage / 100);
+
+    const applicableTaxes = await models.Tax.findAll({ where: { bearer: 'Client' } });
+    const totalTaxAmount = applicableTaxes.reduce((sum, tax) => {
+      return sum + (grossProfitShare * (tax.rate / 100));
+    }, 0);
+
+    const netProfitShare = grossProfitShare - totalTaxAmount;
+
+    calculations[id] = {
+      branchNetProfitSelectedPeriod: totalNetProfit,
+      yourProfitShareSelectedPeriod: netProfitShare,
+    };
+  }
+
+  return calculations;
+};
+
 const calculationStrategies = {
   Comprehensive: calculateComprehensiveProfits,
-  Contractual: calculateComprehensiveProfits,
+  Contractual: calculateContractualProfits,
 };
 
 const getInvestmentCalculations = async (investments) => {

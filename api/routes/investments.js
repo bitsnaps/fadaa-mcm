@@ -61,6 +61,8 @@ investmentsApp.get('/', async (c) => {
             })
         );
 
+        // console.log('\n**** # of enrichedInvestments:', enrichedInvestments.length);
+        
         return c.json({ success: true, data: enrichedInvestments });
     } catch (error) {
         console.error('Error fetching investments:', error);
