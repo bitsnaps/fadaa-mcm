@@ -5,17 +5,6 @@ export const getAllWithdrawals = (params = {}) => {
   return apiClient.get('/withdrawals', { params });
 };
 
-export const approveWithdrawal = (id) => {
-  return apiClient.put(`/withdrawals/${id}/approve`);
-};
-
-export const rejectWithdrawal = (id) => {
-  return apiClient.put(`/withdrawals/${id}/reject`);
-};
-
-export const markWithdrawalPaid = (id) => {
-  return apiClient.put(`/withdrawals/${id}/mark-paid`);
-};
 
 export const getWithdrawal = (id) => {
   return apiClient.get(`/withdrawals/${id}`);

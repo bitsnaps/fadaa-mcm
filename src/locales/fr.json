@@ -1206,7 +1206,7 @@
     },
     "actions": {
       "approve": "Approuver",
-      "reject": "Rejeter",
+      "cancel": "Annuler",
       "markPaid": "Marquer Payé",
       "edit": "Modifier",
       "delete": "Supprimer"

@@ -86,8 +86,6 @@ function save() {
               <label class="form-label">{{ t('manageWithdrawals.modal.status') }}</label>
               <select v-model="form.status" class="form-select">
                 <option value="pending">{{ t('withdrawalStatuses.pending') }}</option>
-                <option value="approved">{{ t('withdrawalStatuses.approved') }}</option>
-                <option value="rejected">{{ t('withdrawalStatuses.rejected') }}</option>
                 <option value="paid">{{ t('withdrawalStatuses.paid') }}</option>
                 <option value="cancelled">{{ t('withdrawalStatuses.cancelled') }}</option>
               </select>

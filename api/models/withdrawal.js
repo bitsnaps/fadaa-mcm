@@ -23,7 +23,7 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(20),
       allowNull: false,
       defaultValue: 'pending',
-      comment: 'pending|approved|rejected|paid|cancelled'
+      comment: 'pending|paid|cancelled'
     },
     payment_method: { type: DataTypes.STRING(50), allowNull: true },
     notes: { type: DataTypes.TEXT, allowNull: true },

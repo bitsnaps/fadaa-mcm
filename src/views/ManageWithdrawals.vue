@@ -4,9 +4,6 @@ import { useI18n } from 'vue-i18n';
 import { formatCurrency } from '@/helpers/utils.js';
 import {
   getAllWithdrawals,
-  approveWithdrawal,
-  rejectWithdrawal,
-  markWithdrawalPaid,
   createWithdrawalAsAdmin,
   updateWithdrawal,
   deleteWithdrawal,
@@ -22,7 +19,7 @@ const error = ref(null);
 const withdrawals = ref([]);
 const investors = ref([]);
 const investments = ref([]);
-const statusFilter = ref(''); // '', 'pending', 'approved', 'paid', 'rejected'
+const statusFilter = ref(''); // '', 'pending', 'paid', 'cancelled'
 const investmentIdFilter = ref('');
 const investorIdFilter = ref('');
 const activeProfileId = ref(null);
@@ -115,29 +112,22 @@ async function loadFilterData() {
   }
 }
 
-async function onApprove(id) {
-  if (!confirm(t('manageWithdrawals.approveConfirm'))) return;
-  await approveWithdrawal(id);
-  await loadWithdrawals();
-}
-
-async function onReject(id) {
-  if (!confirm(t('manageWithdrawals.rejectConfirm'))) return;
-  await rejectWithdrawal(id);
-  await loadWithdrawals();
-}
-
 async function onMarkPaid(id) {
   if (!confirm(t('manageWithdrawals.markPaidConfirm'))) return;
-  await markWithdrawalPaid(id);
+  await updateWithdrawal(id, { status: 'paid' });
+  await loadWithdrawals();
+}
+
+async function onCancel(id) {
+  if (!confirm(t('manageWithdrawals.cancelConfirm'))) return;
+  await updateWithdrawal(id, { status: 'cancelled' });
   await loadWithdrawals();
 }
 
 function statusBadgeClass(status) {
   if (status === 'paid') return 'bg-success';
-  if (status === 'approved') return 'bg-primary';
   if (status === 'pending') return 'bg-warning text-dark';
-  if (status === 'rejected') return 'bg-danger';
+  if (status === 'cancelled') return 'bg-danger';
   return 'bg-secondary';
 }
 
@@ -177,9 +167,8 @@ onMounted(() => {
                 <select v-model="statusFilter" class="form-select">
                   <option value="">{{ t('manageWithdrawals.filters.all') }}</option>
                   <option value="pending">{{ t('withdrawalStatuses.pending') }}</option>
-                  <option value="approved">{{ t('withdrawalStatuses.approved') }}</option>
                   <option value="paid">{{ t('withdrawalStatuses.paid') }}</option>
-                  <option value="rejected">{{ t('withdrawalStatuses.rejected') }}</option>
+                  <option value="cancelled">{{ t('withdrawalStatuses.cancelled') }}</option>
                 </select>
               </div>
               <div class="col-md-3">
@@ -258,24 +247,17 @@ onMounted(() => {
                       <div class="btn-group btn-group-sm" role="group">
                         <button
                           v-if="w.status === 'pending'"
-                          class="btn btn-outline-primary"
-                          @click="onApprove(w.id)"
-                        >
-                          <i class="bi bi-check2-circle"></i> {{ t('manageWithdrawals.actions.approve') }}
-                        </button>
-                        <button
-                          v-if="w.status === 'pending'"
-                          class="btn btn-outline-danger"
-                          @click="onReject(w.id)"
-                        >
-                          <i class="bi bi-x-circle"></i> {{ t('manageWithdrawals.actions.reject') }}
-                        </button>
-                        <button
-                          v-if="w.status === 'approved'"
                           class="btn btn-outline-success"
                           @click="onMarkPaid(w.id)"
                         >
                           <i class="bi bi-cash-coin"></i> {{ t('manageWithdrawals.actions.markPaid') }}
+                        </button>
+                        <button
+                          v-if="w.status === 'pending'"
+                          class="btn btn-outline-warning"
+                          @click="onCancel(w.id)"
+                        >
+                          <i class="bi bi-x-circle"></i> {{ t('manageWithdrawals.actions.cancel') }}
                         </button>
                         <button
                           class="btn btn-outline-secondary"

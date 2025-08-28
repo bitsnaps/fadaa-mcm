@@ -1202,7 +1202,7 @@
     },
     "actions": {
       "approve": "Approve",
-      "reject": "Reject",
+      "cancel": "Cancel",
       "markPaid": "Mark Paid",
       "edit": "Edit",
       "delete": "Delete"

@@ -44,169 +44,6 @@ async function loadWithdrawalOr404(id) {
   return wd;
 }
 
-// PUT /withdrawals/:id/approve - transition to approved from pending
-withdrawalsApp.put('/:id/approve', async (c) => {
-  try {
-    const { id } = c.req.param();
-    const user = c.get('user');
-
-    const wd = await loadWithdrawalOr404(id);
-    if (!wd) {
-      return c.json({ success: false, message: 'Withdrawal not found' }, 404);
-    }
-
-    if (wd.status !== 'pending') {
-      return c.json({ success: false, message: 'Only pending withdrawals can be approved' }, 400);
-    }
-
-    const statusBefore = wd.status;
-    await wd.update({
-      status: 'approved',
-      approved_at: new Date(),
-      processed_by: user.id,
-    });
-
-    // Activity log
-    try {
-      await models.ActivityLog.create({
-        action: 'withdrawal_approve',
-        target_entity_type: 'withdrawal',
-        target_entity_id: wd.id,
-        details: {
-          investment_id: wd.investment_id,
-          amount: wd.amount,
-          status_before: statusBefore,
-          status_after: 'approved',
-        },
-        user_id: user.id,
-      });
-    } catch (logErr) {
-      console.warn('Activity log failed on withdrawal approve:', logErr.message);
-    }
-
-    const finalWithdrawal = await models.Withdrawal.findByPk(wd.id, {
-      include: [
-        { model: models.Investment },
-        { model: models.Profile },
-        { model: models.User, as: 'investor', attributes: ['id', 'first_name', 'last_name', 'email'] },
-        { model: models.User, as: 'processed_by_user', attributes: ['id', 'first_name', 'last_name', 'email'] },
-      ],
-    });
-
-    return c.json({ success: true, message: 'Withdrawal approved', data: finalWithdrawal });
-  } catch (error) {
-    return handleRouteError(c, `Error approving withdrawal ${c.req.param('id')}`, error);
-  }
-});
-
-// PUT /withdrawals/:id/reject - transition to rejected from pending
-withdrawalsApp.put('/:id/reject', async (c) => {
-  try {
-    const { id } = c.req.param();
-    const user = c.get('user');
-
-    const wd = await loadWithdrawalOr404(id);
-    if (!wd) {
-      return c.json({ success: false, message: 'Withdrawal not found' }, 404);
-    }
-
-    if (['approved', 'paid', 'rejected'].includes(wd.status)) {
-      return c.json({ success: false, message: 'Only pending withdrawals can be rejected' }, 400);
-    }
-
-    const statusBefore = wd.status;
-    await wd.update({
-      status: 'rejected',
-      processed_by: user.id,
-    });
-
-    // Activity log
-    try {
-      await models.ActivityLog.create({
-        action: 'withdrawal_reject',
-        target_entity_type: 'withdrawal',
-        target_entity_id: wd.id,
-        details: {
-          investment_id: wd.investment_id,
-          amount: wd.amount,
-          status_before: statusBefore,
-          status_after: 'rejected',
-        },
-        user_id: user.id,
-      });
-    } catch (logErr) {
-      console.warn('Activity log failed on withdrawal reject:', logErr.message);
-    }
-
-    const finalWithdrawal = await models.Withdrawal.findByPk(wd.id, {
-      include: [
-        { model: models.Investment },
-        { model: models.Profile },
-        { model: models.User, as: 'investor', attributes: ['id', 'first_name', 'last_name', 'email'] },
-        { model: models.User, as: 'processed_by_user', attributes: ['id', 'first_name', 'last_name', 'email'] },
-      ],
-    });
-
-    return c.json({ success: true, message: 'Withdrawal rejected', data: finalWithdrawal });
-  } catch (error) {
-    return handleRouteError(c, `Error rejecting withdrawal ${c.req.param('id')}`, error);
-  }
-});
-
-// PUT /withdrawals/:id/mark-paid - transition to paid from approved
-withdrawalsApp.put('/:id/mark-paid', async (c) => {
-  try {
-    const { id } = c.req.param();
-    const user = c.get('user');
-
-    const wd = await loadWithdrawalOr404(id);
-    if (!wd) {
-      return c.json({ success: false, message: 'Withdrawal not found' }, 404);
-    }
-
-    if (wd.status !== 'approved') {
-      return c.json({ success: false, message: 'Only approved withdrawals can be marked as paid' }, 400);
-    }
-
-    const statusBefore = wd.status;
-    await wd.update({
-      status: 'paid',
-      paid_at: new Date(),
-      processed_by: user.id, // keep the payer as processor
-    });
-
-    // Activity log
-    try {
-      await models.ActivityLog.create({
-        action: 'withdrawal_paid',
-        target_entity_type: 'withdrawal',
-        target_entity_id: wd.id,
-        details: {
-          investment_id: wd.investment_id,
-          amount: wd.amount,
-          status_before: statusBefore,
-          status_after: 'paid',
-        },
-        user_id: user.id,
-      });
-    } catch (logErr) {
-      console.warn('Activity log failed on withdrawal paid:', logErr.message);
-    }
-
-    const finalWithdrawal = await models.Withdrawal.findByPk(wd.id, {
-      include: [
-        { model: models.Investment },
-        { model: models.Profile },
-        { model: models.User, as: 'investor', attributes: ['id', 'first_name', 'last_name', 'email'] },
-        { model: models.User, as: 'processed_by_user', attributes: ['id', 'first_name', 'last_name', 'email'] },
-      ],
-    });
-
-    return c.json({ success: true, message: 'Withdrawal marked as paid', data: finalWithdrawal });
-  } catch (error) {
-    return handleRouteError(c, `Error marking withdrawal ${c.req.param('id')} as paid`, error);
-  }
-});
 
 // GET /withdrawals/:id - get a single withdrawal by its ID
 withdrawalsApp.get('/:id', async (c) => {
@@ -285,13 +122,20 @@ withdrawalsApp.put('/:id', async (c) => {
       return c.json({ success: false, message: 'Withdrawal not found' }, 404);
     }
 
-    await wd.update({
+    const updateData = {
       amount,
       status,
       payment_method,
       notes,
       processed_by: user.id,
-    });
+    };
+
+    if (status === 'paid' && wd.status !== 'paid') {
+      updateData.paid_at = new Date();
+      updateData.approved_at = wd.approved_at || new Date();
+    }
+
+    await wd.update(updateData);
 
     const finalWithdrawal = await models.Withdrawal.findByPk(wd.id, {
       include: [
@@ -317,7 +161,7 @@ withdrawalsApp.delete('/:id', async (c) => {
       return c.json({ success: false, message: 'Withdrawal not found' }, 404);
     }
 
-    if (wd.status === 'paid' || wd.status === 'approved') {
+    if (wd.status === 'paid') {
        return c.json({ success: false, message: `Cannot delete a withdrawal with status: ${wd.status}` }, 400);
     }
 
