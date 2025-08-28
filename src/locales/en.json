@@ -491,7 +491,8 @@
       "active": "Active",
       "inactive": "Inactive",
       "lead": "Lead"
-    }
+    },
+    "allBranches": "All Branches"
   },
   "addClient": {
     "addTitle": "Add New Client",

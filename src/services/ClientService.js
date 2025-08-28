@@ -1,7 +1,11 @@
 import apiClient from './ApiClient';
 
-export const getClients = () => {
-    return apiClient.get('/clients');
+export const getClients = (branchId = null) => {
+    const params = {};
+    if (branchId) {
+        params.branchId = branchId;
+    }
+    return apiClient.get('/clients', { params });
 };
 
 export const getClientInvestments = (clientId) => {

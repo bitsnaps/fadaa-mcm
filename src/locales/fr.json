@@ -492,7 +492,8 @@
       "active": "Actif",
       "inactive": "Inactif",
       "lead": "Prospect"
-    }
+    },
+    "allBranches": "Toutes les agences"
   },
   "addClient": {
     "addTitle": "Ajouter un Nouveau Client",

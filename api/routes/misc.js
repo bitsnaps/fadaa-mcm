@@ -81,6 +81,7 @@ miscApp.get('/branches', authMiddleware, async (c) => {
         return handleRouteError(c, 'Error fetching branch list', error);
     }
 });
+
 miscApp.get('/', async (c) => {
     return c.json({message: 'ready'});
 });

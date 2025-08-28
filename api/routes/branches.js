@@ -18,6 +18,29 @@ branchesApp.get('/', authMiddleware, async (c) => {
     }
 });
 
+// GET branches with contracts
+branchesApp.get('/with-contracts', authMiddleware, async (c) => {
+    try {
+        const branches = await models.Branch.findAll({
+            include: [{
+                model: models.Office,
+                required: true, // INNER JOIN to ensure office exists
+                include: [{
+                    model: models.Contract,
+                    required: true, // INNER JOIN to ensure contract exists
+                    attributes: []
+                }],
+                attributes: []
+            }],
+            group: ['Branch.id'],
+            order: [['name', 'ASC']],
+        });
+        return c.json({ success: true, data: branches });
+    } catch (error) {
+        return handleRouteError(c, 'Error fetching branches with contracts', error);
+    }
+});
+
 // POST a new branch
 branchesApp.post('/', authMiddleware, async (c) => {
     try {

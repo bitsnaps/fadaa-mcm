@@ -24,7 +24,7 @@ clientsApp.get('/total', async (c) => {
 // GET all clients
 clientsApp.get('/', async (c) => {
     try {
-        const { profile_id } = c.req.query();
+        const { profile_id, branchId } = c.req.query();
 
         const clientServiceInclude = {
             model: models.ClientService,
@@ -57,7 +57,18 @@ clientsApp.get('/', async (c) => {
             include: [
                 { model: models.User, as: 'managed_by', attributes: ['id', 'first_name', 'last_name'] },
                 { model: models.Office, as: 'office', attributes: ['id', 'name'] },
-                clientServiceInclude
+                clientServiceInclude,
+                ...(branchId ? [{
+                    model: models.Contract,
+                    required: true,
+                    include: [{
+                        model: models.Office,
+                        required: true,
+                        where: { branch_id: branchId },
+                        attributes: []
+                    }],
+                    attributes: []
+                }] : [])
             ],
             order: [['company_name', 'ASC']],
         });

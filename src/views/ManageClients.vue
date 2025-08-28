@@ -4,19 +4,22 @@ import { useRouter } from 'vue-router';
 import * as bootstrap from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { getClients, deleteClient } from '@/services/ClientService';
+import { getBranchesWithContracts } from '@/services/BranchService';
 import { formatDate } from '@/helpers/utils';
 
 const { t } = useI18n();
 const router = useRouter();
 
 const clients = ref([]);
+const branches = ref([]);
+const selectedBranch = ref(null);
 const searchTerm = ref('');
 const selectedClient = ref(null);
 let viewClientModal = null;
 
 const fetchClients = async () => {
   try {
-    const response = await getClients();
+    const response = await getClients(selectedBranch.value);
     if (response.data.success) {
       clients.value = response.data.data;
     }
@@ -25,8 +28,24 @@ const fetchClients = async () => {
   }
 };
 
+const fetchBranches = async () => {
+  try {
+    const response = await getBranchesWithContracts();
+    if (response.data.success) {
+      branches.value = response.data.data;
+    }
+  } catch (error) {
+    console.error("Failed to fetch branches:", error);
+  }
+};
+
+const applyBranchFilter = () => {
+  fetchClients();
+};
+
 onMounted(() => {
   fetchClients();
+  fetchBranches();
   const modalElement = document.getElementById('viewClientDetailsModal');
   if (modalElement) {
     viewClientModal = new bootstrap.Modal(modalElement);
@@ -85,13 +104,23 @@ const removeClient = async (clientId) => {
       </router-link>
     </div>
 
-    <div class="mb-3">
-      <input 
-        type="text" 
-        class="form-control" 
-        v-model="searchTerm" 
-        :placeholder="$t('manageClients.searchPlaceholder')"
-      />
+    <div class="row mb-3">
+      <div class="col-md-8">
+        <input
+          type="text"
+          class="form-control"
+          v-model="searchTerm"
+          :placeholder="$t('manageClients.searchPlaceholder')"
+        />
+      </div>
+      <div class="col-md-4">
+        <select class="form-select" v-model="selectedBranch" @change="applyBranchFilter">
+          <option :value="null">{{ $t('manageClients.allBranches') }}</option>
+          <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+            {{ branch.name }}
+          </option>
+        </select>
+      </div>
     </div>
 
     <div v-if="filteredClients.length > 0" class="table-responsive">
