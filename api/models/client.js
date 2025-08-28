@@ -41,9 +41,6 @@ module.exports = (sequelize) => {
     client_type: {
       type: DataTypes.ENUM('Individual', 'Company'),
     },
-    service_type: {
-        type: DataTypes.STRING(100),
-    },
     id_type: {
       type: DataTypes.STRING(100),
     },
@@ -71,23 +68,6 @@ module.exports = (sequelize) => {
     contact_person_phone: {
       type: DataTypes.STRING(50),
     },
-    contract_start_date: {
-      type: DataTypes.DATE,
-    },
-    contract_end_date: {
-      type: DataTypes.DATE,
-    },
-    payment_terms: {
-      type: DataTypes.STRING(50),
-    },
-    office_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'offices',
-        key: 'id'
-      },
-      allowNull: true
-    }
   }, {
     tableName: 'clients',
     timestamps: true,

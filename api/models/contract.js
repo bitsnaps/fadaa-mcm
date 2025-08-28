@@ -18,6 +18,12 @@ module.exports = (sequelize) => {
     monthly_rate: {
       type: DataTypes.DECIMAL(10, 2),
     },
+    service_type: {
+      type: DataTypes.STRING(100),
+    },
+    payment_terms: {
+      type: DataTypes.STRING(50),
+    },
     status: {
       type: DataTypes.ENUM('Pending', 'Active', 'Expired', 'Terminated'),
       allowNull: false,

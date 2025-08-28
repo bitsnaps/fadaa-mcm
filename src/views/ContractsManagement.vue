@@ -29,6 +29,8 @@ const tableFields = computed(() => [
   { key: 'client_name', label: t('contracts.tableHeaders.client'), sortable: true },
   { key: 'office_name', label: t('contracts.tableHeaders.office'), sortable: true },
   { key: 'status', label: t('contracts.tableHeaders.status'), sortable: true },
+  { key: 'service_type', label: t('contracts.tableHeaders.serviceType'), sortable: true },
+  { key: 'payment_terms', label: t('contracts.tableHeaders.paymentTerms'), sortable: true },
   { key: 'start_date', label: t('contracts.tableHeaders.startDate'), sortable: true, formatter: formatDateContract },
   { key: 'end_date', label: t('contracts.tableHeaders.endDate'), sortable: true, formatter: formatDateContract },
   { key: 'monthly_rate', label: t('contracts.tableHeaders.monthlyRate', 'Monthly Rate'), sortable: true, formatter: (value) => { const n = typeof value === 'number' ? value : parseFloat(value); return Number.isFinite(n) ? n : 'N/A'; } },
@@ -50,7 +52,9 @@ const newContract = ref({
   tax_ids: [],
   profile_id: null,
   status: 'Active',
-  notes: ''
+  notes: '',
+  payment_terms: '',
+  service_type: ''
 });
 
 const clients = ref([]);
@@ -119,6 +123,33 @@ const onProfileChange = (profileId) => {
 
 onMounted(() => {
   // fetchContracts is now called by onProfileChange
+});
+
+watch(() => newContract.value.payment_terms, (newVal) => {
+  if (!newVal) return;
+
+  const today = new Date();
+  let startDate = new Date(today);
+  let endDate = new Date(today);
+
+  switch (newVal) {
+    case 'Monthly':
+      startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      break;
+    case 'Quarterly':
+      const currentQuarter = Math.floor(today.getMonth() / 3);
+      startDate = new Date(today.getFullYear(), currentQuarter * 3, 1);
+      endDate = new Date(today.getFullYear(), currentQuarter * 3 + 3, 0);
+      break;
+    case 'Annually':
+      startDate = new Date(today.getFullYear(), 0, 1);
+      endDate = new Date(today.getFullYear(), 11, 31);
+      break;
+  }
+
+  newContract.value.start_date = startDate.toISOString().split('T')[0];
+  newContract.value.end_date = endDate.toISOString().split('T')[0];
 });
 
 watch(searchTerm, () => {
@@ -275,6 +306,8 @@ const openEditContractModal = async (contract) => {
     profile_id: contractData.profile_id,
     status: contractData.status,
     notes: contractData.notes || '',
+    payment_terms: contractData.payment_terms || '',
+    service_type: contractData.service_type || '',
     original_office_id: contractData.office_id // Keep track of the original office
   };
 
@@ -512,6 +545,27 @@ const submitDocumentUpload = async () => {
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
+                                <label for="serviceType" class="form-label">{{ t('contracts.tableHeaders.serviceType') }}</label>
+                                <select class="form-select" id="serviceType" v-model="newContract.service_type">
+                                  <option value="">{{ t('contracts.tableHeaders.selectService') }}</option>
+                                  <option value="Domiciliation">{{ t('contracts.tableHeaders.domiciliation') }}</option>
+                                  <option value="Office Rental">{{ t('contracts.tableHeaders.officeRental') }}</option>
+                                  <option value="Coworking">{{ t('contracts.tableHeaders.coworking') }}</option>
+                                  <option value="Meeting Room">{{ t('contracts.tableHeaders.meetingRoom') }}</option>
+                                </select>
+                            </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="paymentTerms" class="form-label">{{ t('contracts.tableHeaders.paymentTerms') }}</label>
+                            <select class="form-select" id="paymentTerms" v-model="newContract.payment_terms">
+                              <option value="">{{ t('contracts.tableHeaders.selectTerms') }}</option>
+                              <option value="Monthly">{{ t('contracts.tableHeaders.monthly') }}</option>
+                              <option value="Quarterly">{{ t('contracts.tableHeaders.quarterly') }}</option>
+                              <option value="Annually">{{ t('contracts.tableHeaders.annually') }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
                                 <label for="start_date" class="form-label">{{ t('contracts.tableHeaders.startDate') }} <span class="text-danger">*</span></label>
                                 <input type="date" id="start_date" class="form-control" v-model="newContract.start_date" required>
                             </div>
@@ -582,6 +636,8 @@ const submitDocumentUpload = async () => {
             <p><strong>{{ t('contracts.tableHeaders.endDate') }}:</strong> {{ formatDate(selectedContract.end_date) }}</p>
             <p><strong>{{ t('contracts.tableHeaders.monthlyRate') }}:</strong> {{ formatCurrency(selectedContract.monthly_rate) }}</p>
             <p><strong>{{ t('contracts.tableHeaders.status') }}:</strong> <span :class="getStatusClass(selectedContract.status)">{{ selectedContract.status }}</span></p>
+            <p><strong>{{ t('contracts.tableHeaders.paymentTerms') }}:</strong> {{ selectedContract.payment_terms }}</p>
+            <p><strong>{{ t('addClient.form.serviceType') }}:</strong> {{ selectedContract.service_type }}</p>
             <div v-if="selectedContract.notes">
               <p><strong>{{ t('contracts.notes') }}:</strong></p>
               <p>{{ selectedContract.notes }}</p>

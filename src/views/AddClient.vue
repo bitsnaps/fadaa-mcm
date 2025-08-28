@@ -18,7 +18,6 @@ const client = ref({
   address: '',
   status: 'Active',
   client_type: '',
-  service_type: '',
   id_type: '',
   id_number: '',
   id_expiry_date: '',
@@ -28,66 +27,12 @@ const client = ref({
   contact_person_name: '',
   contact_person_email: '',
   contact_person_phone: '',
-  contract_start_date: '',
-  contract_end_date: '',
-  payment_terms: '',
-  office_id: null,
   attachments: [],
 });
 
 const pageTitle = computed(() => clientId.value ? t('addClient.editTitle') : t('addClient.addTitle'));
 const submitButtonText = computed(() => clientId.value ? t('addClient.submitButtonUpdate') : t('addClient.submitButtonAdd'));
 const validationErrors = ref({});
-const availableOffices = ref([]);
-const availableBranches = ref([]);
-const selectedBranchId = ref(null);
-
-const fetchAvailableBranches = async () => {
-    try {
-        const response = await apiClient.get('/misc/branches');
-        if(response.data.success) {
-            availableBranches.value = response.data.branches;
-        }
-    } catch (error) {
-        console.error("Failed to fetch available branches:", error);
-    }
-};
-
-const fetchAvailableOffices = async (branchId = null) => {
-    try {
-        const params = branchId ? { branch_id: branchId } : {};
-        const response = await apiClient.get('/misc/offices', { params });
-        if(response.data.success) {
-            availableOffices.value = response.data.offices;
-        }
-    } catch (error) {
-        console.error("Failed to fetch available offices:", error);
-    }
-};
-
-const ensureSelectedOfficeInOptions = async () => {
-    if (client.value.office_id && !availableOffices.value.some(o => o.id === client.value.office_id)) {
-        try {
-            const officeResp = await apiClient.get(`/offices/${client.value.office_id}`);
-            if (officeResp.data.success && officeResp.data.data) {
-                availableOffices.value = [...availableOffices.value, officeResp.data.data];
-            }
-        } catch (e) {
-            console.error('Failed to ensure selected office present in options:', e);
-        }
-    }
-};
-
-const onBranchChange = () => {
-    // Reset office selection when branch changes
-    client.value.office_id = null;
-    // Fetch offices for the selected branch
-    if (selectedBranchId.value) {
-        fetchAvailableOffices(selectedBranchId.value);
-    } else {
-        availableOffices.value = [];
-    }
-};
 
 const validateForm = () => {
     const errors = {};
@@ -101,28 +46,11 @@ const validateForm = () => {
 };
 
 onMounted(async () => {
-  await fetchAvailableBranches();
   if (clientId.value) {
     try {
         const response = await apiClient.get(`/clients/${clientId.value}`);
         if(response.data.success) {
             client.value = response.data.data;
-            // If client has an assigned office, infer the branch and load offices accordingly
-            if (client.value.office_id) {
-                try {
-                    const officeResp = await apiClient.get(`/offices/${client.value.office_id}`);
-                    if (officeResp.data.success && officeResp.data.data) {
-                        const office = officeResp.data.data;
-                        selectedBranchId.value = office.branch_id || (office.branch ? office.branch.id : null);
-                        if (selectedBranchId.value) {
-                            await fetchAvailableOffices(selectedBranchId.value);
-                            await ensureSelectedOfficeInOptions();
-                        }
-                    }
-                } catch (err) {
-                    console.error('Failed to fetch office for client to determine branch:', err);
-                }
-            }
         } else {
             console.error(t('addClient.messages.clientNotFound'));
             router.push('/manage-clients');
@@ -163,7 +91,7 @@ const submitForm = async () => {
             console.log(t('addClient.messages.addSuccess'));
         }
         
-        if (response.data.success && client.value.attachments.length > 0) {
+        if (response.data.success && client.value.attachments && client.value.attachments.length > 0) {
             const newClientId = response.data.data.id;
             const attachmentFormData = new FormData();
             client.value.attachments.forEach(file => {
@@ -239,16 +167,6 @@ const handleFileUpload = (event) => {
               <option value="Company">{{ t('addClient.form.company') }}</option>
             </select>
           </div>
-          <div class="col-md-6">
-            <label for="serviceType" class="form-label">{{ t('addClient.form.serviceType') }}</label>
-            <select class="form-select" id="serviceType" v-model="client.service_type">
-              <option value="">{{ t('addClient.form.selectService') }}</option>
-              <option value="Domiciliation">{{ t('addClient.form.domiciliation') }}</option>
-              <option value="Office Rental">{{ t('addClient.form.officeRental') }}</option>
-              <option value="Coworking">{{ t('addClient.form.coworking') }}</option>
-              <option value="Meeting Room">{{ t('addClient.form.meetingRoom') }}</option>
-            </select>
-          </div>
         </div>
         <div class="row mb-3">
           <div class="col-md-4">
@@ -298,46 +216,8 @@ const handleFileUpload = (event) => {
             <input type="tel" class="form-control" id="contactPersonPhone" v-model="client.contact_person_phone">
           </div>
         </div>
-        <h5 class="mt-4">{{ t('addClient.form.contractDetails') }}</h5>
-        <div class="row mb-3">
-          <div class="col-md-4">
-            <label for="contractStartDate" class="form-label">{{ t('addClient.form.contractStartDate') }}</label>
-            <input type="date" class="form-control" id="contractStartDate" v-model="client.contract_start_date">
-          </div>
-          <div class="col-md-4">
-            <label for="contractEndDate" class="form-label">{{ t('addClient.form.contractEndDate') }}</label>
-            <input type="date" class="form-control" id="contractEndDate" v-model="client.contract_end_date">
-          </div>
-          <div class="col-md-4">
-            <label for="paymentTerms" class="form-label">{{ t('addClient.form.paymentTerms') }}</label>
-            <select class="form-select" id="paymentTerms" v-model="client.payment_terms">
-              <option value="">{{ t('addClient.form.selectTerms') }}</option>
-              <option value="Monthly">{{ t('addClient.form.monthly') }}</option>
-              <option value="Quarterly">{{ t('addClient.form.quarterly') }}</option>
-              <option value="Annually">{{ t('addClient.form.annually') }}</option>
-            </select>
-          </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="branchId" class="form-label">{{ t('addClient.form.selectBranch') }}</label>
-            <select class="form-select" id="branchId" v-model="selectedBranchId" @change="onBranchChange">
-              <option :value="null">{{ t('addClient.form.selectBranchPlaceholder') }}</option>
-              <option v-for="branch in availableBranches" :key="branch.id" :value="branch.id">
-                {{ branch.name }}
-              </option>
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label for="officeId" class="form-label">{{ t('addClient.form.assignOffice') }}</label>
-            <select class="form-select" id="officeId" v-model="client.office_id" :disabled="!selectedBranchId">
-              <option :value="null">{{ t('addClient.form.noOfficeAssigned') }}</option>
-              <option v-for="office in availableOffices" :key="office.id" :value="office.id">
-                {{ office.name }}
-              </option>
-            </select>
-          </div>
-        </div>
+
+
         <div class="mb-3">
           <label for="attachments" class="form-label">{{ t('addClient.form.attachments') }}</label>
           <input type="file" class="form-control" id="attachments" @change="handleFileUpload" multiple>

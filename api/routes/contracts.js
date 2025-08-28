@@ -56,7 +56,7 @@ contractApp.get('/:id', async (c) => {
 contractApp.post('/', uploadMiddleware('contracts', 'document'), async (c) => {
     try {
         const body = await c.req.parseBody();
-        const { client_id, office_id, start_date, end_date, monthly_rate, profile_id, notes } = body;
+        const { client_id, office_id, start_date, end_date, monthly_rate, profile_id, notes, payment_terms, service_type } = body;
         const documentUrl = c.req.filePath;
 
         if (!client_id || !office_id || !start_date || !end_date || !monthly_rate || !profile_id) {
@@ -73,6 +73,8 @@ contractApp.post('/', uploadMiddleware('contracts', 'document'), async (c) => {
             status: 'Active', // Or 'Pending' if an approval process is needed
             document_url: documentUrl,
             notes,
+            payment_terms,
+            service_type,
         });
 
         // Support both 'tax_ids' and 'tax_ids[]' from multipart form data
@@ -105,7 +107,7 @@ contractApp.put('/:id', uploadMiddleware('contracts', 'document'), async (c) => 
     const { id } = c.req.param();
     try {
         const body = await c.req.parseBody();
-        const { client_id, office_id, start_date, end_date, monthly_rate, status, notes } = body;
+        const { client_id, office_id, start_date, end_date, monthly_rate, status, notes, payment_terms, service_type } = body;
 
         const contract = await models.Contract.findByPk(id);
         if (!contract) {
@@ -123,6 +125,8 @@ contractApp.put('/:id', uploadMiddleware('contracts', 'document'), async (c) => 
             status,
             document_url: documentUrl,
             notes,
+            payment_terms,
+            service_type,
         });
 
         // Support both 'tax_ids' and 'tax_ids[]' from multipart form data.
