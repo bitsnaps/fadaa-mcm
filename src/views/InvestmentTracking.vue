@@ -15,6 +15,7 @@ const investments = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
 const activeProfileId = ref(null);
+const selectedBranch = ref('all');
 
 // Date range filter
 const fromDate = ref(localStorage.getItem('investmentTracking-fromDate') || '');
@@ -73,10 +74,17 @@ const branchInvestments = computed(() => {
   });
 });
 
+const filteredInvestments = computed(() => {
+  if (selectedBranch.value === 'all') {
+    return branchInvestments.value;
+  }
+  return branchInvestments.value.filter(inv => inv.branchName === selectedBranch.value);
+});
+
 // Get unique branches for the filter dropdown
 const uniqueBranches = computed(() => {
   const branches = investments.value.map(inv => ({
-    id: inv.Branch?.id || 'unknown',
+    id: inv.Branch?.id,
     name: inv.Branch?.name || 'N/A'
   }));
 
@@ -90,7 +98,7 @@ const uniqueBranches = computed(() => {
 
 // Calculate totals for the investments table
 const investmentTotals = computed(() => {
-  return branchInvestments.value.reduce((totals, inv) => {
+  return filteredInvestments.value.reduce((totals, inv) => {
     totals.totalInvested += inv.investmentAmount || 0;
     totals.totalIncome += inv.totalIncome || 0;
     totals.totalExpenses += inv.totalExpenses || 0;
@@ -515,14 +523,14 @@ const getStatusTranslation = (status) => {
           <h6 class="m-0 font-weight-bold text-primary">{{ $t('investmentTracking.breakdown.title') }}</h6>
           <div class="dropdown no-arrow">
             <label for="branchFilter" class="sr-only">{{ $t('investmentTracking.breakdown.filter') }}</label>
-            <select id="branchFilter" class="form-select form-select-sm">
-              <option selected>{{ $t('investmentTracking.breakdown.allBranches') }}</option>
-              <option v-for="branch in uniqueBranches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
+            <select id="branchFilter" v-model="selectedBranch" class="form-select form-select-sm">
+              <option value="all">{{ $t('investmentTracking.breakdown.allBranches') }}</option>
+              <option v-for="branch in uniqueBranches" :key="branch.id" :value="branch.name">{{ branch.name }}</option>
             </select>
           </div>
         </div>
         <div class="card-body">
-          <div v-if="branchInvestments.length === 0" class="text-center">
+          <div v-if="filteredInvestments.length === 0" class="text-center">
             <p>{{ $t('investmentTracking.breakdown.noInvestments') }}</p>
           </div>
           <div v-else class="table-responsive">
@@ -543,7 +551,7 @@ const getStatusTranslation = (status) => {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="branch in branchInvestments" :key="branch.id">
+                <tr v-for="branch in filteredInvestments" :key="branch.id">
                   <td>{{ branch.branchName }}</td>
                   <td>{{ formatCurrency(branch.investmentAmount, '') }}</td>
                   <td>{{ branch.type }}</td>
@@ -557,7 +565,7 @@ const getStatusTranslation = (status) => {
                   <td><span :class="['badge', getStatusClass(branch.status)]">{{ getStatusTranslation(branch.status) }}</span></td>
                 </tr>
               </tbody>
-              <tfoot v-if="branchInvestments.length > 0" class="table-light">
+              <tfoot v-if="filteredInvestments.length > 0" class="table-light">
                 <tr class="fw-bold">
                   <td>{{ $t('investmentTracking.breakdown.totals') }}</td>
                   <td>{{ formatCurrency(investmentTotals.totalInvested, '') }}</td>
