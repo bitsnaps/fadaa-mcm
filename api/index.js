@@ -22,11 +22,11 @@ const activityLogsApp = require('./routes/activityLogs');
 const financialsApp = require('./routes/financials');
 const profilesApp = require('./routes/profiles');
 const investorApp = require('./routes/investor');
-const withdrawalsApp = require('./routes/withdrawals');
 const reportsApp = require('./routes/reports');
 const taskApp = require('./routes/tasks');
 const clientAttachmentsApp = require('./routes/clientAttachments');
 const { hashPassword } = require('./lib/auth');
+const { authMiddleware, adminMiddleware } = require('./middleware/auth');
 const models = require('./models');
 
 if (process.env.NODE_ENV !== 'test') {
@@ -63,6 +63,8 @@ app.route('/api/activity-logs', activityLogsApp);
 app.route('/api/financials', financialsApp);
 app.route('/api/profiles', profilesApp);
 app.route('/api/investor', investorApp);
+const withdrawalsApp = require('./routes/withdrawals');
+app.use('/api/withdrawals/*', authMiddleware, adminMiddleware);
 app.route('/api/withdrawals', withdrawalsApp);
 app.route('/api/reports', reportsApp);
 app.route('/api/tasks', taskApp);

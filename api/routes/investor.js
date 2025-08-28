@@ -92,6 +92,7 @@ investorApp.get('/withdrawals', async (c) => {
     return handleRouteError(c, 'Error fetching investor withdrawals', error);
   }
 });
+
 // GET /investor/documents - list current investor documents (optional filter: profile_id)
 investorApp.get('/documents', async (c) => {
   try {

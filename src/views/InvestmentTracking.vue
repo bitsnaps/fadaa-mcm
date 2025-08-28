@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
+import { useAuthStore } from '@/stores/auth';
 import { useI18n } from 'vue-i18n';
 import { Line, Doughnut } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, ArcElement, Filler } from 'chart.js';
@@ -10,6 +11,8 @@ import ProfileTabs from '@/components/ProfileTabs.vue';
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, ArcElement, Filler);
 
 const { t } = useI18n();
+const authStore = useAuthStore();
+const userRole = computed(() => authStore.userRole);
 
 const investments = ref([]);
 const isLoading = ref(true);
@@ -39,7 +42,7 @@ const investmentSummary = computed(() => {
   const totalInvested = investments.value.reduce((sum, inv) => sum + inv.investment_amount, 0);
   const activeInvestments = investments.value.filter(inv => new Date(inv.ending_date) > new Date());
 
-  // Placeholder for profit share and ROI calculation
+  // Profit share and ROI calculation
   const totalProfitShare = investments.value.reduce((sum, inv) => sum + (inv.yourProfitShareSelectedPeriod || 0), 0);
   
   const overallROI = totalInvested > 0 ? (totalProfitShare / totalInvested) * 100 : 0;
@@ -230,7 +233,9 @@ const fetchProfitSharePayouts = async (profileId) => {
       profile_id: profileId,
       status: 'paid', // We only want the paid ones
     };
-    const { data: response } = await ApiClient.get('/investor/withdrawals', { params });
+    const endpoint = userRole.value === 'admin' ? '/withdrawals' : '/investor/withdrawals';
+    const { data: response } = await ApiClient.get(endpoint, { params });
+    
     if (response.success) {
       profitSharePayouts.value = response.data.map(p => ({
         id: p.id,
@@ -239,6 +244,7 @@ const fetchProfitSharePayouts = async (profileId) => {
         amountPaid: p.amount,
         transactionId: p.transaction_id || `WID-${p.id}`,
       }));
+      
     } else {
       console.error('Failed to fetch profit share payouts:', response.message);
       profitSharePayouts.value = [];
