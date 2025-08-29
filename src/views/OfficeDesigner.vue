@@ -81,20 +81,38 @@
         <div v-if="selectedOfficeIds.length > 0" class="flex-grow-1">
             <h5 class="mb-3">{{ $t('officeDesigner.main.selection', { count: selectedOfficeIds.length }) }}</h5>
             
-            <div class="mb-3" v-if="currentDesignIndex >= 0 && currentDesign.offices[0]?.id">
-                <div class="d-flex flex-1/2 gap-1 mb-1">
-                    <label class="form-label">x:</label>
-                    <input type="number" class="form-control" v-model="currentDesign.offices[0].x">
-                    <label class="form-label">y:</label>
-                    <input type="number" class="form-control" v-model="currentDesign.offices[0].y">
+            <!-- Section: Coordinates viewer -->
+            <div class="mb-3">
+                <div class="row g-2 mb-2">
+                    <div class="col">
+                        <label class="form-label">X</label>
+                        <input type="number" class="form-control" v-model.number="transformInputs.x" @change="updateSelectedOffices('x', transformInputs.x)">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Y</label>
+                        <input type="number" class="form-control" v-model.number="transformInputs.y" @change="updateSelectedOffices('y', transformInputs.y)">
+                    </div>
                 </div>
-                <div class="d-flex flex-1/2 gap-1 mb-1">
-                    <label class="form-label">w:</label>
-                    <input type="number" class="form-control" v-model="currentDesign.offices[0].width">
-                    <label class="form-label">h:</label>
-                    <input type="number" class="form-control" v-model="currentDesign.offices[0].height">
+                <div class="row g-2">
+                    <div class="col">
+                        <label class="form-label">W</label>
+                        <input type="number" class="form-control" v-model.number="transformInputs.width" @change="updateSelectedOffices('width', transformInputs.width)">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">H</label>
+                        <input type="number" class="form-control" v-model.number="transformInputs.height" @change="updateSelectedOffices('height', transformInputs.height)">
+                    </div>
                 </div>
             </div>
+            
+            <div class="mb-3">
+                <label class="form-label">{{ $t('officeDesigner.main.layering') }}</label>
+                <div class="btn-group w-100">
+                    <button class="btn btn-outline-secondary" @click="changeLayer('send-to-back')"><i class="bi bi-arrow-down-square"></i></button>
+                    <button class="btn btn-outline-secondary" @click="changeLayer('bring-to-front')"><i class="bi bi-arrow-up-square"></i></button>
+                </div>
+            </div>
+
             <div class="mb-3">
                 <label class="form-label">{{ $t('officeDesigner.main.shape') }}</label>
                 <select class="form-select" @change="changeSelected('shape', $event.target.value)">
@@ -151,6 +169,7 @@ const selectedOfficeIds = ref([]);
 const isShiftPressed = ref(false);
 const editingName = ref('');
 const isSaving = ref(false);
+const transformInputs = ref({ x: null, y: null, width: null, height: null });
 
 let setupModal, editNameModal;
 const setup = reactive({ branchId: null });
@@ -174,7 +193,8 @@ const officeStyle = (office) => ({
     width: `${office.width}px`,
     height: `${office.height}px`,
     transform: `translate(${office.x}px, ${office.y}px) rotate(${office.rotation}deg)`,
-    backgroundColor: office.colorClass === 'custom' ? office.customColor : ''
+    backgroundColor: office.colorClass === 'custom' ? office.customColor : '',
+    zIndex: office.zIndex
 });
 
 // Methods
@@ -234,7 +254,8 @@ const addOffice = (shape) => {
         id: newId,
         name: `Office ${currentDesign.value.offices.length + 1}`,
         x: 50, y: 50, width: 150, height: 100, rotation: 0,
-        shape: shape, colorClass: 'bg-primary', customColor: '#0d6efd'
+        shape: shape, colorClass: 'bg-primary', customColor: '#0d6efd',
+        zIndex: currentDesign.value.offices.length + 1
     });
     nextTick(initInteract);
 };
@@ -273,6 +294,19 @@ const changeSelected = (property, value) => {
     });
 };
 
+const updateSelectedOffices = (property, value) => {
+    if (value === null || value === '') return;
+    const numericValue = Number(value);
+    if (isNaN(numericValue)) return;
+
+    selectedOfficeIds.value.forEach(id => {
+        const office = currentDesign.value.offices.find(o => o.id === id);
+        if (office) {
+            office[property] = numericValue;
+        }
+    });
+};
+
 const openEditNameModal = () => {
     if (selectedOfficeIds.value.length !== 1) return;
     const office = currentDesign.value.offices.find(o => o.id === selectedOfficeIds.value[0]);
@@ -285,6 +319,33 @@ const saveOfficeName = () => {
     const office = currentDesign.value.offices.find(o => o.id === selectedOfficeIds.value[0]);
     office.name = editingName.value;
     editNameModal.hide();
+};
+
+const changeLayer = (direction) => {
+    if (selectedOfficeIds.value.length === 0) return;
+
+    const offices = currentDesign.value.offices;
+    // Sort offices by zIndex to easily find min/max
+    offices.sort((a, b) => a.zIndex - b.zIndex);
+
+    if (direction === 'bring-to-front') {
+        const maxZ = offices.length;
+        selectedOfficeIds.value.forEach(id => {
+            const office = offices.find(o => o.id === id);
+            if (office) office.zIndex = maxZ + 1; // Move to top
+        });
+    } else if (direction === 'send-to-back') {
+        selectedOfficeIds.value.forEach(id => {
+            const office = offices.find(o => o.id === id);
+            if (office) office.zIndex = 0; // Move to bottom
+        });
+    }
+
+    // Re-normalize z-indexes to keep them sequential and clean
+    offices.sort((a, b) => a.zIndex - b.zIndex);
+    offices.forEach((office, index) => {
+        office.zIndex = index + 1;
+    });
 };
 
 const duplicateSelected = () => {
@@ -442,6 +503,18 @@ onMounted(async () => {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     
+    watch(selectedOfficeIds, (newVal) => {
+        if (newVal.length === 1) {
+            const office = currentDesign.value.offices.find(o => o.id === newVal[0]);
+            if (office) {
+                transformInputs.value = { x: office.x, y: office.y, width: office.width, height: office.height };
+            }
+        } else {
+            // Clear inputs if multiple or no items are selected, as their values might differ.
+            transformInputs.value = { x: null, y: null, width: null, height: null };
+        }
+    }, { deep: true });
+
     onUnmounted(() => {
         window.removeEventListener('keydown', handleKeyDown);
         window.removeEventListener('keyup', handleKeyUp);

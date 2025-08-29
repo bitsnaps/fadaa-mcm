@@ -913,7 +913,8 @@
       "saving": "Enregistrement...",
       "resetDesign": "Réinitialiser les Designs",
       "confirmReset": "Êtes-vous sûr de vouloir effacer tous les designs enregistrés et recommencer ?",
-      "designSaved": "Designs enregistrés avec succès !"
+      "designSaved": "Designs enregistrés avec succès !",
+      "layering":"Superposition"
     }
   },
   "userProfile": {

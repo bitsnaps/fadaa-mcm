@@ -912,7 +912,8 @@
       "saving": "Saving...",
       "resetDesign": "Reset All Designs",
       "confirmReset": "Are you sure you want to clear all saved designs and start over?",
-      "designSaved": "Designs saved successfully!"
+      "designSaved": "Designs saved successfully!",
+      "layering": "Layering"
     }
   },
   "userProfile": {
