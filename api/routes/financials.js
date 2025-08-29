@@ -138,8 +138,8 @@ financialsApp.get('/revenue-series', async (c) => {
       const monthStart = new Date(current.getFullYear(), current.getMonth(), 1);
       const monthEnd = new Date(current.getFullYear(), current.getMonth() + 1, 0, 23, 59, 59, 999);
 
-      const whereCreated = { created_at: { [Op.between]: [start, end] } };
-      const whereTrans = { transaction_date: { [Op.between]: [start, end] } };
+      const whereCreated = { created_at: { [Op.between]: [monthStart, monthEnd] } };
+      const whereTrans = { transaction_date: { [Op.between]: [monthStart, monthEnd] } };
       if (profile_id) {
         whereCreated.profile_id = profile_id;
         whereTrans.profile_id = profile_id;
@@ -147,17 +147,17 @@ financialsApp.get('/revenue-series', async (c) => {
 
       // Client Services
       const servicesRevenue = await calculateServiceRevenue({
-          startDate: start,
-          endDate: end,
+          startDate: monthStart,
+          endDate: monthEnd,
           profile_id,
-          withTaxes: false // Per original logic, revenue is price before tax adjustment
+          withTaxes: false
       });
 
       // Contracts (active within month by start/end date overlap)
       const contractWhere = {
         [Op.and]: [
-          { start_date: { [Op.lte]: end } },
-          { end_date: { [Op.gte]: start } }
+          { start_date: { [Op.lte]: monthEnd } },
+          { end_date: { [Op.gte]: monthStart } }
         ]
       };
       if (profile_id) contractWhere.profile_id = profile_id;

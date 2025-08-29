@@ -3,7 +3,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Line } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler } from 'chart.js';
-import { getRevenueSeries } from '@/services/RevenueService';
+// import { getRevenueSeries } from '@/services/RevenueService';
 import { formatCurrency } from '@/helpers/utils.js';
 import { getMyWithdrawals, createWithdrawal } from '@/services/WithdrawalService';
 import { getMyInvestments } from '@/services/InvestmentService';
@@ -17,8 +17,8 @@ ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScal
 const { t, locale } = useI18n();
 const { showErrorToast } = useToast();
 
-const chartFilter = ref('monthly'); // monthly, bi-yearly, yearly
-const revenueSeries = ref({ labels: [], values: [] });
+// const chartFilter = ref('monthly'); // monthly, bi-yearly, yearly
+// const revenueSeries = ref({ labels: [], values: [] });
 
 // --- Investor withdrawals integration (live data) ---
 const invIsLoading = ref(true);
@@ -68,8 +68,6 @@ async function loadInvestorData() {
   try {
     const params = { profile_id: activeProfileId.value };
     const resInv = await getMyInvestments(params);
-    console.log(resInv.data.data);
-    
     if (resInv.data?.success) {
       myInvestments.value = resInv.data.data || [];
     }
@@ -86,17 +84,18 @@ async function loadInvestorData() {
         icon: d.type === 'Contract' ? 'bi-file-earmark-pdf-fill text-danger' : 'bi-file-earmark-text'
       }));
     }
-    // Revenue series from backend (by month)
+    /*/ Revenue series from backend (by month)
     const today = new Date();
     const year = today.getFullYear();
-    const resRev = await getRevenueSeries({ profile_id: activeProfileId.value, year });
-    console.log(resRev.data.data);
+    const startDate = new Date(year, 0, 1);
+    const endDate = new Date(year, 11, 31);
+    const resRev = await getRevenueSeries({ profile_id: activeProfileId.value, startDate: startDate.toISOString(), endDate: endDate.toISOString() });
     
     if (resRev.data?.success) {
       const d = resRev.data.data || {};
       const months = locale.value === 'fr' ? ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'] : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       revenueSeries.value = { labels: months, values: (d.netRevenue || Array(12).fill(0)) };
-    }
+    }*/
     const resKpis = await getInvestorKpis(params);
     if (resKpis.data?.success) {
       kpis.value = resKpis.data.data;
@@ -160,136 +159,127 @@ async function initializeDashboard() {
 
 onMounted(initializeDashboard);
 
-// Removed mock investment lists; investor sees live data only
-
-// Removed mock investment lists; investor sees live data only
-
-// Removed mock investment lists; investor sees live data only
-
 // Profit shares derived from paid withdrawals
 const paidWithdrawals = computed(() => myWithdrawals.value.filter(w => w.status === 'paid'));
 
 // Documents from backend
 const documents = ref([]);
 
-// Deprecated table filter and mock data
+// const monthLabels = computed(() => (
+//     locale.value === 'fr'
+//     ? ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
+//     : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+// ));
 
+// const monthlyData = computed(() => ({
+//   labels: revenueSeries.value.labels.length ? revenueSeries.value.labels : monthLabels.value,
+//   datasets: [
+//     {
+//       label: t('investorDashboard.chart.monthlyLabel'),
+//       borderColor: '#0D6EFD',
+//       backgroundColor: 'rgba(13, 110, 253, 0.1)',
+//       tension: 0.4,
+//       fill: true,
+//       data: revenueSeries.value.values.length ? revenueSeries.value.values : [0,0,0,0,0,0,0,0,0,0,0,0],
+//     },
+//   ],
+// }));
 
-const monthLabels = computed(() => (
-    locale.value === 'fr'
-    ? ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
-    : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-));
+// const biYearlyData = computed(() => ({
+//   labels: ['S1-2023', 'S2-2023', 'S1-2024', 'S2-2024'],
+//   datasets: [
+//     {
+//       label: t('investorDashboard.chart.biYearlyLabel'),
+//       borderColor: '#0D6EFD',
+//       backgroundColor: 'rgba(13, 110, 253, 0.1)',
+//       tension: 0.4,
+//       fill: true,
+//       data: [800, 950, 1100, 1250],
+//     },
+//   ],
+// }));
 
-const monthlyData = computed(() => ({
-  labels: revenueSeries.value.labels.length ? revenueSeries.value.labels : monthLabels.value,
-  datasets: [
-    {
-      label: t('investorDashboard.chart.monthlyLabel'),
-      borderColor: '#0D6EFD',
-      backgroundColor: 'rgba(13, 110, 253, 0.1)',
-      tension: 0.4,
-      fill: true,
-      data: revenueSeries.value.values.length ? revenueSeries.value.values : [0,0,0,0,0,0,0,0,0,0,0,0],
-    },
-  ],
-}));
+// const yearlyData = computed(() => ({
+//   labels: ['2022', '2023', '2024', '2025 (Proj.)'],
+//   datasets: [
+//     {
+//       label: t('investorDashboard.chart.yearlyLabel'),
+//       borderColor: '#0D6EFD',
+//       backgroundColor: 'rgba(13, 110, 253, 0.1)',
+//       tension: 0.4,
+//       fill: true,
+//       data: [1500, 1750, 2350, 2800],
+//     },
+//   ],
+// }));
 
-const biYearlyData = computed(() => ({
-  labels: ['S1-2023', 'S2-2023', 'S1-2024', 'S2-2024'],
-  datasets: [
-    {
-      label: t('investorDashboard.chart.biYearlyLabel'),
-      borderColor: '#0D6EFD',
-      backgroundColor: 'rgba(13, 110, 253, 0.1)',
-      tension: 0.4,
-      fill: true,
-      data: [800, 950, 1100, 1250],
-    },
-  ],
-}));
+// const chartData = ref(monthlyData.value);
 
-const yearlyData = computed(() => ({
-  labels: ['2022', '2023', '2024', '2025 (Proj.)'],
-  datasets: [
-    {
-      label: t('investorDashboard.chart.yearlyLabel'),
-      borderColor: '#0D6EFD',
-      backgroundColor: 'rgba(13, 110, 253, 0.1)',
-      tension: 0.4,
-      fill: true,
-      data: [1500, 1750, 2350, 2800],
-    },
-  ],
-}));
-
-const chartData = ref(monthlyData.value);
-
-const chartOptions = computed(() => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      display: true,
-      position: 'top',
-    },
-    title: {
-      display: true,
-      text: t('investorDashboard.chart.title'),
-      font: {
-        size: 16
-      }
-    },
-    tooltip: {
-      mode: 'index',
-      intersect: false,
-    }
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-      title: {
-        display: true,
-        text: t('investorDashboard.chart.revenue')
-      }
-    },
-    x: {
-        grid: {
-            display: false
-        }
-    }
-  }
-}));
+// const chartOptions = computed(() => ({
+//   responsive: true,
+//   maintainAspectRatio: false,
+//   plugins: {
+//     legend: {
+//       display: true,
+//       position: 'top',
+//     },
+//     title: {
+//       display: true,
+//       text: t('investorDashboard.chart.title'),
+//       font: {
+//         size: 16
+//       }
+//     },
+//     tooltip: {
+//       mode: 'index',
+//       intersect: false,
+//     }
+//   },
+//   scales: {
+//     y: {
+//       beginAtZero: true,
+//       title: {
+//         display: true,
+//         text: t('investorDashboard.chart.revenue')
+//       }
+//     },
+//     x: {
+//         grid: {
+//             display: false
+//         }
+//     }
+//   }
+// }));
 
 // Chart filter controls removed from UI; chart remains illustrative
 
 // Removed table filter per requirement: investor sees only active profile data
 
 
-watch(chartFilter, (newFilter) => {
-  const options = chartOptions.value;
-  switch (newFilter) {
-    case 'monthly':
-      chartData.value = monthlyData.value;
-      options.plugins.title.text = t('investorDashboard.chart.monthlyTitle');
-      break;
-    case 'bi-yearly':
-      chartData.value = biYearlyData.value;
-      options.plugins.title.text = t('investorDashboard.chart.biYearlyTitle');
-      break;
-    case 'yearly':
-      chartData.value = yearlyData.value;
-      options.plugins.title.text = t('investorDashboard.chart.yearlyTitle');
-      break;
-  }
-}, { immediate: true });
+// watch(chartFilter, (newFilter) => {
+//   const options = chartOptions.value;
+//   switch (newFilter) {
+//     case 'monthly':
+//       chartData.value = monthlyData.value;
+//       options.plugins.title.text = t('investorDashboard.chart.monthlyTitle');
+//       break;
+//     case 'bi-yearly':
+//       chartData.value = biYearlyData.value;
+//       options.plugins.title.text = t('investorDashboard.chart.biYearlyTitle');
+//       break;
+//     case 'yearly':
+//       chartData.value = yearlyData.value;
+//       options.plugins.title.text = t('investorDashboard.chart.yearlyTitle');
+//       break;
+//   }
+// }, { immediate: true });
 
-watch(locale, () => {
-    // Re-run the filter watcher to update titles
-    const currentFilter = chartFilter.value;
-    chartFilter.value = '';
-    chartFilter.value = currentFilter;
-});
+// watch(locale, () => {
+//     // Re-run the filter watcher to update titles
+//     const currentFilter = chartFilter.value;
+//     chartFilter.value = '';
+//     chartFilter.value = currentFilter;
+// });
 
 </script>
 
@@ -297,7 +287,144 @@ watch(locale, () => {
   <div class="dashboard-container container-fluid">
     <h2 class="mb-4">{{ $t('investorDashboard.title') }}</h2>
 
-    <!-- Withdrawals KPIs + Request -->
+    <!-- Section 1: Major KPIs -->
+    <div class="row gy-4 mb-4">
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm text-center">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-graph-up me-2 text-fadaa-blue"></i>{{ $t('investorDashboard.kpis.roi') }}</h5>
+            <p class="card-text fs-4 fw-bold">{{ kpis.roi.toFixed(2) }}%</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm text-center">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-currency-euro me-2 text-fadaa-blue"></i>{{ $t('investorDashboard.kpis.totalRevenue') }}</h5>
+            <p class="card-text fs-4 fw-bold"> {{ formatCurrency(kpis.totalRevenue) }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm text-center">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-people-fill me-2 text-fadaa-blue"></i>{{ $t('investorDashboard.kpis.activeClients') }}</h5>
+            <p class="card-text fs-4 fw-bold">{{ kpis.activeClients }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Revenue Evolution Line Chart -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-fadaa-light-blue">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0"><i class="bi bi-briefcase-fill me-2"></i>{{ $t('investorDashboard.investmentDetails.title') }}</h5>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>{{ $t('investorDashboard.investmentDetails.table.branch') }}</th>
+                    <th>{{ $t('investorDashboard.investmentDetails.table.share') }}</th>
+                    <th>{{ $t('investorDashboard.withdrawals.kpis.accrued') }}</th>
+                    <th>{{ $t('investorDashboard.withdrawals.kpis.committed') }}</th>
+                    <th>{{ $t('investorDashboard.withdrawals.kpis.available') }}</th>
+                    <!-- <th>{{ $t('investorDashboard.investmentDetails.table.status') }}</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="myInvestments.length === 0">
+                    <td colspan="6" class="text-center">{{ $t('investorDashboard.investmentDetails.noData') }}</td>
+                  </tr>
+                  <tr v-for="inv in myInvestments" :key="inv.id">
+                    <td>{{ inv.Branch?.name || inv.name }}</td>
+                    <td>{{ inv.percentage }}%</td>
+                    <td>{{ formatCurrency(inv.yourProfitShareSelectedPeriod || 0) }}</td>
+                    <td>{{ formatCurrency(inv.withdrawalsCommitted || 0) }}</td>
+                    <td>{{ formatCurrency(inv.availableForWithdrawal != null ? inv.availableForWithdrawal : Math.max((inv.yourProfitShareSelectedPeriod || 0) - (inv.withdrawalsCommitted || 0), 0)) }}</td>
+                    <!-- <td><span :class="['badge', (inv.status==='active' ? 'bg-success' : 'bg-warning')]">{{ $t(`investorDashboard.statuses.${inv.status || 'active'}`) }}</span></td> -->
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart (filters removed to simplify investor view) -->
+      <!-- div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-header bg-fadaa-light-blue">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0"><i class="bi bi-activity me-2"></i>{{ $t('investorDashboard.revenueEvolution.title') }}</h5>
+            </div>
+          </div>
+          <div class="card-body">
+            <Line :data="chartData" :options="chartOptions" style="height: 350px;" />
+          </div>
+        </div>
+      </div -->
+
+    </div>
+
+    <!-- Section 3: Recent Activities -->
+    <!-- <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-fadaa-light-blue">
+            <h5 class="mb-0"><i class="bi bi-list-stars me-2"></i>{{ $t('investorDashboard.recentActivities.title') }}</h5>
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item"><i class="bi bi-building-add text-success me-2"></i>{{ $t('investorDashboard.recentActivities.activity1') }}</li>
+              <li class="list-group-item"><i class="bi bi-cash-stack text-primary me-2"></i>{{ $t('investorDashboard.recentActivities.activity2') }}</li>
+              <li class="list-group-item"><i class="bi bi-graph-up-arrow text-info me-2"></i>{{ $t('investorDashboard.recentActivities.activity3') }}</li>
+              <li class="list-group-item"><i class="bi bi-person-plus-fill text-fadaa-orange me-2"></i>{{ $t('investorDashboard.recentActivities.activity4') }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- Section 4: Profit Share History -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-fadaa-light-blue">
+            <h5 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>{{ $t('investorDashboard.profitShareHistory.title') }}</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>{{ $t('investorDashboard.profitShareHistory.table.date') }}</th>
+                    <th>{{ $t('investorDashboard.profitShareHistory.table.branch') }}</th>
+                    <th>{{ $t('investorDashboard.profitShareHistory.table.amountReceived') }}</th>
+                    <th>{{ $t('investorDashboard.profitShareHistory.table.period') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="w in paidWithdrawals" :key="w.id">
+                    <td>{{ new Date(w.paid_at || w.updated_at || w.created_at).toLocaleString() }}</td>
+                    <td>{{ w.Investment?.name || w.investment_id }}</td>
+                    <td>{{ formatCurrency(w.amount) }}</td>
+                    <td>{{ $t('investorDashboard.revenueEvolution.monthly') }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5: Withdrawals -->
     <div class="row gy-4 mb-4">
       <div class="col-md-6">
         <div class="card h-100 shadow-sm">
@@ -425,143 +552,7 @@ watch(locale, () => {
       </div>
     </div>
 
-    <!-- Section 1: Major KPIs -->
-    <div class="row gy-4 mb-4">
-      <div class="col-md-4">
-        <div class="card h-100 shadow-sm text-center">
-          <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-graph-up me-2 text-fadaa-blue"></i>{{ $t('investorDashboard.kpis.roi') }}</h5>
-            <p class="card-text fs-4 fw-bold">{{ kpis.roi.toFixed(2) }}%</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100 shadow-sm text-center">
-          <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-currency-euro me-2 text-fadaa-blue"></i>{{ $t('investorDashboard.kpis.totalRevenue') }}</h5>
-            <p class="card-text fs-4 fw-bold"> {{ formatCurrency(kpis.totalRevenue) }}</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100 shadow-sm text-center">
-          <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-people-fill me-2 text-fadaa-blue"></i>{{ $t('investorDashboard.kpis.activeClients') }}</h5>
-            <p class="card-text fs-4 fw-bold">{{ kpis.activeClients }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 2: Revenue Evolution Line Chart -->
-    <div class="row mb-4">
-      <div class="col-md-6">
-        <div class="card shadow-sm">
-          <div class="card-header bg-fadaa-light-blue">
-            <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0"><i class="bi bi-briefcase-fill me-2"></i>{{ $t('investorDashboard.investmentDetails.title') }}</h5>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>{{ $t('investorDashboard.investmentDetails.table.branch') }}</th>
-                    <th>{{ $t('investorDashboard.investmentDetails.table.share') }}</th>
-                    <th>{{ $t('investorDashboard.withdrawals.kpis.accrued') }}</th>
-                    <th>{{ $t('investorDashboard.withdrawals.kpis.committed') }}</th>
-                    <th>{{ $t('investorDashboard.withdrawals.kpis.available') }}</th>
-                    <!-- <th>{{ $t('investorDashboard.investmentDetails.table.status') }}</th> -->
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-if="myInvestments.length === 0">
-                    <td colspan="6" class="text-center">{{ $t('investorDashboard.investmentDetails.noData') }}</td>
-                  </tr>
-                  <tr v-for="inv in myInvestments" :key="inv.id">
-                    <td>{{ inv.Branch?.name || inv.name }}</td>
-                    <td>{{ inv.percentage }}%</td>
-                    <td>{{ formatCurrency(inv.yourProfitShareSelectedPeriod || 0) }}</td>
-                    <td>{{ formatCurrency(inv.withdrawalsCommitted || 0) }}</td>
-                    <td>{{ formatCurrency(inv.availableForWithdrawal != null ? inv.availableForWithdrawal : Math.max((inv.yourProfitShareSelectedPeriod || 0) - (inv.withdrawalsCommitted || 0), 0)) }}</td>
-                    <!-- <td><span :class="['badge', (inv.status==='active' ? 'bg-success' : 'bg-warning')]">{{ $t(`investorDashboard.statuses.${inv.status || 'active'}`) }}</span></td> -->
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="card shadow-sm">
-          <div class="card-header bg-fadaa-light-blue">
-            <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0"><i class="bi bi-activity me-2"></i>{{ $t('investorDashboard.revenueEvolution.title') }}</h5>
-              <!-- Chart filters removed to simplify investor view -->
-            </div>
-          </div>
-          <div class="card-body">
-            <Line :data="chartData" :options="chartOptions" style="height: 350px;" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 3: Recent Activities -->
-    <!-- <div class="row mb-4">
-      <div class="col-12">
-        <div class="card shadow-sm">
-          <div class="card-header bg-fadaa-light-blue">
-            <h5 class="mb-0"><i class="bi bi-list-stars me-2"></i>{{ $t('investorDashboard.recentActivities.title') }}</h5>
-          </div>
-          <div class="card-body">
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item"><i class="bi bi-building-add text-success me-2"></i>{{ $t('investorDashboard.recentActivities.activity1') }}</li>
-              <li class="list-group-item"><i class="bi bi-cash-stack text-primary me-2"></i>{{ $t('investorDashboard.recentActivities.activity2') }}</li>
-              <li class="list-group-item"><i class="bi bi-graph-up-arrow text-info me-2"></i>{{ $t('investorDashboard.recentActivities.activity3') }}</li>
-              <li class="list-group-item"><i class="bi bi-person-plus-fill text-fadaa-orange me-2"></i>{{ $t('investorDashboard.recentActivities.activity4') }}</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div> -->
-
-    <!-- Section 4: Profit Share History -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="card shadow-sm">
-          <div class="card-header bg-fadaa-light-blue">
-            <h5 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>{{ $t('investorDashboard.profitShareHistory.title') }}</h5>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>{{ $t('investorDashboard.profitShareHistory.table.date') }}</th>
-                    <th>{{ $t('investorDashboard.profitShareHistory.table.branch') }}</th>
-                    <th>{{ $t('investorDashboard.profitShareHistory.table.amountReceived') }}</th>
-                    <th>{{ $t('investorDashboard.profitShareHistory.table.period') }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="w in paidWithdrawals" :key="w.id">
-                    <td>{{ new Date(w.paid_at || w.updated_at || w.created_at).toLocaleString() }}</td>
-                    <td>{{ w.Investment?.name || w.investment_id }}</td>
-                    <td>{{ formatCurrency(w.amount) }}</td>
-                    <td>{{ $t('investorDashboard.revenueEvolution.monthly') }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 5: Documents -->
+    <!-- Section 6: Documents -->
     <div class="row mb-4">
       <div class="col-12">
         <div class="card shadow-sm">
