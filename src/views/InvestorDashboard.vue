@@ -9,6 +9,7 @@ import { getMyWithdrawals, createWithdrawal } from '@/services/WithdrawalService
 import { getMyInvestments } from '@/services/InvestmentService';
 import { getMyDocuments } from '@/services/InvestorService';
 import profileService from '@/services/profileService';
+import { getInvestorKpis } from '@/services/DashboardService';
 import { useToast } from '@/helpers/toast';
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler);
@@ -30,6 +31,12 @@ const withdrawalForm = ref({
   amount: '',
   payment_method: '',
   notes: ''
+});
+
+const kpis = ref({
+  roi: 0,
+  totalRevenue: 0,
+  activeClients: 0,
 });
 
 const totals = computed(() => {
@@ -89,6 +96,10 @@ async function loadInvestorData() {
       const d = resRev.data.data || {};
       const months = locale.value === 'fr' ? ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'] : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       revenueSeries.value = { labels: months, values: (d.netRevenue || Array(12).fill(0)) };
+    }
+    const resKpis = await getInvestorKpis(params);
+    if (resKpis.data?.success) {
+      kpis.value = resKpis.data.data;
     }
   } catch (e) {
     invError.value = e.message || 'Failed to load investor data';
@@ -420,7 +431,7 @@ watch(locale, () => {
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-graph-up me-2 text-fadaa-blue"></i>{{ $t('investorDashboard.kpis.roi') }}</h5>
-            <p class="card-text fs-4 fw-bold">15.2%</p>
+            <p class="card-text fs-4 fw-bold">{{ kpis.roi.toFixed(2) }}%</p>
           </div>
         </div>
       </div>
@@ -428,7 +439,7 @@ watch(locale, () => {
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-currency-euro me-2 text-fadaa-blue"></i>{{ $t('investorDashboard.kpis.totalRevenue') }}</h5>
-            <p class="card-text fs-4 fw-bold"> {{ formatCurrency(1250000)}}</p>
+            <p class="card-text fs-4 fw-bold"> {{ formatCurrency(kpis.totalRevenue) }}</p>
           </div>
         </div>
       </div>
@@ -436,7 +447,7 @@ watch(locale, () => {
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-people-fill me-2 text-fadaa-blue"></i>{{ $t('investorDashboard.kpis.activeClients') }}</h5>
-            <p class="card-text fs-4 fw-bold">850</p>
+            <p class="card-text fs-4 fw-bold">{{ kpis.activeClients }}</p>
           </div>
         </div>
       </div>

@@ -15,3 +15,7 @@ export const getMonthlyIncomeByBranch = (params) => {
 export const getRevenueSummary = (params) => {
     return apiClient.get('/financials/revenue-summary', { params });
 };
+
+export const getInvestorKpis = (params) => {
+    return apiClient.get('/investor/kpis', { params });
+};

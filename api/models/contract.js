@@ -44,8 +44,8 @@ module.exports = (sequelize) => {
        key: 'id'
      }
    }
-  }, {
-    tableName: 'contracts',
+ }, {
+   tableName: 'contracts',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',

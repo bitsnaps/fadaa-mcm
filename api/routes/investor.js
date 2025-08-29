@@ -346,4 +346,69 @@ investorApp.post('/withdrawals', async (c) => {
   }
 });
 
+investorApp.get('/kpis', async (c) => {
+  try {
+    const user = c.get('user');
+    const { profile_id } = c.req.query();
+
+    if (!profile_id) {
+      return c.json({ success: false, message: 'Profile ID is required' }, 400);
+    }
+
+    const where = {
+      profile_id: profile_id,
+      ...(user.id && { investor_id: user.id })
+    };
+
+    const investments = await models.Investment.findAll({ where });
+    if (investments.length === 0) {
+      return c.json({ success: true, data: { totalRevenue: 0, roi: 0, activeClients: 0 } });
+    }
+
+    const totalInvested = investments.reduce((sum, inv) => sum + Number(inv.investment_amount), 0);
+    const calculations = await getInvestmentCalculations(investments.map(i => ({ ...i.toJSON(), ending_date: new Date() })));
+    
+    let totalProfitShare = 0;
+    for (const invId in calculations) {
+      totalProfitShare += calculations[invId].yourProfitShareSelectedPeriod || 0;
+    }
+
+    // console.log('\n**** totalInvested: ', totalInvested, ', totalProfitShare: ', totalProfitShare);
+    
+    const roi = totalInvested > 0 ? (totalProfitShare / totalInvested) * 100 : 0;
+    const activeProfile = await models.Profile.findOne({ where: { is_active: true } });
+    if (!activeProfile) {
+      return c.json({ success: true, data: { totalRevenue: totalProfitShare, roi: roi, activeClients: 0 } });
+    }
+
+    const contractClients = await models.Contract.findAndCountAll({
+      where: { profile_id: activeProfile.id, status: 'Active' },
+      attributes: ['client_id'],
+      group: ['client_id'],
+    });
+
+    const serviceClients = await models.ClientService.findAndCountAll({
+      where: { profile_id: activeProfile.id, status: 'Active' },
+      attributes: ['client_id'],
+      group: ['client_id'],
+    });
+
+    const contractClientIds = contractClients.rows.map(c => c.client_id);
+    const serviceClientIds = serviceClients.rows.map(s => s.client_id);
+
+    const activeClientIds = new Set([...contractClientIds, ...serviceClientIds]);
+
+    return c.json({
+      success: true,
+      data: {
+        totalRevenue: totalProfitShare,
+        roi: roi,
+        activeClients: activeClientIds.size,
+      }
+    });
+  } catch (error) {
+    return handleRouteError(c, 'Error fetching investor KPIs', error);
+  }
+});
+
 module.exports = investorApp;
