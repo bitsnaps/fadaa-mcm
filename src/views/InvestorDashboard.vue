@@ -372,7 +372,7 @@ const documents = ref([]);
 
     </div>
 
-    <!-- Section 3: Recent Activities -->
+    <!-- Section 3: Recent Activities (not implemented)-->
     <!-- <div class="row mb-4">
       <div class="col-12">
         <div class="card shadow-sm">
@@ -381,10 +381,7 @@ const documents = ref([]);
           </div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
-              <li class="list-group-item"><i class="bi bi-building-add text-success me-2"></i>{{ $t('investorDashboard.recentActivities.activity1') }}</li>
-              <li class="list-group-item"><i class="bi bi-cash-stack text-primary me-2"></i>{{ $t('investorDashboard.recentActivities.activity2') }}</li>
-              <li class="list-group-item"><i class="bi bi-graph-up-arrow text-info me-2"></i>{{ $t('investorDashboard.recentActivities.activity3') }}</li>
-              <li class="list-group-item"><i class="bi bi-person-plus-fill text-fadaa-orange me-2"></i>{{ $t('investorDashboard.recentActivities.activity4') }}</li>
+              <li class="list-group-item" v-for="activity in activities" :key="activity.id"><i :class="bi bi-building-add text-{activity.type} me-2"></i>{{ activity.content }}</li>
             </ul>
           </div>
         </div>

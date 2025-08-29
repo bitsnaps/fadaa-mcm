@@ -90,18 +90,15 @@ financialsApp.get('/revenue-summary', async (c) => {
         const netRevenue = servicesRevenue + contractsRevenue + incomeRevenue;
         const netProfit = netRevenue - totalExpense;
 
-        console.log('------------------------');
-        // For debugging purposes
-        console.log(`Net Revenue: ${netRevenue}`);
-        console.log(`Net Profit: ${netProfit}`);
-        console.log(`Total Expense: ${totalExpense}`);
-        console.log(`Services Revenue: ${servicesRevenue}`);
-        console.log(`Contracts Revenue: ${contractsRevenue}`);
-        console.log(`Income Revenue: ${incomeRevenue}`);
-        console.log('------------------------');
-        console.log('[Net Revenue]: 100000+(20000*.81)+40000=156,200.00');
-        console.log('[Net Profit]=[Net Revenue]-20000=136,200.000');
-        console.log('------------------------');
+        // console.log('------------------------');
+        // // For debugging purposes
+        // console.log(`Net Revenue: ${netRevenue}`);
+        // console.log(`Net Profit: ${netProfit}`);
+        // console.log(`Total Expense: ${totalExpense}`);
+        // console.log(`Services Revenue: ${servicesRevenue}`);
+        // console.log(`Contracts Revenue: ${contractsRevenue}`);
+        // console.log(`Income Revenue: ${incomeRevenue}`);
+        // console.log('------------------------');
 
         return c.json({
             success: true,

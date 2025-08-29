@@ -30,7 +30,6 @@ authApp.post('/login', async (c) => {
       // Generate JWT
       const token = jwt.sign({ id: user.id, email: user.email, role_id: user.role_id, branch_id: user.branch_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
       
-      console.log('User logged in:', email);
       return c.json({
         success: true,
         message: 'Login successful',

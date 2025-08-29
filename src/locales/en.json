@@ -510,6 +510,7 @@
       "country": "Country",
       "clientType": "Client Type",
       "selectType": "Select Type",
+      "serviceType": "Service Type",
       "individual": "Individual",
       "company": "Company",
       "people": "people",
@@ -1184,6 +1185,7 @@
     "approveConfirm": "Approve this withdrawal?",
     "rejectConfirm": "Reject this withdrawal?",
     "markPaidConfirm": "Mark this withdrawal as PAID?",
+    "cancelConfirm": "Do you really want to cancel this withdrawal?",
     "filters": {
       "title": "Filters",
       "status": "Status",

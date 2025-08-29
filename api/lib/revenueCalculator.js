@@ -63,7 +63,7 @@ const calculateContractRevenue = (contracts, investment) => {
 
       current.setMonth(current.getMonth() + 1);
     }
-    console.log('totalContractRevenue = ', totalContractRevenue, `from: ${start_date}, to: ${end_date}, monthly_rate: ${monthly_rate}`);
+    // console.log('totalContractRevenue = ', totalContractRevenue, `from: ${start_date}, to: ${end_date}, monthly_rate: ${monthly_rate}`);
   }
 
   return totalContractRevenue;

@@ -79,12 +79,12 @@ const calculateComprehensiveProfits = async (investments) => {
     };
   }
 
-  console.log('\n**** calculateComprehensiveProfits (global):\n');  
-  Object.keys(calculations).forEach( key => {
-    console.log(`calculations[${key}]:\n`);
-    console.log(`[branchNetProfitSelectedPeriod] = [totalIncome] - [totalExpense] = `, calculations[key]['branchNetProfitSelectedPeriod']);
-    console.log(`[yourProfitShareSelectedPeriod] = [grossProfitShare] - [totalTaxAmount] = `, calculations[key]['yourProfitShareSelectedPeriod']);
-  });
+  // console.log('\n**** calculateComprehensiveProfits (global):\n');  
+  // Object.keys(calculations).forEach( key => {
+  //   console.log(`calculations[${key}]:\n`);
+  //   console.log(`[branchNetProfitSelectedPeriod] = [totalIncome] - [totalExpense] = `, calculations[key]['branchNetProfitSelectedPeriod']);
+  //   console.log(`[yourProfitShareSelectedPeriod] = [grossProfitShare] - [totalTaxAmount] = `, calculations[key]['yourProfitShareSelectedPeriod']);
+  // });
 
   return calculations;
 };

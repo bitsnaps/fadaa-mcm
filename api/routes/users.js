@@ -90,7 +90,6 @@ userApp.post('/', authMiddleware, async (c) => {
             preferences
         });
 
-        console.log('User created:', email);
         return c.json({ success: true, message: 'User created successfully', userId: newUser.id });
     } catch (error) {
         console.error('User creation error:', error);

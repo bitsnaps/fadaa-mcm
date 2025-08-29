@@ -511,6 +511,7 @@
       "country": "Pays",
       "clientType": "Type de Client",
       "selectType": "Sélectionner un Type",
+      "serviceType": "Type de Service",
       "individual": "Particulier",
       "company": "Entreprise",
       "people": "personnes",
@@ -1188,6 +1189,7 @@
     "approveConfirm": "Approuver ce retrait ?",
     "rejectConfirm": "Rejeter ce retrait ?",
     "markPaidConfirm": "Marquer ce retrait comme PAYÉ ?",
+    "cancelConfirm": "Êtes-vous sûr de vouloir annuler ce retrait ?",
     "filters": {
       "title": "Filtres",
       "status": "Statut",
