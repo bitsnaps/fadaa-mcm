@@ -169,6 +169,8 @@
       "name": "Nom",
       "percentage": "Pourcentage",
       "type": "Type",
+      "comprehensive": "Complet",
+      "contractual": "Contractuel",      
       "investment_amount": "Montant",
       "starting_date": "Début",
       "ending_date": "Fin",

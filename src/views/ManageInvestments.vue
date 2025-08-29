@@ -99,6 +99,7 @@ const tableItems = computed(() =>
         ...inv,
         investor_name: inv.investor ? `${inv.investor.first_name} ${inv.investor.last_name}` : 'N/A',
         branch_name: inv.Branch ? inv.Branch.name : 'N/A',
+        type: t(`investments.tableHeaders.${inv.type.toLowerCase()}`),
         starting_date: inv.starting_date ? (typeof inv.starting_date === 'string' ? inv.starting_date.slice(0, 10) : '') : '',
         ending_date: inv.ending_date ? (typeof inv.ending_date === 'string' ? inv.ending_date.slice(0, 10) : '') : ''
     }))
@@ -287,8 +288,8 @@ const handleDelete = async (id) => {
                             <div class="mb-3">
                                 <label for="inv-type" class="form-label">{{ t('investments.tableHeaders.type') }} <span class="text-danger">*</span></label>
                                 <select id="inv-type" class="form-select" v-model="currentInvestment.type" required>
-                                    <option value="Comprehensive">Comprehensive</option>
-                                    <option value="Contractual">Contractual</option>
+                                    <option value="Comprehensive">{{ t('investments.tableHeaders.comprehensive') }}</option>
+                                    <option value="Contractual">{{ t('investments.tableHeaders.contractual') }}</option>
                                 </select>
                             </div>
                             <div class="row">

@@ -172,7 +172,9 @@
       "starting_date": "Start Date",
       "ending_date": "End Date",
       "actions": "Actions",
-      "type": "Type"
+      "type": "Type",
+      "comprehensive": "Comprehensive",
+      "contractual": "Contractual"
     },
     "edit": "Edit",
     "delete": "Delete"

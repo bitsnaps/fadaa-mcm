@@ -562,7 +562,7 @@ const getStatusTranslation = (status) => {
                 <tr v-for="branch in filteredInvestments" :key="branch.id">
                   <td>{{ branch.branchName }}</td>
                   <td>{{ formatCurrency(branch.investmentAmount, '') }}</td>
-                  <td>{{ branch.type }}</td>
+                  <td>{{ t(`investments.tableHeaders.${branch.type.toLowerCase()}`) }} </td>
                   <td>{{ branch.participationPercentage }}%</td>
                   <td>{{ branch.contractStartDate }}</td>
                   <td>{{ branch.contractEndDate }} ({{ branch.daysRemaining }} {{ $t('investmentTracking.breakdown.daysRemaining') }})</td>
