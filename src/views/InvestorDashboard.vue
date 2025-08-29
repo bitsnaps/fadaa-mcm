@@ -61,6 +61,8 @@ async function loadInvestorData() {
   try {
     const params = { profile_id: activeProfileId.value };
     const resInv = await getMyInvestments(params);
+    console.log(resInv.data.data);
+    
     if (resInv.data?.success) {
       myInvestments.value = resInv.data.data || [];
     }
@@ -81,6 +83,8 @@ async function loadInvestorData() {
     const today = new Date();
     const year = today.getFullYear();
     const resRev = await getRevenueSeries({ profile_id: activeProfileId.value, year });
+    console.log(resRev.data.data);
+    
     if (resRev.data?.success) {
       const d = resRev.data.data || {};
       const months = locale.value === 'fr' ? ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'] : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -457,7 +461,7 @@ watch(locale, () => {
                     <th>{{ $t('investorDashboard.withdrawals.kpis.accrued') }}</th>
                     <th>{{ $t('investorDashboard.withdrawals.kpis.committed') }}</th>
                     <th>{{ $t('investorDashboard.withdrawals.kpis.available') }}</th>
-                    <th>{{ $t('investorDashboard.investmentDetails.table.status') }}</th>
+                    <!-- <th>{{ $t('investorDashboard.investmentDetails.table.status') }}</th> -->
                   </tr>
                 </thead>
                 <tbody>
@@ -470,7 +474,7 @@ watch(locale, () => {
                     <td>{{ formatCurrency(inv.yourProfitShareSelectedPeriod || 0) }}</td>
                     <td>{{ formatCurrency(inv.withdrawalsCommitted || 0) }}</td>
                     <td>{{ formatCurrency(inv.availableForWithdrawal != null ? inv.availableForWithdrawal : Math.max((inv.yourProfitShareSelectedPeriod || 0) - (inv.withdrawalsCommitted || 0), 0)) }}</td>
-                    <td><span :class="['badge', (inv.status==='active' ? 'bg-success' : 'bg-warning')]">{{ $t(`investorDashboard.statuses.${inv.status || 'active'}`) }}</span></td>
+                    <!-- <td><span :class="['badge', (inv.status==='active' ? 'bg-success' : 'bg-warning')]">{{ $t(`investorDashboard.statuses.${inv.status || 'active'}`) }}</span></td> -->
                   </tr>
                 </tbody>
               </table>

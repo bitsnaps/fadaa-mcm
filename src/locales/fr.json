@@ -1077,11 +1077,7 @@
       }
     },
     "recentActivities": {
-      "title": "Activités Récentes",
-      "activity1": "Nouvelle opportunité d'investissement dans l'Agence Centre-ville",
-      "activity2": "Part de bénéfice trimestrielle distribuée",
-      "activity3": "Renouvellement de contrat pour l'Agence Uptown",
-      "activity4": "Rapport de performance mensuel disponible"
+      "title": "Activités Récentes"
     },
     "withdrawals": {
       "title": "Retraits",
@@ -1108,7 +1104,13 @@
         "investment": "Investissement",
         "amount": "Montant",
         "status": "Statut"
-      }
+      },
+      "statuses": {
+        "pending": "En attente",
+        "approved": "Approuvé",
+        "paid": "Payé",
+        "rejected": "Rejeté"
+      }         
     },
     "documents": {
       "title": "Documents",
@@ -1132,7 +1134,7 @@
     },
     "addContract": {
         "submitButtonAdd": "Ajouter le Contrat"
-    }
+    } 
   },
   "pagination": {
     "previous": "Précédent",

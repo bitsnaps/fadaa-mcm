@@ -1076,11 +1076,7 @@
       }
     },
     "recentActivities": {
-      "title": "Recent Activities",
-      "activity1": "New investment opportunity in Downtown Branch",
-      "activity2": "Quarterly profit share distributed",
-      "activity3": "Contract renewal for Uptown Branch",
-      "activity4": "Monthly performance report available"
+      "title": "Recent Activities"
     },
     "documents": {
       "title": "Documents",
@@ -1130,7 +1126,13 @@
         "investment": "Investment",
         "amount": "Amount",
         "status": "Status"
-      }
+      },
+      "statuses": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "paid": "Paid",
+        "rejected": "Rejected"
+      }      
     }
   },
   "pagination": {
