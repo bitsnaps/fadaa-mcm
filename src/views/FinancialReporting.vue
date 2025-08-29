@@ -153,7 +153,7 @@ import {
   Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler, ArcElement
 } from 'chart.js';
 import { formatCurrency } from '@/helpers/utils.js';
-import { getRevenueSummary } from '@/services/DashboardService';
+import FinancialsService from '@/services/FinancialsService.js';
 import { getExpenses } from '@/services/ExpenseService';
 import { getInvestments } from '@/services/InvestmentService';
 import ReportService from '@/services/ReportService';
@@ -162,7 +162,8 @@ import { saveAs } from 'file-saver';
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler, ArcElement);
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+
 const activeProfileId = ref(null);
 const revExpFilter = ref('quarterly'); // quarterly, yearly
 
@@ -284,18 +285,34 @@ const fetchFinancialData = async () => {
 
 const fetchRevenueExpenseData = async () => {
   const isQuarterly = revExpFilter.value === 'quarterly';
-  const { labels, startDate, endDate } = getChartTimeRange(isQuarterly);
+  const now = new Date();
+  let startDate, endDate;
+
+  if (isQuarterly) {
+    // Current quarter
+    const quarter = Math.floor(now.getMonth() / 3);
+    startDate = new Date(now.getFullYear(), quarter * 3, 1);
+    endDate = new Date(now.getFullYear(), quarter * 3 + 3, 0);
+  } else {
+    // Current year
+    startDate = new Date(now.getFullYear(), 0, 1);
+    endDate = new Date(now.getFullYear(), 11, 31);
+  }
 
   try {
-    const response = await getRevenueSummary({
-      profile_id: activeProfileId.value,
-      startDate,
-      endDate,
-    });
-    const summary = response.data.data;
+    const response = await FinancialsService.getRevenueSeries(
+      activeProfileId.value,
+      startDate.toISOString().split('T')[0],
+      endDate.toISOString().split('T')[0]
+    );
+    const seriesData = response.data.data;
+
+    const monthNames = seriesData.labels.map(dateString =>
+      new Date(dateString).toLocaleString(locale.value || 'en', { month: 'short' })
+    );
 
     revenueExpenseChartData.value = {
-      labels,
+      labels: monthNames,
       datasets: [
         {
           label: t('financialReporting.revenueVsExpenses.revenue'),
@@ -303,7 +320,7 @@ const fetchRevenueExpenseData = async () => {
           backgroundColor: 'rgba(13, 110, 253, 0.1)',
           tension: 0.3,
           fill: true,
-          data: [summary.netRevenue], // This needs to be adapted if the API returns time series data
+          data: seriesData.netRevenue,
         },
         {
           label: t('financialReporting.revenueVsExpenses.expenses'),
@@ -311,17 +328,15 @@ const fetchRevenueExpenseData = async () => {
           backgroundColor: 'rgba(220, 53, 69, 0.1)',
           tension: 0.3,
           fill: true,
-          data: [summary.totalExpense], // Same as above
+          data: seriesData.totalExpense,
         },
       ],
     };
-    // Update chart title and axis labels
+
     lineChartOptions.value.plugins.title.text = isQuarterly
       ? t('financialReporting.revenueVsExpenses.chartTitleQuarterly')
       : t('financialReporting.revenueVsExpenses.chartTitleYearly');
-    lineChartOptions.value.scales.y.title.text = isQuarterly
-      ? t('financialReporting.revenueVsExpenses.amountInThousands')
-      : t('financialReporting.revenueVsExpenses.amountInMillions');
+    lineChartOptions.value.scales.y.title.text = t('financialReporting.revenueVsExpenses.amount');
 
   } catch (error) {
     console.error('Error fetching revenue/expense data:', error);
@@ -405,24 +420,6 @@ const fetchInvestmentData = async () => {
   }
 };
 
-const getChartTimeRange = (isQuarterly) => {
-  const now = new Date();
-  if (isQuarterly) {
-    // Example: last 4 quarters + current
-    return {
-      labels: ['T1 2023', 'T2 2023', 'T3 2023', 'T4 2023', 'T1 2024'], // These are static, need dynamic generation
-      startDate: '2023-01-01',
-      endDate: '2024-03-31',
-    };
-  } else {
-    // Example: last 2 years + current year projected
-    return {
-      labels: ['2022', '2023', '2024 (Proj.)'], // Static, need dynamic generation
-      startDate: '2022-01-01',
-      endDate: '2024-12-31',
-    };
-  }
-};
 
 const getCategoryIcon = (categoryKey) => {
   // This mapping may need to be adjusted based on actual category names from the backend

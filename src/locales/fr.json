@@ -798,10 +798,9 @@
       "chartTitleQuarterly": "Revenus vs. Dépenses (Trimestriel)",
       "chartTitleYearly": "Revenus vs. Dépenses (Annuel)",
       "amount": "Montant",
-      "amountInThousands": "Montant (k)",
-      "amountInMillions": "Montant (M)",
       "revenue": "Revenus",
-      "expenses": "Dépenses"
+      "expenses": "Dépenses",
+      "amountInThousands": "Montant in 1k"
     },
     "expenseBreakdown": {
       "title": "Répartition des Dépenses (Annuel)",

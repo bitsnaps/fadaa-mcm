@@ -797,10 +797,9 @@
       "chartTitleQuarterly": "Revenue vs. Expenses (Quarterly)",
       "chartTitleYearly": "Revenue vs. Expenses (Yearly)",
       "amount": "Amount",
-      "amountInThousands": "Amount (k)",
-      "amountInMillions": "Amount (M)",
       "revenue": "Revenue",
-      "expenses": "Expenses"
+      "expenses": "Expenses",
+      "amountInThousands": "Amount in 1k"
     },
     "expenseBreakdown": {
       "title": "Expense Breakdown (Yearly)",

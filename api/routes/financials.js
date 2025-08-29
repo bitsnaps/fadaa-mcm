@@ -123,16 +123,20 @@ financialsApp.get('/revenue-summary', async (c) => {
 // Revenue and profit time series by month for a given year
 financialsApp.get('/revenue-series', async (c) => {
   try {
-    const { profile_id, year } = c.req.query();
-    const yearNum = parseInt(year, 10) || new Date().getFullYear();
+    const { profile_id, startDate, endDate } = c.req.query();
 
-    const labels = Array.from({ length: 12 }, (_, i) => i); // 0..11 month indexes
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const labels = [];
     const netRevenue = [];
     const netProfit = [];
-
-    for (let month = 0; month < 12; month++) {
-      const start = new Date(yearNum, month, 1);
-      const end = new Date(yearNum, month + 1, 0, 23, 59, 59, 999);
+    const totalExpense = [];
+    
+    let current = new Date(start);
+    while (current <= end) {
+      const monthStart = new Date(current.getFullYear(), current.getMonth(), 1);
+      const monthEnd = new Date(current.getFullYear(), current.getMonth() + 1, 0, 23, 59, 59, 999);
 
       const whereCreated = { created_at: { [Op.between]: [start, end] } };
       const whereTrans = { transaction_date: { [Op.between]: [start, end] } };
@@ -178,23 +182,20 @@ financialsApp.get('/revenue-series', async (c) => {
 
       // Expenses
       const expenses = await models.Expense.findAll({ where: whereTrans });
-      const totalExpense = expenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
+      const monthTotalExpense = expenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
 
       const monthNetRevenue = servicesRevenue + contractsRevenue + incomeRevenue;
-      const monthNetProfit = monthNetRevenue - totalExpense;
+      const monthNetProfit = monthNetRevenue - monthTotalExpense;
+      
       netRevenue.push(monthNetRevenue);
       netProfit.push(monthNetProfit);
-      // console.log('------------------------');
-      // console.log(`Month ${month} net profit: ${monthNetProfit}`);
-      // console.log(`Month ${month} net revenue: ${monthNetRevenue}`);
-      // console.log(`Month ${month} services revenue: ${servicesRevenue}`);
-      // console.log(`Month ${month} contracts revenue: ${contractsRevenue}`);
-      // console.log(`Month ${month} income revenue: ${incomeRevenue}`);
-      // console.log(`Month ${month} total expense: ${totalExpense}`);
-      // console.log('------------------------');
+      totalExpense.push(monthTotalExpense);
+
+      labels.push(monthStart);
+      current.setMonth(current.getMonth() + 1);
     }
 
-    return c.json({ success: true, data: { labels, netRevenue, netProfit } });
+    return c.json({ success: true, data: { labels, netRevenue, netProfit, totalExpense } });
   } catch (error) {
     return handleRouteError(c, 'Error fetching revenue series', error);
   }

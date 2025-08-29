@@ -10,4 +10,14 @@ export default {
       },
     });
   },
+
+  getRevenueSeries(profileId, startDate, endDate) {
+    return ApiClient.get('/financials/revenue-series', {
+      params: {
+        profile_id: profileId,
+        startDate,
+        endDate,
+      },
+    });
+  },
 };
