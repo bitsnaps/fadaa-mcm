@@ -133,126 +133,105 @@ investorApp.get('/profit-share-series', async (c) => {
   try {
     const user = c.get('user');
     const { profile_id, year, startDate, endDate } = c.req.query();
-    const where = { investor_id: user.id };
-    if (profile_id) where.profile_id = profile_id;
+    
+    const isAdmin = user.isAdmin();
+
+    const where = {};
+    if (!isAdmin) {
+      where.investor_id = user.id;
+    }
+    if (profile_id) {
+      where.profile_id = profile_id;
+    }
 
     const investments = await models.Investment.findAll({
       where,
-      include: [{ model: models.Branch }, { model: models.Profile }],
+      include: [
+        { model: models.Branch, attributes: ['name'] },
+        { model: models.Profile, attributes: ['name'] },
+      ],
     });
 
-    // If no investments, return empty series
     const emptyResp = (labels) => c.json({ success: true, data: { labels, profitShare: labels.map(() => 0), branchBreakdown: [] } });
 
-    // If explicit date range provided, compute monthly series across that range
-    if (startDate && endDate) {
-      const rangeStart = new Date(startDate);
-      const rangeEnd = new Date(endDate);
-      if (investments.length === 0) {
-        // Build labels even if empty investments
-        const labels = [];
-        let cur = new Date(rangeStart.getFullYear(), rangeStart.getMonth(), 1);
-        const endMarker = new Date(rangeEnd.getFullYear(), rangeEnd.getMonth(), 1);
-        while (cur <= endMarker) {
-          labels.push(cur.toLocaleString('en', { month: 'short' }));
-          cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
-        }
-        return emptyResp(labels);
-      }
-
-      const labels = [];
-      const profitShare = [];
-      const branchData = {};
-
-      let cur = new Date(rangeStart.getFullYear(), rangeStart.getMonth(), 1);
-      const endMarker = new Date(rangeEnd.getFullYear(), rangeEnd.getMonth(), 1);
-      while (cur <= endMarker) {
-        const monthStart = new Date(cur.getFullYear(), cur.getMonth(), 1);
-        const monthEnd = new Date(cur.getFullYear(), cur.getMonth() + 1, 0, 23, 59, 59, 999);
-
-        // Clip month to range
-        const start = monthStart < rangeStart ? rangeStart : monthStart;
-        const end = monthEnd > rangeEnd ? rangeEnd : monthEnd;
-
-        let monthlyProfitShare = 0;
-
-        for (const investment of investments) {
-          const invStart = new Date(investment.starting_date);
-          const invEnd = new Date(investment.ending_date);
-          if (invStart <= end && invEnd >= start) {
-            const calcInput = {
-              ...investment.toJSON(),
-              starting_date: start > invStart ? start : invStart,
-              ending_date: end < invEnd ? end : invEnd,
-            };
-            const calculations = await getInvestmentCalculations([calcInput]);
-            const calc = calculations?.[investment.id] || {};
-            const investmentProfitShare = calc.yourProfitShareSelectedPeriod || 0;
-            monthlyProfitShare += investmentProfitShare;
-
-            const branchName = investment.Branch?.name || 'Unknown';
-            if (!branchData[branchName]) branchData[branchName] = 0;
-            branchData[branchName] += investmentProfitShare;
-          }
-        }
-
-        labels.push(cur.toLocaleString('en', { month: 'short' }));
-        profitShare.push(monthlyProfitShare);
-        cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
-      }
-
-      const branchBreakdown = Object.entries(branchData).map(([branchName, totalProfit]) => ({ branchName, totalProfit }));
-      return c.json({ success: true, data: { labels, profitShare, branchBreakdown } });
-    }
-
-    // Fallback: by year
-    const yearNum = parseInt(year, 10) || new Date().getFullYear();
+    
     if (investments.length === 0) {
-      const labels = Array.from({ length: 12 }, (_, i) => new Date(0, i).toLocaleString('en', { month: 'short' }));
+      const labels = startDate && endDate
+        ? (() => {
+            const rangeStart = new Date(startDate);
+            const rangeEnd = new Date(endDate);
+            const l = [];
+            let cur = new Date(rangeStart.getFullYear(), rangeStart.getMonth(), 1);
+            const endMarker = new Date(rangeEnd.getFullYear(), rangeEnd.getMonth(), 1);
+            while (cur <= endMarker) {
+              l.push(cur.toLocaleString('en', { month: 'short' }));
+              cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+            }
+            return l;
+          })()
+        : Array.from({ length: 12 }, (_, i) => new Date(0, i).toLocaleString('en', { month: 'short' }));
       return emptyResp(labels);
     }
+    
+    const { rangeStart, rangeEnd } = (() => {
+      if (startDate && endDate) {
+        return { rangeStart: new Date(startDate), rangeEnd: new Date(endDate) };
+      }
+      const yearNum = parseInt(year, 10) || new Date().getFullYear();
+      return {
+        rangeStart: new Date(yearNum, 0, 1),
+        rangeEnd: new Date(yearNum, 11, 31),
+      };
+    })();
 
-    const labels = Array.from({ length: 12 }, (_, i) => new Date(0, i).toLocaleString('en', { month: 'short' }));
+    const labels = [];
     const profitShare = [];
     const branchData = {};
 
-    for (let month = 0; month < 12; month++) {
-      const start = new Date(yearNum, month, 1);
-      const end = new Date(yearNum, month + 1, 0, 23, 59, 59, 999);
+    let currentMonth = new Date(rangeStart.getFullYear(), rangeStart.getMonth(), 1);
+    const endMarker = new Date(rangeEnd.getFullYear(), rangeEnd.getMonth(), 1);
+
+    while (currentMonth <= endMarker) {
+      const monthStart = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+      const monthEnd = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0, 23, 59, 59, 999);
+
+      const effectiveStart = monthStart < rangeStart ? rangeStart : monthStart;
+      const effectiveEnd = monthEnd > rangeEnd ? rangeEnd : monthEnd;
 
       let monthlyProfitShare = 0;
 
       for (const investment of investments) {
-        // Create a calculation input for this specific month
-        const calcInput = {
-          ...investment.toJSON(),
-          starting_date: start > new Date(investment.starting_date) ? start : new Date(investment.starting_date),
-          ending_date: end < new Date(investment.ending_date) ? end : new Date(investment.ending_date)
-        };
+        const invStart = new Date(investment.starting_date);
+        const invEnd = new Date(investment.ending_date);
 
-        // Only calculate if the investment was active during this month
-        if (new Date(investment.starting_date) <= end && new Date(investment.ending_date) >= start) {
+        if (invStart <= effectiveEnd && invEnd >= effectiveStart) {
+          const calcInput = {
+            ...investment.toJSON(),
+            starting_date: effectiveStart > invStart ? effectiveStart : invStart,
+            ending_date: effectiveEnd < invEnd ? effectiveEnd : invEnd,
+          };
+          
           const calculations = await getInvestmentCalculations([calcInput]);
           const calc = calculations?.[investment.id] || {};
           const investmentProfitShare = calc.yourProfitShareSelectedPeriod || 0;
-
           monthlyProfitShare += investmentProfitShare;
 
-          // Track by branch for breakdown chart
-          const branchName = investment.Branch?.name || 'Unknown';
+          const branchName = investment.Branch?.name || 'N/A';
           if (!branchData[branchName]) {
             branchData[branchName] = 0;
           }
           branchData[branchName] += investmentProfitShare;
         }
       }
-
+      
+      labels.push(currentMonth.toLocaleString('en', { month: 'short' }));
       profitShare.push(monthlyProfitShare);
+      currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
     }
 
     const branchBreakdown = Object.entries(branchData).map(([branchName, totalProfit]) => ({
       branchName,
-      totalProfit
+      totalProfit,
     }));
 
     return c.json({ success: true, data: { labels, profitShare, branchBreakdown } });

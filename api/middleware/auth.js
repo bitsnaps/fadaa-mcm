@@ -9,9 +9,22 @@ const authMiddleware = async (c, next) => {
     const token = authHeader.split(' ')[1];
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        c.set('user', decoded);
+        const user = await models.User.findByPk(decoded.id, {
+            include: [{ model: models.Role, as: 'role' }]
+        });
+
+        if (!user) {
+            return c.json({ success: false, message: 'Unauthorized' }, 401);
+        }
+
+        const userJSON = user.toJSON();
+        userJSON.role = user.role ? user.role.name.toLowerCase() : null;
+        userJSON.isAdmin = () => userJSON.role === 'admin';
+        
+        c.set('user', userJSON);
         await next();
     } catch (error) {
+        console.error('Auth middleware error:', error);
         return c.json({ success: false, message: 'Invalid token' }, 401);
     }
 };

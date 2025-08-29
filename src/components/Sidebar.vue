@@ -183,13 +183,13 @@ const toggleFinancial = () => {
                 {{ $t('sidebar.manageExpenses') }}
               </router-link>
             </li>
-            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+            <li class="nav-item" v-if="userRole === 'admin'">
               <router-link to="/investment-tracking" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-graph-up me-2"></i>
                 {{ $t('sidebar.investmentTracking') }}
               </router-link>
             </li>
-            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+            <li class="nav-item" v-if="userRole === 'admin'">
               <router-link to="/financial-reporting" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-file-earmark-medical me-2"></i>
                 {{ $t('sidebar.financialReporting') }}

@@ -237,6 +237,7 @@ const fetchProfitSharePayouts = async (profileId) => {
     const { data: response } = await ApiClient.get(endpoint, { params });
     
     if (response.success) {
+      
       profitSharePayouts.value = response.data.map(p => ({
         id: p.id,
         payoutDate: formatDate(p.paid_at || p.updated_at),
@@ -244,7 +245,7 @@ const fetchProfitSharePayouts = async (profileId) => {
         amountPaid: p.amount,
         transactionId: p.transaction_id || `WID-${p.id}`,
       }));
-      
+
     } else {
       console.error('Failed to fetch profit share payouts:', response.message);
       profitSharePayouts.value = [];
@@ -268,6 +269,7 @@ const fetchChartData = async (profileId) => {
     }
 
     const { data: response } = await ApiClient.get('/investor/profit-share-series', { params });
+    
     if (response.success) {
       const { labels, profitShare, branchBreakdown } = response.data;
 
