@@ -129,7 +129,7 @@ const toggleFinancial = () => {
             <li class="nav-item" v-if="userRole === 'admin'">
               <router-link to="/system-settings" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-gear-fill me-2"></i>
-                {{ $t('sidebar.systemSettings') }}
+                {{ $t('systemSettings.title') }}
               </router-link>
             </li>
           </ul>

@@ -693,7 +693,8 @@
       "defaultTheme": "Default Theme",
       "themeOptions": {
         "light": "Light",
-        "dark": "Dark"
+        "dark": "Dark",
+        "system": "System"
       },
       "saveButton": "Save",
       "alert": "General settings saved!"
@@ -711,9 +712,17 @@
       "title": "API Keys",
       "googleMaps": "Google Maps API Key",
       "openAI": "OpenAI API Key",
+      "openAIBaseUrl": "OpenAI Base URL",
       "saveButton": "Save",
-      "alert": "API keys saved!"
+      "alert": "API keys saved successfully."
     },
+    "success": {
+      "save": "Settings saved successfully."
+    },
+    "errors": {
+      "load": "Failed to load settings.",
+      "save": "Failed to save settings."
+    },    
     "activityLog": {
       "title": "Activity Log",
       "description": "Browse and filter system-wide user activities.",

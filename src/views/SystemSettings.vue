@@ -9,18 +9,18 @@
             <h6 class="m-0 font-weight-bold text-primary">{{ $t('systemSettings.generalSettings.title') }}</h6>
           </div>
           <div class="card-body">
-            <form @submit.prevent="saveGeneralSettings">
+            <form @submit.prevent="saveSettings">
               <div class="mb-3">
                 <label for="siteName" class="form-label">{{ $t('systemSettings.generalSettings.siteName') }}</label>
-                <input type="text" class="form-control" id="siteName" v-model="generalSettings.siteName">
+                <input type="text" class="form-control" id="siteName" v-model="settings.site_name">
               </div>
               <div class="mb-3">
                 <label for="siteLogo" class="form-label">{{ $t('systemSettings.generalSettings.siteLogo') }}</label>
-                <input type="text" class="form-control" id="siteLogo" v-model="generalSettings.siteLogo">
+                <input type="text" class="form-control" id="siteLogo" v-model="settings.site_logo">
               </div>
               <div class="mb-3">
                 <label for="defaultTheme" class="form-label">{{ $t('systemSettings.generalSettings.defaultTheme') }}</label>
-                <select class="form-select" id="defaultTheme" v-model="generalSettings.defaultTheme">
+                <select class="form-select" id="defaultTheme" v-model="settings.default_theme">
                   <option value="light">{{ $t('systemSettings.generalSettings.themeOptions.light') }}</option>
                   <option value="dark">{{ $t('systemSettings.generalSettings.themeOptions.dark') }}</option>
                 </select>
@@ -37,22 +37,22 @@
             <h6 class="m-0 font-weight-bold text-primary">{{ $t('systemSettings.emailSettings.title') }}</h6>
           </div>
           <div class="card-body">
-            <form @submit.prevent="saveEmailSettings">
+            <form @submit.prevent="saveSettings">
               <div class="mb-3">
                 <label for="smtpHost" class="form-label">{{ $t('systemSettings.emailSettings.smtpHost') }}</label>
-                <input type="text" class="form-control" id="smtpHost" v-model="emailSettings.smtpHost">
+                <input type="text" class="form-control" id="smtpHost" v-model="settings.smtp_host">
               </div>
               <div class="mb-3">
                 <label for="smtpPort" class="form-label">{{ $t('systemSettings.emailSettings.smtpPort') }}</label>
-                <input type="number" class="form-control" id="smtpPort" v-model="emailSettings.smtpPort">
+                <input type="number" class="form-control" id="smtpPort" v-model="settings.smtp_port">
               </div>
               <div class="mb-3">
                 <label for="smtpUser" class="form-label">{{ $t('systemSettings.emailSettings.smtpUser') }}</label>
-                <input type="text" class="form-control" id="smtpUser" v-model="emailSettings.smtpUser">
+                <input type="text" class="form-control" id="smtpUser" v-model="settings.smtp_user">
               </div>
               <div class="mb-3">
                 <label for="smtpPassword" class="form-label">{{ $t('systemSettings.emailSettings.smtpPassword') }}</label>
-                <input type="password" class="form-control" id="smtpPassword" v-model="emailSettings.smtpPassword">
+                <input type="password" class="form-control" id="smtpPassword" v-model="settings.smtp_password">
               </div>
               <button type="submit" class="btn btn-primary">{{ $t('systemSettings.emailSettings.saveButton') }}</button>
             </form>
@@ -68,14 +68,18 @@
             <h6 class="m-0 font-weight-bold text-primary">{{ $t('systemSettings.apiKeys.title') }}</h6>
           </div>
           <div class="card-body">
-            <form @submit.prevent="saveApiKeys">
+            <form @submit.prevent="saveSettings">
               <div class="mb-3">
                 <label for="googleApiKey" class="form-label">{{ $t('systemSettings.apiKeys.googleMaps') }}</label>
-                <input type="text" class="form-control" id="googleApiKey" v-model="apiKeys.googleMaps">
+                <input type="text" class="form-control" id="googleApiKey" v-model="settings.google_maps_api_key">
               </div>
               <div class="mb-3">
                 <label for="openAiApiKey" class="form-label">{{ $t('systemSettings.apiKeys.openAI') }}</label>
-                <input type="text" class="form-control" id="openAiApiKey" v-model="apiKeys.openAI">
+                <input type="text" class="form-control" id="openAiApiKey" v-model="settings.openAI_api_key">
+              </div>
+              <div class="mb-3">
+                <label for="openAIBaseUrl" class="form-label">{{ $t('systemSettings.apiKeys.openAIBaseUrl') }}</label>
+                <input type="text" class="form-control" id="openAIBaseUrl" v-model="settings.OPENAI_BASE_URL">
               </div>
               <button type="submit" class="btn btn-primary">{{ $t('systemSettings.apiKeys.saveButton') }}</button>
             </form>
@@ -88,48 +92,37 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useToast } from '@/helpers/toast';
+import { getSettings, updateSettings } from '@/services/SystemSettingsService';
 
 const { t } = useI18n();
-const { showSuccessToast } = useToast();
+const { showSuccessToast, showErrorToast } = useToast();
 
-const generalSettings = ref({
-  siteName: 'FADAA Platform',
-  siteLogo: '/logo.png', // Path under /public. You can change it via this setting.
-  defaultTheme: 'light',
-});
+const settings = ref({});
 
-const emailSettings = ref({
-  smtpHost: 'smtp.example.com',
-  smtpPort: 587,
-  smtpUser: 'user@example.com',
-  smtpPassword: '',
-});
-
-const apiKeys = ref({
-  googleMaps: '',
-  openAI: '',
-});
-
-const saveGeneralSettings = () => {
-  // Placeholder for actual save logic
-  console.log('General Settings Saved:', generalSettings.value);
-  showSuccessToast(t('systemSettings.generalSettings.alert'));
+const loadSettings = async () => {
+  try {
+    const response = await getSettings();
+    settings.value = response.data;
+  } catch (error) {
+    showErrorToast(t('systemSettings.errors.load'));
+  }
 };
 
-const saveEmailSettings = () => {
-  // Placeholder for actual save logic
-  console.log('Email Settings Saved:', emailSettings.value);
-  showSuccessToast(t('systemSettings.emailSettings.alert'));
+const saveSettings = async () => {
+  try {
+    await updateSettings(settings.value);
+    showSuccessToast(t('systemSettings.success.save'));
+  } catch (error) {
+    showErrorToast(t('systemSettings.errors.save'));
+  }
 };
 
-const saveApiKeys = () => {
-  // Placeholder for actual save logic
-  console.log('API Keys Saved:', apiKeys.value);
-  showSuccessToast(t('systemSettings.apiKeys.alert'));
-};
+onMounted(() => {
+  loadSettings();
+});
 
 </script>
 

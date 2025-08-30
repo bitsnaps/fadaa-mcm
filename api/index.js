@@ -25,6 +25,7 @@ const investorApp = require('./routes/investor');
 const reportsApp = require('./routes/reports');
 const taskApp = require('./routes/tasks');
 const clientAttachmentsApp = require('./routes/clientAttachments');
+const systemSettingsApp = require('./routes/systemSettings');
 const { hashPassword } = require('./lib/auth');
 const { authMiddleware, adminMiddleware } = require('./middleware/auth');
 const models = require('./models');
@@ -69,6 +70,7 @@ app.route('/api/withdrawals', withdrawalsApp);
 app.route('/api/reports', reportsApp);
 app.route('/api/tasks', taskApp);
 app.route('/api/client-attachments', clientAttachmentsApp);
+app.route('/api/system-settings', systemSettingsApp);
 
 
 // --- Static File Serving ---
