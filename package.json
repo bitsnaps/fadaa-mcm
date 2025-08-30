@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && rm -rf ./dist/uploads/{attachments,contracts,documents,avatars}",
     "clean": "rm -rf ./dist",
     "preview": "vite preview",
     "check": "node tests/translation-checker.js"
