@@ -3,6 +3,11 @@ const { Hono } = require('hono');
 const { serveStatic } = require('@hono/node-server/serve-static');
 const { cors } = require('hono/cors');
 const crypto = require('crypto');
+const path = require('path');
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 const taxApp = require('./routes/taxes');
 const contractApp = require('./routes/contracts');
 const userApp = require('./routes/users');
@@ -74,10 +79,18 @@ app.route('/api/system-settings', systemSettingsApp);
 
 
 // --- Static File Serving ---
-// Serve the uploaded contract files
-app.use('/uploads/contracts/*', serveStatic({ root: './' }));
-app.use('/uploads/documents/*', serveStatic({ root: './' }));
-app.use('/uploads/*', serveStatic({ root: './' }));
+if (process.env.NODE_ENV === 'production') {
+  // Production: Use the absolute path from the environment variable
+  const uploadDir = process.env.UPLOAD_DIR;
+  if (uploadDir) {
+    app.use('/uploads/*', serveStatic({ root: uploadDir }));
+  } else {
+    console.error('UPLOAD_DIR environment variable is not set for production.');
+  }
+} else {
+  // Development: Serve from the project's relative 'uploads' directory
+  app.use('/uploads/*', serveStatic({ root: './' }));
+}
 
 app.get('/api/csrf', async (c) => {
     const ts = c.req.query('ts');

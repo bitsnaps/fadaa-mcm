@@ -4,9 +4,6 @@ const path = require('path');
 
 const ensureUploadDir = () => {
     const uploadDir = process.env.UPLOAD_DIR;
-    // if (!uploadDir) {
-    //     throw new Error('UPLOAD_DIR environment variable is not set.');
-    // }
     if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
     }
