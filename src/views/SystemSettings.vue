@@ -21,7 +21,7 @@
               <div class="mb-3">
                 <label for="defaultTheme" class="form-label">{{ $t('systemSettings.generalSettings.defaultTheme') }}</label>
                 <select class="form-select" id="defaultTheme" v-model="settings.defaultTheme">
-                  <option value="dark">{{ $t('systemSettings.generalSettings.themeOptions.system') }}</option>
+                  <option value="system">{{ $t('systemSettings.generalSettings.themeOptions.system') }}</option>
                   <option value="light">{{ $t('systemSettings.generalSettings.themeOptions.light') }}</option>
                   <option value="dark">{{ $t('systemSettings.generalSettings.themeOptions.dark') }}</option>
                 </select>
@@ -95,10 +95,16 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useToast } from '@/helpers/toast';
 import { getSettings, updateSettings } from '@/services/SystemSettingsService';
+import { useThemeStore } from '@/stores/theme';
+// import { useToast } from '@/helpers/toast';
+
+const themeStore = useThemeStore();
+
+// import { useToast } from '@/helpers/toast';
 
 const { t } = useI18n();
+// Globally managed in axios interceptor
 // const { showSuccessToast, showErrorToast } = useToast();
 
 const settings = ref({});
@@ -116,6 +122,7 @@ const loadSettings = async () => {
 const saveSettings = async () => {
   try {
     await updateSettings(settings.value);
+    themeStore.theme = settings.value.defaultTheme || 'system';
     // showSuccessToast(t('systemSettings.success.save'));
   } catch (error) {
     console.error('Failed to save settings:', error);

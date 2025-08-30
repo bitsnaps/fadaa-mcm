@@ -134,8 +134,8 @@
           <div class="card-body text-center">
             <button @click="exportData('json')" class="btn btn-fadaa-orange me-2"><i class="bi bi-filetype-json me-1"></i>JSON</button>
             <button @click="exportData('csv')" class="btn btn-fadaa-orange me-2"><i class="bi bi-filetype-csv me-1"></i>CSV</button>
-            <button @click="exportData('excel')" class="btn btn-outline-fadaa-orange me-2"><i class="bi bi-file-earmark-excel-fill me-1"></i>Excel (Simulated)</button>
-            <button @click="exportData('pdf')" class="btn btn-outline-fadaa-orange"><i class="bi bi-file-earmark-pdf-fill me-1"></i>PDF (Simulated)</button>
+            <button @click="exportData('excel')" class="btn btn-outline-fadaa-orange me-2"><i class="bi bi-file-earmark-excel-fill me-1"></i>Excel</button>
+            <button @click="exportData('pdf')" class="btn btn-outline-fadaa-orange"><i class="bi bi-file-earmark-pdf-fill me-1"></i>PDF</button>
           </div>
         </div>
       </div>
@@ -253,6 +253,9 @@ onMounted(() => {
   // fetchTasks will be called from handleProfileUpdate
 });
 
+/**
+ * TODO: Remove the simulation code, and implement the export feature
+ */
 const exportData = (format) => {
   // Export real dashboard data
   const dataToExport = {

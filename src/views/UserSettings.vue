@@ -19,18 +19,22 @@
           </div>
 
           <!-- Theme Preference -->
-          <!-- <div class="mb-4">
+          <div class="mb-4">
             <label class="form-label fw-bold">{{ $t('userSettings.preferences.theme') }}</label>
             <p class="text-muted small">{{ $t('userSettings.preferences.themeDesc') }}</p>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="theme" id="lightTheme" value="light" v-model="settings.theme">
+              <input class="form-check-input" type="radio" name="theme" id="lightTheme" value="light" v-model="themeStore.theme">
               <label class="form-check-label" for="lightTheme">{{ $t('userSettings.themes.light') }}</label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="theme" id="darkTheme" value="dark" v-model="settings.theme">
+              <input class="form-check-input" type="radio" name="theme" id="darkTheme" value="dark" v-model="themeStore.theme">
               <label class="form-check-label" for="darkTheme">{{ $t('userSettings.themes.dark') }}</label>
             </div>
-          </div> -->
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="theme" id="systemTheme" value="system" v-model="themeStore.theme">
+              <label class="form-check-label" for="systemTheme">{{ $t('userSettings.themes.system') }}</label>
+            </div>
+          </div>
 
           <!-- Notification Preferences -->
           <!-- <div class="mb-4">
@@ -62,15 +66,19 @@
 import { ref, reactive, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
+import { useThemeStore } from '@/stores/theme';
+import { updateUserPreferences } from '@/services/UserService';
+// import { useToast } from '@/helpers/toast';
 
 const { t, locale } = useI18n();
 const authStore = useAuthStore();
+const themeStore = useThemeStore();
+// const { showSuccessToast, showErrorToast } = useToast();
 
 const isSaving = ref(false);
 
 const settings = reactive({
   language: 'en',
-  theme: 'light',
   notifications: {
     email: { enabled: true },
     push: { enabled: false }
@@ -80,39 +88,35 @@ const settings = reactive({
 onMounted(() => {
   const userPreferences = authStore.user?.preferences || {};
   settings.language = userPreferences.language || 'en';
-  settings.theme = userPreferences.theme || 'light';
+  themeStore.theme = userPreferences.theme || 'system';
   settings.notifications = {
     ...settings.notifications,
     ...userPreferences.notifications
   };
-  applyTheme(settings.theme);
 });
 
 watch(() => settings.language, (newLang) => {
   locale.value = newLang;
 });
 
-
-watch(() => settings.theme, (newTheme) => {
-  applyTheme(newTheme);
-});
-
-const applyTheme = (theme) => {
-  document.body.setAttribute('data-bs-theme', theme);
-}
-
 const saveSettings = async () => {
   isSaving.value = true;
-  console.log('Saving user settings:', JSON.parse(JSON.stringify(settings)));
   
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-  
-  // In a real app, you would call an action in your auth store
-  // await authStore.updateUserPreferences(settings);
-  authStore.user.preferences = JSON.parse(JSON.stringify(settings));
+  const userSettings = {
+    language: settings.language,
+    theme: themeStore.theme,
+    notifications: settings.notifications
+  };
 
-  isSaving.value = false;
-  console.log('Settings saved successfully');
+  try {
+    await updateUserPreferences(authStore.user.id, userSettings);
+    authStore.user.preferences = userSettings;
+    // showSuccessToast(t('userSettings.alerts.profileUpdated'));
+  } catch (error) {
+    // showErrorToast(t('userSettings.alerts.profileUpdateFailed'));
+  } finally {
+    isSaving.value = false;
+  }
 };
 
 </script>

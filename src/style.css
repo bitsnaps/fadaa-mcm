@@ -159,3 +159,57 @@ body {
 body {
   padding-top: 56px; /* Adjust if navbar height changes, matches common Bootstrap navbar height */
 }
+
+/* Dark Theme Styles */
+html.dark {
+  --fadaa-blue: #a8c7fa;
+  --fadaa-orange: #fddb9f;
+  --fadaa-yellow: #fd9800;
+  --fadaa-green: #a3e9a4;
+  --fadaa-light-blue: #2a3b4d;
+  --fadaa-dark-text: #e1e3e6;
+  --fadaa-light-text: #1a1c1e;
+  --fadaa-dark-blue: #a8c7fa;
+
+  --bs-body-color: #e1e3e6;
+  --bs-body-bg: #1a1c1e;
+  --bs-secondary-bg: #2a3b4d;
+  --bs-tertiary-bg: #3a4c5d;
+  --bs-border-color: #444;
+}
+
+html.dark .card {
+  background-color: var(--bs-secondary-bg);
+  border-color: var(--bs-border-color);
+}
+
+html.dark .card-header {
+  background-color: var(--bs-tertiary-bg);
+  border-bottom-color: var(--bs-border-color);
+}
+
+html.dark .form-control,
+html.dark .form-select {
+  background-color: var(--bs-tertiary-bg);
+  color: var(--bs-body-color);
+  border-color: var(--bs-border-color);
+}
+
+html.dark .form-control:focus,
+html.dark .form-select:focus {
+  background-color: var(--bs-tertiary-bg);
+  color: var(--bs-body-color);
+  border-color: var(--fadaa-blue);
+  box-shadow: 0 0 0 0.25rem rgba(var(--fadaa-orange-rgb), 0.25);
+}
+
+html.dark .table {
+  --bs-table-bg: var(--bs-secondary-bg);
+  --bs-table-striped-bg: var(--bs-tertiary-bg);
+  --bs-table-color: var(--bs-body-color);
+  --bs-table-border-color: var(--bs-border-color);
+}
+
+html.dark .modal-content {
+    background-color: var(--bs-body-bg);
+}

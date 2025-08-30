@@ -31,6 +31,10 @@ export const updateUser = (id, userData) => {
 export const deleteUser = (id) => {
     return apiClient.delete(`/users/${id}`);
 };
+
+export const updateUserPreferences = (id, preferences) => {
+    return apiClient.put(`/users/preferences/${id}`, preferences);
+};
 export const updateUserProfile = (id, userData) => {
     return apiClient.put(`/users/profile/${id}`, userData);
 };

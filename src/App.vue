@@ -8,6 +8,10 @@ import { useNotificationStore } from '@/stores/notification';
 import Navbar from '@/components/Navbar.vue';
 import Sidebar from '@/components/Sidebar.vue';
 import { useToast } from '@/helpers/toast';
+import { useTheme } from '@/composables/useTheme';
+
+// Initialize the theme management
+useTheme();
 
 const route = useRoute();
 const authStore = useAuthStore();

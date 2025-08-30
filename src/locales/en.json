@@ -967,7 +967,8 @@
     },
     "themes": {
       "light": "Light",
-      "dark": "Dark"
+      "dark": "Dark",
+      "system": "System"
     },
     "notifications": {
       "title": "Notification Preferences",
