@@ -87,7 +87,7 @@ const seedDatabase = async () => {
                 company_name: 'Main Client',
                 first_name: 'Main',
                 last_name: 'Client',
-                email: 'main.client@example.com',
+                email: 'main.client@fadaa.dz',
                 phone_number: '+1234567890',
                 managed_by_user_id: adminUser.id,
                 status: 'active'

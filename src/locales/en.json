@@ -722,7 +722,7 @@
     "errors": {
       "load": "Failed to load settings.",
       "save": "Failed to save settings."
-    },    
+    },
     "activityLog": {
       "title": "Activity Log",
       "description": "Browse and filter system-wide user activities.",

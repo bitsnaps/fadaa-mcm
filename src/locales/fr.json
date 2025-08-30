@@ -715,7 +715,7 @@
       "openAI": "Clé API OpenAI",
       "openAIBaseUrl": "Base URL de OpenAI",
       "saveButton": "Enregistrer",
-      "alert": "Paramètres email enregistrés avec succès."
+      "alert": "Clés API enregistrées avec succès."
     },
     "success": {
       "save": "Paramètres enregistrés avec succès."
@@ -723,7 +723,7 @@
     "errors": {
       "load": "Échec du chargement des paramètres.",
       "save": "Échec de l'enregistrement des paramètres."
-    },    
+    },
     "activityLog": {
       "title": "Journal d'Activité",
       "description": "Parcourez et filtrez les activités des utilisateurs à l'échelle du système.",
