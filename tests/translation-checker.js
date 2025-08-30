@@ -236,25 +236,6 @@ class TranslationChecker {
     }
     console.log();
     
-    // Missing translations
-    console.log('❌ MISSING TRANSLATIONS:');
-    let hasMissing = false;
-    
-    for (const locale of CONFIG.supportedLocales) {
-      if (this.missingKeys[locale].length > 0) {
-        hasMissing = true;
-        console.log(`\n   🔴 Missing in ${locale}.json (${this.missingKeys[locale].length} keys):`);
-        this.missingKeys[locale].sort().forEach(key => {
-          console.log(`      - ${key}`);
-        });
-      }
-    }
-    
-    if (!hasMissing) {
-      console.log('   ✅ No missing translations found!');
-    }
-    console.log();
-    
     // Unused translations
     console.log('🗑️  UNUSED TRANSLATIONS:');
     let hasUnused = false;
@@ -274,6 +255,25 @@ class TranslationChecker {
     }
     console.log();
     
+    // Missing translations
+    console.log('❌ MISSING TRANSLATIONS:');
+    let hasMissing = false;
+    
+    for (const locale of CONFIG.supportedLocales) {
+      if (this.missingKeys[locale].length > 0) {
+        hasMissing = true;
+        console.log(`\n   🔴 Missing in ${locale}.json (${this.missingKeys[locale].length} keys):`);
+        this.missingKeys[locale].sort().forEach(key => {
+          console.log(`      - ${key}`);
+        });
+      }
+    }
+    
+    if (!hasMissing) {
+      console.log('   ✅ No missing translations found!');
+    }
+    console.log();
+        
     // Recommendations
     this.generateRecommendations();
   }

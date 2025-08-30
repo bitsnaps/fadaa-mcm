@@ -1,6 +1,7 @@
 {
   "dashboard": {
     "title": "Admin Dashboard",
+    "selectProfileFirst": "Please select a profile first.",
     "kpis": {
       "clients": "Number of Clients",
       "monthlyRevenue": "Monthly Revenue",
@@ -52,7 +53,8 @@
       "title": "Data Export",
       "excel": "Excel",
       "csv": "CSV",
-      "pdf": "PDF"
+      "pdf": "PDF",
+      "success": "Data exported successfully."
     }
   },
   "common": {

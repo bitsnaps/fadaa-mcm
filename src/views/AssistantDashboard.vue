@@ -132,10 +132,21 @@
             <h5 class="mb-0"><i class="bi bi-download me-2"></i>Data Export</h5>
           </div>
           <div class="card-body text-center">
-            <button @click="exportData('json')" class="btn btn-fadaa-orange me-2"><i class="bi bi-filetype-json me-1"></i>JSON</button>
-            <button @click="exportData('csv')" class="btn btn-fadaa-orange me-2"><i class="bi bi-filetype-csv me-1"></i>CSV</button>
-            <button @click="exportData('excel')" class="btn btn-outline-fadaa-orange me-2"><i class="bi bi-file-earmark-excel-fill me-1"></i>Excel</button>
-            <button @click="exportData('pdf')" class="btn btn-outline-fadaa-orange"><i class="bi bi-file-earmark-pdf-fill me-1"></i>PDF</button>
+            <button @click="exportData('csv')" class="btn btn-fadaa-orange me-2" :disabled="isExporting.csv">
+              <span v-if="isExporting.csv" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+              <i v-else class="bi bi-filetype-csv me-1"></i>
+              CSV
+            </button>
+            <button @click="exportData('xlsx')" class="btn btn-outline-fadaa-orange me-2" :disabled="isExporting.excel">
+              <span v-if="isExporting.excel" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+              <i v-else class="bi bi-file-earmark-excel-fill me-1"></i>
+              Excel
+            </button>
+            <button @click="exportData('pdf')" class="btn btn-outline-fadaa-orange" :disabled="isExporting.pdf">
+              <span v-if="isExporting.pdf" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+              <i v-else class="bi bi-file-earmark-pdf-fill me-1"></i>
+              PDF
+            </button>
           </div>
         </div>
       </div>
@@ -155,17 +166,24 @@ import { getTasks as apiGetTasks, updateTask as apiUpdateTask } from '@/services
 import { getContracts } from '@/services/ContractService';
 import { getClients } from '@/services/ClientService';
 import { getOffices } from '@/services/OfficeService';
+import ReportService from '@/services/ReportService';
 import { useRouter } from 'vue-router';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 
 const { t } = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
-const { showSuccessToast } = useToast();
+const { showSuccessToast, showErrorToast } = useToast();
 
 const tasks = ref([]);
 const tasksLoading = ref(false);
 const pendingTasks = ref([]);
+const isExporting = ref({
+  json: false,
+  csv: false,
+  excel: false,
+  pdf: false,
+});
 
 const fetchTasks = async () => {
   tasksLoading.value = true;
@@ -253,54 +271,57 @@ onMounted(() => {
   // fetchTasks will be called from handleProfileUpdate
 });
 
-/**
- * TODO: Remove the simulation code, and implement the export feature
- */
-const exportData = (format) => {
-  // Export real dashboard data
-  const dataToExport = {
-    renewals: renewals.value,
-    expiringContracts: expiringContracts.value,
-    prospects: prospects.value,
-    offices: offices.value,
-    tasks: pendingTasks.value
-  };
-
-  let content = '';
-  let filename = `assistant_dashboard_export.${format}`;
-  let mimeType = '';
-
-  if (format === 'json') { // Added JSON export for simplicity
-    content = JSON.stringify(dataToExport, null, 2);
-    mimeType = 'application/json';
-    filename = `assistant_dashboard_export.json`;
-  } else if (format === 'csv') {
-    // Basic CSV conversion for offices as an example
-    let csvString = 'Office ID,Name,Status,Capacity,Branch\n';
-    dataToExport.offices.forEach(office => {
-      csvString += `${office.id},${office.name || ''},${office.status || ''},${office.capacity || ''},${office.branch?.name || ''}\n`;
-    });
-    content = csvString;
-    mimeType = 'text/csv';
-    filename = `assistant_dashboard_export.csv`;
-  } else {
-    // For Excel and PDF, we'll just show an alert as true generation is complex without libraries
-    // Keep this page-specific informational toast
-    console.log(`Simulated export data for ${format.toUpperCase()}:`, dataToExport);
+const exportData = async (format) => {
+  if (!activeProfileId.value) {
+    showErrorToast(t('dashboard.selectProfileFirst'));
     return;
   }
 
-  // Simulate file download
-  const blob = new Blob([content], { type: mimeType });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(link.href);
-  // Keep this page-specific success toast
-  console.log(`Exported ${filename} with content:`, content);
+  isExporting.value[format] = true;
+  try {
+    const exportConfig = {
+      format,
+      profile_id: activeProfileId.value,
+      type: 'assistant', // Differentiates from admin/financial reports
+      data: {
+        renewals: renewals.value,
+        expiringContracts: expiringContracts.value,
+        prospects: prospects.value,
+        offices: offices.value,
+        tasks: pendingTasks.value,
+      },
+    };
+
+    const response = await ReportService.generateReport(exportConfig);
+
+    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    
+    // Extract filename from content-disposition header if available, otherwise create one
+    const disposition = response.headers['content-disposition'];
+    let filename = `assistant-dashboard-${activeProfileId.value}-${new Date().toISOString().split('T')[0]}.${format}`;
+    if (disposition && disposition.indexOf('attachment') !== -1) {
+      const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+      const matches = filenameRegex.exec(disposition);
+      if (matches != null && matches[1]) {
+        filename = matches[1].replace(/['"]/g, '');
+      }
+    }
+
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+    showSuccessToast(t('dashboard.dataExport.success', { format }));
+
+  } catch (error) {
+    console.error(`Failed to export data to ${format}:`, error);
+    // Global interceptor will show a toast for API errors.
+  } finally {
+    isExporting.value[format] = false;
+  }
 };
 
 const statusBadge = (status) => {

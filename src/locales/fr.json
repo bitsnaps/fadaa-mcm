@@ -1,6 +1,7 @@
 {
   "dashboard": {
     "title": "Tableau de Bord Administrateur",
+    "selectProfileFirst": "Veuillez d'abord sélectionner un profil.",
     "filter": {
       "thisMonth": "Ce mois",
       "thisYear": "Cette année",
@@ -52,7 +53,8 @@
       "title": "Exportation de Données",
       "excel": "Excel",
       "csv": "CSV",
-      "pdf": "PDF"
+      "pdf": "PDF",
+      "success": "Données exportées avec succès."      
     }
   },
   "common": {

@@ -111,9 +111,9 @@ const saveSettings = async () => {
   try {
     await updateUserPreferences(authStore.user.id, userSettings);
     authStore.user.preferences = userSettings;
-    // showSuccessToast(t('userSettings.alerts.profileUpdated'));
+    // showSuccessToast(t('userProfile.alerts.profileUpdated'));
   } catch (error) {
-    // showErrorToast(t('userSettings.alerts.profileUpdateFailed'));
+    // showErrorToast(t('userProfile.alerts.profileUpdateFailed'));
   } finally {
     isSaving.value = false;
   }
