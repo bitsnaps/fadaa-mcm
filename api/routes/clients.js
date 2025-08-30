@@ -170,9 +170,9 @@ clientsApp.post('/', uploadMiddleware('attachments', 'attachments'), async (c) =
         const clientData = await c.req.parseBody();
 
         // Validate required fields
-        // if (!clientData.company_name || !clientData.first_name || !clientData.last_name || !clientData.phone_number) {
-        //     return c.json({ success: false, message: 'Missing required fields: company_name, first_name, last_name, phone_number' }, 400);
-        // }
+        if (!clientData.company_name || !clientData.first_name || !clientData.last_name || !clientData.phone_number) {
+            return c.json({ success: false, message: 'Missing required fields: company_name, first_name, last_name, phone_number' }, 400);
+        }
 
         const newClient = await models.Client.create(clientData);
         return c.json({ success: true, message: 'Client created successfully', data: newClient }, 201);

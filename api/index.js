@@ -75,9 +75,9 @@ app.route('/api/system-settings', systemSettingsApp);
 
 // --- Static File Serving ---
 // Serve the uploaded contract files
-app.use('/uploads/contracts/*', serveStatic({ root: './public' }));
-app.use('/uploads/documents/*', serveStatic({ root: './public' }));
-app.use('/uploads/*', serveStatic({ root: './public' }));
+app.use('/uploads/contracts/*', serveStatic({ root: './' }));
+app.use('/uploads/documents/*', serveStatic({ root: './' }));
+app.use('/uploads/*', serveStatic({ root: './' }));
 
 app.get('/api/csrf', async (c) => {
     const ts = c.req.query('ts');
