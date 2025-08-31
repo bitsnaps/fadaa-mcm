@@ -389,7 +389,7 @@ const documents = ref([]);
     </div> -->
 
     <!-- Section 4: Profit Share History -->
-    <div class="row mb-4">
+    <!-- <div class="row mb-4">
       <div class="col-12">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
@@ -419,7 +419,7 @@ const documents = ref([]);
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Section 5: Withdrawals -->
     <div class="row gy-4 mb-4">
