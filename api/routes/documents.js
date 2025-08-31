@@ -2,9 +2,8 @@ const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
-const fs = require('fs');
-const path = require('path');
 const { handleRouteError } = require('../lib/errorHandler');
+const { downloadFile, deleteFile } = require('../services/fileService');
 
 const documentApp = new Hono();
 documentApp.use('*', authMiddleware);
@@ -82,16 +81,19 @@ documentApp.delete('/:id', async (c) => {
         }
 
         // Optional: Delete the file from storage as well
-        // const filePath = path.join(__dirname, '../public', document.file_path);
-        // if (fs.existsSync(filePath)) {
-        //     fs.unlinkSync(filePath);
-        // }
+        // deleteFile(document.file_path);
 
         await document.destroy();
         return c.json({ success: true, message: 'Document deleted successfully' });
     } catch (error) {
         return handleRouteError(c, `Error deleting document ${c.req.param('id')}`, error);
     }
+});
+
+// GET /api/documents/download/* - Download a contract document
+documentApp.get('/download/*', async (c) => {
+    const filePath = c.req.path.replace('/api/documents/download/uploads/', '');
+    return downloadFile(c, filePath);
 });
 
 module.exports = documentApp;

@@ -8,6 +8,7 @@ import { getInvestmentsList } from '@/services/InvestmentService';
 import { useAuthStore } from '@/stores/auth';
 import { Modal } from 'bootstrap';
 import { format } from 'date-fns';
+import { downloadFile } from '../helpers/files';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -127,17 +128,7 @@ const viewDocument = (docUrl) => {
 };
 
 const downloadDocument = (docUrl) => {
-  if (docUrl) {
-    const link = document.createElement('a');
-    link.href = docUrl;
-    link.setAttribute('download', '');
-    link.setAttribute('target', '_blank');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } else {
-    console.log('No document URL to download.');
-  }
+  downloadFile('documents', docUrl);
 };
 
 const openAddDocumentModal = () => {

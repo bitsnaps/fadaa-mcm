@@ -10,6 +10,7 @@ import { Modal } from 'bootstrap';
 
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import { formatCurrency, formatDate } from '@/helpers/utils.js';
+import { downloadFile } from '@/helpers/files.js';
 import { useToast } from '@/helpers/toast';
 const { t } = useI18n();
 const { showErrorToast } = useToast();
@@ -214,39 +215,7 @@ const viewDocument = (docUrl) => {
 };
 
 const downloadDocument = async (docUrl) => {
-  if (!docUrl) {
-    console.log('No document URL to download.');
-    return;
-  }
-  try {
-    const response = await apiClient.get(`/contracts/download${docUrl.startsWith('/') ? docUrl : '/' + docUrl}`, {
-      responseType: 'blob',
-    });
-
-    const blob = new Blob([response.data], { type: response.headers['content-type'] });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    
-    // Extract filename from content-disposition header
-    const contentDisposition = response.headers['content-disposition'];
-    let filename = 'downloaded-file';
-    if (contentDisposition) {
-      const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
-      if (filenameMatch.length > 1) {
-        filename = filenameMatch[1];
-      }
-    }
-    
-    link.setAttribute('download', filename);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
-
-  } catch (error) {
-    console.error('Error downloading document:', error);
-    showErrorToast('Failed to download document.');
-  }
+  downloadFile('contracts', docUrl);
 };
 
 const archiveContract = async (contractId) => {
