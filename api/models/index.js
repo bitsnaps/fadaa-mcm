@@ -56,8 +56,8 @@ Branch.hasMany(User, { foreignKey: 'branch_id' });
 Client.belongsTo(User, { as: 'managed_by', foreignKey: 'managed_by_user_id' });
 User.hasMany(Client, { foreignKey: 'managed_by_user_id' });
 
-Client.belongsTo(Office, { as: 'office', foreignKey: 'office_id' });
-Office.hasMany(Client, { as: 'clients', foreignKey: 'office_id' });
+// Client.belongsTo(Office, { as: 'office', foreignKey: 'office_id' });
+// Office.hasMany(Client, { as: 'clients', foreignKey: 'office_id' });
 
 // Profile associations
 Profile.hasMany(Investment, { foreignKey: 'profile_id' });

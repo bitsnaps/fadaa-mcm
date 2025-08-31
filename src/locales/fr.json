@@ -511,6 +511,7 @@
       "address": "Adresse",
       "city": "Ville",
       "country": "Pays",
+      "status": "Statut",
       "clientType": "Type de Client",
       "selectType": "Sélectionner un Type",
       "serviceType": "Type de Service",

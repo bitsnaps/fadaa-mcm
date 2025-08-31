@@ -158,13 +158,21 @@ const handleFileUpload = (event) => {
           <label for="clientAddress" class="form-label">{{ t('addClient.form.address') }}</label>
           <input type="text" class="form-control" id="clientAddress" v-model="client.address">
         </div>
-        <div class="row mb-3">
+        <div class="row mb-3">          
           <div class="col-md-6">
             <label for="clientType" class="form-label">{{ t('addClient.form.clientType') }}</label>
             <select class="form-select" id="clientType" v-model="client.client_type">
               <option value="">{{ t('addClient.form.selectType') }}</option>
               <option value="Individual">{{ t('addClient.form.individual') }}</option>
               <option value="Company">{{ t('addClient.form.company') }}</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="clientStatus" class="form-label">{{ t('addClient.form.status') }}</label>
+            <select class="form-select" id="clientStatus" v-model="client.status">
+              <option value="Active">{{ t('manageClients.statuses.active') }}</option>
+              <option value="Inactive">{{ t('manageClients.statuses.inactive') }}</option>
+              <option value="Lead">{{ t('manageClients.statuses.lead') }}</option>
             </select>
           </div>
         </div>

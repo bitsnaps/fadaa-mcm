@@ -56,7 +56,7 @@ clientsApp.get('/', async (c) => {
             ],
             include: [
                 { model: models.User, as: 'managed_by', attributes: ['id', 'first_name', 'last_name'] },
-                { model: models.Office, as: 'office', attributes: ['id', 'name'] },
+                // { model: models.Office, as: 'office', attributes: ['id', 'name'] },
                 clientServiceInclude,
                 ...(branchId ? [{
                     model: models.Contract,
@@ -166,19 +166,19 @@ clientsApp.get('/:id', async (c) => {
 
 // POST a new client
 clientsApp.post('/', uploadMiddleware('attachments', 'attachments'), async (c) => {
+    const clientData = await c.req.parseBody();
     try {
-        const clientData = await c.req.parseBody();
 
         // Validate required fields
-        if (!clientData.company_name || !clientData.first_name || !clientData.last_name || !clientData.phone_number) {
-            return c.json({ success: false, message: 'Missing required fields: company_name, first_name, last_name, phone_number' }, 400);
-        }
+        // if (!clientData.company_name || !clientData.first_name || !clientData.last_name || !clientData.phone_number) {
+        //     return c.json({ success: false, message: 'Missing required fields: company_name, first_name, last_name, phone_number' }, 400);
+        // }
 
-        const newClient = await models.Client.create(clientData);
+        const newClient = await models.Client.create({email: clientData.email || null, ...clientData});
         return c.json({ success: true, message: 'Client created successfully', data: newClient }, 201);
     } catch (error) {
         console.error('Error creating client:', error);
-        return c.json({ success: false, message: 'Failed to create client' }, 500);
+        return c.json({ success: false, message: `Failed to create client: ${error}. clientData: ${JSON.stringify(clientData)}` }, 500);
     }
 });
 
@@ -197,6 +197,14 @@ clientsApp.put('/:id', uploadMiddleware('attachments', 'attachments'), async (c)
         if (!client) {
             return c.json({ success: false, message: 'Client not found' }, 404);
         }
+
+        if (clientData.managed_by_user_id === 'null' || clientData.managed_by_user_id === '') {
+            clientData.managed_by_user_id = null;
+        }
+        if (clientData.id_expiry_date === 'null' || clientData.id_expiry_date === '') {
+            clientData.id_expiry_date = null;
+        }
+
         await client.update(clientData);
         return c.json({ success: true, message: 'Client updated successfully', data: client });
     } catch (error) {

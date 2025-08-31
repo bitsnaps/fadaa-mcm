@@ -510,6 +510,7 @@
       "address": "Address",
       "city": "City",
       "country": "Country",
+      "status": "Status",
       "clientType": "Client Type",
       "selectType": "Select Type",
       "serviceType": "Service Type",
