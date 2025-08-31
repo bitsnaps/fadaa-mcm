@@ -105,7 +105,7 @@ const openAddModal = () => {
     isEditMode.value = false;
     currentIncome.value = {
         amount: 0,
-        description: '',
+        description: null,
         transaction_date: new Date().toISOString().slice(0, 10), // Default to today's date
         branch_id: null,
         registered_by: authStore.user.id, // Set current user as registered_by
@@ -255,8 +255,8 @@ const handleDelete = async (id) => {
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label for="inc-description" class="form-label">{{ t('incomes.tableHeaders.description') }}</label>
-                                <textarea id="inc-description" class="form-control" :placeholder="t('incomes.description.placeholder','Please enter the name of the entity')" v-model="currentIncome.description"></textarea>
+                                <label for="inc-description" class="form-label">{{ t('incomes.tableHeaders.description') }} <span class="text-danger">*</span></label>
+                                <textarea id="inc-description" class="form-control" :placeholder="t('incomes.description.placeholder','Please enter the name of the entity')" v-model="currentIncome.description" required></textarea>
                             </div>
                             <div class="mb-3">
                                 <label for="inc-transaction-date" class="form-label">{{ t('incomes.tableHeaders.transaction_date') }} <span class="text-danger">*</span></label>

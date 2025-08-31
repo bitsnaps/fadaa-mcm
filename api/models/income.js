@@ -13,7 +13,7 @@ module.exports = (sequelize) => {
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: false,
     },
     transaction_date: {
       type: DataTypes.DATE,

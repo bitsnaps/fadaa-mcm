@@ -105,7 +105,7 @@ const openAddModal = () => {
     isEditMode.value = false;
     currentExpense.value = {
         amount: 0,
-        description: '',
+        description: null,
         transaction_date: new Date().toISOString().slice(0, 10), // Default to today's date
         branch_id: null,
         registered_by: authStore.user.id, // Set current user as registered_by
@@ -249,8 +249,8 @@ const handleDelete = async (id) => {
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label for="exp-description" class="form-label">{{ t('expenses.tableHeaders.description') }}</label>
-                                <textarea id="exp-description" class="form-control" v-model="currentExpense.description"></textarea>
+                                <label for="exp-description" class="form-label">{{ t('expenses.tableHeaders.description') }} <span class="text-danger">*</span></label>
+                                <textarea id="exp-description" class="form-control" v-model="currentExpense.description" required></textarea>
                             </div>
                             <div class="mb-3">
                                 <label for="exp-transaction-date" class="form-label">{{ t('expenses.tableHeaders.transaction_date') }} <span class="text-danger">*</span></label>
