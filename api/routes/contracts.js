@@ -3,6 +3,7 @@ const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
 const { handleRouteError } = require('../lib/errorHandler');
+const { downloadFile } = require('../services/fileService');
 
 const contractApp = new Hono();
 contractApp.use('*', authMiddleware);
@@ -223,5 +224,11 @@ contractApp.post('/:id/document', uploadMiddleware('contracts', 'document'), asy
     }
 });
 
+
+// GET /api/contracts/download/* - Download a contract document
+contractApp.get('/download/*', async (c) => {
+    const filePath = c.req.path.replace('/api/contracts/download/uploads/', '');
+    return downloadFile(c, filePath);
+});
 
 module.exports = contractApp;
