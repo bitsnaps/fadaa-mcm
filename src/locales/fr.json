@@ -627,7 +627,8 @@
     "notes": "Notes",
     "viewContractTitle": "Détails du Contrat",
     "viewCurrentDocument": "Voir le Document Actuel",
-    "viewDocument": "Voir le Document"
+    "viewDocument": "Voir le Document",
+    "endDateBeforeStartDateError": "La date de fin doit être postérieure à la date de début."
   },
   "offices": {
     "manageOffices": "Gérer les Bureaux de Coworking",

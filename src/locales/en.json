@@ -626,7 +626,8 @@
     "notes": "Notes",
     "viewContractTitle": "Contract Details",
     "viewCurrentDocument": "View Current Document",
-    "viewDocument": "View Document"
+    "viewDocument": "View Document",
+    "endDateBeforeStartDateError": "The end date must be later than the start date."
   },
   "offices": {
     "manageOffices": "Manage Coworking Offices",

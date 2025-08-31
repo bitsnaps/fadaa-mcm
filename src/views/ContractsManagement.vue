@@ -179,6 +179,13 @@ const filteredContracts = computed(() => {
 // For BTable, we don't need paginatedContracts as BTable handles pagination internally
 const totalRows = computed(() => filteredContracts.value.length);
 
+const areDatesValid = computed(() => {
+  if (!newContract.value.start_date || !newContract.value.end_date) {
+    return true;
+  }
+  return new Date(newContract.value.start_date) < new Date(newContract.value.end_date);
+});
+
 const formatDateContract = (date) => {
   if (!date) return t('documents.notApplicable');
   return formatDate(date);
@@ -560,6 +567,9 @@ const submitDocumentUpload = async () => {
                             <div class="col-md-6 mb-3">
                                 <label for="end_date" class="form-label">{{ t('contracts.tableHeaders.endDate') }} <span class="text-danger">*</span></label>
                                 <input type="date" id="end_date" class="form-control" v-model="newContract.end_date" required>
+                                <div v-if="!areDatesValid" class="text-danger mt-1">
+                                    {{ t('contracts.endDateBeforeStartDateError') }}
+                                </div>
                             </div>
                         </div>
                         <div class="row">
@@ -601,7 +611,7 @@ const submitDocumentUpload = async () => {
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('manageUsers.cancel') }}</button>
-                    <button type="button" class="btn btn-primary" @click="submitNewContract" :disabled="isSubmitting">
+                    <button type="button" class="btn btn-primary" @click="submitNewContract" :disabled="isSubmitting || !areDatesValid">
                         <span v-if="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                         {{ isSubmitting ? t('contracts.submitting', 'Submitting...') : (isEditMode ? t('contracts.updateButton', 'Update') : t('contracts.addButton', 'Add Contract')) }}
                     </button>
