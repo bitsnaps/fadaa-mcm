@@ -406,3 +406,5 @@ app.post('/api/create-client', async (c) => {
 serve(app, (info) => {
   //console.log(`Listening on http://localhost:${info.port}`);
 });
+
+module.exports = app;

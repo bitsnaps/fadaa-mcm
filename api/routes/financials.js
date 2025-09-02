@@ -3,7 +3,7 @@ const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { Op } = require('sequelize');
 const { handleRouteError } = require('../lib/errorHandler');
-const { calculateServiceRevenue } = require('../lib/revenueCalculator');
+const { calculateServiceRevenueExlcTax } = require('../lib/revenueCalculator');
 
 const financialsApp = new Hono();
 
@@ -25,7 +25,7 @@ financialsApp.get('/revenue-summary', async (c) => {
         }
 
         // 1. Calculate revenue from Client Services
-        const servicesRevenue = await calculateServiceRevenue({
+        const servicesRevenue = await calculateServiceRevenueExlcTax({
             startDate: start,
             endDate: end,
             profile_id,
@@ -143,7 +143,7 @@ financialsApp.get('/revenue-series', async (c) => {
       }
 
       // Client Services
-      const servicesRevenue = await calculateServiceRevenue({
+      const servicesRevenue = await calculateServiceRevenueExlcTax({
           startDate: monthStart,
           endDate: monthEnd,
           profile_id,

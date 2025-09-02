@@ -1,6 +1,6 @@
 const models = require('../models');
 const { Op } = require('sequelize');
-const { calculateContractRevenue } = require('../lib/revenueCalculator');
+const { calculateContractRevenue } = require('../lib/calculations');
 
 const calculateComprehensiveProfits = async (investments) => {
   const calculations = {};

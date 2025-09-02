@@ -8,7 +8,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "syncdb": "node sync-db.js",
-    "seed": "node seed.js"
+    "seed": "node seed.js",
+    "test": "NODE_ENV=test vitest run test/*"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +25,10 @@
     "mysql2": "^3.14.2",
     "node-cron": "^4.2.1",
     "nodemailer": "^6.10.1",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
   }
 }
