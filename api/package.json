@@ -9,7 +9,8 @@
     "dev": "nodemon index.js",
     "syncdb": "node sync-db.js",
     "seed": "node seed.js",
-    "test": "NODE_ENV=test vitest run test/*"
+    "test": "NODE_ENV=test vitest run test/*",
+    "test:dev": "NODE_ENV=test vitest test/*"
   },
   "keywords": [],
   "author": "",

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-const { calculateServiceRevenue } = require('../lib/calculations');
+const { calculateServiceRevenue } = require('../../lib/calculations');
 
 describe('Service Revenue Calculation', () => {
     it('should calculate the total revenue from a list of client services', async () => {

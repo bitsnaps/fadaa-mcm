@@ -1,4 +1,5 @@
 const { Hono } = require('hono');
+const { Op } = require('sequelize');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
@@ -6,6 +7,7 @@ const { handleRouteError } = require('../lib/errorHandler');
 const { downloadFile } = require('../services/fileService');
 
 const contractApp = new Hono();
+
 contractApp.use('*', authMiddleware);
 
 // GET /api/contracts - Get all contracts
@@ -64,6 +66,36 @@ contractApp.post('/', uploadMiddleware('contracts', 'document'), async (c) => {
             return c.json({ success: false, message: 'Missing required fields, including profile_id' }, 400);
         }
 
+        const existingContract = await models.Contract.findOne({
+            where: {
+                office_id,
+                profile_id,
+                status: { [Op.ne]: 'Terminated' },
+                [Op.or]: [
+                    {
+                        start_date: {
+                            [Op.between]: [start_date, end_date]
+                        }
+                    },
+                    {
+                        end_date: {
+                            [Op.between]: [start_date, end_date]
+                        }
+                    },
+                    {
+                        [Op.and]: [
+                            { start_date: { [Op.lte]: start_date } },
+                            { end_date: { [Op.gte]: end_date } }
+                        ]
+                    }
+                ]
+            }
+        });
+
+        if (existingContract) {
+            return c.json({ success: false, message: 'contracts.errors.officeBooked' }, 409);
+        }
+
         const newContract = await models.Contract.create({
             client_id,
             office_id,
@@ -113,6 +145,39 @@ contractApp.put('/:id', uploadMiddleware('contracts', 'document'), async (c) => 
         const contract = await models.Contract.findByPk(id);
         if (!contract) {
             return c.json({ success: false, message: 'Contract not found' }, 404);
+        }
+
+        if (start_date && end_date) {
+            const existingContract = await models.Contract.findOne({
+                where: {
+                    id: { [Op.ne]: id },
+                    office_id: office_id || contract.office_id,
+                    profile_id: contract.profile_id,
+                    status: { [Op.ne]: 'Terminated' },
+                    [Op.or]: [
+                        {
+                            start_date: {
+                                [Op.between]: [start_date, end_date]
+                            }
+                        },
+                        {
+                            end_date: {
+                                [Op.between]: [start_date, end_date]
+                            }
+                        },
+                        {
+                            [Op.and]: [
+                                { start_date: { [Op.lte]: start_date } },
+                                { end_date: { [Op.gte]: end_date } }
+                            ]
+                        }
+                    ]
+                }
+            });
+
+            if (existingContract) {
+                return c.json({ success: false, message: 'contracts.errors.officeBooked' }, 409);
+            }
         }
 
         const documentUrl = c.req.filePath || contract.document_url;

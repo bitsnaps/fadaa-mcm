@@ -278,7 +278,7 @@ const changePage = (page) => {
                   <option value="Available">{{ t('offices.status.available') }}</option>
                   <option value="Occupied">{{ t('offices.status.occupied') }}</option>
                   <option value="Maintenance">{{ t('offices.status.maintenance') }}</option>
-                  <option value="Unavailable">Unavailable</option>
+                  <option value="Unavailable">{{ t('offices.status.unavailable') }}</option>
                 </select>
                 <div v-if="validationErrors.status" class="invalid-feedback">{{ validationErrors.status }}</div>
               </div>

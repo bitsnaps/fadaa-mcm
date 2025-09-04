@@ -627,7 +627,10 @@
     "viewContractTitle": "Contract Details",
     "viewCurrentDocument": "View Current Document",
     "viewDocument": "View Document",
-    "endDateBeforeStartDateError": "The end date must be later than the start date."
+    "endDateBeforeStartDateError": "The end date must be later than the start date.",
+    "errors": {
+      "officeBooked": "Office is already booked for the selected period in this profile."
+    }
   },
   "offices": {
     "manageOffices": "Manage Coworking Offices",
@@ -645,6 +648,7 @@
     "status": {
       "available": "Available",
       "occupied": "Occupied",
+      "unavailable": "Unavailable",
       "maintenance": "Maintenance"
     },
     "noOfficesFound": "No offices found.",

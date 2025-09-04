@@ -362,8 +362,10 @@ const submitNewContract = async () => {
 
     }
   } catch (error) {
-    console.error(`Error submitting ${isEditMode.value ? 'updated' : 'new'} contract:`, error);
-
+    // if the error is not officeBooked
+    if (error.status != 409){
+      console.error(`Error submitting ${isEditMode.value ? 'updated' : 'new'} contract:`, error);
+    }
   } finally {
     isSubmitting.value = false;
   }

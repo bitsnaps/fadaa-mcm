@@ -12,7 +12,8 @@ let sequelize;
 if (env === 'test') {
   sequelize = new Sequelize({
       dialect: 'sqlite',
-      storage: ':memory:'
+      storage: ':memory:',
+      logging: false
   });
 } else {
   const config = require(__dirname + '/../config/config.js')[env];

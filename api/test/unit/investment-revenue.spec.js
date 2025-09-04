@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-const { calculateContractRevenue } = require('../lib/calculations');
+const { calculateContractRevenue } = require('../../lib/calculations');
 
 describe('Investment Revenue Calculation', () => {
     it('should correctly calculate the investment revenue, excluding contracts signed before the investment start date', () => {

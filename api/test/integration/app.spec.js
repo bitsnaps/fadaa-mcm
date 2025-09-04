@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-const app = require('../index');
+const app = require('../../index');
 
 describe('API Endpoints', () => {
     it('should return a 404 for a non-existent route', async () => {
