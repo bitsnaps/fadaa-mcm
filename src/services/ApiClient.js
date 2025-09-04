@@ -59,6 +59,8 @@ apiClient.interceptors.response.use(
       message = t('errors.forbidden');
     } else if (status === 404) {
       message = t('errors.notFound');
+    } else if (status === 408) {
+      message = t('contracts.errors.officeNotAvailable');
     } else if (status === 409) {
       message = t('contracts.errors.officeBooked');
     } else if (status === 422 || status === 400) {

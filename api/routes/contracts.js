@@ -66,6 +66,11 @@ contractApp.post('/', uploadMiddleware('contracts', 'document'), async (c) => {
             return c.json({ success: false, message: 'Missing required fields, including profile_id' }, 400);
         }
 
+        const office = await models.Office.findByPk(office_id);
+        if (!office || office.status == 'Maintenance' || office.status == 'Unavailable') {
+            return c.json({ success: false, message: 'contracts.errors.officeNotAvailable' }, 408);
+        }
+
         const existingContract = await models.Contract.findOne({
             where: {
                 office_id,
@@ -148,10 +153,16 @@ contractApp.put('/:id', uploadMiddleware('contracts', 'document'), async (c) => 
         }
 
         if (start_date && end_date) {
+            const targetOfficeId = office_id || contract.office_id;
+            const office = await models.Office.findByPk(targetOfficeId);
+            if (office && office.status !== 'Maintenance' && office.status !== 'Unavailable' && office.id !== contract.office_id) {
+                return c.json({ success: false, message: 'contracts.errors.officeNotAvailable' }, 408);
+            }
+
             const existingContract = await models.Contract.findOne({
                 where: {
                     id: { [Op.ne]: id },
-                    office_id: office_id || contract.office_id,
+                    office_id: targetOfficeId,
                     profile_id: contract.profile_id,
                     status: { [Op.ne]: 'Terminated' },
                     [Op.or]: [
