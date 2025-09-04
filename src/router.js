@@ -159,7 +159,7 @@ const routes = [
     meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
   },
   {
-    path: '/manage-coworking-offices',
+    path: '/manage-offices',
     name: 'ManageOffices',
     components: { default: ManageOffices, header: Navbar },
     meta: { requiresAuth: true, roles: ['admin'] }
