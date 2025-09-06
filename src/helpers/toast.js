@@ -5,7 +5,7 @@ export function useToast() {
 
   const showToast = (message, options = {}) => {
     const { variant = 'info', title = 'Notification' } = options;
-    toast.show({
+    toast.create({
         title,
         body: message,
         variant,
