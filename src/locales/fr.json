@@ -635,7 +635,7 @@
     }
   },
   "offices": {
-    "manageOffices": "Gérer les Bureaux de Coworking",
+    "manageOffices": "Gérer les Bureaux",
     "addNewOffice": "Ajouter un Nouveau Bureau",
     "searchPlaceholder": "Rechercher des bureaux par nom, agence ou statut...",
     "tableHeaders": {

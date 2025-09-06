@@ -634,7 +634,7 @@
     }
   },
   "offices": {
-    "manageOffices": "Manage Coworking Offices",
+    "manageOffices": "Manage Offices",
     "addNewOffice": "Add New Office",
     "searchPlaceholder": "Search offices by name, branch, or status...",
     "tableHeaders": {
