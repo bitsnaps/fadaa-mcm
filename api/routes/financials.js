@@ -3,7 +3,7 @@ const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { Op } = require('sequelize');
 const { handleRouteError } = require('../lib/errorHandler');
-const { calculateServiceRevenueExlcTax } = require('../lib/revenueCalculator');
+const { calculateServiceRevenueExlcTax } = require('../lib/calculations');
 
 const financialsApp = new Hono();
 

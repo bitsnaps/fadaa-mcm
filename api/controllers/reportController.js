@@ -1,40 +1,12 @@
 const models = require('../models');
 const { Op } = require('sequelize');
 const ExcelJS = require('exceljs');
+const { calculateMonthlyReportMetrics } = require('../lib/calculations');
 
 async function getMonthlyReport(c) {
   try {
-    const { year, month, clientId, branchId, profile_id } = c.req.query();
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0);
-
-    const where = {
-      profile_id,
-      transaction_date: {
-        [Op.between]: [startDate, endDate],
-      },
-    };
-
-    if (branchId) where.branch_id = branchId;
-
-    const revenue = await models.Income.sum('amount', { where });
-    const newClients = await models.Client.count({
-      where: {
-        created_at: {
-          [Op.between]: [startDate, endDate],
-        },
-      },
-    });
-    const contractsSigned = await models.Contract.count({
-      where: {
-        start_date: {
-          [Op.between]: [startDate, endDate],
-        },
-      },
-    });
-    const occupiedOffices = await models.Office.count({ where: { status: 'Occupied' } });
-    const totalOffices = await models.Office.count();
-    const occupancyRate = totalOffices > 0 ? (occupiedOffices / totalOffices) * 100 : 0;
+    const filters = c.req.query();
+    const { revenue, newClients, contractsSigned, occupancyRate } = await calculateMonthlyReportMetrics(filters);
 
     const reportData = [
       { metric: 'revenue', value: revenue || 0 },
@@ -106,35 +78,8 @@ async function downloadMonthlyReport(c) {
   try {
     const { format, ...filters } = await c.req.json();
     const { year, month } = filters;
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0);
-
-    const where = {
-      profile_id: filters.profile_id,
-      transaction_date: {
-        [Op.between]: [startDate, endDate],
-      },
-    };
-    if (filters.branchId) where.branch_id = filters.branchId;
-
-    const revenue = await models.Income.sum('amount', { where });
-    const newClients = await models.Client.count({
-      where: {
-        created_at: {
-          [Op.between]: [startDate, endDate],
-        },
-      },
-    });
-    const contractsSigned = await models.Contract.count({
-      where: {
-        start_date: {
-          [Op.between]: [startDate, endDate],
-        },
-      },
-    });
-    const occupiedOffices = await models.Office.count({ where: { status: 'Occupied' } });
-    const totalOffices = await models.Office.count();
-    const occupancyRate = totalOffices > 0 ? (occupiedOffices / totalOffices) * 100 : 0;
+    
+    const { revenue, newClients, contractsSigned, occupancyRate } = await calculateMonthlyReportMetrics(filters);
 
     const reportData = [
       { metric: 'Revenue', value: revenue || 0 },
