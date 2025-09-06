@@ -12,7 +12,11 @@
             <label for="password" class="form-label">{{ t('login.passwordLabel') }}</label>
             <input type="password" class="form-control" id="password" v-model="password" required :placeholder="t('login.passwordPlaceholder')">
           </div>
-          <button type="submit" class="btn btn-fadaa-primary w-100">{{ t('login.loginButton') }} <i class="bi bi-box-arrow-in-right"></i></button>
+          <BButton type="submit" variant="fadaa-primary" class="w-100" :disabled="isLoading">
+            <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span v-if="isLoading"> {{ t('login.loggingIn') }}...</span>
+            <span v-else>{{ t('login.loginButton') }} <i class="bi bi-box-arrow-in-right"></i></span>
+          </BButton>
         </form>
 
       </div>
@@ -34,13 +38,15 @@ const password = ref(import.meta.env.DEV?import.meta.env.VITE_DEFAULT_PASSWORD:'
 const router = useRouter();
 const authStore = useAuthStore();
 const { showErrorToast } = useToast();
-
+const isLoading = ref(false);
+ 
 const handleLogin = async () => {
     if (!email.value || !password.value) {
         showErrorToast(t('login.error.missingCredentials'));
         return;
     }
-
+ 
+    isLoading.value = true;
     try {
         const success = await authStore.login({
             email: email.value,
@@ -76,6 +82,8 @@ const handleLogin = async () => {
         } else {
           showErrorToast(t('login.error.unknown'));
         }
+    } finally {
+        isLoading.value = false;
     }
 };
 </script>

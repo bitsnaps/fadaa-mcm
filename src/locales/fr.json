@@ -1015,6 +1015,7 @@
     "passwordLabel": "Mot de passe",
     "passwordPlaceholder": "Votre mot de passe",
     "loginButton": "Connexion",
+    "loggingIn": "Connexion en cours...",
     "success": "Vous vous êtes connecté avec succès",
     "error": {
       "missingCredentials": "Veuillez saisir l'email et le mot de passe.",

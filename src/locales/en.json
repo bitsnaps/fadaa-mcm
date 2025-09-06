@@ -1014,6 +1014,7 @@
     "passwordLabel": "Password",
     "passwordPlaceholder": "Your assword",
     "loginButton": "Login",
+    "loggingIn": "Logging in...",
     "success": "You have successfully logged in",
     "error": {
       "missingCredentials": "Please enter both email and password.",
