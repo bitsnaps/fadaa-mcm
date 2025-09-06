@@ -33,7 +33,9 @@ module.exports = (sequelize) => {
         type: DataTypes.TEXT,
         note: 'Comma-separated list of amenities'
     }
-  },{
+  }, {
+    tableName: 'offices',
+    timestamps: false,
     hooks: {
       beforeCreate: (office, options) => {
         const validStatuses = ['Available', 'Occupied', 'Maintenance', 'Unavailable'];
@@ -41,10 +43,7 @@ module.exports = (sequelize) => {
           throw new Error(`Invalid status value: '${office.status}'. Must be one of: ${validStatuses.join(', ')}`);
         }
       }
-    }    
-  }, {
-    tableName: 'offices',
-    timestamps: false,
+    }
   });
 
   return Office;
