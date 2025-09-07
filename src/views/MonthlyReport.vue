@@ -106,72 +106,46 @@ async function fetchBranches() {
     <ProfileTabs @update:activeProfile="handleProfileChange">
       <template #default="{ profileId }">
         <div v-if="profileId">
+          
           <div class="card shadow-sm mb-4">
-      <div class="card-header bg-fadaa-primary">
-        <h5 class="mb-0 text-white"><i class="bi bi-filter me-2"></i>{{ $t('monthlyReport.filters.title') }}</h5>
-      </div>
-      <div class="card-body">
-        <div class="row g-3 align-items-end">
-          <div class="col-md-3">
-            <label for="month" class="form-label">{{ $t('monthlyReport.filters.month') }}</label>
-            <select id="month" class="form-select" v-model="filters.month">
-              <option v-for="month in months" :key="month.value" :value="month.value">{{ month.name }}</option>
-            </select>
+            <div class="card-header bg-fadaa-primary">
+              <h5 class="mb-0 text-white"><i class="bi bi-filter me-2"></i>{{ $t('monthlyReport.filters.title') }}</h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                  <label for="month" class="form-label">{{ $t('monthlyReport.filters.month') }}</label>
+                  <select id="month" class="form-select" v-model="filters.month">
+                    <option v-for="month in months" :key="month.value" :value="month.value">{{ month.name }}</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <label for="year" class="form-label">{{ $t('monthlyReport.filters.year') }}</label>
+                  <select id="year" class="form-select" v-model="filters.year">
+                    <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="client" class="form-label">{{ $t('monthlyReport.filters.client') }}</label>
+                  <select id="client" class="form-select" v-model="filters.clientId">
+                    <option :value="null">{{ $t('monthlyReport.filters.allClients') }}</option>
+                    <option v-for="client in clients" :key="client.id" :value="client.id">{{ client.company_name }}</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <label for="branch" class="form-label">{{ $t('monthlyReport.filters.branch') }}</label>
+                  <select id="branch" class="form-select" v-model="filters.branchId">
+                    <option :value="null">{{ $t('monthlyReport.filters.allBranches') }}</option>
+                    <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <button @click="generateReport" class="btn btn-fadaa-primary w-100"><i class="bi bi-search me-2"></i>{{ $t('monthlyReport.filters.generate') }}</button>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="col-md-2">
-            <label for="year" class="form-label">{{ $t('monthlyReport.filters.year') }}</label>
-            <select id="year" class="form-select" v-model="filters.year">
-              <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label for="client" class="form-label">{{ $t('monthlyReport.filters.client') }}</label>
-            <select id="client" class="form-select" v-model="filters.clientId">
-              <option :value="null">{{ $t('monthlyReport.filters.allClients') }}</option>
-              <option v-for="client in clients" :key="client.id" :value="client.id">{{ client.company_name }}</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <label for="branch" class="form-label">{{ $t('monthlyReport.filters.branch') }}</label>
-            <select id="branch" class="form-select" v-model="filters.branchId">
-              <option :value="null">{{ $t('monthlyReport.filters.allBranches') }}</option>
-              <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <button @click="generateReport" class="btn btn-fadaa-primary w-100"><i class="bi bi-search me-2"></i>{{ $t('monthlyReport.filters.generate') }}</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="card shadow-sm">
-      <div class="card-header bg-fadaa-light-blue d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>{{ $t('monthlyReport.report.title') }}</h5>
-        <div class="btn-group">
-          <button @click="downloadReport('csv')" class="btn btn-success btn-sm"><i class="bi bi-file-earmark-spreadsheet me-2"></i>{{ $t('monthlyReport.report.downloadCsv') }}</button>
-          <button @click="downloadReport('xlsx')" class="btn btn-info btn-sm"><i class="bi bi-file-earmark-excel me-2"></i>{{ $t('monthlyReport.report.downloadXlsx') }}</button>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>{{ $t('monthlyReport.table.metric') }}</th>
-                <th>{{ $t('monthlyReport.table.value') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in reportData" :key="item.metric">
-                <td>{{ item.metric }}</td>
-                <td>{{ item.value }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-          </div>
           <div class="card shadow-sm">
             <div class="card-header bg-fadaa-light-blue d-flex justify-content-between align-items-center">
               <h5 class="mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>{{ $t('monthlyReport.report.title') }}</h5>
@@ -199,6 +173,7 @@ async function fetchBranches() {
               </div>
             </div>
           </div>
+
         </div>
       </template>
     </ProfileTabs>

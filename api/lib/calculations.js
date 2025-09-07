@@ -108,7 +108,6 @@ async function calculateMonthlyReportMetrics(filters) {
 
   if (branchId) {
     where.branch_id = branchId;
-    creationWhere.branch_id = branchId;
   }
   
   if (clientId) {
@@ -117,7 +116,9 @@ async function calculateMonthlyReportMetrics(filters) {
   }
 
   // Revenue Calculation
-  const incomeRevenue = await models.Income.sum('amount', { where });
+  const incomeWhere = { ...where };
+  delete incomeWhere.client_id;
+  const incomeRevenue = await models.Income.sum('amount', { where: incomeWhere });
 
   const serviceRevenue = await calculateServiceRevenueExlcTax({
     startDate,
@@ -132,10 +133,21 @@ async function calculateMonthlyReportMetrics(filters) {
       { end_date: { [Op.gte]: startDate } }
     ]
   };
-  if (branchId) contractWhere.branch_id = branchId;
   if (clientId) contractWhere.client_id = clientId;
+
+  const includeOptions = [];
+  if (branchId) {
+    includeOptions.push({
+      model: models.Office,
+      where: { branch_id: branchId },
+      required: true,
+    });
+  }
   
-  const contracts = await models.Contract.findAll({ where: contractWhere });
+  const contracts = await models.Contract.findAll({
+    where: contractWhere,
+    include: includeOptions,
+  });
   let contractsRevenue = 0;
   contracts.forEach(contract => {
     contractsRevenue += parseFloat(contract.monthly_rate);
@@ -153,7 +165,20 @@ async function calculateMonthlyReportMetrics(filters) {
   const newClients = await models.Client.count({ where: newClientsWhere });
 
   // Contracts Signed
-  const contractsSigned = await models.Contract.count({ where: creationWhere });
+  const contractsSignedWhere = { ...creationWhere };
+  let contractsSigned;
+  if (branchId) {
+    contractsSigned = await models.Contract.count({
+      where: contractsSignedWhere,
+      include: [{
+        model: models.Office,
+        where: { branch_id: branchId },
+        required: true
+      }]
+    });
+  } else {
+    contractsSigned = await models.Contract.count({ where: contractsSignedWhere });
+  }
 
   // Occupancy Rate
   const occupiedOfficesWhere = {
@@ -163,10 +188,18 @@ async function calculateMonthlyReportMetrics(filters) {
       { end_date: { [Op.gte]: startDate } }
     ]
   };
-  if (branchId) occupiedOfficesWhere.branch_id = branchId;
+  const occupiedOfficesInclude = [];
+  if (branchId) {
+    occupiedOfficesInclude.push({
+      model: models.Office,
+      where: { branch_id: branchId },
+      required: true,
+    });
+  }
 
   const occupiedOffices = await models.Contract.count({
     where: occupiedOfficesWhere,
+    include: occupiedOfficesInclude,
     distinct: true,
     col: 'office_id'
   });
