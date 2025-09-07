@@ -1,7 +1,7 @@
 const models = require('../models');
 const { Op } = require('sequelize');
 const ExcelJS = require('exceljs');
-const { calculateMonthlyReportMetrics } = require('../lib/calculations');
+const { calculateMonthlyReportMetrics, calculateAnnualReportMetrics } = require('../lib/calculations');
 
 async function getMonthlyReport(c) {
   try {
@@ -24,46 +24,15 @@ async function getMonthlyReport(c) {
 
 async function getAnnualReport(c) {
   try {
-    const { year, branchId, profile_id } = c.req.query();
-    const startDate = new Date(year, 0, 1);
-    const endDate = new Date(year, 11, 31);
-
-    const where = {
-      profile_id,
-      transaction_date: {
-        [Op.between]: [startDate, endDate],
-      },
-    };
-
-    if (branchId) where.branch_id = branchId;
-
-    const revenue = await models.Income.sum('amount', { where });
-    const expenses = await models.Expense.sum('amount', { where });
-    const profit = revenue - expenses;
-    const newClients = await models.Client.count({
-      where: {
-        created_at: {
-          [Op.between]: [startDate, endDate],
-        },
-      },
-    });
-    const contractsSigned = await models.Contract.count({
-      where: {
-        start_date: {
-          [Op.between]: [startDate, endDate],
-        },
-      },
-    });
-    const occupiedOffices = await models.Office.count({ where: { status: 'Occupied' } });
-    const totalOffices = await models.Office.count();
-    const occupancyRate = totalOffices > 0 ? (occupiedOffices / totalOffices) * 100 : 0;
+    const filters = c.req.query();
+    const { revenue, expenses, profit, newClients, contractsSigned, occupancyRate } = await calculateAnnualReportMetrics(filters);
 
     const reportData = {
-      revenue: revenue || 0,
-      expenses: expenses || 0,
-      profit: profit || 0,
-      newClients: newClients || 0,
-      contractsSigned: contractsSigned || 0,
+      revenue,
+      expenses,
+      profit,
+      newClients,
+      contractsSigned,
       occupancyRate: `${occupancyRate.toFixed(2)}%`,
     };
 
@@ -121,44 +90,14 @@ async function downloadAnnualReport(c) {
   try {
     const { format, ...filters } = await c.req.json();
     const { year } = filters;
-    const startDate = new Date(year, 0, 1);
-    const endDate = new Date(year, 11, 31);
-
-    const where = {
-      profile_id: filters.profile_id,
-      transaction_date: {
-        [Op.between]: [startDate, endDate],
-      },
-    };
-    if (filters.branchId) where.branch_id = filters.branchId;
-
-    const revenue = await models.Income.sum('amount', { where });
-    const expenses = await models.Expense.sum('amount', { where });
-    const profit = revenue - expenses;
-    const newClients = await models.Client.count({
-      where: {
-        created_at: {
-          [Op.between]: [startDate, endDate],
-        },
-      },
-    });
-    const contractsSigned = await models.Contract.count({
-      where: {
-        start_date: {
-          [Op.between]: [startDate, endDate],
-        },
-      },
-    });
-    const occupiedOffices = await models.Office.count({ where: { status: 'Occupied' } });
-    const totalOffices = await models.Office.count();
-    const occupancyRate = totalOffices > 0 ? (occupiedOffices / totalOffices) * 100 : 0;
+    const { revenue, expenses, profit, newClients, contractsSigned, occupancyRate } = await calculateAnnualReportMetrics(filters);
 
     const reportData = {
-      'Total Revenue': revenue || 0,
-      'Total Expenses': expenses || 0,
-      'Net Profit': profit || 0,
-      'New Clients': newClients || 0,
-      'Contracts Signed': contractsSigned || 0,
+      'Total Revenue': revenue,
+      'Total Expenses': expenses,
+      'Net Profit': profit,
+      'New Clients': newClients,
+      'Contracts Signed': contractsSigned,
       'Average Occupancy': `${occupancyRate.toFixed(2)}%`,
     };
 

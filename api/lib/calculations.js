@@ -217,9 +217,144 @@ async function calculateMonthlyReportMetrics(filters) {
   };
 }
 
+async function calculateAnnualReportMetrics(filters) {
+  const { year, branchId, profile_id } = filters;
+  const startDate = new Date(year, 0, 1);
+  const endDate = new Date(year, 11, 31, 23, 59, 59, 999);
+
+  const where = {
+    profile_id,
+    transaction_date: {
+      [Op.between]: [startDate, endDate],
+    },
+  };
+
+  const creationWhere = {
+    created_at: {
+      [Op.between]: [startDate, endDate],
+    },
+  }
+
+  if (branchId) {
+    where.branch_id = branchId;
+  }
+
+  // Revenue Calculation
+  const incomeRevenue = await models.Income.sum('amount', { where });
+
+  const serviceRevenue = await calculateServiceRevenueExlcTax({
+    startDate,
+    endDate,
+    profile_id,
+  });
+
+  const contractWhere = {
+    profile_id,
+    [Op.and]: [
+      { start_date: { [Op.lte]: endDate } },
+      { end_date: { [Op.gte]: startDate } }
+    ]
+  };
+
+  const includeOptions = [];
+  if (branchId) {
+    includeOptions.push({
+      model: models.Office,
+      where: { branch_id: branchId },
+      required: true,
+    });
+  }
+  
+  const contracts = await models.Contract.findAll({
+    where: contractWhere,
+    include: includeOptions,
+  });
+
+  let contractsRevenue = 0;
+  contracts.forEach(contract => {
+    // Calculate the number of months the contract is active within the year
+    const contractStart = new Date(contract.start_date);
+    const contractEnd = new Date(contract.end_date);
+
+    const start = contractStart > startDate ? contractStart : startDate;
+    const end = contractEnd < endDate ? contractEnd : endDate;
+
+    let months = (end.getFullYear() - start.getFullYear()) * 12;
+    months -= start.getMonth();
+    months += end.getMonth();
+    const monthCount = months <= 0 ? 1 : months + 1;
+
+    contractsRevenue += parseFloat(contract.monthly_rate) * monthCount;
+  });
+
+  const totalRevenue = (incomeRevenue || 0) + (serviceRevenue || 0) + (contractsRevenue || 0);
+
+  // Expenses
+  const expenses = await models.Expense.sum('amount', { where });
+  const profit = totalRevenue - (expenses || 0);
+
+  // New Clients
+  const newClients = await models.Client.count({ where: creationWhere });
+
+  // Contracts Signed
+  const contractsSignedWhere = { ...creationWhere };
+  let contractsSigned;
+  if (branchId) {
+    contractsSigned = await models.Contract.count({
+      where: contractsSignedWhere,
+      include: [{
+        model: models.Office,
+        where: { branch_id: branchId },
+        required: true
+      }]
+    });
+  } else {
+    contractsSigned = await models.Contract.count({ where: contractsSignedWhere });
+  }
+
+  // Occupancy Rate
+  const occupiedOfficesWhere = {
+    profile_id,
+    [Op.and]: [
+      { start_date: { [Op.lte]: endDate } },
+      { end_date: { [Op.gte]: startDate } }
+    ]
+  };
+  const occupiedOfficesInclude = [];
+  if (branchId) {
+    occupiedOfficesInclude.push({
+      model: models.Office,
+      where: { branch_id: branchId },
+      required: true,
+    });
+  }
+
+  const occupiedOffices = await models.Contract.count({
+    where: occupiedOfficesWhere,
+    include: occupiedOfficesInclude,
+    distinct: true,
+    col: 'office_id'
+  });
+
+  const totalOfficesWhere = {};
+  if (branchId) totalOfficesWhere.branch_id = branchId;
+  const totalOffices = await models.Office.count({ where: totalOfficesWhere });
+  const occupancyRate = totalOffices > 0 ? (occupiedOffices / totalOffices) * 100 : 0;
+
+  return {
+    revenue: totalRevenue,
+    expenses: expenses || 0,
+    profit: profit,
+    newClients,
+    contractsSigned,
+    occupancyRate,
+  };
+}
+
 module.exports = {
   calculateContractRevenue,
   calculateServiceRevenue,
   calculateMonthlyReportMetrics,
+  calculateAnnualReportMetrics,
   calculateServiceRevenueExlcTax,
 };
