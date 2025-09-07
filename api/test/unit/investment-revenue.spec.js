@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-const { calculateContractRevenue } = require('../../lib/calculations');
+const { calculateContractRevenueForPeriod } = require('../../lib/calculations');
 
 describe('Investment Revenue Calculation', () => {
     it('should correctly calculate the investment revenue, excluding contracts signed before the investment start date', () => {
@@ -21,13 +21,9 @@ describe('Investment Revenue Calculation', () => {
             },
         ];
 
-        const investment = {
-            starting_date: investment_start_date,
-            ending_date: investment_end_date,
-        };
+        const revenue = calculateContractRevenueForPeriod(contracts, investment_start_date, investment_end_date);
 
-        const revenue = calculateContractRevenue(contracts, investment);
-
+        // The old contract should be ignored. The new contract runs for 12 months. 12 * 2000 = 24000
         expect(revenue).toBe(24000);
     });
 });
