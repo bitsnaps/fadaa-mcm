@@ -1,7 +1,7 @@
 import apiClient from './ApiClient';
 
-export const getContracts = (profileId) => {
-    return apiClient.get('/contracts', { params: { profile_id: profileId } });
+export const getContracts = (params) => {
+    return apiClient.get('/contracts', { params });
 };
 
 export const addContract = (formData) => {

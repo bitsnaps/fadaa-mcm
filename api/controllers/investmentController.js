@@ -1,6 +1,6 @@
 const models = require('../models');
 const { Op } = require('sequelize');
-const { calculateContractRevenue } = require('../lib/calculations');
+const { calculateContractRevenueForPeriod } = require('../lib/calculations');
 
 const calculateComprehensiveProfits = async (investments) => {
   const calculations = {};
@@ -46,7 +46,7 @@ const calculateComprehensiveProfits = async (investments) => {
       ]
     };
     const contracts = await models.Contract.findAll({ where: contractWhere });
-    const contractRevenue = calculateContractRevenue(contracts, investment);
+    const contractRevenue = calculateContractRevenueForPeriod(contracts, new Date(investment.starting_date), new Date(investment.ending_date));
 
     const incomeAmount = await models.Income.sum('amount', { where: whereClause });
 
@@ -111,7 +111,7 @@ const calculateContractualProfits = async (investments) => {
       ]
     };
     const contracts = await models.Contract.findAll({ where: contractWhere });
-    const contractRevenue = calculateContractRevenue(contracts, investment);
+    const contractRevenue = calculateContractRevenueForPeriod(contracts, new Date(investment.starting_date), new Date(investment.ending_date));
 
     const totalNetProfit = contractRevenue; // For contractual, profit is just the revenue
     const grossProfitShare = totalNetProfit * (percentage / 100);

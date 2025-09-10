@@ -97,7 +97,7 @@ const fetchContracts = async (profileId) => {
   if (!profileId) return;
   try {
     isLoading.value = true;
-    const response = await getContracts(profileId);
+    const response = await getContracts({ profile_id: profileId });
     if (response.data.success) {
       contracts.value = response.data.contracts;
     } else {

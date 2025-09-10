@@ -13,11 +13,20 @@ contractApp.use('*', authMiddleware);
 // GET /api/contracts - Get all contracts
 contractApp.get('/', async (c) => {
     try {
-        const { profile_id } = c.req.query();
+        const { profile_id, expiring_within_days } = c.req.query();
         let whereClause = {};
 
         if (profile_id) {
             whereClause.profile_id = profile_id;
+        }
+
+        if (expiring_within_days) {
+            const now = new Date();
+            const futureDate = new Date();
+            futureDate.setDate(now.getDate() + parseInt(expiring_within_days, 10));
+            whereClause.end_date = {
+                [Op.between]: [now, futureDate]
+            };
         }
 
         const contracts = await models.Contract.findAll({

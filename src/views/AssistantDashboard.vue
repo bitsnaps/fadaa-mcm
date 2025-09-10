@@ -229,20 +229,22 @@ const loadAssistantDashboard = async (profileId = null) => {
   if (!profileId) return;
 
   try {
-    // Renewals: approximate via contracts ending within next 15 days
-    const { data: contractsRes } = await getContracts(profileId);
-    const contracts = contractsRes?.contracts || [];
     const now = new Date();
-    const soon = new Date(); soon.setDate(now.getDate() + 15);
-    renewals.value = contracts
-      .filter(c => c.end_date && new Date(c.end_date) <= soon && new Date(c.end_date) >= now)
-      .map(c => ({ id: c.id, client: c.Client?.company_name || '—', daysLeft: Math.ceil((new Date(c.end_date) - now) / (1000*60*60*24)) }));
+    // Renewals: contracts ending within the next 15 days
+    const { data: renewalsRes } = await getContracts({ profile_id: profileId, expiring_within_days: 15 });
+    renewals.value = (renewalsRes?.contracts || []).map(c => ({
+      id: c.id,
+      client: c.Client?.company_name || '—',
+      daysLeft: Math.ceil((new Date(c.end_date) - now) / (1000 * 60 * 60 * 24))
+    }));
 
-    // Expiring contracts next 30 days
-    const thirty = new Date(); thirty.setDate(now.getDate() + 30);
-    expiringContracts.value = contracts
-      .filter(c => c.end_date && new Date(c.end_date) <= thirty && new Date(c.end_date) >= now)
-      .map(c => ({ id: c.id, client: c.Client?.company_name || '—', office: c.Office?.name || '—' }));
+    // Expiring contracts: contracts ending within the next 30 days
+    const { data: expiringRes } = await getContracts({ profile_id: profileId, expiring_within_days: 30 });
+    expiringContracts.value = (expiringRes?.contracts || []).map(c => ({
+      id: c.id,
+      client: c.Client?.company_name || '—',
+      office: c.Office?.name || '—'
+    }));
 
     // Prospects: use clients with status = 'Lead'
     // const { data: clientsRes } = await getClients({ profile_id: profileId });
