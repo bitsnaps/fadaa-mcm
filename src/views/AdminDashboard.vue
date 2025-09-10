@@ -140,18 +140,20 @@
           <table class="table table-striped table-hover">
             <thead class="table-dark">
               <tr>
-                <th @click="sortBy('id')" class="cursor-pointer">{{ $t('dashboard.officeList.table.id') }} <i :class="sortIcon('id')"></i></th>
-                <th @click="sortBy('branch')" class="cursor-pointer">{{ $t('dashboard.officeList.table.branch') }} <i :class="sortIcon('branch')"></i></th>
-                <th @click="sortBy('space')" class="cursor-pointer">{{ $t('dashboard.officeList.table.space') }} <i :class="sortIcon('space')"></i></th>
-                <th @click="sortBy('status')" class="cursor-pointer">{{ $t('dashboard.officeList.table.status') }} <i :class="sortIcon('status')"></i></th>
+                <th>{{ $t('dashboard.officeList.table.id') }}</th>
+                <th>{{ $t('dashboard.officeList.table.name') }}</th>
+                <th>{{ $t('dashboard.officeList.table.branch') }}</th>
+                <th>{{ $t('dashboard.officeList.table.space') }}</th>
+                <th>{{ $t('dashboard.officeList.table.status') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="paginatedOffices.length === 0">
-                <td colspan="4" class="text-center">{{ $t('dashboard.officeList.noOffices') }}</td>
+                <td colspan="5" class="text-center">{{ $t('dashboard.officeList.noOffices') }}</td>
               </tr>
               <tr v-for="office in paginatedOffices" :key="office.id">
                 <td>{{ office.id }}</td>
+                <td>{{ office.name }}</td>
                 <td>{{ office.branch.name }}</td>
                 <td>{{ office.capacity }}</td>
                 <td><span :class="statusBadge(office.status)">{{ office.status }}</span></td>
@@ -202,7 +204,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, Filler } from 'chart.js';
 import { formatCurrency } from '@/helpers/utils.js';
@@ -239,8 +241,6 @@ const fromDate = ref(localStorage.getItem('adminDashboard-fromDate') || '');
 const toDate = ref(localStorage.getItem('adminDashboard-toDate') || '');
 
 const searchTerm = ref('');
-const sortKey = ref('id');
-const sortAsc = ref(true);
 const currentPage = ref(1);
 const itemsPerPage = ref(5);
 const totalOffices = ref(0);
@@ -315,7 +315,6 @@ const fetchDashboardData = async (profileId) => {
       const assistantsRes = await getAssistants();
       assistants.value = assistantsRes.data.data;
 
-      fetchOffices();
     }
 
   } catch (error) {
@@ -329,13 +328,13 @@ const onProfileChange = (profileId) => {
 };
 
 const fetchOffices = async () => {
+  if (!activeProfileId.value) return;
   try {
     const params = {
       page: currentPage.value,
       limit: itemsPerPage.value,
       search: searchTerm.value,
-      sortBy: sortKey.value,
-      sortAsc: sortAsc.value,
+      profile_id: activeProfileId.value,
     };
     const response = await getOffices(params);
     offices.value = response.data.data;
@@ -349,6 +348,8 @@ onMounted(() => {
   initThisMonth();
   // fetchDashboardData is now called by onProfileChange
 });
+
+watch([activeProfileId, currentPage, searchTerm], fetchOffices, { immediate: true });
 
 const totalPages = computed(() => {
   return Math.ceil(totalOffices.value / itemsPerPage.value);
@@ -375,15 +376,6 @@ const getActivityIcon = (action) => {
 };
 
 
-const sortBy = (key) => {
-  if (sortKey.value === key) {
-    sortAsc.value = !sortAsc.value;
-  } else {
-    sortKey.value = key;
-    sortAsc.value = true;
-  }
-  currentPage.value = 1;
-};
 
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
@@ -448,10 +440,6 @@ const exportData = async (format) => {
   }
 };
 
-const sortIcon = (key) => {
-  if (sortKey.value !== key) return 'bi bi-arrow-down-up';
-  return sortAsc.value ? 'bi bi-sort-up-alt' : 'bi bi-sort-down';
-};
 
 const statusBadge = (status) => {
   switch (status) {

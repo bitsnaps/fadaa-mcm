@@ -39,6 +39,7 @@
       "searchPlaceholder": "Search offices...",
       "table": {
         "id": "ID",
+        "name": "Name",
         "branch": "Branch",
         "space": "Space (m²)",
         "status": "Status"

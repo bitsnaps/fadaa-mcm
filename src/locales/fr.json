@@ -39,6 +39,7 @@
       "searchPlaceholder": "Rechercher des bureaux...",
       "table": {
         "id": "ID",
+        "name": "Nom",
         "branch": "Branche",
         "space": "Espace (m²)",
         "status": "Statut"
