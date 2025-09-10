@@ -2,48 +2,14 @@ const { Hono } = require('hono');
 const { Op } = require('sequelize');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
+const officeController = require('../controllers/officeController');
 const { createNotification } = require('../services/notificationService');
 const { handleRouteError } = require('../lib/errorHandler');
 
 const officesApp = new Hono();
 
 // GET all offices with pagination and search
-officesApp.get('/', authMiddleware, async (c) => {
-    try {
-        const { page = 1, limit = 10, search = '' } = c.req.query();
-        const offset = (page - 1) * limit;
-
-        const whereClause = search ? {
-            [Op.or]: [
-                { name: { [Op.like]: `%${search}%` } },
-                { '$branch.name$': { [Op.like]: `%${search}%` } },
-                { status: { [Op.like]: `%${search}%` } }
-            ]
-        } : {};
-
-        const { count, rows } = await models.Office.findAndCountAll({
-            where: whereClause,
-            include: [{ model: models.Branch, as: 'branch' }],
-            order: [['name', 'ASC']],
-            limit: parseInt(limit),
-            offset: parseInt(offset),
-        });
-
-        return c.json({
-            success: true,
-            data: rows,
-            pagination: {
-                total: count,
-                page: parseInt(page),
-                limit: parseInt(limit),
-                totalPages: Math.ceil(count / limit),
-            }
-        });
-    } catch (error) {
-        console.error('Error fetching offices:', error);
-        return c.json({ success: false, message: 'Failed to fetch offices' }, 500);
-    }
-});
+officesApp.get('/', authMiddleware, officeController.getOffices);
 
 // GET single office by ID
 officesApp.get('/:id', authMiddleware, async (c) => {
