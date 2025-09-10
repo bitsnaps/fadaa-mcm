@@ -247,8 +247,7 @@ const loadAssistantDashboard = async (profileId = null) => {
     }));
 
     // Prospects: use clients with status = 'Lead'
-    // const { data: clientsRes } = await getClients({ profile_id: profileId });
-    const { data: clientsRes } = await getClients();
+    const { data: clientsRes } = await getClients({ profile_id: profileId });
     const clients = clientsRes?.data || [];
     prospects.value = clients
       .filter(cl => cl.status === 'Lead')

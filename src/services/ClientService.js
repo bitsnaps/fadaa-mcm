@@ -1,10 +1,6 @@
 import apiClient from './ApiClient';
 
-export const getClients = (branchId = null) => {
-    const params = {};
-    if (branchId) {
-        params.branchId = branchId;
-    }
+export const getClients = (params = {}) => {
     return apiClient.get('/clients', { params });
 };
 

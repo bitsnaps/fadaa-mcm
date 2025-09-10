@@ -6,9 +6,11 @@ import { useI18n } from 'vue-i18n';
 import { getClients, deleteClient } from '@/services/ClientService';
 import { getBranchesWithContracts } from '@/services/BranchService';
 import { formatDate } from '@/helpers/utils';
+import { useAuthStore } from '@/stores/auth';
 
 const { t } = useI18n();
 const router = useRouter();
+const authStore = useAuthStore();
 
 const clients = ref([]);
 const branches = ref([]);
@@ -19,7 +21,7 @@ let viewClientModal = null;
 
 const fetchClients = async () => {
   try {
-    const response = await getClients(selectedBranch.value);
+    const response = await getClients({ branchId: selectedBranch.value });
     if (response.data.success) {
       clients.value = response.data.data;
     }
@@ -113,7 +115,7 @@ const removeClient = async (clientId) => {
           :placeholder="$t('manageClients.searchPlaceholder')"
         />
       </div>
-      <div class="col-md-4">
+      <div class="col-md-4" v-if="authStore && authStore.userRole == 'admin'">
         <select class="form-select" v-model="selectedBranch" @change="applyBranchFilter">
           <option :value="null">{{ $t('manageClients.allBranches') }}</option>
           <option v-for="branch in branches" :key="branch.id" :value="branch.id">

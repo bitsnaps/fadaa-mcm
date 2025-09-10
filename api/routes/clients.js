@@ -26,68 +26,64 @@ clientsApp.get('/', async (c) => {
     try {
         const { profile_id, branchId } = c.req.query();
 
-        const clientServiceInclude = {
-            model: models.ClientService,
-            attributes: ['id', 'price', 'taxId', 'profile_id'],
-            include: [
-                {
-                    model: models.Tax,
-                    attributes: ['rate', 'bearer']
-                }
-            ],
-            required: false // keep clients even if they have no services for this profile
-        };
-
-        if (profile_id) {
-            clientServiceInclude.where = { profile_id };
-        }
-
-        const clients = await models.Client.findAll({
+        let findOptions = {
             attributes: [
-                'id',
-                'company_name',
-                'first_name',
-                'last_name',
-                'email',
-                'phone_number',
-                'address',
-                'status',
-                'created_at'
+                'id', 'company_name', 'first_name', 'last_name', 'email',
+                'phone_number', 'address', 'status', 'created_at'
             ],
             include: [
                 { model: models.User, as: 'managed_by', attributes: ['id', 'first_name', 'last_name'] },
-                // { model: models.Office, as: 'office', attributes: ['id', 'name'] },
-                clientServiceInclude,
-                ...(branchId ? [{
-                    model: models.Contract,
-                    required: true,
-                    include: [{
-                        model: models.Office,
-                        required: true,
-                        where: { branch_id: branchId },
-                        attributes: []
-                    }],
-                    attributes: []
-                }] : [])
+                {
+                    model: models.ClientService,
+                    attributes: ['id', 'price', 'taxId', 'profile_id'],
+                    include: [{ model: models.Tax, attributes: ['rate', 'bearer'] }],
+                    required: false
+                }
             ],
             order: [['company_name', 'ASC']],
-        });
+            subQuery: false // Important for where clauses on includes
+        };
 
-        // Calculate service count and total amount for each client
+        if (profile_id) {
+            // We need to find clients that have EITHER a contract OR a service with this profile
+            findOptions.where = {
+                [Op.or]: [
+                    { '$Contracts.profile_id$': profile_id },
+                    { '$ClientServices.profile_id$': profile_id }
+                ]
+            };
+            // We need to make sure the includes are there for the where clause to work
+            findOptions.include.push({
+                model: models.Contract,
+                attributes: [],
+                required: false // Use LEFT JOIN to be able to use Op.or
+            });
+        } else if (branchId) {
+            findOptions.include.push({
+                model: models.Contract,
+                required: true, // Use INNER JOIN for branch filtering
+                attributes: [],
+                include: [{
+                    model: models.Office,
+                    required: true,
+                    where: { branch_id: branchId },
+                    attributes: []
+                }]
+            });
+        }
+
+        const clients = await models.Client.findAll(findOptions);
+
+        // The admin view relies on these stats, so we keep this calculation block.
         const clientsWithStats = clients.map(client => {
             const clientData = client.toJSON();
             const services = clientData.ClientServices || [];
-
-            // Calculate total service count
             clientData.total_services = services.length;
-
-            // Calculate total amount with and without taxes
             let totalAmountWithTaxes = 0;
             let totalAmountWithoutTaxes = 0;
             services.forEach(service => {
                 const servicePrice = parseFloat(service.price) || 0;
                 totalAmountWithoutTaxes += servicePrice;
-
                 let serviceAmountWithTax = servicePrice;
                 if (service.Tax && service.Tax.rate) {
                     const taxRate = parseFloat(service.Tax.rate) || 0;
@@ -98,17 +94,14 @@ clientsApp.get('/', async (c) => {
                 }
                 totalAmountWithTaxes += serviceAmountWithTax;
             });
-
             clientData.total_amount_with_taxes = totalAmountWithTaxes;
             clientData.total_amount_without_taxes = totalAmountWithoutTaxes;
-
-            // Remove the ClientServices array from response to keep it clean
             delete clientData.ClientServices;
-
             return clientData;
         });
 
         return c.json({ success: true, data: clientsWithStats });
+
     } catch (error) {
         console.error('Error fetching clients:', error);
         return c.json({ success: false, message: 'Failed to fetch clients' }, 500);
