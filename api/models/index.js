@@ -180,5 +180,6 @@ User.hasMany(Expense, { as: 'registered_expenses', foreignKey: 'registered_by' }
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+db.Op = Sequelize.Op;
 
 module.exports = db;

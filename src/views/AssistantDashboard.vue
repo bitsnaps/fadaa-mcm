@@ -188,10 +188,9 @@ const isExporting = ref({
 const fetchTasks = async () => {
   tasksLoading.value = true;
   try {
-    const { data } = await apiGetTasks({ category: 'Compliance' });
+    const { data } = await apiGetTasks({ category: 'Compliance', status: 'Pending,In Progress' });
     const list = Array.isArray(data) ? data : (data?.data || []);
-    tasks.value = list;
-    pendingTasks.value = list.filter(t => (t.status === 'Pending' || t.status === 'In Progress'));
+    pendingTasks.value = list;
   } catch (e) {
     // Error toast is handled globally by ApiClient interceptor
   } finally {

@@ -1,4 +1,4 @@
-const { Task } = require('../models');
+const { Task, Op } = require('../models');
 const { handleRouteError } = require('../lib/errorHandler');
 
 // @desc    Get all tasks, with optional filtering by category
@@ -6,11 +6,21 @@ const { handleRouteError } = require('../lib/errorHandler');
 // @access  Private
 const getTasks = async (c) => {
   try {
-    const { category } = c.req.query();
+    const { category, status } = c.req.query();
     const whereClause = {};
 
     if (category) {
       whereClause.category = category;
+    }
+
+    if (status) {
+      // Handle single or multiple statuses
+      const statuses = status.split(',').map(s => s.trim());
+      if (statuses.length > 1) {
+        whereClause.status = { [Op.in]: statuses };
+      } else {
+        whereClause.status = statuses[0];
+      }
     }
 
     const tasks = await Task.findAll({ where: whereClause, order: [['due_date', 'ASC']] });
