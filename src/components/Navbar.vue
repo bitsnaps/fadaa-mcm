@@ -121,7 +121,7 @@ onMounted(() => {
 <template>
   <BNavbar toggleable="lg" variant="fadaa-blue" class="fixed-top navbar-dark">
     <BNavbarBrand :to="{ path: '/' }" class="d-flex align-items-center">
-      <BImg src="/logo.png" alt="FADAA Logo" width="30" height="30" class="d-inline-block align-text-top me-2 rounded-circle" />
+      <BImg src="/logo.png" alt="FADAA Logo" width="30" height="30" class="d-inline-block align-text-top m-2 rounded-circle" />
       FADAA-MCM
     </BNavbarBrand>
 
@@ -153,7 +153,7 @@ onMounted(() => {
               <span v-if="unreadCount > 0" class="badge rounded-pill bg-danger">{{ unreadCount }}</span>
             </template>
             <BDropdownItem v-for="notification in notifications" :key="notification.id" :to="getNotificationLink(notification)" link-class="d-flex align-items-center">
-                <i :class="['bi', getNotificationIcon(notification.type), 'me-2']"></i>
+                <i :class="['bi', getNotificationIcon(notification.type), 'm-2']"></i>
                 <div class="flex-grow-1">
                     <p class="mb-0" :class="{'fw-bold': !notification.is_read}">{{ notification.message }}</p>
                     <small class="text-muted">{{ new Date(notification.created_at).toLocaleString() }}</small>
@@ -169,13 +169,13 @@ onMounted(() => {
 
           <BNavItemDropdown id="userProfileDropdown" right menu-class="dropdown-menu-end">
             <template #button-content>
-              <i class="bi bi-person-circle me-1"></i> {{ userRole }}
+              <i class="bi bi-person-circle m-1"></i> {{ userRole }}
             </template>
-            <BDropdownItem :to="{ path: '/profile' }"><i class="bi bi-person-fill me-2"></i>{{ t('navbar.user.profile') }}</BDropdownItem>
-            <BDropdownItem :to="{ path: '/settings' }"><i class="bi bi-gear-fill me-2"></i>{{ t('navbar.user.settings') }}</BDropdownItem>
-            <!-- <BDropdownItem v-if="userRole === 'admin' || userRole === 'assistant'" :to="{ path: '/manage-notifications' }"><i class="bi bi-bell-slash-fill me-2"></i>Gérer les Notifications</BDropdownItem> -->
+            <BDropdownItem :to="{ path: '/profile' }"><i class="bi bi-person-fill m-2"></i>{{ t('navbar.user.profile') }}</BDropdownItem>
+            <BDropdownItem :to="{ path: '/settings' }"><i class="bi bi-gear-fill m-2"></i>{{ t('navbar.user.settings') }}</BDropdownItem>
+            <!-- <BDropdownItem v-if="userRole === 'admin' || userRole === 'assistant'" :to="{ path: '/manage-notifications' }"><i class="bi bi-bell-slash-fill m-2"></i>Gérer les Notifications</BDropdownItem> -->
             <BDropdownItem divider />
-            <BDropdownItem @click.prevent="handleLogout"><i class="bi bi-box-arrow-right me-2"></i>{{ t('navbar.user.logout') }}</BDropdownItem>
+            <BDropdownItem @click.prevent="handleLogout"><i class="bi bi-box-arrow-right m-2"></i>{{ t('navbar.user.logout') }}</BDropdownItem>
           </BNavItemDropdown>
         </template>
       </BNavbarNav>
@@ -193,13 +193,13 @@ onMounted(() => {
   width: 25px;
   height: 25px;
   padding: 0;
-  border-radius: 30%;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
   border: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-right: 2px;
 }
 
 .navbar-brand img {

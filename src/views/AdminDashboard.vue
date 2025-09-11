@@ -27,7 +27,7 @@
           <div class="col-md-4">
             <div class="card h-100 shadow-sm text-center">
               <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-people-fill me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.clients') }}</h5>
+                <h5 class="card-title"><i class="bi bi-people-fill m-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.clients') }}</h5>
                 <p class="card-text fs-4 fw-bold">{{ kpis.clients }}</p>
               </div>
             </div>
@@ -35,7 +35,7 @@
           <div class="col-md-4">
             <div class="card h-100 shadow-sm text-center">
               <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-cash-coin me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.monthlyRevenue') }}</h5>
+                <h5 class="card-title"><i class="bi bi-cash-coin m-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.monthlyRevenue') }}</h5>
                 <p class="card-text fs-4 fw-bold">{{ formatCurrency(kpis.monthlyRevenue) }}</p>
               </div>
             </div>
@@ -43,7 +43,7 @@
           <div class="col-md-4">
             <div class="card h-100 shadow-sm text-center">
               <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-graph-up-arrow me-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.monthlyNet') }}</h5>
+                <h5 class="card-title"><i class="bi bi-graph-up-arrow m-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.monthlyNet') }}</h5>
                 <p class="card-text fs-4 fw-bold">{{ formatCurrency(kpis.monthlyNet) }}</p>
               </div>
             </div>
@@ -55,7 +55,7 @@
 			<div class="col-lg-6">
         		<div class="card shadow-sm mb-4">
           <div class="card-header bg-fadaa-yellow">
-            <h5 class="mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>{{ $t('dashboard.charts.monthlySales') }}</h5>
+            <h5 class="mb-0"><i class="bi bi-bar-chart-line-fill m-2"></i>{{ $t('dashboard.charts.monthlySales') }}</h5>
           </div>
           <div class="card-body">
             <Bar :data="chartData" :options="chartOptions" style="height: 300px;" />
@@ -67,12 +67,12 @@
       	<div class="col-lg-6">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-yellow">
-            <h5 class="mb-0"><i class="bi bi-bell-fill me-2"></i>{{ $t('dashboard.notifications.title') }}</h5>
+            <h5 class="mb-0"><i class="bi bi-bell-fill m-2"></i>{{ $t('dashboard.notifications.title') }}</h5>
           </div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
               <li v-for="notification in notifications" :key="notification.id" class="list-group-item d-flex align-items-center" :class="`list-group-item-${notification.type || 'info'}`">
-                <i :class="`bi ${getNotificationIcon(notification.type)} me-2 fs-4`"></i> {{ notification.message }}
+                <i :class="`bi ${getNotificationIcon(notification.type)} m-2 fs-4`"></i> {{ notification.message }}
               </li>
             </ul>
           </div>
@@ -90,12 +90,12 @@
       <div class="col-lg-6">
         <div class="card shadow-sm h-100">
           <div class="card-header bg-fadaa-yellow">
-            <h5 class="mb-0"><i class="bi bi-list-task me-2"></i>{{ $t('dashboard.recentActivities.title') }}</h5>
+            <h5 class="mb-0"><i class="bi bi-list-task m-2"></i>{{ $t('dashboard.recentActivities.title') }}</h5>
           </div>
           <div class="card-body">
             <ul class="list-unstyled">
               <li v-for="activity in recentActivities" :key="activity.id" class="mb-2">
-                <i :class="`bi ${getActivityIcon(activity.action)} me-2`"></i>
+                <i :class="`bi ${getActivityIcon(activity.action)} m-2`"></i>
                 {{ activity.action }} - {{ activity.details ? activity.details.message : '' }}
                 <span class="text-muted small">({{ formatDistanceToNow(new Date(activity.created_at), { addSuffix: true, locale: fr }) }})</span>
               </li>
@@ -109,7 +109,7 @@
     <div class="col-md-6">
       <div class="card shadow-sm h-100">
         <div class="card-header bg-fadaa-yellow">
-          <h5 class="mb-0"><i class="bi bi-person-workspace me-2"></i>{{ $t('dashboard.assistantPerformance.title') }}</h5>
+          <h5 class="mb-0"><i class="bi bi-person-workspace m-2"></i>{{ $t('dashboard.assistantPerformance.title') }}</h5>
         </div>
         <div class="card-body">
           <ul class="list-group list-group-flush">
@@ -130,7 +130,7 @@
     <!-- Office List Table -->
     <div class="card shadow-sm mb-4">
       <div class="card-header bg-fadaa-yellow">
-        <h5 class="mb-0"><i class="bi bi-building me-2"></i>{{ $t('dashboard.officeList.title') }}</h5>
+        <h5 class="mb-0"><i class="bi bi-building m-2"></i>{{ $t('dashboard.officeList.title') }}</h5>
       </div>
       <div class="card-body">
         <div class="mb-3">
@@ -180,22 +180,22 @@
     <!-- Data Export Section -->
     <div class="card shadow-sm">
       <div class="card-header bg-fadaa-yellow">
-        <h5 class="mb-0"><i class="bi bi-download me-2"></i>{{ $t('dashboard.dataExport.title') }}</h5>
+        <h5 class="mb-0"><i class="bi bi-download m-2"></i>{{ $t('dashboard.dataExport.title') }}</h5>
       </div>
       <div class="card-body text-center">
-        <button @click="exportData('xlsx')" class="btn btn-fadaa-orange me-2" :disabled="isExporting.excel">
-          <span v-if="isExporting.excel" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-          <i v-else class="bi bi-file-earmark-excel-fill me-1"></i>
+        <button @click="exportData('xlsx')" class="btn btn-fadaa-orange m-2" :disabled="isExporting.excel">
+          <span v-if="isExporting.excel" class="spinner-border spinner-border-sm m-1" role="status" aria-hidden="true"></span>
+          <i v-else class="bi bi-file-earmark-excel-fill m-1"></i>
           {{ $t('dashboard.dataExport.excel') }}
         </button>
-        <button @click="exportData('csv')" class="btn btn-fadaa-orange me-2" :disabled="isExporting.csv">
-          <span v-if="isExporting.csv" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-          <i v-else class="bi bi-filetype-csv me-1"></i>
+        <button @click="exportData('csv')" class="btn btn-fadaa-orange m-2" :disabled="isExporting.csv">
+          <span v-if="isExporting.csv" class="spinner-border spinner-border-sm m-1" role="status" aria-hidden="true"></span>
+          <i v-else class="bi bi-filetype-csv m-1"></i>
           {{ $t('dashboard.dataExport.csv') }}
         </button>
         <button @click="exportData('pdf')" class="btn btn-fadaa-orange" :disabled="isExporting.pdf">
-          <span v-if="isExporting.pdf" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-          <i v-else class="bi bi-file-earmark-pdf-fill me-1"></i>
+          <span v-if="isExporting.pdf" class="spinner-border spinner-border-sm m-1" role="status" aria-hidden="true"></span>
+          <i v-else class="bi bi-file-earmark-pdf-fill m-1"></i>
           {{ $t('dashboard.dataExport.pdf') }}
         </button>
       </div>
