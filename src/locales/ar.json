@@ -1,0 +1,1317 @@
+{
+  "dashboard": {
+    "title": "لوحة تحكم الإدارة",
+    "selectProfileFirst": "يرجى اختيار ملف شخصي أولاً.",
+    "kpis": {
+      "clients": "عدد العملاء",
+      "monthlyRevenue": "الإيرادات الشهرية",
+      "monthlyNet": "الصافي الشهري"
+    },
+    "filter": {
+      "thisMonth": "هذا الشهر",
+      "thisYear": "هذا العام",
+      "apply": "تطبيق"
+    },
+    "charts": {
+      "monthlySales": "المبيعات الشهرية (الإجمالي مقابل الصافي)"
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "urgentContract": "عقد XYZ على وشك الانتهاء (عاجل)",
+      "pendingApproval": "طلب الموافقة في انتظار (تحذير)",
+      "systemMaintenance": "صيانة النظام المجدولة (عادي)"
+    },
+    "recentActivities": {
+      "title": "الأنشطة الأخيرة (العملاء)"
+    },
+    "assistantPerformance": {
+      "title": "أداء المساعدين",
+      "assistant1": "المساعد 1",
+      "statusExcellent": "ممتاز",
+      "statusActive": "نشط",
+      "assistant2": "المساعد 2",
+      "statusGood": "جيد",
+      "assistant3": "المساعد 3",
+      "statusNeedsImprovement": "يحتاج إلى تحسين"
+    },
+    "officeList": {
+      "title": "قائمة المكاتب حسب الفرع",
+      "searchPlaceholder": "البحث في المكاتب...",
+      "table": {
+        "id": "المعرف",
+        "name": "الاسم",
+        "branch": "الفرع",
+        "space": "المساحة (م²)",
+        "status": "الحالة"
+      },
+      "noOffices": "لم يتم العثور على مكاتب.",
+      "pagination": {
+        "previous": "السابق",
+        "next": "التالي"
+      }
+    },
+    "dataExport": {
+      "title": "تصدير البيانات",
+      "excel": "إكسل",
+      "csv": "CSV",
+      "pdf": "PDF",
+      "success": "تم تصدير البيانات بنجاح."
+    }
+  },
+  "common": {
+    "view": "عرض",
+    "daysLeft": "الأيام المتبقية",
+    "na": "غير متاح",
+    "edit": "تحرير",
+    "delete": "حذف",
+    "details": "التفاصيل",
+    "cancel": "إلغاء",
+    "save": "حفظ"
+  },
+  "sidebar": {
+    "adminDashboard": "لوحة تحكم الإدارة",
+    "manageUsers": "إدارة المستخدمين",
+    "manageBranches": "إدارة الفروع",
+    "manageServiceCategories": "إدارة فئات الخدمات",
+    "assistantDashboard": "لوحة تحكم المساعد",
+    "manageClients": "إدارة العملاء",
+    "manageOffices": "إدارة المكاتب",
+    "documentsContractsManagement": "إدارة المستندات والعقود",
+    "addClient": "إضافة عميل",
+    "manageClientServices": "إدارة خدمات العملاء",
+    "systemSettings": "إعدادات النظام",
+    "tasks": "المهام",
+    "investmentTracking": "تتبع الاستثمارات",
+    "financialReporting": "التقارير المالية",
+    "complianceManagement": "إدارة الامتثال",
+    "reports": "التقارير",
+    "monthlyReport": "التقرير الشهري",
+    "annualReport": "التقرير السنوي",
+    "officeDesigner": "مصمم المكتب",
+    "activityLog": "سجل النشاط",
+    "manageTaxes": "إدارة الضرائب",
+    "manageInvestments": "إدارة الاستثمارات",
+    "manageWithdrawals": "إدارة السحوبات",
+    "manageIncomes": "إدارة الإيرادات",
+    "manageExpenses": "إدارة المصروفات",
+    "manageProfiles": "إدارة الحسابات",
+    "managementOperations": "الإدارة والعمليات",
+    "financialAnalytics": "التحليلات المالية والتتبع"
+  },
+  "tasks": {
+    "title": "إدارة المهام",
+    "addTask": "مهمة جديدة",
+    "editTask": "تحرير المهمة",
+    "searchPlaceholder": "البحث في المهام...",
+    "allStatuses": "جميع الحالات",
+    "allPriorities": "جميع الأولويات",
+    "noTasksFound": "لم يتم العثور على مهام.",
+    "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذه المهمة؟",
+    "tableHeaders": {
+      "title": "العنوان",
+      "description": "الوصف",
+      "due_date": "تاريخ الاستحقاق",
+      "priority": "الأولوية",
+      "status": "الحالة",
+      "actions": "الإجراءات"
+    },
+    "statuses": {
+      "pending": "معلق",
+      "in_progress": "قيد التقدم",
+      "completed": "مكتمل",
+      "cancelled": "ملغى",
+      "": "حالة غير معروفة"
+    },
+    "priorities": {
+      "low": "منخفضة",
+      "medium": "متوسطة",
+      "high": "عالية",
+      "urgent": "عاجلة",
+      "": "لا أولوية"
+    },
+    "success": {
+      "created": "تم إنشاء المهمة بنجاح.",
+      "updated": "تم تحديث المهمة بنجاح.",
+      "deleted": "تم حذف المهمة بنجاح."
+    },
+    "errors": {
+      "fetchFailed": "فشل في جلب المهام.",
+      "createFailed": "فشل في إنشاء المهمة.",
+      "updateFailed": "فشل في تحديث المهمة.",
+      "deleteFailed": "فشل في حذف المهمة."
+    }
+  },
+  "profiles": {
+    "addProfile": "إضافة حساب",
+    "editProfile": "تحرير الحساب",
+    "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذا الحساب؟ هذا الإجراء لا يمكن التراجع عنه.",
+    "activate": "تفعيل",
+    "edit": "تحرير",
+    "delete": "حذف",
+    "tableHeaders": {
+      "name": "الاسم",
+      "description": "الوصف",
+      "status": "الحالة",
+      "actions": "الإجراءات"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    }
+  },
+  "investments": {
+    "title": "إدارة الاستثمارات",
+    "addInvestment": "إضافة استثمار",
+    "editInvestment": "تحرير الاستثمار",
+    "searchPlaceholder": "البحث بالمستثمر أو الفرع...",
+    "noInvestmentsFound": "لم يتم العثور على استثمارات.",
+    "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذا الاستثمار؟",
+    "tableHeaders": {
+      "investor": "المستثمر",
+      "branch": "الفرع",
+      "name": "الاسم",
+      "percentage": "النسبة المئوية",
+      "investment_amount": "المبلغ",
+      "starting_date": "تاريخ البدء",
+      "ending_date": "تاريخ الانتهاء",
+      "actions": "الإجراءات",
+      "type": "النوع",
+      "comprehensive": "شامل",
+      "contractual": "تعاقدي"
+    },
+    "edit": "تحرير",
+    "delete": "حذف"
+  },
+  "incomes": {
+    "title": "إدارة الإيرادات",
+    "addIncome": "إضافة إيراد",
+    "editIncome": "تحرير الإيراد",
+    "searchPlaceholder": "البحث بالوصف أو الفرع أو المسجل بواسطة...",
+    "noIncomesFound": "لم يتم العثور على إيرادات.",
+    "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذا الإيراد؟",
+    "tableHeaders": {
+      "amount": "المبلغ",
+      "description": "الوصف",
+      "transaction_date": "تاريخ المعاملة",
+      "branch": "الفرع",
+      "registered_by": "المسجل بواسطة",
+      "actions": "الإجراءات"
+    },
+    "description": {
+      "placeholder": "يرجى إدخال اسم الكيان"
+    },
+    "edit": "تحرير",
+    "delete": "حذف"
+  },
+  "expenses": {
+    "title": "إدارة المصروفات",
+    "addExpense": "إضافة مصروف",
+    "editExpense": "تحرير المصروف",
+    "searchPlaceholder": "البحث بالوصف أو الفرع أو المسجل بواسطة...",
+    "noExpensesFound": "لم يتم العثور على مصروفات.",
+    "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذا المصروف؟",
+    "tableHeaders": {
+      "amount": "المبلغ",
+      "description": "الوصف",
+      "transaction_date": "تاريخ المعاملة",
+      "branch": "الفرع",
+      "registered_by": "المسجل بواسطة",
+      "actions": "الإجراءات"
+    },
+    "edit": "تحرير",
+    "delete": "حذف"
+  },
+  "manageTaxes": {
+    "title": "الضريبة",
+    "addTax": "إضافة ضريبة",
+    "editTax": "تحرير الضريبة",
+    "createTax": "إنشاء ضريبة",
+    "name": "الاسم",
+    "rate": "المعدل",
+    "description": "الوصف",
+    "actions": "الإجراءات",
+    "edit": "تحرير",
+    "delete": "حذف",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "confirmDeleteTax": "هل أنت متأكد من رغبتك في حذف هذه الضريبة؟",
+    "selectTax": "اختر ضريبة",
+    "bearer": "الحامل",
+    "client": "العميل",
+    "company": "الشركة"
+  },
+  "monthlyReport": {
+    "title": "التقرير الشهري",
+    "filters": {
+      "title": "الفلاتر",
+      "month": "الشهر",
+      "year": "السنة",
+      "client": "العميل",
+      "branch": "الفرع",
+      "allClients": "جميع العملاء",
+      "allBranches": "جميع الفروع",
+      "generate": "إنشاء"
+    },
+    "report": {
+      "title": "الملخص الشهري",
+      "downloadCsv": "تحميل CSV",
+      "downloadXlsx": "تحميل XLSX"
+    },
+    "table": {
+      "metric": "المقياس",
+      "value": "القيمة",
+      "change": "التغيير مقابل الشهر الماضي",
+      "revenue": "الإيرادات الإجمالية",
+      "newClients": "عملاء جدد",
+      "contractsSigned": "العقود الموقعة",
+      "occupancyRate": "معدل الإشغال"
+    }
+  },
+  "annualReport": {
+    "title": "التقرير السنوي",
+    "filters": {
+      "title": "الفلاتر",
+      "year": "السنة",
+      "branch": "الفرع",
+      "allBranches": "جميع الفروع",
+      "generate": "إنشاء"
+    },
+    "report": {
+      "title": "الملخص المالي السنوي",
+      "downloadCsv": "تحميل CSV",
+      "downloadXlsx": "تحميل XLSX"
+    },
+    "chart": {
+      "financialSummary": "الملخص المالي",
+      "revenue": "الإيرادات",
+      "expenses": "المصروفات",
+      "profit": "الربح"
+    },
+    "summary": {
+      "title": "المقاييس الرئيسية",
+      "totalRevenue": "الإيرادات الإجمالية",
+      "totalExpenses": "المصروفات الإجمالية",
+      "netProfit": "الربح الصافي",
+      "newClients": "عملاء جدد",
+      "contractsSigned": "العقود الموقعة",
+      "avgOccupancy": "متوسط الإشغال"
+    }
+  },
+  "investmentTracking": {
+    "title": "تتبع الاستثمارات",
+    "filters": {
+      "from": "من",
+      "to": "إلى",
+      "apply": "تطبيق",
+      "thisMonth": "هذا الشهر",
+      "thisYear": "هذا العام"
+    },
+    "selectProfilePrompt": "يرجى اختيار ملف شخصي لعرض تتبع الاستثمارات.",
+    "summary": {
+      "title": "ملخص الاستثمارات",
+      "totalInvested": "المبلغ الإجمالي المستثمر",
+      "totalProfitShare": "حصة الربح المستلمة (الإجمالي)",
+      "overallROI": "العائد على الاستثمار الإجمالي (المختلط)",
+      "activeInvestments": "الاستثمارات النشطة",
+      "agencies": "الوكالات",
+      "nextPayout": "الدفعة التالية"
+    },
+    "breakdown": {
+      "title": "تفصيل الاستثمار حسب الفرع",
+      "filter": "تصفية حسب الفرع",
+      "allBranches": "جميع الفروع",
+      "branchName": "اسم الفرع",
+      "investmentAmount": "مبلغ الاستثمار",
+      "typeOfInvestment": "نوع الاستثمار",
+      "yourStake": "حصتك (%)",
+      "type": "النوع",
+      "contractStart": "بدء العقد",
+      "contractEnd": "انتهاء العقد",
+      "branchNetProfit": "ربح الفرع الصافي (الفترة)",
+      "totalIncome": "الإيرادات الإجمالية (الفترة)",
+      "totalExpenses": "المصروفات الإجمالية (الفترة)",
+      "yourProfitShare": "حصة ربحك (الفترة)",
+      "status": "الحالة",
+      "daysRemaining": "الأيام المتبقية",
+      "noInvestments": "لم يتم العثور على استثمارات للمعايير المحددة.",
+      "totals": "الإجماليات"
+    },
+    "charts": {
+      "yourProfitShareOverTime": "حصة ربحك على مر الزمن",
+      "profitShareChartPlaceholder": "قريباً سيتم إضافة رسم بياني لحصة الربح.",
+      "branchNetProfitTrend": "اتجاه ربح الفرع الصافي",
+      "netProfitTrendChartPlaceholder": "قريباً سيتم إضافة رسم بياني لاتجاه الربح الصافي.",
+      "yourProfitShare": "حصة ربحك",
+      "profitShareAmount": "مبلغ حصة الربح",
+      "noData": "لا توجد بيانات متاحة",
+      "selectYear": "اختر السنة",
+      "refresh": "تحديث الرسوم البيانية"
+    },
+    "payoutHistory": {
+      "title": "تاريخ الدفعات (حصة الربح)",
+      "export": "تصدير",
+      "payoutDate": "تاريخ الدفعة",
+      "branch": "الفرع",
+      "amountPaid": "المبلغ المدفوع",
+      "transactionId": "معرف المعاملة",
+      "noPayouts": "لا توجد دفعات."
+    },
+    "documents": {
+      "title": "الوصول إلى المستندات",
+      "download": "تحميل",
+      "investmentContract": "عقد الاستثمار",
+      "performanceReportQ2": "تقرير الأداء ربع السنة الثاني 2024",
+      "allBranches": "جميع الفروع"
+    },
+    "statuses": {
+      "active": "نشط",
+      "pending": "معلق",
+      "expiringsoon": "ينتهي قريباً",
+      "expired": "منتهي الصلاحية"
+    }
+  },
+  "manageUsers": {
+    "title": "إدارة المستخدمين",
+    "addUser": "إضافة مستخدم",
+    "userList": "قائمة المستخدمين",
+    "id": "المعرف",
+    "name": "الاسم",
+    "fullName": "الاسم الكامل",
+    "firstName": "الاسم الأول",
+    "lastName": "اللقب",
+    "email": "البريد الإلكتروني",
+    "emailAddress": "عنوان البريد الإلكتروني",
+    "role": "الدور",
+    "status": "الحالة",
+    "createdAt": "تاريخ الإنشاء",
+    "actions": "الإجراءات",
+    "noUsersFound": "لم يتم العثور على مستخدمين.",
+    "editUser": "تحرير المستخدم",
+    "addUserTitle": "إضافة مستخدم",
+    "branch": "الفرع",
+    "noBranch": "لا يوجد فرع مخصص",
+    "password": "كلمة المرور",
+    "phone": "رقم الهاتف",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "save": "حفظ",
+    "add": "إضافة",
+    "confirmDeleteTitle": "تأكيد الحذف",
+    "confirmDeleteMessage": "هل أنت متأكد من رغبتك في حذف المستخدم {userName}؟ هذا الإجراء لا يمكن التراجع عنه.",
+    "delete": "حذف",
+    "userUpdatedSuccess": "تم تحديث المستخدم بنجاح.",
+    "userAddedSuccess": "تم إضافة المستخدم بنجاح.",
+    "userDeletedSuccess": "تم حذف المستخدم {userName} بنجاح.",
+    "roles": {
+      "admin": "مدير",
+      "assistant": "مساعد",
+      "investor": "مستثمر",
+      "client": "عميل"
+    }
+  },
+  "manageBranches": {
+    "id": "المعرف",
+    "title": "إدارة الفروع",
+    "addBranch": "إضافة فرع",
+    "branchList": "قائمة الفروع",
+    "branchName": "اسم الفرع",
+    "location": "الموقع",
+    "createdAt": "تاريخ الإنشاء",
+    "status": "الحالة",
+    "actions": "الإجراءات",
+    "noBranchesFound": "لم يتم العثور على فروع.",
+    "editBranch": "تحرير الفرع",
+    "addBranchTitle": "إضافة فرع",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "add": "إضافة",
+    "confirmDeleteTitle": "تأكيد الحذف",
+    "confirmDeleteMessage": "هل أنت متأكد من رغبتك في حذف هذا الفرع؟",
+    "branchUpdatedSuccess": "تم تحديث الفرع بنجاح!",
+    "branchAddedSuccess": "تم إضافة الفرع بنجاح!",
+    "branchDeletedSuccess": "تم حذف الفرع بنجاح!"
+  },
+  "manageServiceCategories": {
+    "title": "إدارة فئات الخدمات",
+    "description": "يمكن للمديرين تحديد فئات للخدمات المقدمة للعملاء.",
+    "addNewCategory": "إضافة فئة جديدة",
+    "loadingCategories": "جاري تحميل الفئات...",
+    "noServiceCategoriesFound": "لم يتم العثور على فئات خدمات.",
+    "categoryName": "اسم الفئة",
+    "descriptionHeader": "الوصف",
+    "actions": "الإجراءات",
+    "edit": "تحرير",
+    "delete": "حذف",
+    "addEditModalTitle": "{mode} فئة الخدمة",
+    "addMode": "إضافة جديد",
+    "editMode": "تحرير",
+    "categoryNameLabel": "اسم الفئة",
+    "descriptionLabel": "الوصف",
+    "close": "إغلاق",
+    "add": "إضافة",
+    "saveChanges": "حفظ التغييرات",
+    "confirmDelete": "هل أنت متأكد من رغبتك في حذف فئة الخدمة هذه؟"
+  },
+  "manageClients": {
+    "title": "إدارة العملاء",
+    "addNewClient": "إضافة عميل جديد",
+    "searchPlaceholder": "البحث في العملاء بالاسم أو البريد الإلكتروني أو الهاتف أو الحالة...",
+    "idHeader": "#المعرف",
+    "fullNameHeader": "الاسم الكامل",
+    "companyName": "اسم الشركة",
+    "emailHeader": "البريد الإلكتروني",
+    "phoneHeader": "الهاتف",
+    "statusHeader": "الحالة",
+    "actionsHeader": "الإجراءات",
+    "statusActive": "نشط",
+    "statusInactive": "غير نشط",
+    "statusPending": "معلق",
+    "viewDetails": "عرض التفاصيل",
+    "editClient": "تحرير العميل",
+    "deleteClient": "حذف العميل",
+    "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذا العميل؟",
+    "manageServices": "إدارة الخدمات",
+    "noClientsFoundSearch": "لم يتم العثور على عملاء مطابقين لمعايير البحث الخاصة بك \"{searchTerm}\".",
+    "noClientsAvailable": "لا توجد عملاء متاحة.",
+    "addClientLink": "إضافة عميل جديد",
+    "clientDetailsTitle": "تفاصيل العميل: {companyName}",
+    "detailsId": "المعرف:",
+    "detailsFullName": "الاسم الكامل:",
+    "companyInformation": "معلومات الشركة",
+    "contactPersonInformation": "معلومات الشخص المسؤول",
+    "contactName": "اسم الشخص المسؤول",
+    "detailsEmail": "البريد الإلكتروني:",
+    "detailsPhone": "الهاتف:",
+    "detailsStatus": "الحالة:",
+    "detailsAddress": "العنوان:",
+    "detailsRegistrationDate": "تاريخ التسجيل:",
+    "detailsClientType": "نوع العميل:",
+    "close": "إغلاق",
+    "statuses": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "lead": "عميل محتمل"
+    },
+    "allBranches": "جميع الفروع"
+  },
+  "addClient": {
+    "addTitle": "إضافة عميل جديد",
+    "editTitle": "تحرير العميل",
+    "submitButtonAdd": "إضافة العميل",
+    "submitButtonUpdate": "تحديث العميل",
+    "form": {
+      "clientName": "اسم العميل",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "address": "العنوان",
+      "city": "المدينة",
+      "country": "البلد",
+      "status": "الحالة",
+      "clientType": "نوع العميل",
+      "selectType": "اختر النوع",
+      "serviceType": "نوع الخدمة",
+      "individual": "فردي",
+      "company": "شركة",
+      "people": "أشخاص",
+      "idType": "نوع الهوية",
+      "selectIdType": "اختر نوع الهوية",
+      "nationalId": "الهوية الوطنية",
+      "passport": "جواز السفر",
+      "tradeRegister": "سجل التجارة (RC)",
+      "idNumber": "رقم الهوية",
+      "idExpiryDate": "تاريخ انتهاء الهوية",
+      "taxId": "رقم الضريبة (NIF)",
+      "nis": "NIS (للشركات)",
+      "rcNumber": "رقم RC (للشركات)",
+      "contactPerson": "الشخص المسؤول",
+      "name": "الاسم",
+      "contractDetails": "تفاصيل العقد",
+      "contractStartDate": "تاريخ بدء العقد",
+      "contractEndDate": "تاريخ انتهاء العقد",
+      "attachments": "المرفقات",
+      "cancel": "إلغاء"
+    },
+    "messages": {
+      "clientNotFound": "لم يتم العثور على بيانات العميل. إعادة التوجيه إلى قائمة العملاء.",
+      "fetchError": "خطأ في جلب تفاصيل العميل:",
+      "loadError": "فشل في تحميل بيانات العميل للتحرير.",
+      "updateSuccess": "تم تحديث العميل بنجاح!",
+      "addSuccess": "تم إضافة العميل بنجاح!",
+      "updateError": "فشل في تحديث العميل.",
+      "addError": "فشل في إضافة العميل."
+    }
+  },
+  "documents": {
+    "title": "إدارة المستندات",
+    "uploadNewDocument": "رفع مستند جديد",
+    "searchPlaceholder": "البحث بالاسم أو النوع أو العميل...",
+    "tableHeaders": {
+      "name": "الاسم",
+      "client": "العميل",
+      "investment": "الاستثمار",
+      "type": "النوع",
+      "uploadDate": "تاريخ الرفع",
+      "actions": "الإجراءات"
+    },
+    "noDocumentsFound": "لم يتم العثور على مستندات.",
+    "view": "عرض",
+    "download": "تحميل",
+    "edit": "تحرير",
+    "delete": "حذف",
+    "selectInvestment": "اختر استثمار (اختياري)",
+    "selectClient": "-- اختر عميل --",
+    "editDocument": "تحرير المستند",
+    "deleteDocument": "حذف المستند",
+    "deleteConfirmation": "هل أنت متأكد من رغبتك في حذف هذا المستند؟ هذا الإجراء لا يمكن التراجع عنه.",
+    "updateButton": "تحديث",
+    "addButton": "إضافة مستند",
+    "submitting": "جاري الإرسال...",
+    "updating": "جاري التحديث...",
+    "deleting": "جاري الحذف...",
+    "cancel": "إلغاء",
+    "notApplicable": "غير متاح",
+    "form": {
+      "attachments": "المرفق"
+    }
+  },
+  "contracts": {
+    "title": "إدارة العقود",
+    "addNewContract": "إضافة عقد جديد",
+    "searchPlaceholder": "البحث بالعميل أو المكتب أو الحالة...",
+    "tableHeaders": {
+      "client": "العميل",
+      "office": "المكتب",
+      "status": "الحالة",
+      "serviceType": "نوع الخدمة",
+      "selectService": "اختر الخدمة",
+      "domiciliation": "الدوميسيليا",
+      "officeRental": "إيجار المكتب",
+      "coworking": "المشاركة في العمل",
+      "meetingRoom": "غرفة الاجتماعات",
+      "paymentTerms": "شروط الدفع",
+      "selectTerms": "اختر الشروط",
+      "monthly": "شهري",
+      "quarterly": "ربع سنوي",
+      "annually": "سنوي",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "actions": "الإجراءات",
+      "monthlyRate": "المعدل الشهري",
+      "totalAmount": "المبلغ الإجمالي"
+    },
+    "status": {
+      "active": "نشط",
+      "pending": "معلق",
+      "expired": "منتهي الصلاحية",
+      "terminated": "منتهي"
+    },
+    "viewContract": "عرض العقد",
+    "downloadContract": "تحميل العقد",
+    "editContract": "تحرير العقد",
+    "editContractTitle": "تحرير العقد",
+    "archiveContract": "أرشفة العقد",
+    "deleteContract": "حذف العقد",
+    "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذا العقد؟",
+    "noContractsFound": "لم يتم العثور على عقود.",
+    "uploadDocument": "رفع مستند",
+    "upload": "رفع",
+    "taxSelectionNote": "يتم تطبيق الضرائب على المعدل الشهري لحساب المبلغ الإجمالي.",
+    "submitting": "جاري الإرسال...",
+    "updateButton": "تحديث",
+    "addButton": "إضافة عقد",
+    "notes": "الملاحظات",
+    "viewContractTitle": "تفاصيل العقد",
+    "viewCurrentDocument": "عرض المستند الحالي",
+    "viewDocument": "عرض المستند",
+    "endDateBeforeStartDateError": "يجب أن تكون تاريخ الانتهاء لاحقاً لتاريخ البدء.",
+    "errors": {
+      "officeBooked": "المكتب محجوز بالفعل للفترة المحددة في هذا الملف الشخصي.",
+      "officeNotAvailable": "المكتب المحدد غير متاح."
+    }
+  },
+  "offices": {
+    "manageOffices": "إدارة المكاتب",
+    "addNewOffice": "إضافة مكتب جديد",
+    "searchPlaceholder": "البحث في المكاتب بالاسم أو الفرع أو الحالة...",
+    "tableHeaders": {
+      "id": "#المعرف",
+      "name": "الاسم",
+      "branch": "الفرع",
+      "status": "الحالة",
+      "capacity": "السعة",
+      "actions": "الإجراءات",
+      "type": "النوع"
+    },
+    "status": {
+      "available": "متاح",
+      "occupied": "مشغول",
+      "unavailable": "غير متاح",
+      "maintenance": "صيانة"
+    },
+    "noOfficesFound": "لم يتم العثور على مكاتب.",
+    "viewDetails": "عرض التفاصيل",
+    "editOffice": "تحرير المكتب",
+    "deleteOffice": "حذف المكتب",
+    "officeDetails": "تفاصيل المكتب",
+    "details": {
+      "id": "المعرف",
+      "name": "الاسم",
+      "branch": "الفرع",
+      "status": "الحالة",
+      "capacity": "السعة",
+      "amenities": "المرافق"
+    },
+    "amenities": {
+      "wifi": "واي فاي",
+      "coffee": "قهوة",
+      "meetingRoom": "غرفة اجتماعات",
+      "printer": "طابعة",
+      "privateRestroom": "حمام خاص"
+    },
+    "addEditOfficeModal": {
+      "addTitle": "إضافة مكتب جديد",
+      "editTitle": "تحرير المكتب",
+      "officeName": "اسم المكتب",
+      "branch": "الفرع",
+      "capacity": "السعة",
+      "amenities": "المرافق",
+      "status": "الحالة",
+      "close": "إغلاق",
+      "save": "حفظ التغييرات",
+      "add": "إضافة مكتب"
+    },
+    "confirmDeleteOffice": {
+      "title": "تأكيد الحذف",
+      "message": "هل أنت متأكد من رغبتك في حذف المكتب \"{officeName}\"؟",
+      "delete": "حذف"
+    },
+    "officeAddedSuccess": "تم إضافة المكتب بنجاح.",
+    "officeUpdatedSuccess": "تم تحديث المكتب بنجاح.",
+    "officeDeletedSuccess": "تم حذف المكتب بنجاح."
+  },
+  "systemSettings": {
+    "title": "إعدادات النظام",
+    "generalSettings": {
+      "title": "الإعدادات العامة",
+      "siteName": "اسم الموقع",
+      "siteLogo": "شعار الموقع (URL)",
+      "defaultTheme": "السمة الافتراضية",
+      "themeOptions": {
+        "light": "فاتح",
+        "dark": "داكن",
+        "system": "النظام"
+      },
+      "saveButton": "حفظ",
+      "alert": "تم حفظ الإعدادات العامة!"
+    },
+    "emailSettings": {
+      "title": "إعدادات البريد الإلكتروني",
+      "smtpHost": "مضيف SMTP",
+      "smtpPort": "منفذ SMTP",
+      "smtpUser": "مستخدم SMTP",
+      "smtpPassword": "كلمة مرور SMTP",
+      "saveButton": "حفظ",
+      "alert": "تم حفظ إعدادات البريد الإلكتروني!"
+    },
+    "apiKeys": {
+      "title": "مفاتيح API",
+      "googleMaps": "مفتاح API خرائط جوجل",
+      "openAI": "مفتاح API OpenAI",
+      "openAIBaseUrl": "رابط أساسي OpenAI",
+      "saveButton": "حفظ",
+      "alert": "تم حفظ مفاتيح API بنجاح."
+    },
+    "success": {
+      "save": "تم حفظ الإعدادات بنجاح."
+    },
+    "errors": {
+      "load": "فشل في تحميل الإعدادات.",
+      "save": "فشل في حفظ الإعدادات."
+    },
+    "activityLog": {
+      "title": "سجل النشاط",
+      "description": "تصفح وتصفية أنشطة المستخدمين على مستوى النظام.",
+      "noActivities": "لم يتم العثور على أنشطة.",
+      "action": "الإجراء",
+      "user": "المستخدم",
+      "target": "الهدف",
+      "date": "التاريخ"
+    }
+  },
+  "clientServices": {
+    "title": "إدارة خدمات العملاء",
+    "description": "تعيين وإدارة الخدمات لكل عميل.",
+    "selectClient": "اختر عميل",
+    "searchClientPlaceholder": "البحث عن عميل بالاسم أو الشركة...",
+    "servicesFor": "الخدمات لـ",
+    "addNewService": "إضافة خدمة جديدة",
+    "serviceCategory": "فئة الخدمة",
+    "selectCategoryPlaceholder": "اختر فئة",
+    "paymentType": "نوع الدفع",
+    "recurrent": "متكرر",
+    "oneShot": "مرة واحدة",
+    "price": "السعر",
+    "notes": "الملاحظات",
+    "addService": "إضافة خدمة",
+    "editService": "تحرير الخدمة",
+    "saveChanges": "حفظ التغييرات",
+    "currentServices": "الخدمات الحالية",
+    "service": "الخدمة",
+    "type": "النوع",
+    "status": "الحالة",
+    "actions": "الإجراءات",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "cancelled": "ملغى",
+    "loading": "جاري التحميل...",
+    "loadingClientData": "جاري تحميل بيانات العميل...",
+    "noServices": "هذا العميل ليس لديه خدمات مشتركة.",
+    "addSuccess": "تم إضافة الخدمة بنجاح (محاكاة).",
+    "removeSuccess": "تم إزالة الخدمة بنجاح (محاكاة).",
+    "confirmRemove": "هل أنت متأكد من رغبتك في إزالة هذه الخدمة من العميل؟",
+    "selectClientAndService": "يرجى اختيار عميل وفئة خدمة.",
+    "noServicesYet": "هذا العميل ليس لديه خدمات نشطة.",
+    "noClientSelected": "يرجى اختيار عميل لعرض وإدارة خدماته.",
+    "clients": "العملاء",
+    "noClientsFound": "لم يتم العثور على عملاء.",
+    "viewServices": "عرض الخدمات",
+    "totalServices": "إجمالي الخدمات",
+    "totalAmountWithTaxes": "الإجمالي (شامل الضريبة)",
+    "totalAmountWithoutTaxes": "الإجمالي (خالي من الضريبة)",
+    "transactionDate": "تاريخ المعاملة"
+  },
+  "client": {
+    "companyName": "اسم الشركة",
+    "firstName": "الاسم الأول",
+    "lastName": "اللقب",
+    "email": "البريد الإلكتروني",
+    "phoneNumber": "رقم الهاتف",
+    "status": "الحالة"
+  },
+  "financialReporting": {
+    "title": "التقارير المالية",
+    "noProfileSelected": "يرجى اختيار ملف شخصي لعرض التقارير المالية.",
+    "customReport": {
+      "title": "تقرير مخصص",
+      "reportType": "نوع التقرير",
+      "types": {
+        "profit_loss": "الأرباح والخسائر",
+        "balance_sheet": "الميزانية العمومية",
+        "cash_flow": "تدفق النقد",
+        "expense_details": "تفاصيل المصروفات"
+      },
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "format": "التنسيق",
+      "downloadReport": "تحميل التقرير",
+      "generatingMessage": "تم إنشاء التقرير ({type}) للفترة من {startDate} إلى {endDate} بتنسيق {format} بنجاح."
+    },
+    "revenueVsExpenses": {
+      "title": "الإيرادات مقابل المصروفات",
+      "quarterly": "ربع سنوي",
+      "yearly": "سنوي",
+      "loading": "جاري تحميل بيانات الرسم البياني...",
+      "chartTitleQuarterly": "الإيرادات مقابل المصروفات (ربع سنوي)",
+      "chartTitleYearly": "الإيرادات مقابل المصروفات (سنوي)",
+      "amount": "المبلغ",
+      "revenue": "الإيرادات",
+      "expenses": "المصروفات",
+      "amountInThousands": "المبلغ بالآلاف"
+    },
+    "expenseBreakdown": {
+      "title": "تفصيل المصروفات (سنوي)",
+      "chartTitle": "تفصيل المصروفات حسب الفئة (سنوي)",
+      "summaryTitle": "ملخص المصروفات",
+      "categories": {
+        "rent": "الإيجار",
+        "salaries": "الرواتب",
+        "marketing": "التسويق",
+        "supplies": "اللوازم",
+        "utilities": "الخدمات",
+        "other": "أخرى"
+      }
+    },
+    "investmentBreakdown": {
+      "title": "تفصيل الاستثمار حسب النوع",
+      "type": "النوع",
+      "totalInvested": "إجمالي الاستثمار",
+      "totalProfitShare": "إجمالي حصة الربح",
+      "chartTitle": "توزيع الاستثمار حسب النوع"
+    }
+  },
+  "complianceManagement": {
+    "title": "إدارة الامتثال",
+    "loading": "جاري تحميل بيانات الامتثال...",
+    "actions": "الإجراءات",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "overview": {
+      "overallStatus": "الحالة العامة",
+      "compliant": "متوافق",
+      "lastChecked": "آخر فحص",
+      "activeDocuments": "المستندات النشطة",
+      "policiesAndProcedures": "السياسات والإجراءات",
+      "activeAlerts": "التنبيهات النشطة",
+      "needsAttention": "يتطلب الانتباه"
+    },
+    "upcomingDeadlines": {
+      "title": "المواعيد النهائية القادمة",
+      "add": "إضافة موعد نهائي",
+      "addTitle": "إضافة موعد نهائي جديد",
+      "editTitle": "تحرير الموعد النهائي",
+      "task": "المهمة",
+      "description": "الوصف",
+      "dueDate": "تاريخ الاستحقاق",
+      "priority": "الأولوية",
+      "priorities": {
+        "high": "عالية",
+        "medium": "متوسطة",
+        "low": "منخفضة"
+      },
+      "noDeadlines": "لا توجد مواعيد نهائية قادمة.",
+      "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذا الموعد النهائي؟"
+    },
+    "recentActivities": {
+      "title": "أنشطة الامتثال الأخيرة",
+      "log": "تسجيل النشاط",
+      "addTitle": "تسجيل نشاط جديد",
+      "editTitle": "تحرير النشاط",
+      "activity": "النشاط",
+      "description": "الوصف",
+      "status": "الحالة",
+      "noActivities": "لا توجد أنشطة حديثة.",
+      "statuses": {
+        "completed": "مكتمل",
+        "in_progress": "قيد التقدم",
+        "pending": "معلق"
+      },
+      "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذا النشاط؟"
+    },
+    "errors": {
+      "fetchFailed": "فشل في تحميل بيانات الامتثال.",
+      "saveFailed": "فشل في حفظ العنصر.",
+      "deleteFailed": "فشل في حذف العنصر."
+    }
+  },
+  "officeDesigner": {
+    "setupModal": {
+      "title": "اختر فرع للتصميم",
+      "branchName": "الفرع",
+      "startDesigning": "بدء التصميم",
+      "noAvailableBranches": "جميع الفروع لديها تصميم بالفعل. اذهب إلى 'إدارة الفروع' لإضافة فرع جديد."
+    },
+    "editNameModal": {
+      "title": "تحرير اسم المكتب",
+      "newName": "اسم جديد",
+      "cancel": "إلغاء",
+      "save": "حفظ"
+    },
+    "main": {
+      "title": "مصمم تخطيط الفرع",
+      "branches": "الفروع",
+      "addBranch": "إضافة تصميم فرع",
+      "deleteBranchConfirm": "هل أنت متأكد من رغبتك في حذف تصميم \"{branchName}\"؟ هذا الإجراء لا يمكن التراجع عنه.",
+      "tools": "الأدوات",
+      "addOffice": "إضافة مكتب",
+      "addDesk": "إضافة مكتب",
+      "selection": "التحديد ({count} عنصر(s))",
+      "shape": "الشكل",
+      "rectangle": "مستطيل",
+      "circle": "دائرة",
+      "color": "اللون",
+      "rename": "إعادة تسمية",
+      "duplicate": "تكرار",
+      "delete": "حذف المحدد",
+      "noSelection": "اختر مكتبًا لرؤية خصائصه.",
+      "saveDesign": "حفظ التصميمات",
+      "saving": "جاري الحفظ...",
+      "resetDesign": "إعادة تعيين جميع التصميمات",
+      "confirmReset": "هل أنت متأكد من رغبتك في مسح جميع التصميمات المحفوظة والبدء من جديد؟",
+      "designSaved": "تم حفظ التصميمات بنجاح!",
+      "layering": "الطبقات"
+    }
+  },
+  "userProfile": {
+    "title": "ملفي الشخصي",
+    "uploadPicture": "رفع صورة",
+    "personalInformation": "المعلومات الشخصية",
+    "firstName": "الاسم الأول",
+    "lastName": "اللقب",
+    "email": "البريد الإلكتروني",
+    "emailCannotBeChanged": "لا يمكن تغيير البريد الإلكتروني.",
+    "phone": "الهاتف",
+    "saveChanges": "حفظ التغييرات",
+    "changePassword": "تغيير كلمة المرور",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+    "alerts": {
+      "selectFile": "يرجى اختيار ملف.",
+      "pictureUpdated": "تم تحديث صورة الملف الشخصي.",
+      "profileUpdated": "تم تحديث الملف الشخصي بنجاح.",
+      "profileUpdateFailed": "فشل تحديث الملف الشخصي.",
+      "pictureUpdateFailed": "فشل تحديث صورة الملف الشخصي.",
+      "passwordsDoNotMatch": "كلمتا المرور الجديدتان غير متطابقتين.",
+      "passwordTooShort": "يجب أن تكون كلمة المرور الجديدة 6 أحرف على الأقل.",
+      "passwordChanged": "تم تغيير كلمة المرور بنجاح.",
+      "passwordChangeFailed": "فشل تغيير كلمة المرور. يرجى المحاولة مرة أخرى."
+    }
+  },
+  "userSettings": {
+    "title": "إعدادات المستخدم",
+    "preferences": {
+      "title": "التفضيلات",
+      "language": "اللغة",
+      "languageDesc": "اختر لغتك المفضلة لواجهة التطبيق.",
+      "theme": "السمة",
+      "themeDesc": "اختر سمة فاتحة أو داكنة للتطبيق."
+    },
+    "languages": {
+      "en": "الإنجليزية",
+      "fr": "الفرنسية"
+    },
+    "themes": {
+      "light": "فاتح",
+      "dark": "داكن",
+      "system": "النظام"
+    },
+    "notifications": {
+      "title": "تفضيلات الإشعارات",
+      "desc": "إدارة كيفية تلقي الإشعارات من النظام.",
+      "email": "إشعارات البريد الإلكتروني",
+      "push": "إشعارات الدفع (عبر المتصفح)"
+    },
+    "saveChanges": "حفظ التغييرات",
+    "saving": "جاري الحفظ..."
+  },
+  "navbar": {
+    "language": "اللغة",
+    "english": "الإنجليزية",
+    "french": "الفرنسية",
+    "arabic": "العربية",
+    "login": "تسجيل الدخول",
+    "notifications": {
+      "title": "الإشعارات",
+      "mock1": "إشعار 1",
+      "mock2": "إشعار 2",
+      "noNewNotifications": "لا توجد إشعارات جديدة",
+      "viewAll": "عرض جميع الإشعارات",
+      "markAllAsRead": "وضع علامة على الكل كمقروء"
+    },
+    "user": {
+      "profile": "الملف الشخصي",
+      "settings": "الإعدادات",
+      "logout": "تسجيل الخروج"
+    }
+  },
+  "login": {
+    "title": "تسجيل الدخول",
+    "emailLabel": "عنوان البريد الإلكتروني",
+    "emailPlaceholder": "بريدك الإلكتروني",
+    "passwordLabel": "كلمة المرور",
+    "passwordPlaceholder": "كلمة المرور الخاصة بك",
+    "loginButton": "تسجيل الدخول",
+    "loggingIn": "جاري تسجيل الدخول...",
+    "success": "لقد قمت بتسجيل الدخول بنجاح",
+    "error": {
+      "missingCredentials": "يرجى إدخال كل من البريد الإلكتروني وكلمة المرور.",
+      "invalidCredentials": "بيانات الاعتماد غير صالحة. يرجى المحاولة مرة أخرى.",
+      "backendError": "حدث خطأ: {message}",
+      "unknown": "حدث خطأ غير معروف. يرجى المحاولة مرة أخرى لاحقًا."
+    }
+  },
+  "assistantDashboard": {
+    "title": "لوحة تحكم المساعد",
+    "renewals": {
+      "title": "تجديدات عقود العملاء",
+      "empty": "لا توجد تجديدات عقود متاحة."
+    },
+    "expiringContracts": {
+      "title": "العقود التي تنتهي صلاحيتها (30 يومًا القادمة)",
+      "empty": "لم يتم العثور على عقود تنتهي صلاحيتها."
+    },
+    "prospects": {
+      "title": "قائمة العملاء المحتملين",
+      "contact": "اتصل",
+      "empty": "لا يوجد عملاء محتملون متاحون."
+    },
+    "offices": {
+      "title": "نظرة عامة على حالة المكاتب",
+      "empty": "لا توجد بيانات متاحة عن حالة المكاتب.",
+      "table": {
+        "name": "اسم المكتب",
+        "branch": "الفرع",
+        "status": "الحالة",
+        "capacity": "السعة",
+        "actions": "الإجراءات"
+      }
+    },
+    "tasksApprovals": {
+      "title": "المهام / الموافقات",
+      "loading": "جاري تحميل المهام...",
+      "noPending": "لا توجد مهام معلقة.",
+      "due": "مستحق",
+      "priority": "الأولوية",
+      "status": "الحالة",
+      "complete": "إكمال",
+      "viewAll": "عرض الكل",
+      "completedMsg": "تم وضع علامة على المهمة كمكتملة."
+    }
+  },
+  "investorDashboard": {
+    "title": "لوحة تحكم المستثمر",
+    "kpis": {
+      "roi": "العائد على الاستثمار",
+      "totalRevenue": "الإيرادات الإجمالية (سنويًا)",
+      "activeClients": "عدد العملاء النشطين"
+    },
+    "investmentDetails": {
+      "title": "تفاصيل الاستثمار",
+      "monthly": "شهريًا",
+      "bi-yearly": "نصف سنوي",
+      "yearly": "سنويًا",
+      "table": {
+        "branch": "الفرع",
+        "revenue": "الإيرادات",
+        "share": "الحصة",
+        "clients": "العملاء",
+        "status": "الحالة"
+      },
+      "noData": "لا توجد بيانات متاحة لهذه الفترة."
+    },
+    "revenueEvolution": {
+      "title": "تطور الإيرادات",
+      "monthly": "شهريًا",
+      "bi-yearly": "نصف سنوي",
+      "yearly": "سنويًا"
+    },
+    "profitShareHistory": {
+      "title": "تاريخ حصة الربح",
+      "table": {
+        "date": "التاريخ",
+        "branch": "الفرع",
+        "amountReceived": "المبلغ المستلم",
+        "period": "الفترة المعنية"
+      }
+    },
+    "recentActivities": {
+      "title": "الأنشطة الأخيرة"
+    },
+    "documents": {
+      "title": "المستندات",
+      "download": "تحميل"
+    },
+    "cta": {
+      "title": "هل أنت مستعد لتوسيع تأثيرك؟",
+      "description": "استكشف فرص استثمارية جديدة أو اطلب فتح فرع جديد.",
+      "requestBranch": "طلب فرع جديد",
+      "investMore": "استثمر المزيد"
+    },
+    "chart": {
+      "title": "تطور الإيرادات",
+      "monthlyTitle": "تطور الإيرادات الشهرية",
+      "biYearlyTitle": "تطور الإيرادات نصف السنوية",
+      "yearlyTitle": "تطور الإيرادات السنوية",
+      "monthlyLabel": "الإيرادات الشهرية",
+      "biYearlyLabel": "الإيرادات نصف السنوية",
+      "yearlyLabel": "الإيرادات السنوية",
+      "revenue": "الإيرادات (بالآلاف)"
+    },
+    "addContract": {
+      "submitButtonAdd": "إضافة عقد"
+    },
+    "withdrawals": {
+      "title": "السحوبات",
+      "kpis": {
+        "accrued": "الربح الصافي المستحق (حتى الآن)",
+        "withdrawnPaid": "المسحوب (مدفوع)",
+        "committed": "الملتزم به (معلق + موافق عليه)",
+        "available": "المتاح"
+      },
+      "form": {
+        "title": "طلب سحب",
+        "selectInvestment": "اختر الاستثمار",
+        "availableForThisInvestment": "متاح لهذا الاستثمار",
+        "amount": "المبلغ",
+        "paymentMethod": "طريقة الدفع (اختياري)",
+        "notes": "الملاحظات (اختياري)",
+        "submit": "إرسال الطلب",
+        "validationRequired": "يرجى اختيار استثمار وإدخال مبلغ إيجابي.",
+        "validationExceeds": "المبلغ المطلوب يتجاوز الرصيد المتاح للاستثمار المحدد."
+      },
+      "history": {
+        "title": "السحوبات الأخيرة",
+        "date": "تم الطلب في",
+        "investment": "الاستثمار",
+        "amount": "المبلغ",
+        "status": "الحالة"
+      },
+      "statuses": {
+        "pending": "معلق",
+        "approved": "موافق عليه",
+        "paid": "مدفوع",
+        "rejected": "مرفوض"
+      }
+    }
+  },
+  "pagination": {
+    "previous": "السابق",
+    "next": "التالي"
+  },
+  "locale": "ar",
+  "withdrawals": {
+    "title": "السحوبات",
+    "kpis": {
+      "accrued": "الربح الصافي المستحق (حتى الآن)",
+      "withdrawnPaid": "المسحوب (مدفوع)",
+      "committed": "الملتزم به (معلق + موافق عليه)",
+      "available": "المتاح"
+    },
+    "form": {
+      "title": "طلب سحب",
+      "selectInvestment": "اختر الاستثمار",
+      "availableForThisInvestment": "متاح لهذا الاستثمار",
+      "amount": "المبلغ",
+      "paymentMethod": "طريقة الدفع (اختياري)",
+      "notes": "الملاحظات (اختياري)",
+      "submit": "إرسال الطلب",
+      "validationRequired": "يرجى اختيار استثمار وإدخال مبلغ إيجابي.",
+      "validationExceeds": "المبلغ المطلوب يتجاوز الرصيد المتاح للاستثمار المحدد.",
+      "success": "تم إرسال طلب السحب.",
+      "error": "فشل إرسال طلب السحب."
+    },
+    "history": {
+      "title": "السحوبات الأخيرة",
+      "date": "تم الطلب في",
+      "investment": "الاستثمار",
+      "amount": "المبلغ",
+      "status": "الحالة"
+    },
+    "statuses": {
+      "pending": "معلق",
+      "approved": "موافق عليه",
+      "paid": "مدفوع",
+      "rejected": "مرفوض"
+    }
+  },
+  "manageWithdrawals": {
+    "title": "إدارة السحوبات",
+    "add": "إضافة سحب",
+    "refresh": "تحديث",
+    "deleteConfirm": "هل أنت متأكد من رغبتك في حذف هذا السحب؟",
+    "approveConfirm": "هل توافق على هذا السحب؟",
+    "rejectConfirm": "هل ترفض هذا السحب؟",
+    "markPaidConfirm": "هل تضع علامة على هذا السحب كمدفوع؟",
+    "cancelConfirm": "هل تريد حقًا إلغاء هذا السحب؟",
+    "filters": {
+      "title": "الفلاتر",
+      "status": "الحالة",
+      "all": "الكل",
+      "investment": "الاستثمار",
+      "investor": "المستثمر",
+      "apply": "تطبيق"
+    },
+    "table": {
+      "title": "السحوبات",
+      "id": "المعرف",
+      "requestedAt": "تم الطلب في",
+      "investor": "المستثمر",
+      "investment": "الاستثمار",
+      "amount": "المبلغ",
+      "paymentMethod": "طريقة الدفع",
+      "status": "الحالة",
+      "actions": "الإجراءات",
+      "noWithdrawals": "لم يتم العثور على سحوبات."
+    },
+    "actions": {
+      "approve": "الموافقة",
+      "cancel": "إلغاء",
+      "markPaid": "وضع علامة كمدفوع",
+      "edit": "تحرير",
+      "delete": "حذف"
+    },
+    "modal": {
+      "addTitle": "إضافة سحب",
+      "editTitle": "تحرير السحب",
+      "investor": "المستثمر",
+      "investment": "الاستثمار",
+      "amount": "المبلغ",
+      "paymentMethod": "طريقة الدفع",
+      "selectPaymentMethod": "اختر طريقة الدفع",
+      "status": "الحالة",
+      "notes": "الملاحظات",
+      "close": "إغلاق",
+      "save": "حفظ التغييرات"
+    }
+  },
+  "withdrawalStatuses": {
+    "pending": "معلق",
+    "approved": "موافق عليه",
+    "rejected": "مرفوض",
+    "paid": "مدفوع",
+    "cancelled": "ملغى"
+  },
+  "paymentMethods": {
+    "bank_transfer": "تحويل بنكي",
+    "cash": "نقدًا"
+  },
+  "loading": "جاري التحميل...",
+  "notifications": {
+    "manage": "إدارة الإشعارات",
+    "list": "قائمة الإشعارات",
+    "create": "إنشاء إشعار",
+    "id": "المعرف",
+    "message": "الرسالة",
+    "type": "النوع",
+    "status": "الحالة",
+    "date": "التاريخ",
+    "actions": "الإجراءات",
+    "noNotifications": "لا توجد إشعارات لعرضها.",
+    "read": "مقروء",
+    "unread": "غير مقروء",
+    "markAsRead": "وضع علامة كمقروء",
+    "createModalTitle": "إنشاء إشعار",
+    "types": {
+      "NewTask": "مهمة جديدة",
+      "TaskUpdate": "تحديث المهمة",
+      "ContractReminder": "تذكير بالعقد",
+      "SystemAlert": "تنبيه النظام",
+      "InvestorContractExpiry": "انتهاء صلاحية عقد المستثمر",
+      "HighValueTransaction": "معاملة ذات قيمة عالية",
+      "OfficeBookingRequest": "طلب حجز مكتب",
+      "ClientDeletion": "حذف العميل"
+    },
+    "markAllAsRead": "وضع علامة على الكل كمقروء",
+    "editModalTitle": "تحرير الإشعار",
+    "deleteConfirm": "هل أنت متأكد من رغبتك في حذف هذا الإشعار؟",
+    "searchPlaceholder": "البحث بالرسالة...",
+    "assignedTo": "مخصص لـ",
+    "assignTo": "تخصيص لـ",
+    "selectUser": "اختر مستخدمًا",
+    "unassigned": "غير مخصص",
+    "sortBy": {
+      "date": "فرز حسب التاريخ",
+      "type": "فرز حسب النوع",
+      "status": "فرز حسب الحالة"
+    },
+    "sortOrder": {
+      "desc": "تنازلي",
+      "asc": "تصاعدي"
+    }
+  },
+  "errors": {
+    "network": "خطأ في الشبكة. يرجى التحقق من اتصالك بالإنترنت.",
+    "timeout": "انتهت مهلة الطلب. يرجى المحاولة مرة أخرى.",
+    "unauthorized": "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.",
+    "forbidden": "ليس لديك إذن للقيام بهذا الإجراء.",
+    "notFound": "لم يتم العثور على المورد المطلوب.",
+    "validation": "بعض المدخلات غير صالحة. يرجى مراجعة إدخالاتك.",
+    "server": "واجه الخادم خطأ. يرجى المحاولة مرة أخرى لاحقًا.",
+    "unknown": "حدث خطأ غير معروف. يرجى المحاولة مرة أخرى.",
+    "fetchFailed": "فشل في جلب {entity}."
+  }
+}

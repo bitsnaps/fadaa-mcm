@@ -213,3 +213,7 @@ html.dark .table {
 html.dark .modal-content {
     background-color: var(--bs-body-bg);
 }
+
+html.arabic-font body {
+  font-family: 'Tajawal', sans-serif;
+}

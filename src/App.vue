@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch } from 'vue';
+import { computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { BToastOrchestrator } from 'bootstrap-vue-next';
 import { useAuthStore } from '@/stores/auth';
@@ -9,9 +9,24 @@ import Navbar from '@/components/Navbar.vue';
 import Sidebar from '@/components/Sidebar.vue';
 import { useToast } from '@/helpers/toast';
 import { useTheme } from '@/composables/useTheme';
+import { useI18n } from 'vue-i18n';
 
 // Initialize the theme management
 useTheme();
+
+const { locale } = useI18n();
+
+onMounted(() => {
+  watch(locale, (newLocale) => {
+    document.documentElement.dir = newLocale === 'ar' ? 'rtl' : 'ltr';
+    localStorage.setItem('locale', newLocale);
+    if (newLocale === 'ar') {
+      document.documentElement.classList.add('arabic-font');
+    } else {
+      document.documentElement.classList.remove('arabic-font');
+    }
+  }, { immediate: true });
+});
 
 const route = useRoute();
 const authStore = useAuthStore();
