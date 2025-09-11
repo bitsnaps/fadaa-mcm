@@ -241,10 +241,18 @@ const toggleFinancial = () => {
   transition: all 0.3s ease;
 }
 
+html.arabic-font .sidebar {
+  left: auto;
+  right: 0;
+  box-shadow: inset 1px 0 0 rgba(0, 0, 0, .1);
+}
+
 .sidebar.collapsed {
-  /* Adjust based on desired collapsed width */
-  /*margin-left: -160px; */
   width: 0;
+}
+
+html.arabic-font .sidebar.collapsed {
+  margin-right: -280px;
 }
 
 .sidebar-sticky {

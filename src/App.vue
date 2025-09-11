@@ -81,7 +81,8 @@ watch(() => notificationStore.notification, (newNotification) => {
 
         <!-- Main content area -->
         <main :class="{
-          'col-md-9 ms-sm-auto col-lg-10 px-md-4': showSidebar && !isSidebarCollapsed,
+          'col-md-9 col-lg-10 px-md-4': showSidebar && !isSidebarCollapsed,
+          [locale === 'ar' ? 'me-sm-auto' : 'ms-sm-auto']: showSidebar && !isSidebarCollapsed,
           'col-12': !showSidebar || isSidebarCollapsed,
           'content-shifted': showSidebar && !isSidebarCollapsed
         }">
@@ -103,8 +104,18 @@ main {
   padding-left: 2rem; /* Space for the toggle button */
 }
 
+html[dir="rtl"] main {
+  padding-left: 0;
+  padding-right: 2rem;
+}
+
 .content-shifted {
   padding-left: 3rem; /* Additional padding when sidebar is visible */
+}
+
+html[dir="rtl"] .content-shifted {
+  padding-left: 0;
+  padding-right: 3rem;
 }
 
 @media (max-width: 767.98px) {
@@ -112,8 +123,18 @@ main {
     padding-left: 1rem;
   }
   
+  html[dir="rtl"] main {
+    padding-left: 0;
+    padding-right: 1rem;
+  }
+
   .content-shifted {
     padding-left: 1rem;
+  }
+
+  html[dir="rtl"] .content-shifted {
+    padding-left: 0;
+    padding-right: 1rem;
   }
 }
 </style>
