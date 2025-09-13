@@ -1,24 +1,13 @@
 const fs = require('fs');
 const path = require('path');
-
-const deleteFile = async (c, filePath) => {
-    try {
-        // TODO: This could be improved by resolving the upload dir from `UPLOAD_DIR` var env
-        const abosultePath = path.join(__dirname, '../public', filePath);
-        if (fs.existsSync(abosultePath)) {
-            fs.unlinkSync(abosultePath);
-        }    
-    } catch (error) {
-        console.error('Error deleting file:', error);
-        return c.json({ success: false, message: 'Failed to delete file' }, 500);
-    }
-};
+const { getUploadDir } = require('../lib/errorHandler');
 
 const downloadFile = async (c, filePath) => {
     try {
         const decodedPath = decodeURIComponent(filePath);
         
-        const absolutePath = path.resolve(process.env.UPLOAD_DIR, decodedPath);
+        const uploadDir = getUploadDir();
+        const absolutePath = path.resolve(uploadDir, decodedPath);
 
         if (!fs.existsSync(absolutePath)) {
             return c.json({ success: false, message: 'File not found' }, 404);

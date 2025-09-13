@@ -96,7 +96,8 @@
     "manageExpenses": "Expense Management",
     "manageProfiles": "Accounts Management",
     "managementOperations": "Management & Operations",
-    "financialAnalytics": "Financial Analytics & Tracking"
+    "financialAnalytics": "Financial Analytics & Tracking",
+    "fileManager": "File Manager"
   },
   "tasks": {
     "title": "Manage Tasks",

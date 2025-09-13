@@ -96,7 +96,8 @@
     "manageExpenses": "إدارة المصروفات",
     "manageProfiles": "إدارة الحسابات",
     "managementOperations": "الإدارة والعمليات",
-    "financialAnalytics": "التحليلات المالية والتتبع"
+    "financialAnalytics": "التحليلات المالية والتتبع",
+    "fileManager": "إدراة الملفات"
   },
   "tasks": {
     "title": "إدارة المهام",

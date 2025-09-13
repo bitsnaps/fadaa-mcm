@@ -34,6 +34,7 @@ import ManageIncomes from './views/ManageIncomes.vue';
 import ManageExpenses from './views/ManageExpenses.vue';
 import ManageProfiles from './views/ManageProfiles.vue';
 import ManageWithdrawals from './views/ManageWithdrawals.vue';
+import FileManager from './views/FileManager.vue';
 import Navbar from './components/Navbar.vue';
 
 const routes = [
@@ -234,6 +235,12 @@ const routes = [
     path: '/manage-profiles',
     name: 'ManageProfiles',
     components: { default: ManageProfiles, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin'] }
+  },
+  {
+    path: '/file-manager',
+    name: 'FileManager',
+    components: { default: FileManager, header: Navbar },
     meta: { requiresAuth: true, roles: ['admin'] }
   },
 ];

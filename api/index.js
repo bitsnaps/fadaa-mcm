@@ -31,8 +31,11 @@ const reportsApp = require('./routes/reports');
 const taskApp = require('./routes/tasks');
 const clientAttachmentsApp = require('./routes/clientAttachments');
 const systemSettingsApp = require('./routes/systemSettings');
+const fileManagerApp = require('./routes/fileManager');
+const trashManagerApp = require('./routes/trashManager');
 const { hashPassword } = require('./lib/auth');
 const { authMiddleware, adminMiddleware } = require('./middleware/auth');
+const { getUploadDir } = require('./lib/filesHelper');
 const models = require('./models');
 
 if (process.env.NODE_ENV !== 'test') {
@@ -76,12 +79,14 @@ app.route('/api/reports', reportsApp);
 app.route('/api/tasks', taskApp);
 app.route('/api/client-attachments', clientAttachmentsApp);
 app.route('/api/system-settings', systemSettingsApp);
+app.route('/api/files', fileManagerApp);
+app.route('/api/trash', trashManagerApp);
 
 
 // --- Static File Serving ---
 if (process.env.NODE_ENV === 'production') {
   // Production: Use the absolute path from the environment variable
-  const uploadDir = process.env.UPLOAD_DIR;
+  const uploadDir = getUploadDir();
   if (uploadDir) {
     app.use('/uploads/*', serveStatic({ root: uploadDir }));
   } else {

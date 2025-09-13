@@ -96,7 +96,8 @@
     "manageExpenses": "Gestion des Dépenses",
     "manageProfiles": "Gestion des Profils",
     "managementOperations": "Gestion & Opérations",
-    "financialAnalytics": "Analyses Financières & Suivi"
+    "financialAnalytics": "Analyses Financières & Suivi",
+    "fileManager": "Gestionnaire de Fichiers"
   },
   "tasks": {
     "title": "Gérer les Tâches",

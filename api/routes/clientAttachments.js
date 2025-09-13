@@ -5,6 +5,7 @@ const { uploadMiddleware } = require('../middleware/upload');
 const path = require('path');
 const fs = require('fs');
 const { handleRouteError } = require('../lib/errorHandler');
+const { getUploadDir } = require('../lib/filesHelper');
 
 const clientAttachmentsApp = new Hono();
 clientAttachmentsApp.use('*', authMiddleware);
@@ -46,7 +47,7 @@ clientAttachmentsApp.post('/:clientId', uploadMiddleware('attachments', 'attachm
                 const fileBuffer = Buffer.from(fileArrayBuffer);
                 const fileName = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;
                 
-                const uploadDir = path.join(process.env.UPLOAD_DIR, 'attachments');
+                const uploadDir = path.join(getUploadDir(), 'attachments');
                  if (!fs.existsSync(uploadDir)) {
                     fs.mkdirSync(uploadDir, { recursive: true });
                 }
