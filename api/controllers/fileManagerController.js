@@ -40,6 +40,8 @@ const deleteFile = async (c) => {
         const { filePath } = c.req.param();
         const decodedPath = decodeURIComponent(filePath);
 
+        console.log('**** decodedPath: ', decodedPath);
+        
         const isLinked = await isFileLinked(decodedPath);
         if (isLinked) {
             return c.json({ success: false, message: 'File is linked to a record and cannot be deleted.' }, 400);

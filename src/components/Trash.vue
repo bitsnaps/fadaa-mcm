@@ -69,7 +69,8 @@ const fetchTrashedFiles = async () => {
 const permanentDeleteFile = async (file) => {
   if (confirm(`Are you sure you want to permanently delete ${file.name}?`)) {
     try {
-      const response = await TrashManagerService.permanentDeleteFile(file.name);
+      const relativePath = file.path.startsWith('/uploads/trash') ? file.path.substring('/uploads/trash'.length) : file.path;
+      const response = await TrashManagerService.permanentDeleteFile(relativePath);
       if (response.data.success) {
         // showSuccessToast(response.data.message);
         fetchTrashedFiles();

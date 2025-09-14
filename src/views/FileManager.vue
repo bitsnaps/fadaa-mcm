@@ -98,7 +98,8 @@ const previewFile = async (file) => {
 const deleteFile = async (file) => {
   if (confirm(`Are you sure you want to delete ${file.name}?`)) {
     try {
-      const response = await FileManagerService.deleteFile(file.path);
+      const relativePath = file.path.startsWith('/uploads') ? file.path.substring('/uploads'.length) : file.path;
+      const response = await FileManagerService.deleteFile(relativePath);
       if (response.data.success) {
         // showSuccessToast(response.data.message);
         fetchFiles();

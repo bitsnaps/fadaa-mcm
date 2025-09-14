@@ -5,13 +5,15 @@ const { getUploadDir } = require('../lib/filesHelper');
 const moveFileToTrash = async (filePath) => {
     const uploadDir = getUploadDir();
     const trashDir = path.join(uploadDir, 'trash');
-    
+
     if (!fs.existsSync(trashDir)) {
         fs.mkdirSync(trashDir, { recursive: true });
     }
 
+    // The filePath is a URL path like /uploads/..., not a file system path.
+    // We need to resolve the absolute path on the file system.
     const sourcePath = path.join(uploadDir, filePath);
-    const fileName = path.basename(filePath);
+    const fileName = path.basename(sourcePath);
     const destinationPath = path.join(trashDir, fileName);
 
     if (fs.existsSync(sourcePath)) {
