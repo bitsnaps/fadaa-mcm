@@ -98,4 +98,8 @@ const emptyTrash = async () => {
 };
 
 onMounted(fetchTrashedFiles);
+
+defineExpose({
+  fetchTrashedFiles,
+});
 </script>
