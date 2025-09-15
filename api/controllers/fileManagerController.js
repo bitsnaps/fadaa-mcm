@@ -6,6 +6,7 @@ const { getUploadDir } = require('../lib/filesHelper');
 
 const listFiles = async (c) => {
     try {
+        const { page = 1, limit = 5 } = c.req.query();
         const uploadDir = getUploadDir();
         const subDirs = ['attachments', 'avatars', 'contracts', 'documents'];
         const allFiles = [];
@@ -28,7 +29,20 @@ const listFiles = async (c) => {
             }
         }
 
-        return c.json({ success: true, data: allFiles });
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+        const paginatedFiles = allFiles.slice(startIndex, endIndex);
+
+        return c.json({
+            success: true,
+            data: paginatedFiles,
+            pagination: {
+                total: allFiles.length,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                totalPages: Math.ceil(allFiles.length / limit),
+            },
+        });
     } catch (error) {
         console.error('Error listing files:', error);
         return c.json({ success: false, message: 'Failed to list files' }, 500);

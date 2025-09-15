@@ -1,8 +1,8 @@
 import apiClient from './ApiClient';
 
 export default {
-  listTrash() {
-    return apiClient.get('/trash');
+  listTrash(page = 1, limit = 5) {
+    return apiClient.get(`/trash?page=${page}&limit=${limit}`);
   },
   permanentDeleteFile(filePath) {
     return apiClient.delete(`/trash/${encodeURIComponent(filePath)}`);

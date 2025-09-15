@@ -4,6 +4,7 @@ const { getUploadDir } = require('../lib/filesHelper');
 
 const listTrash = async (c) => {
     try {
+        const { page = 1, limit = 5 } = c.req.query();
         const uploadDir = getUploadDir();
         const trashDir = path.join(uploadDir, 'trash');
         
@@ -27,7 +28,20 @@ const listTrash = async (c) => {
             }
         }
 
-        return c.json({ success: true, data: trashedFiles });
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+        const paginatedFiles = trashedFiles.slice(startIndex, endIndex);
+
+        return c.json({
+            success: true,
+            data: paginatedFiles,
+            pagination: {
+                total: trashedFiles.length,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                totalPages: Math.ceil(trashedFiles.length / limit),
+            },
+        });
     } catch (error) {
         console.error('Error listing trashed files:', error);
         return c.json({ success: false, message: 'Failed to list trashed files' }, 500);

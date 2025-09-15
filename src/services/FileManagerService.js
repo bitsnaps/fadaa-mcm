@@ -1,8 +1,8 @@
 import apiClient from './ApiClient';
 
 export default {
-  listFiles() {
-    return apiClient.get('/files');
+  listFiles(page = 1, limit = 5) {
+    return apiClient.get(`/files?page=${page}&limit=${limit}`);
   },
   deleteFile(filePath) {
     return apiClient.delete(`/files/${encodeURIComponent(filePath)}`);
