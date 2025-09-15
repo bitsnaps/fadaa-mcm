@@ -10,6 +10,7 @@
             class="form-control"
             v-model="searchTerm"
             placeholder="Search by name..."
+            @input="fetchFiles"
           />
         </div>
 
@@ -19,12 +20,10 @@
           </div>
         </div>
 
-        <div v-else-if="tableItems.length > 0">
+        <div v-else-if="files.length > 0">
           <BTable
-            :items="tableItems"
+            :items="files"
             :fields="tableFields"
-            :current-page="currentPage"
-            :per-page="perPage"
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
             responsive
@@ -49,7 +48,7 @@
           <div class="d-flex justify-content-center mt-3">
             <BPagination
               v-model="currentPage"
-              :total-rows="totalRows"
+              :total-rows="pagination.total"
               :per-page="perPage"
             />
           </div>
@@ -66,7 +65,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { BTable, BPagination, BButton, BTabs, BTab } from 'bootstrap-vue-next';
 import FileManagerService from '@/services/FileManagerService';
 import Trash from '@/components/Trash.vue';
@@ -83,13 +82,17 @@ const currentPage = ref(1);
 const perPage = ref(5);
 const sortBy = ref(['createdAt']);
 const sortDesc = ref(true);
+const pagination = ref({
+  total: 0,
+});
 
 const fetchFiles = async () => {
   try {
     isLoading.value = true;
-    const response = await FileManagerService.listFiles(currentPage.value, perPage.value);
+    const response = await FileManagerService.listFiles(currentPage.value, perPage.value, searchTerm.value);
     if (response.data.success) {
       files.value = response.data.data;
+      pagination.value.total = response.data.pagination.total;
     } else {
       files.value = [];
     }
@@ -102,7 +105,6 @@ const fetchFiles = async () => {
 };
 
 const handleTabActivation = (newTabIndex) => {
-  // activeTab.value = newTabIndex;
   if (newTabIndex === 0) {
     fetchFiles();
   } else if (newTabIndex === 1) {
@@ -110,26 +112,13 @@ const handleTabActivation = (newTabIndex) => {
   }
 };
 
-const filteredFiles = computed(() => {
-  if (!searchTerm.value) {
-    return files.value;
-  }
-  return files.value.filter(file =>
-    file.name.toLowerCase().includes(searchTerm.value.toLowerCase())
-  );
-});
-
 const tableFields = [
   { key: 'name', label: 'Name', sortable: true },
   { key: 'source', label: 'Source', sortable: true },
   { key: 'size', label: 'Size', sortable: true },
-  { key: 'createdAt', label: 'Created', sortable: true },
+  { key: 'createdAt', label: 'Date Uploaded', sortable: true },
   { key: 'actions', label: 'Actions' }
 ];
-
-const tableItems = computed(() => filteredFiles.value);
-
-const totalRows = computed(() => tableItems.value.length);
 
 const deleteFile = async (file) => {
   if (confirm(`Are you sure you want to delete ${file.name}?`)) {
@@ -147,8 +136,5 @@ const deleteFile = async (file) => {
 
 onMounted(fetchFiles);
 
-watch(currentPage, () => {
-    fetchFiles();
-});
-
+watch(currentPage, fetchFiles);
 </script>

@@ -6,7 +6,7 @@ const { getUploadDir } = require('../lib/filesHelper');
 
 const listFiles = async (c) => {
     try {
-        const { page = 1, limit = 5 } = c.req.query();
+        const { page = 1, limit = 5, search = '' } = c.req.query();
         const uploadDir = getUploadDir();
         const subDirs = ['attachments', 'avatars', 'contracts', 'documents'];
         const allFiles = [];
@@ -29,18 +29,22 @@ const listFiles = async (c) => {
             }
         }
 
+        const filteredFiles = allFiles.filter(file => file.name.toLowerCase().includes(search.toLowerCase()));
+
+        const totalFiles = filteredFiles.length;
+        const totalPages = Math.ceil(totalFiles / limit);
         const startIndex = (page - 1) * limit;
         const endIndex = page * limit;
-        const paginatedFiles = allFiles.slice(startIndex, endIndex);
+        const paginatedFiles = filteredFiles.slice(startIndex, endIndex);
 
         return c.json({
             success: true,
             data: paginatedFiles,
             pagination: {
-                total: allFiles.length,
+                total: totalFiles,
                 page: parseInt(page),
                 limit: parseInt(limit),
-                totalPages: Math.ceil(allFiles.length / limit),
+                totalPages: totalPages,
             },
         });
     } catch (error) {

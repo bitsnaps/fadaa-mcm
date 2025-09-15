@@ -1,7 +1,14 @@
 <template>
   <div>
     <div class="d-flex justify-content-between align-items-center my-4">
-      <button class="btn btn-danger" @click="emptyTrash" :disabled="!tableItems.length">Empty Trash</button>
+      <input
+        type="text"
+        class="form-control"
+        v-model="searchTerm"
+        placeholder="Search by name..."
+        @input="fetchTrashedFiles"
+      />
+      <button class="btn btn-danger ms-3" @click="emptyTrash" :disabled="!files.length">Empty Trash</button>
     </div>
 
     <div v-if="isLoading" class="text-center">
@@ -10,12 +17,10 @@
       </div>
     </div>
 
-    <div v-else-if="tableItems.length > 0">
+    <div v-else-if="files.length > 0">
       <BTable
-        :items="tableItems"
+        :items="files"
         :fields="tableFields"
-        :current-page="currentPage"
-        :per-page="perPage"
         :sort-by.sync="sortBy"
         :sort-desc.sync="sortDesc"
         responsive
@@ -40,7 +45,7 @@
       <div class="d-flex justify-content-center mt-3">
         <BPagination
           v-model="currentPage"
-          :total-rows="totalRows"
+          :total-rows="pagination.total"
           :per-page="perPage"
         />
       </div>
@@ -52,32 +57,37 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, defineExpose } from 'vue';
+import { ref, onMounted, watch, defineExpose } from 'vue';
 import { BTable, BPagination, BButton } from 'bootstrap-vue-next';
 import TrashManagerService from '@/services/TrashManagerService';
 import { formatBytes } from '@/helpers/files';
 
-const trashedFiles = ref([]);
+const files = ref([]);
 const isLoading = ref(true);
+const searchTerm = ref('');
 
 // Table state
 const currentPage = ref(1);
 const perPage = ref(5);
 const sortBy = ref(['createdAt']);
 const sortDesc = ref(true);
+const pagination = ref({
+  total: 0,
+});
 
 const fetchTrashedFiles = async () => {
   try {
     isLoading.value = true;
-    const response = await TrashManagerService.listTrash(currentPage.value, perPage.value);
+    const response = await TrashManagerService.listTrash(currentPage.value, perPage.value, searchTerm.value);
     if (response.data.success) {
-      trashedFiles.value = response.data.data;
+      files.value = response.data.data;
+      pagination.value.total = response.data.pagination.total;
     } else {
-      trashedFiles.value = [];
+      files.value = [];
     }
   } catch (error) {
     console.error('An error occurred while fetching trashed files:', error);
-    trashedFiles.value = [];
+    files.value = [];
   } finally {
     isLoading.value = false;
   }
@@ -89,10 +99,6 @@ const tableFields = [
   { key: 'createdAt', label: 'Date Trashed', sortable: true },
   { key: 'actions', label: 'Actions' }
 ];
-
-const tableItems = computed(() => trashedFiles.value);
-
-const totalRows = computed(() => tableItems.value.length);
 
 const permanentDeleteFile = async (file) => {
   if (confirm(`Are you sure you want to permanently delete ${file.name}?`)) {
@@ -123,9 +129,7 @@ const emptyTrash = async () => {
 
 onMounted(fetchTrashedFiles);
 
-watch(currentPage, () => {
-    fetchTrashedFiles();
-});
+watch(currentPage, fetchTrashedFiles);
 
 defineExpose({
   fetchTrashedFiles,

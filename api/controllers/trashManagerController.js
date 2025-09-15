@@ -4,7 +4,7 @@ const { getUploadDir } = require('../lib/filesHelper');
 
 const listTrash = async (c) => {
     try {
-        const { page = 1, limit = 5 } = c.req.query();
+        const { page = 1, limit = 5, search = '' } = c.req.query();
         const uploadDir = getUploadDir();
         const trashDir = path.join(uploadDir, 'trash');
         
@@ -28,18 +28,22 @@ const listTrash = async (c) => {
             }
         }
 
+        const filteredFiles = trashedFiles.filter(file => file.name.toLowerCase().includes(search.toLowerCase()));
+
+        const totalFiles = filteredFiles.length;
+        const totalPages = Math.ceil(totalFiles / limit);
         const startIndex = (page - 1) * limit;
         const endIndex = page * limit;
-        const paginatedFiles = trashedFiles.slice(startIndex, endIndex);
+        const paginatedFiles = filteredFiles.slice(startIndex, endIndex);
 
         return c.json({
             success: true,
             data: paginatedFiles,
             pagination: {
-                total: trashedFiles.length,
+                total: totalFiles,
                 page: parseInt(page),
                 limit: parseInt(limit),
-                totalPages: Math.ceil(trashedFiles.length / limit),
+                totalPages: totalPages,
             },
         });
     } catch (error) {
