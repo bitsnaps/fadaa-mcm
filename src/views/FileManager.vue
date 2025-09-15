@@ -40,6 +40,7 @@
             </template>
             <template #cell(actions)="data">
               <div class="text-center">
+                <BButton variant="primary" size="sm" class="me-2" @click="downloadFile(data.item)"><i class="bi bi-download"></i></BButton>
                 <BButton variant="danger" size="sm" @click="deleteFile(data.item)"><i class="bi bi-trash"></i></BButton>
               </div>
             </template>
@@ -119,6 +120,17 @@ const tableFields = [
   { key: 'createdAt', label: 'Date Uploaded', sortable: true },
   { key: 'actions', label: 'Actions' }
 ];
+
+const downloadFile = async (file) => {
+  try {
+    const response = await FileManagerService.downloadFile(file.path);
+    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+    const url = window.URL.createObjectURL(blob);
+    window.open(url);
+  } catch (error) {
+    console.error('Error downloading file:', error);
+  }
+};
 
 const deleteFile = async (file) => {
   if (confirm(`Are you sure you want to delete ${file.name}?`)) {

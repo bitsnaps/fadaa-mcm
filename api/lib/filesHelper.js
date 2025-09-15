@@ -5,4 +5,12 @@ const getUploadDir = () => {
   return '../public/uploads'; // This is maybe better to grab it from the var env, even on dev mode.
 };
 
-module.exports = { getUploadDir };
+const path = require('path');
+
+const resolveFilePath = (filePath) => {
+    const uploadDir = getUploadDir();
+    const relativePath = filePath.startsWith('/uploads') ? filePath.substring('/uploads'.length) : filePath;
+    return path.join(uploadDir, relativePath);
+};
+
+module.exports = { getUploadDir, resolveFilePath };

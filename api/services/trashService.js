@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { getUploadDir } = require('../lib/filesHelper');
+const { getUploadDir, resolveFilePath } = require('../lib/filesHelper');
 
 const moveFileToTrash = async (filePath) => {
     const uploadDir = getUploadDir();
@@ -12,7 +12,7 @@ const moveFileToTrash = async (filePath) => {
 
     // The filePath is a URL path like /uploads/..., not a file system path.
     // We need to resolve the absolute path on the file system.
-    const sourcePath = path.join(uploadDir, filePath);
+    const sourcePath = resolveFilePath(filePath);
     const fileName = path.basename(sourcePath);
     const destinationPath = path.join(trashDir, fileName);
 

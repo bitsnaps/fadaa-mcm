@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { getUploadDir } = require('../lib/filesHelper');
+const { getUploadDir, resolveFilePath } = require('../lib/filesHelper');
 
 const listTrash = async (c) => {
     try {
@@ -56,12 +56,7 @@ const permanentDeleteFile = async (c) => {
     try {
         const { filePath } = c.req.param();
         const decodedPath = decodeURIComponent(filePath);
-
-        const uploadDir = getUploadDir();
-        const trashDir = path.join(uploadDir, 'trash');
-        const sourcePath = path.join(trashDir, decodedPath);
-
-        console.log('****** sourcePath: ', sourcePath);
+        const sourcePath = resolveFilePath(path.join('trash', decodedPath));
         
         if (fs.existsSync(sourcePath)) {
             fs.unlinkSync(sourcePath);

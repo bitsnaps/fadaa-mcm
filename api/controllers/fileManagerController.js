@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { moveFileToTrash } = require('../services/trashService');
 const models = require('../models');
-const { getUploadDir } = require('../lib/filesHelper');
+const { getUploadDir, resolveFilePath } = require('../lib/filesHelper');
 
 const listFiles = async (c) => {
     try {
@@ -87,7 +87,32 @@ const isFileLinked = async (filePath) => {
     return false;
 };
 
+const downloadFile = async (c) => {
+    try {
+        const { filePath } = c.req.param();
+        const decodedPath = decodeURIComponent(filePath);
+        const sourcePath = resolveFilePath(decodedPath);
+        
+        if (fs.existsSync(sourcePath)) {
+            const fileStream = fs.createReadStream(sourcePath);
+            const fileName = path.basename(sourcePath);
+            const contentType = fileName.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'application/octet-stream';
+
+            c.header('Content-Type', contentType);
+            c.header('Content-Disposition', `attachment; filename=${encodeURIComponent(fileName)}`);
+
+            return c.body(fileStream);
+        }
+
+        return c.json({ success: false, message: 'File not found' }, 404);
+    } catch (error) {
+        console.error('Error downloading file:', error);
+        return c.json({ success: false, message: 'Failed to download file' }, 500);
+    }
+};
+
 module.exports = {
     listFiles,
     deleteFile,
+    downloadFile,
 };
