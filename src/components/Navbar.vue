@@ -6,7 +6,6 @@ import { useAuthStore } from '@/stores/auth';
 import { useSidebarStore } from '@/stores/sidebar';
 import { useI18n } from 'vue-i18n';
 import { getNotifications, markNotificationsAsRead } from '@/services/notificationService';
-import { BModal } from 'bootstrap-vue-next';
 import {
   BNavbar,
   BNavbarBrand,
@@ -25,7 +24,7 @@ const authStore = useAuthStore();
 const sidebarStore = useSidebarStore();
 
 const notifications = ref([]);
-const unreadCount = computed(() => notifications.value.filter(n => !n.is_read).length);
+const unreadCount = computed(() => notifications.value?.filter(n => !n.is_read).length || 0);
 
 
 const isAuthenticated = computed(() => authStore.isAuthenticated);
@@ -53,17 +52,21 @@ const handleLogout = () => {
   router.push('/login');
 };
 const fetchNotifications = async () => {
-  try {
-    const response = await getNotifications();
-    if (response.data.success) {
-      notifications.value = response.data.notifications;
+  if (isAuthenticated.value)
+    try {
+      const response = await getNotifications();
+      if (response.data.success) {
+        notifications.value = response.data.notifications;
+      }
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
     }
-  } catch (error) {
-    console.error('Failed to fetch notifications:', error);
-  }
 };
 
 const handleNotificationDropdownClick = async () => {
+  if (!isAuthenticated.value){
+    return;
+  }
   const unreadIds = notifications.value.filter(n => !n.is_read).map(n => n.id);
   if (unreadIds.length > 0) {
     try {
