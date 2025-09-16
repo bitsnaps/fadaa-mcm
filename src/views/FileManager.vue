@@ -1,22 +1,22 @@
 <template>
   <div class="container-fluid mt-4">
-    <h1 class="h3 mb-4 text-gray-800">File Manager</h1>
+    <h1 class="h3 mb-4 text-gray-800">{{ t('fileManager.title') }}</h1>
 
     <BTabs v-model:index="activeTab" @activate-tab="handleTabActivation">
-      <BTab title="Files" :active="activeTab === 0">
+      <BTab :title="t('fileManager.title')" :active="activeTab === 0">
         <div class="d-flex justify-content-between align-items-center my-4">
           <input
             type="text"
             class="form-control"
             v-model="searchTerm"
-            placeholder="Search by name..."
+            :placeholder="t('fileManager.searchPlaceholder')"
             @input="fetchFiles"
           />
         </div>
 
         <div v-if="isLoading" class="text-center">
           <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+            <span class="visually-hidden">{{ t('loading') }}</span>
           </div>
         </div>
 
@@ -30,7 +30,7 @@
             striped
             hover
             show-empty
-            empty-text="No files found."
+            :empty-text="t('fileManager.noFilesFound')"
           >
             <template #cell(size)="data">
               {{ formatBytes(data.value) }}
@@ -55,10 +55,10 @@
           </div>
         </div>
         <div v-else class="alert alert-info text-center" role="alert">
-          No files found.
+          {{ t('fileManager.noFilesFound') }}
         </div>
       </BTab>
-      <BTab title="Trash" :active="activeTab === 1">
+      <BTab :title="t('trash.title')" :active="activeTab === 1">
         <Trash ref="trash" />
       </BTab>
     </BTabs>
@@ -66,12 +66,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { BTable, BPagination, BButton, BTabs, BTab } from 'bootstrap-vue-next';
 import FileManagerService from '@/services/FileManagerService';
 import Trash from '@/components/Trash.vue';
 import { formatBytes } from '@/helpers/files';
 
+const { t } = useI18n();
 const files = ref([]);
 const isLoading = ref(true);
 const searchTerm = ref('');
@@ -113,13 +115,13 @@ const handleTabActivation = (newTabIndex) => {
   }
 };
 
-const tableFields = [
-  { key: 'name', label: 'Name', sortable: true },
-  { key: 'source', label: 'Source', sortable: true },
-  { key: 'size', label: 'Size', sortable: true },
-  { key: 'createdAt', label: 'Date Uploaded', sortable: true },
-  { key: 'actions', label: 'Actions' }
-];
+const tableFields = computed(() => [
+  { key: 'name', label: t('fileManager.tableHeaders.name'), sortable: true },
+  { key: 'source', label: t('fileManager.tableHeaders.source'), sortable: true },
+  { key: 'size', label: t('fileManager.tableHeaders.size'), sortable: true },
+  { key: 'createdAt', label: t('fileManager.tableHeaders.dateUploaded'), sortable: true },
+  { key: 'actions', label: t('fileManager.tableHeaders.actions') }
+]);
 
 const downloadFile = async (file) => {
   try {
@@ -133,7 +135,7 @@ const downloadFile = async (file) => {
 };
 
 const deleteFile = async (file) => {
-  if (confirm(`Are you sure you want to delete ${file.name}?`)) {
+  if (confirm(t('fileManager.deleteConfirm', { fileName: file.name }))) {
     try {
       const relativePath = file.path.startsWith('/uploads') ? file.path.substring('/uploads'.length) : file.path;
       const response = await FileManagerService.deleteFile(relativePath);

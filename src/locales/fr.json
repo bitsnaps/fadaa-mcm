@@ -99,6 +99,32 @@
     "financialAnalytics": "Analyses Financières & Suivi",
     "fileManager": "Gestionnaire de Fichiers"
   },
+  "fileManager": {
+    "title": "Gestionnaire de Fichiers",
+    "searchPlaceholder": "Rechercher par nom...",
+    "noFilesFound": "Aucun fichier trouvé.",
+    "tableHeaders": {
+      "name": "Nom",
+      "source": "Source",
+      "size": "Taille",
+      "dateUploaded": "Date de Téléversement",
+      "actions": "Actions"
+    },
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer {fileName} ?"
+  },
+  "trash": {
+    "title": "Corbeille",
+    "emptyTrash": "Vider la corbeille",
+    "noFilesFound": "La corbeille est vide.",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer définitivement {fileName} ?",
+    "emptyConfirm": "Êtes-vous sûr de vouloir vider la corbeille ? Cette action est irréversible.",
+    "tableHeaders": {
+      "name": "Nom",
+      "size": "Taille",
+      "dateTrashed": "Date de Suppression",
+      "actions": "Actions"
+    }
+  },
   "tasks": {
     "title": "Gérer les Tâches",
     "addTask": "Nouvelle Tâche",

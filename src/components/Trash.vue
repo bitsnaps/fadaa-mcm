@@ -5,15 +5,15 @@
         type="text"
         class="form-control"
         v-model="searchTerm"
-        placeholder="Search by name..."
+        :placeholder="t('fileManager.searchPlaceholder')"
         @input="fetchTrashedFiles"
       />
-      <button class="btn btn-danger ms-3" @click="emptyTrash" :disabled="!files.length">Empty Trash</button>
+      <button class="btn btn-danger ms-3" @click="emptyTrash" :disabled="!files.length">{{ t('trash.emptyTrash') }}</button>
     </div>
 
     <div v-if="isLoading" class="text-center">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+        <span class="visually-hidden">{{ t('loading') }}</span>
       </div>
     </div>
 
@@ -27,7 +27,7 @@
         striped
         hover
         show-empty
-        empty-text="Trash is empty."
+        :empty-text="t('trash.noFilesFound')"
       >
         <template #cell(size)="data">
           {{ formatBytes(data.value) }}
@@ -37,7 +37,7 @@
         </template>
         <template #cell(actions)="data">
           <div class="text-center">
-            <button class="btn btn-sm btn-danger" @click="permanentDeleteFile(data.item)">Delete Permanently</button>
+            <button class="btn btn-sm btn-danger" @click="permanentDeleteFile(data.item)">{{ t('common.delete') }}</button>
           </div>
         </template>
       </BTable>
@@ -51,17 +51,19 @@
       </div>
     </div>
     <div v-else class="alert alert-info text-center" role="alert">
-      Trash is empty.
+      {{ t('trash.noFilesFound') }}
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, defineExpose, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { BTable, BPagination, BButton } from 'bootstrap-vue-next';
 import TrashManagerService from '@/services/TrashManagerService';
 import { formatBytes } from '@/helpers/files';
 
+const { t } = useI18n();
 const files = ref([]);
 const isLoading = ref(true);
 const searchTerm = ref('');
@@ -93,15 +95,15 @@ const fetchTrashedFiles = async () => {
   }
 };
 
-const tableFields = [
-  { key: 'name', label: 'Name', sortable: true },
-  { key: 'size', label: 'Size', sortable: true },
-  { key: 'createdAt', label: 'Date Trashed', sortable: true },
-  { key: 'actions', label: 'Actions' }
-];
+const tableFields = computed(() => [
+  { key: 'name', label: t('trash.tableHeaders.name'), sortable: true },
+  { key: 'size', label: t('trash.tableHeaders.size'), sortable: true },
+  { key: 'createdAt', label: t('trash.tableHeaders.dateTrashed'), sortable: true },
+  { key: 'actions', label: t('trash.tableHeaders.actions') }
+]);
 
 const permanentDeleteFile = async (file) => {
-  if (confirm(`Are you sure you want to permanently delete ${file.name}?`)) {
+  if (confirm(t('trash.deleteConfirm', { fileName: file.name }))) {
     try {
       const relativePath = file.path.startsWith('/uploads/trash') ? file.path.substring('/uploads/trash'.length) : file.path;
       const response = await TrashManagerService.permanentDeleteFile(relativePath);
@@ -115,7 +117,7 @@ const permanentDeleteFile = async (file) => {
 };
 
 const emptyTrash = async () => {
-  if (confirm('Are you sure you want to empty the trash? This action cannot be undone.')) {
+  if (confirm(t('trash.emptyConfirm'))) {
     try {
       const response = await TrashManagerService.emptyTrash();
       if (response.data.success) {

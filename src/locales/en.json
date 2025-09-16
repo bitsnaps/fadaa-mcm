@@ -99,6 +99,32 @@
     "financialAnalytics": "Financial Analytics & Tracking",
     "fileManager": "File Manager"
   },
+  "fileManager": {
+    "title": "File Manager",
+    "searchPlaceholder": "Search by name...",
+    "noFilesFound": "No files found.",
+    "tableHeaders": {
+      "name": "Name",
+      "source": "Source",
+      "size": "Size",
+      "dateUploaded": "Date Uploaded",
+      "actions": "Actions"
+    },
+    "deleteConfirm": "Are you sure you want to delete {fileName}?"
+  },
+  "trash": {
+    "title": "Trash",
+    "emptyTrash": "Empty Trash",
+    "noFilesFound": "Trash is empty.",
+    "deleteConfirm": "Are you sure you want to permanently delete {fileName}?",
+    "emptyConfirm": "Are you sure you want to empty the trash? This action cannot be undone.",
+    "tableHeaders": {
+      "name": "Name",
+      "size": "Size",
+      "dateTrashed": "Date Trashed",
+      "actions": "Actions"
+    }
+  },
   "tasks": {
     "title": "Manage Tasks",
     "addTask": "New Task",

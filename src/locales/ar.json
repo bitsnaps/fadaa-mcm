@@ -97,7 +97,33 @@
     "manageProfiles": "إدارة الحسابات",
     "managementOperations": "الإدارة والعمليات",
     "financialAnalytics": "التحليلات المالية والتتبع",
-    "fileManager": "إدراة الملفات"
+    "fileManager": "إدارة الملفات"
+  },
+  "fileManager": {
+    "title": "إدارة الملفات",
+    "searchPlaceholder": "البحث بالاسم...",
+    "noFilesFound": "لم يتم العثور على ملفات.",
+    "tableHeaders": {
+      "name": "الاسم",
+      "source": "المصدر",
+      "size": "الحجم",
+      "dateUploaded": "تاريخ الرفع",
+      "actions": "الإجراءات"
+    },
+    "deleteConfirm": "هل أنت متأكد من رغبتك في حذف {fileName}؟"
+  },
+  "trash": {
+    "title": "سلة المهملات",
+    "emptyTrash": "إفراغ سلة المهملات",
+    "noFilesFound": "سلة المهملات فارغة.",
+    "deleteConfirm": "هل أنت متأكد من رغبتك في حذف {fileName} بشكل دائم؟",
+    "emptyConfirm": "هل أنت متأكد من رغبتك في إفراغ سلة المهملات؟ هذا الإجراء لا يمكن التراجع عنه.",
+    "tableHeaders": {
+      "name": "الاسم",
+      "size": "الحجم",
+      "dateTrashed": "تاريخ الحذف",
+      "actions": "الإجراءات"
+    }
   },
   "tasks": {
     "title": "إدارة المهام",
