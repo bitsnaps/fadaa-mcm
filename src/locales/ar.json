@@ -1267,6 +1267,7 @@
       "investor": "المستثمر",
       "investment": "الاستثمار",
       "amount": "المبلغ",
+      "requestedAt": "تاريخ الطلب",
       "paymentMethod": "طريقة الدفع",
       "selectPaymentMethod": "اختر طريقة الدفع",
       "status": "الحالة",

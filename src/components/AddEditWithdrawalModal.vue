@@ -48,7 +48,8 @@ watch(() => props.showModal, (isShown) => {
         investment_id: null,
         amount: null,
         payment_method: 'cash',
-        notes: ''
+        notes: '',
+        requested_at: new Date().toISOString().slice(0, 10)
       };
     }
   }
@@ -93,6 +94,10 @@ function save() {
             <div class="mb-3">
               <label class="form-label">{{ t('manageWithdrawals.modal.amount') }}</label>
               <input type="number" v-model="form.amount" class="form-control" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">{{ t('manageWithdrawals.modal.requestedAt') }}</label>
+              <input type="date" v-model="form.requested_at" class="form-control" />
             </div>
             <div class="mb-3">
               <label class="form-label">{{ t('manageWithdrawals.modal.paymentMethod') }}</label>

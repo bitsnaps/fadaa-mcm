@@ -1268,6 +1268,7 @@
       "investor": "Investor",
       "investment": "Investment",
       "amount": "Amount",
+      "requestedAt": "Request Date",
       "paymentMethod": "Payment Method",
       "selectPaymentMethod": "Select Payment Method",
       "status": "Status",

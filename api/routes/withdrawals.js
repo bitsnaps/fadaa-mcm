@@ -44,7 +44,8 @@ withdrawalsApp.post('/', async (c) => {
       amount,
       status,
       payment_method,
-      notes
+      notes,
+      requested_at
     } = await c.req.json();
 
     if (!profile_id || !investor_id || !investment_id || !amount) {
@@ -59,7 +60,7 @@ withdrawalsApp.post('/', async (c) => {
       status: status || 'pending',
       payment_method,
       notes,
-      requested_at: new Date(),
+      requested_at: requested_at || new Date(),
       created_by: user.id
     });
 
@@ -83,6 +84,7 @@ withdrawalsApp.put('/:id', async (c) => {
       status,
       payment_method,
       notes,
+      requested_at,
     } = await c.req.json();
 
     const wd = await loadWithdrawalOr404(id);
@@ -95,6 +97,7 @@ withdrawalsApp.put('/:id', async (c) => {
       status,
       payment_method,
       notes,
+      requested_at,
       processed_by: user.id,
     };
 
