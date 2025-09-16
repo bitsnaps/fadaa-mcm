@@ -13,4 +13,23 @@ const resolveFilePath = (filePath) => {
     return path.join(uploadDir, relativePath);
 };
 
-module.exports = { getUploadDir, resolveFilePath };
+const getContentType = (fileName) => {
+    const extension = path.extname(fileName).toLowerCase();
+    switch (extension) {
+        case '.pdf':
+            return 'application/pdf';
+        case '.png':
+            return 'image/png';
+        case '.jpg':
+        case '.jpeg':
+            return 'image/jpeg';
+        case '.txt':
+            return 'text/plain';
+        case '.csv':
+            return 'text/csv';
+        default:
+            return 'application/octet-stream';
+    }
+};
+
+module.exports = { getUploadDir, resolveFilePath, getContentType };

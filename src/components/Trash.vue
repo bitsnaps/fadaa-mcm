@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, defineExpose } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { BTable, BPagination, BButton } from 'bootstrap-vue-next';
 import TrashManagerService from '@/services/TrashManagerService';
 import { formatBytes } from '@/helpers/files';

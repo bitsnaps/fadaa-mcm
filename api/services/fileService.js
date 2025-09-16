@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const { getUploadDir } = require('../lib/errorHandler');
+const { getContentType } = require('../lib/filesHelper');
+const { getUploadDir } = require('../lib/filesHelper');
 
 const downloadFile = async (c, filePath) => {
     try {
@@ -16,7 +17,7 @@ const downloadFile = async (c, filePath) => {
         const fileStream = fs.createReadStream(absolutePath);
         const fileName = path.basename(decodedPath);
 
-        const contentType = fileName.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'application/octet-stream';
+        const contentType = getContentType(fileName);
 
         c.header('Content-Type', contentType);
         c.header('Content-Disposition', `attachment; filename=${encodeURIComponent(fileName)}`);

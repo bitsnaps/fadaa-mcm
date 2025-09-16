@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { moveFileToTrash } = require('../services/trashService');
 const models = require('../models');
-const { getUploadDir, resolveFilePath } = require('../lib/filesHelper');
+const { getUploadDir, resolveFilePath, getContentType } = require('../lib/filesHelper');
 
 const listFiles = async (c) => {
     try {
@@ -96,7 +96,7 @@ const downloadFile = async (c) => {
         if (fs.existsSync(sourcePath)) {
             const fileStream = fs.createReadStream(sourcePath);
             const fileName = path.basename(sourcePath);
-            const contentType = fileName.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'application/octet-stream';
+            const contentType = getContentType(fileName);
 
             c.header('Content-Type', contentType);
             c.header('Content-Disposition', `attachment; filename=${encodeURIComponent(fileName)}`);
