@@ -9,7 +9,6 @@ import {
   deleteWithdrawal,
 } from '@/services/WithdrawalService.js';
 import { getInvestors } from '@/services/UserService.js';
-import { getInvestmentsList } from '@/services/InvestmentService.js';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import AddEditWithdrawalModal from '@/components/AddEditWithdrawalModal.vue';
 
@@ -18,7 +17,6 @@ const isLoading = ref(true);
 const error = ref(null);
 const withdrawals = ref([]);
 const investors = ref([]);
-const investments = ref([]);
 const statusFilter = ref(''); // '', 'pending', 'paid', 'cancelled'
 const investmentIdFilter = ref('');
 const investorIdFilter = ref('');
@@ -97,15 +95,9 @@ async function loadWithdrawals() {
 async function loadFilterData() {
     if (!activeProfileId.value) return;
   try {
-    const [investorsRes, investmentsRes] = await Promise.all([
-      getInvestors({ profile_id: activeProfileId.value }),
-      getInvestmentsList({ profile_id: activeProfileId.value })
-    ]);
+    const investorsRes = await getInvestors({ profile_id: activeProfileId.value });
     if (investorsRes.data?.success) {
       investors.value = investorsRes.data.data;
-    }
-    if (investmentsRes.data?.success) {
-      investments.value = investmentsRes.data.investments;
     }
   } catch (e) {
     console.error("Failed to load filter data", e);
@@ -171,7 +163,7 @@ onMounted(() => {
                   <option value="cancelled">{{ t('withdrawalStatuses.cancelled') }}</option>
                 </select>
               </div>
-              <div class="col-md-3">
+              <!-- <div class="col-md-3">
                 <label class="form-label">{{ t('manageWithdrawals.filters.investment') }}</label>
                 <select v-model="investmentIdFilter" class="form-select">
                   <option value="">{{ t('manageWithdrawals.filters.all') }}</option>
@@ -179,7 +171,7 @@ onMounted(() => {
                     {{ inv.name }}
                   </option>
                 </select>
-              </div>
+              </div> -->
               <div class="col-md-3">
                 <label class="form-label">{{ t('manageWithdrawals.filters.investor') }}</label>
                 <select v-model="investorIdFilter" class="form-select">
@@ -288,7 +280,6 @@ onMounted(() => {
     :show-modal="showModal"
     :withdrawal="editingWithdrawal"
     :investors="investors"
-    :investments="investments"
     :profile-id="activeProfileId"
     @close="closeModal"
     @save="handleSave"

@@ -89,6 +89,20 @@ investmentsApp.get('/:id', async (c) => {
     }
 });
 
+// GET investments by investor ID
+investmentsApp.get('/by-investor/:investorId', async (c) => {
+    try {
+        const { investorId } = c.req.param();
+        const investments = await models.Investment.findAll({
+            where: { investor_id: investorId },
+            order: [['created_at', 'DESC']],
+        });
+        return c.json({ success: true, data: investments });
+    } catch (error) {
+        return handleRouteError(c, `Error fetching investments for investor ${c.req.param('investorId')}`, error);
+    }
+});
+
 // POST a new investment
 investmentsApp.post('/', async (c) => {
     try {

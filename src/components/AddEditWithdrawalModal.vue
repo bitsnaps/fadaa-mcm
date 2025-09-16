@@ -1,6 +1,7 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { getInvestmentsByInvestor } from '@/services/InvestmentService';
 
 const { t } = useI18n();
 
@@ -8,13 +9,32 @@ const props = defineProps({
   showModal: Boolean,
   withdrawal: Object,
   investors: Array,
-  investments: Array,
   profileId: Number,
 });
 
 const emit = defineEmits(['close', 'save']);
 
 const form = ref({});
+const filteredInvestments = ref([]);
+
+watch(() => form.value.investor_id, async (newInvestorId) => {
+  if (newInvestorId) {
+    try {
+      const response = await getInvestmentsByInvestor(newInvestorId);
+      if (response.data.success) {
+        filteredInvestments.value = response.data.data;
+        if (!filteredInvestments.value.some(inv => inv.id === form.value.investment_id)) {
+            form.value.investment_id = null;
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching investments for investor:', error);
+      filteredInvestments.value = [];
+    }
+  } else {
+    filteredInvestments.value = [];
+  }
+});
 
 watch(() => props.showModal, (isShown) => {
   if (isShown) {
@@ -27,7 +47,7 @@ watch(() => props.showModal, (isShown) => {
         investor_id: null,
         investment_id: null,
         amount: null,
-        payment_method: '',
+        payment_method: 'cash',
         notes: ''
       };
     }
@@ -65,7 +85,7 @@ function save() {
             <div class="mb-3">
               <label class="form-label">{{ t('manageWithdrawals.modal.investment') }} <span class="text-danger">*</span></label>
               <select v-model="form.investment_id" class="form-select" required>
-                <option v-for="inv in investments" :key="inv.id" :value="inv.id">
+                <option v-for="inv in filteredInvestments" :key="inv.id" :value="inv.id">
                   {{ inv.name }}
                 </option>
               </select>
@@ -78,8 +98,8 @@ function save() {
               <label class="form-label">{{ t('manageWithdrawals.modal.paymentMethod') }}</label>
               <select v-model="form.payment_method" class="form-select">
                 <option value="">{{ t('manageWithdrawals.modal.selectPaymentMethod') }}</option>
+                <option value="cash" selected>{{ t('paymentMethods.cash') }}</option>
                 <option value="bank transfer">{{ t('paymentMethods.bank_transfer') }}</option>
-                <option value="cash">{{ t('paymentMethods.cash') }}</option>
               </select>
             </div>
             <div class="mb-3">

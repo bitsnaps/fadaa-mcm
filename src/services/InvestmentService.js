@@ -27,3 +27,6 @@ export const deleteInvestment = (id) => {
 export const getMyInvestments = (params = {}) => {
   return apiClient.get('/investor/investments', { params });
 };
+export const getInvestmentsByInvestor = (investorId) => {
+    return apiClient.get(`/investments/by-investor/${investorId}`);
+};

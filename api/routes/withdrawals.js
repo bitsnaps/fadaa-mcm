@@ -1,8 +1,11 @@
 const { Hono } = require('hono');
 const models = require('../models');
+const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
 const { handleRouteError } = require('../lib/errorHandler');
 
 const withdrawalsApp = new Hono();
+
+withdrawalsApp.use('*', authMiddleware, adminOrAssistantMiddleware);
 
 async function loadWithdrawalOr404(id) {
   return await models.Withdrawal.findByPk(id);
@@ -27,6 +30,46 @@ withdrawalsApp.get('/', async (c) => {
     return c.json({ success: true, data: withdrawals });
   } catch (error) {
     return handleRouteError(c, 'Error fetching withdrawals', error);
+  }
+});
+
+// POST /withdrawals - create a new withdrawal (admin)
+withdrawalsApp.post('/', async (c) => {
+  try {
+    const user = c.get('user');
+    const {
+      profile_id,
+      investor_id,
+      investment_id,
+      amount,
+      status,
+      payment_method,
+      notes
+    } = await c.req.json();
+
+    if (!profile_id || !investor_id || !investment_id || !amount) {
+      return c.json({ success: false, message: 'Missing required fields for withdrawal creation.' }, 400);
+    }
+
+    const newWithdrawal = await models.Withdrawal.create({
+      profile_id,
+      investor_id,
+      investment_id,
+      amount,
+      status: status || 'pending',
+      payment_method,
+      notes,
+      requested_at: new Date(),
+      created_by: user.id
+    });
+
+    const finalWithdrawal = await models.Withdrawal.findByPk(newWithdrawal.id, {
+      include: [{ model: models.Investment }, { model: models.Profile }, { model: models.User, as: 'investor' }]
+    });
+
+    return c.json({ success: true, message: 'Withdrawal created successfully', data: finalWithdrawal }, 201);
+  } catch (error) {
+    return handleRouteError(c, 'Error creating withdrawal', error);
   }
 });
 
