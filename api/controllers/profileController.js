@@ -37,6 +37,13 @@ exports.createProfile = async (c) => {
     });
     return c.json(newProfile, 201);
   } catch (error) {
+    if (error.name === 'SequelizeValidationError') {
+      const errors = error.errors.reduce((acc, err) => {
+        acc[err.path] = err.message;
+        return acc;
+      }, {});
+      return c.json({ errors }, 422);
+    }
     return handleRouteError(c, 'Error creating profile', error);
   }
 };
@@ -81,6 +88,13 @@ exports.updateProfile = async (c) => {
     await profile.update({ name, description });
     return c.json(profile);
   } catch (error) {
+    if (error.name === 'SequelizeValidationError') {
+      const errors = error.errors.reduce((acc, err) => {
+        acc[err.path] = err.message;
+        return acc;
+      }, {});
+      return c.json({ errors }, 422);
+    }
     return handleRouteError(c, 'Error updating profile', error);
   }
 };

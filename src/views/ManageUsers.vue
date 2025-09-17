@@ -66,16 +66,25 @@
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label for="userFirstName" class="form-label">{{ $t('manageUsers.firstName') }} <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="userFirstName" v-model="currentUser.first_name" required>
+                    <input type="text" class="form-control" id="userFirstName" v-model="v$.first_name.$model" :class="{ 'is-invalid': v$.first_name.$error }">
+                    <div v-if="v$.first_name.$error" class="invalid-feedback">
+                      <p v-for="error of v$.first_name.$errors" :key="error.$uid">{{ error.$message }}</p>
+                    </div>
                   </div>
                   <div class="col-md-6 mb-3">
                     <label for="userLastName" class="form-label">{{ $t('manageUsers.lastName') }} <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="userLastName" v-model="currentUser.last_name" required>
+                    <input type="text" class="form-control" id="userLastName" v-model="v$.last_name.$model" :class="{ 'is-invalid': v$.last_name.$error }">
+                    <div v-if="v$.last_name.$error" class="invalid-feedback">
+                      <p v-for="error of v$.last_name.$errors" :key="error.$uid">{{ error.$message }}</p>
+                    </div>
                   </div>
                 </div>
                 <div class="mb-3">
                   <label for="userEmail" class="form-label">{{ $t('manageUsers.emailAddress') }} <span class="text-danger">*</span></label>
-                  <input type="email" class="form-control" id="userEmail" v-model="currentUser.email" required>
+                  <input type="email" class="form-control" id="userEmail" v-model="v$.email.$model" :class="{ 'is-invalid': v$.email.$error }">
+                  <div v-if="v$.email.$error" class="invalid-feedback">
+                    <p v-for="error of v$.email.$errors" :key="error.$uid">{{ error.$message }}</p>
+                  </div>
                 </div>
                 <div class="mb-3">
                   <label for="userPhone" class="form-label">{{ $t('manageUsers.phone') }}</label>
@@ -84,9 +93,12 @@
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label for="userRole" class="form-label">{{ $t('manageUsers.role') }} <span class="text-danger">*</span></label>
-                    <select class="form-select" id="userRole" v-model="currentUser.role_id" required>
+                    <select class="form-select" id="userRole" v-model="v$.role_id.$model" :class="{ 'is-invalid': v$.role_id.$error }">
                       <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
                     </select>
+                    <div v-if="v$.role_id.$error" class="invalid-feedback">
+                      <p v-for="error of v$.role_id.$errors" :key="error.$uid">{{ error.$message }}</p>
+                    </div>
                   </div>
                   <div class="col-md-6 mb-3">
                     <label for="userBranch" class="form-label">{{ $t('manageUsers.branch') }}</label>
@@ -98,7 +110,10 @@
                 </div>
                 <div class="mb-3" v-if="!editingUser">
                   <label for="userPassword" class="form-label">{{ $t('manageUsers.password') }} <span class="text-danger">*</span></label>
-                  <input type="password" class="form-control" id="userPassword" v-model="currentUser.password" :required="!editingUser">
+                  <input type="password" class="form-control" id="userPassword" v-model="currentUser.password" :class="{ 'is-invalid': v$.password.$error }" :required="!editingUser">
+                   <div v-if="v$.password.$error" class="invalid-feedback">
+                    <p v-for="error of v$.password.$errors" :key="error.$uid">{{ error.$message }}</p>
+                  </div>
                 </div>
                 <div class="mb-3">
                   <label for="userStatus" class="form-label">{{ $t('manageUsers.status') }}</label>
@@ -106,6 +121,9 @@
                     <option :value="true">{{ $t('manageUsers.active') }}</option>
                     <option :value="false">{{ $t('manageUsers.inactive') }}</option>
                   </select>
+                </div>
+                <div v-if="errors.server" class="alert alert-danger mt-3">
+                  {{ errors.server }}
                 </div>
               </div>
               <div class="modal-footer">
@@ -141,10 +159,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getUsers, getRoles, getBranches, updateUser, addUser, deleteUser as deleteUserApi } from '@/services/UserService';
 import { formatDate } from '@/helpers/utils';
+import { useVuelidate } from '@vuelidate/core';
+import { required, email, minLength } from '@vuelidate/validators';
 
 const { t } = useI18n();
 
@@ -167,6 +187,20 @@ const defaultUser = {
 };
 
 const currentUser = ref({ ...defaultUser });
+const errors = reactive({ server: '' });
+
+const rules = computed(() => ({
+  first_name: { required },
+  last_name: { required },
+  email: { required, email },
+  role_id: { required },
+  password: {
+    required: !editingUser.value,
+    minLength: !editingUser.value || currentUser.value.password ? minLength(3) : {},
+  },
+}));
+
+const v$ = useVuelidate(rules, currentUser);
 
 const fetchUsers = async () => {
   try {
@@ -224,6 +258,8 @@ const closeModal = () => {
   showAddUserModal.value = false;
   editingUser.value = null;
   currentUser.value = { ...defaultUser };
+  v$.value.$reset();
+  errors.server = '';
 };
 
 const editUser = (user) => {
@@ -237,24 +273,32 @@ const editUser = (user) => {
 };
 
 const saveUser = async () => {
+  v$.value.$touch();
+  if (v$.value.$invalid) return;
+
   try {
     if (editingUser.value) {
-      // Update User
       const payload = { ...currentUser.value };
-      delete payload.password; // Do not send password on update
+      delete payload.password;
       await updateUser(editingUser.value.id, payload);
-      console.log(t('manageUsers.userUpdatedSuccess'));
     } else {
-      // Add User
       await addUser(currentUser.value);
-      console.log(t('manageUsers.userAddedSuccess'));
     }
     fetchUsers();
     closeModal();
   } catch (error) {
+    if (error.response && error.response.status === 422) {
+      const backendErrors = error.response.data.errors;
+      for (const field in backendErrors) {
+        if (v$.value[field]) {
+          v$.value[field].$errors.push({ $uid: `server-error-${field}`, $message: backendErrors[field] });
+        }
+      }
+      errors.server = 'Please check the fields below for errors.';
+    } else {
+      errors.server = error.response?.data?.message || 'An unknown error occurred';
+    }
     console.error('Failed to save user:', error);
-    const errorMessage = error.response?.data?.message || 'An unknown error occurred';
-    console.log(`Error: ${errorMessage}`);
   }
 };
 

@@ -59,13 +59,9 @@ exports.createUser = async (c) => {
     try {
         const { first_name, last_name, email, password, role_id, branch_id, is_active, preferences } = await c.req.json();
 
-        if (!email || !password || !first_name || !last_name || !role_id) {
-            return c.json({ success: false, message: 'Missing required fields' }, 400);
-        }
-
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
-            return c.json({ success: false, message: 'User already exists' }, 409);
+            return c.json({ errors: { email: 'User with this email already exists' } }, 422);
         }
 
         const newUser = await User.create({
@@ -81,6 +77,13 @@ exports.createUser = async (c) => {
 
         return c.json({ success: true, message: 'User created successfully', userId: newUser.id });
     } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
         return handleRouteError(c, 'User creation error', error);
     }
 };
@@ -107,6 +110,13 @@ exports.updateUser = async (c) => {
 
         return c.json({ success: true, message: 'User updated successfully' });
     } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
         return handleRouteError(c, `Error updating user ${id}`, error);
     }
 };

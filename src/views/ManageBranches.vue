@@ -66,7 +66,10 @@
             <form @submit.prevent="saveBranch">
               <div class="mb-3">
                 <label for="branchName" class="form-label">{{ $t('manageBranches.branchName') }} <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="branchName" v-model="branchForm.name" required>
+                <input type="text" class="form-control" id="branchName" v-model="v$.name.$model" :class="{ 'is-invalid': v$.name.$error }">
+                <div v-if="v$.name.$error" class="invalid-feedback">
+                  <p v-for="error of v$.name.$errors" :key="error.$uid">{{ error.$message }}</p>
+                </div>
               </div>
               <div class="mb-3">
                 <label for="branchLocation" class="form-label">{{ $t('manageBranches.location') }}</label>
@@ -78,6 +81,9 @@
                   <option value="active">{{ $t('manageBranches.active') }}</option>
                   <option value="inactive">{{ $t('manageBranches.inactive') }}</option>
                 </select>
+              </div>
+              <div v-if="errors.server" class="alert alert-danger mt-3">
+                {{ errors.server }}
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" @click="closeModal">{{ $t('manageBranches.cancel') }}</button>
@@ -93,16 +99,19 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import apiClient from '@/services/ApiClient';
 import { formatDate } from '@/helpers/utils';
+import { useVuelidate } from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 
 const { t } = useI18n();
 
 const branches = ref([]);
 const showAddBranchModal = ref(false);
 const editingBranch = ref(null);
+const errors = reactive({ server: '' });
 
 const branchForm = reactive({
   id: null,
@@ -110,6 +119,12 @@ const branchForm = reactive({
   location: '',
   status: 'active',
 });
+
+const rules = computed(() => ({
+  name: { required },
+}));
+
+const v$ = useVuelidate(rules, branchForm);
 
 const fetchBranches = async () => {
   try {
@@ -124,19 +139,30 @@ const fetchBranches = async () => {
 };
 
 const saveBranch = async () => {
+  v$.value.$touch();
+  if (v$.value.$invalid) return;
+
   try {
     if (editingBranch.value) {
       await apiClient.put(`/branches/${editingBranch.value.id}`, branchForm);
-      console.log(t('manageBranches.branchUpdatedSuccess'));
     } else {
       await apiClient.post('/branches', branchForm);
-      console.log(t('manageBranches.branchAddedSuccess'));
     }
     closeModal();
     fetchBranches();
   } catch (error) {
+    if (error.response && error.response.status === 422) {
+      const backendErrors = error.response.data.errors;
+      for (const field in backendErrors) {
+        if (v$.value[field]) {
+          v$.value[field].$errors.push({ $uid: `server-error-${field}`, $message: backendErrors[field] });
+        }
+      }
+      errors.server = 'Please check the fields below for errors.';
+    } else {
+      errors.server = error.response?.data?.message || 'An unknown error occurred';
+    }
     console.error('Failed to save branch:', error);
-    console.log('Error saving branch.');
   }
 };
 
@@ -163,6 +189,8 @@ const closeModal = () => {
   showAddBranchModal.value = false;
   editingBranch.value = null;
   Object.assign(branchForm, { id: null, name: '', location: '', status: 'active' });
+  v$.value.$reset();
+  errors.server = '';
 };
 
 onMounted(() => {

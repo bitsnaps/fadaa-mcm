@@ -45,14 +45,17 @@ branchesApp.get('/with-contracts', authMiddleware, async (c) => {
 branchesApp.post('/', authMiddleware, async (c) => {
     try {
         const { name, location } = await c.req.json();
-        if (!name || !location) {
-            return c.json({ success: false, message: 'Name and location are required' }, 400);
-        }
         const newBranch = await models.Branch.create({ name, location });
         return c.json({ success: true, message: 'Branch created successfully', data: newBranch }, 201);
     } catch (error) {
-        console.error('Error creating branch:', error);
-        return c.json({ success: false, message: 'Failed to create branch' }, 500);
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
+        return handleRouteError(c, 'Error creating branch', error);
     }
 });
 
@@ -68,6 +71,13 @@ branchesApp.put('/:id', authMiddleware, async (c) => {
         await branch.update({ name, location, status });
         return c.json({ success: true, message: 'Branch updated successfully', data: branch });
     } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
         return handleRouteError(c, `Error updating branch ${id}`, error);
     }
 });

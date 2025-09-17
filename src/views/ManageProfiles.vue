@@ -53,15 +53,18 @@
             <form @submit.prevent="saveProfile">
               <div class="mb-3">
                 <label for="profile-name" class="form-label">{{ $t('profiles.tableHeaders.name') }} <span class="text-danger">*</span></label>
-                <input type="text" id="profile-name" class="form-control" v-model="currentProfile.name" required>
+                <input type="text" id="profile-name" class="form-control" v-model="v$.name.$model" :class="{ 'is-invalid': v$.name.$error }">
+                <div v-if="v$.name.$error" class="invalid-feedback">
+                  <p v-for="error of v$.name.$errors" :key="error.$uid">{{ error.$message }}</p>
+                </div>
               </div>
               <div class="mb-3">
                 <label for="profile-description" class="form-label">{{ $t('profiles.tableHeaders.description') }}</label>
                 <textarea id="profile-description" class="form-control" v-model="currentProfile.description"></textarea>
               </div>
-              <div class="mb-3" v-if="errorMessage">
+              <div class="mb-3" v-if="errors.server">
                 <div class="alert alert-danger">
-                  <p>{{ errorMessage }}</p>
+                  <p>{{ errors.server }}</p>
                 </div>
               </div>
             </form>
@@ -77,18 +80,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive, computed } from 'vue';
 import { Modal } from 'bootstrap';
 import profileService from '@/services/profileService';
 import { useI18n } from 'vue-i18n';
+import { useVuelidate } from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 
 const { t } = useI18n();
 const profiles = ref([]);
 const currentProfile = ref({ id: null, name: '', description: '' });
 const isEditMode = ref(false);
 const profileModal = ref(null);
-const errorMessage = ref('');
+const errors = reactive({ server: '', name: '' });
 let modalInstance = null;
+
+const rules = computed(() => ({
+  name: { required },
+}));
+
+const v$ = useVuelidate(rules, currentProfile);
 
 onMounted(async () => {
   await fetchProfiles();
@@ -113,6 +124,9 @@ function openProfileModal(profile = null) {
     isEditMode.value = false;
     currentProfile.value = { id: null, name: '', description: '' };
   }
+  v$.value.$reset();
+  errors.server = '';
+  errors.name = '';
   modalInstance.show();
 }
 
@@ -121,6 +135,9 @@ function closeProfileModal() {
 }
 
 async function saveProfile() {
+  v$.value.$touch();
+  if (v$.value.$invalid) return;
+
   try {
     if (isEditMode.value) {
       await profileService.updateProfile(currentProfile.value.id, currentProfile.value);
@@ -130,8 +147,18 @@ async function saveProfile() {
     await fetchProfiles();
     closeProfileModal();
   } catch (error) {
+    if (error.response && error.response.status === 422) {
+      const backendErrors = error.response.data.errors;
+      if (backendErrors.name) {
+        errors.name = backendErrors.name;
+        // This is a bit of a hack to show server-side errors in Vuelidate
+        v$.value.name.$errors.push({ $uid: 'server-error', $message: backendErrors.name });
+      }
+      errors.server = backendErrors.server || 'Please check the fields below.';
+    } else {
+      errors.server = error.message || 'An unexpected error occurred.';
+    }
     console.error('Error saving profile:', error);
-    errorMessage.value = error.message || 'Error saving profile';
   }
 }
 
