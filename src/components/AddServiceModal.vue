@@ -3,23 +3,35 @@
     <form>
       <div class="mb-3">
         <label for="serviceCategorySelect" class="form-label">{{ $t('clientServices.serviceCategory') }} <span class="text-danger">*</span></label>
-        <select class="form-select" id="serviceCategorySelect" v-model="newService.categoryId" required>
+        <select class="form-select" id="serviceCategorySelect" v-model="v$.categoryId.$model" :class="{'is-invalid': v$.categoryId.$error || errors.categoryId}">
           <option value="" disabled>{{ $t('clientServices.selectCategoryPlaceholder') }}</option>
           <option v-for="category in availableServiceCategories" :key="category.id" :value="category.id">
             {{ category.name }}
           </option>
         </select>
+        <div v-if="v$.categoryId.$error" class="invalid-feedback">
+            <p v-for="error of v$.categoryId.$errors" :key="error.$uid">{{ error.$message }}</p>
+        </div>
+        <div v-if="errors.categoryId" class="invalid-feedback">{{ errors.categoryId }}</div>
       </div>
       <div class="mb-3">
         <label for="paymentType" class="form-label">{{ $t('clientServices.paymentType') }} <span class="text-danger">*</span></label>
-        <select class="form-select" id="paymentType" v-model="newService.paymentType" required>
+        <select class="form-select" id="paymentType" v-model="v$.paymentType.$model" :class="{'is-invalid': v$.paymentType.$error || errors.paymentType}">
           <option value="recurrent">{{ $t('clientServices.recurrent') }}</option>
           <option value="one-shot">{{ $t('clientServices.oneShot') }}</option>
         </select>
+        <div v-if="v$.paymentType.$error" class="invalid-feedback">
+            <p v-for="error of v$.paymentType.$errors" :key="error.$uid">{{ error.$message }}</p>
+        </div>
+        <div v-if="errors.paymentType" class="invalid-feedback">{{ errors.paymentType }}</div>
       </div>
       <div class="mb-3">
         <label for="servicePrice" class="form-label">{{ $t('clientServices.price') }} <span class="text-danger">*</span></label>
-        <input type="number" class="form-control" id="servicePrice" v-model.number="newService.price" min="0" required>
+        <input type="number" class="form-control" id="servicePrice" v-model.number="v$.price.$model" :class="{'is-invalid': v$.price.$error || errors.price}" min="0">
+        <div v-if="v$.price.$error" class="invalid-feedback">
+            <p v-for="error of v$.price.$errors" :key="error.$uid">{{ error.$message }}</p>
+        </div>
+        <div v-if="errors.price" class="invalid-feedback">{{ errors.price }}</div>
       </div>
       <div class="mb-3">
         <label for="serviceTaxes" class="form-label">{{ $t('manageTaxes.title') }}</label>
@@ -32,11 +44,15 @@
       </div>
       <div class="mb-3">
         <label for="status" class="form-label">{{ $t('clientServices.status') }} <span class="text-danger">*</span></label>
-        <select class="form-select" id="status" v-model="newService.status" required>
+        <select class="form-select" id="status" v-model="v$.status.$model" :class="{'is-invalid': v$.status.$error || errors.status}">
           <option value="Active">{{ $t('clientServices.active') }}</option>
           <option value="Inactive">{{ $t('clientServices.inactive') }}</option>
           <option value="Cancelled">{{ $t('clientServices.cancelled') }}</option>
         </select>
+        <div v-if="v$.status.$error" class="invalid-feedback">
+            <p v-for="error of v$.status.$errors" :key="error.$uid">{{ error.$message }}</p>
+        </div>
+        <div v-if="errors.status" class="invalid-feedback">{{ errors.status }}</div>
       </div>
       <div class="mb-3">
         <label for="transactionDate" class="form-label">{{ $t('clientServices.transactionDate') }}</label>
@@ -49,19 +65,22 @@
     </form>
     <template #modal-footer="{ ok, cancel }">
         <b-button @click="cancel()">{{ $t('manageUsers.cancel') }}</b-button>
-       <b-button variant="primary" @click="ok()" :disabled="!isFormValid">{{ props.editingService ? $t('clientServices.saveChanges') : $t('clientServices.addService') }}</b-button>
+       <b-button variant="primary" @click="ok()">{{ props.editingService ? $t('clientServices.saveChanges') : $t('clientServices.addService') }}</b-button>
     </template>
   </b-modal>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, reactive } from 'vue';
 import apiClient from '@/services/ApiClient';
 import { useI18n } from 'vue-i18n';
+import { useVuelidate } from '@vuelidate/core';
+import { required, minValue } from '@vuelidate/validators';
 
 const { t } = useI18n();
 
 const modal = ref(null);
+const errors = ref({});
 
 const props = defineProps({
   client: {
@@ -90,6 +109,15 @@ const newService = ref({
   transaction_date: new Date().toISOString().split('T')[0]
 });
 
+const rules = computed(() => ({
+    categoryId: { required },
+    paymentType: { required },
+    price: { required, minValue: minValue(0) },
+    status: { required },
+}));
+
+const v$ = useVuelidate(rules, newService);
+
 const availableServiceCategories = ref([]);
 const availableTaxes = ref([]);
 
@@ -97,10 +125,6 @@ const modalTitle = computed(() => {
   return props.editingService
     ? t('clientServices.editService')
     : t('clientServices.addNewService');
-});
-
-const isFormValid = computed(() => {
-  return newService.value.categoryId && newService.value.price > 0;
 });
 
 
@@ -136,6 +160,8 @@ const resetModal = () => {
       transaction_date: new Date().toISOString().split('T')[0]
     };
   }
+  v$.value.$reset();
+  errors.value = {};
 };
 
 defineExpose({
@@ -143,7 +169,8 @@ defineExpose({
 });
 
 const handleSubmit = async () => {
-  if (!isFormValid.value) return;
+  v$.value.$touch();
+  if (v$.value.$invalid) return;
 
   try {
     const payload = {
@@ -160,7 +187,11 @@ const handleSubmit = async () => {
     }
     modal.value.hide();
   } catch (error) {
-    console.error('Failed to save service:', error);
+    if (error.response && error.response.status === 422) {
+        errors.value = error.response.data.errors;
+    } else {
+        console.error('Failed to save service:', error);
+    }
   }
 };
 

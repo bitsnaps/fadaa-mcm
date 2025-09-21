@@ -1,9 +1,11 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import * as bootstrap from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { getOffices, getBranches, addOffice, updateOffice, deleteOffice as deleteOfficeApi } from '@/services/OfficeService';
+import { useVuelidate } from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -17,7 +19,7 @@ let addEditOfficeModal = null;
 
 const pagination = ref({ page: 1, limit: 10, total: 0, totalPages: 1 });
 const isEditMode = ref(false);
-const validationErrors = ref({});
+const errors = reactive({ server: '' });
 
 const officeForm = ref({
   id: null,
@@ -28,6 +30,15 @@ const officeForm = ref({
   status: 'Available',
   type: 'Private Suite',
 });
+
+const rules = computed(() => ({
+  name: { required },
+  branch_id: { required },
+  status: { required },
+  type: { required },
+}));
+
+const v$ = useVuelidate(rules, officeForm);
 
 const fetchOffices = async () => {
   try {
@@ -81,29 +92,22 @@ const viewOfficeDetails = (office) => {
 const openAddOfficeModal = () => {
   isEditMode.value = false;
   officeForm.value = { id: null, name: '', branch_id: null, capacity: 1, amenities: '', status: 'Available', type: 'Private Suite' };
-  validationErrors.value = {};
+  v$.value.$reset();
+  errors.server = '';
   if(addEditOfficeModal) addEditOfficeModal.show();
 };
 
 const openEditOfficeModal = (office) => {
   isEditMode.value = true;
   officeForm.value = { ...office, branch_id: office.branch?.id, amenities: Array.isArray(office.amenities) ? office.amenities.join(', ') : office.amenities };
-  validationErrors.value = {};
+  v$.value.$reset();
+  errors.server = '';
   if(addEditOfficeModal) addEditOfficeModal.show();
 };
 
-const validateForm = () => {
-    const errors = {};
-    if (!officeForm.value.name) errors.name = 'Office name is required.';
-    if (!officeForm.value.branch_id) errors.branch_id = 'Branch is required.';
-    if (!officeForm.value.status) errors.status = 'Status is required.';
-    if (!officeForm.value.type) errors.type = 'Type is required.';
-    validationErrors.value = errors;
-    return Object.keys(errors).length === 0;
-};
-
 const saveOffice = async () => {
-    if (!validateForm()) return;
+  v$.value.$touch();
+  if (v$.value.$invalid) return;
 
   try {
     const payload = { ...officeForm.value };
@@ -115,6 +119,17 @@ const saveOffice = async () => {
     fetchOffices();
     if(addEditOfficeModal) addEditOfficeModal.hide();
   } catch (error) {
+    if (error.response && error.response.status === 422) {
+        const backendErrors = error.response.data.errors;
+        for (const field in backendErrors) {
+            if (v$.value[field]) {
+                v$.value[field].$errors.push({ $uid: `server-error-${field}`, $message: backendErrors[field] });
+            }
+        }
+        errors.server = 'Please check the fields below for errors.';
+    } else {
+        errors.server = error.response?.data?.message || 'An unknown error occurred';
+    }
     console.error("Failed to save office:", error);
   }
 };
@@ -248,25 +263,31 @@ const changePage = (page) => {
             <form @submit.prevent="saveOffice">
               <div class="mb-3">
                 <label for="officeName" class="form-label">{{ t('offices.addEditOfficeModal.officeName') }} <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" :class="{'is-invalid': validationErrors.name}" id="officeName" v-model="officeForm.name" required>
-                <div v-if="validationErrors.name" class="invalid-feedback">{{ validationErrors.name }}</div>
+                <input type="text" class="form-control" :class="{'is-invalid': v$.name.$error}" id="officeName" v-model="v$.name.$model">
+                <div v-if="v$.name.$error" class="invalid-feedback">
+                    <p v-for="error of v$.name.$errors" :key="error.$uid">{{ error.$message }}</p>
+                </div>
               </div>
               <div class="mb-3">
                 <label for="officeBranch" class="form-label">{{ t('offices.addEditOfficeModal.branch') }} <span class="text-danger">*</span></label>
-                <select class="form-select" :class="{'is-invalid': validationErrors.branch_id}" id="officeBranch" v-model="officeForm.branch_id" required>
+                <select class="form-select" :class="{'is-invalid': v$.branch_id.$error}" id="officeBranch" v-model="v$.branch_id.$model">
                     <option :value="null" disabled>Select a branch</option>
                     <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
                 </select>
-                <div v-if="validationErrors.branch_id" class="invalid-feedback">{{ validationErrors.branch_id }}</div>
+                <div v-if="v$.branch_id.$error" class="invalid-feedback">
+                    <p v-for="error of v$.branch_id.$errors" :key="error.$uid">{{ error.$message }}</p>
+                </div>
               </div>
               <div class="mb-3">
                   <label for="officeType" class="form-label">{{ t('offices.tableHeaders.type') }} <span class="text-danger">*</span></label>
-                  <select class="form-select" :class="{'is-invalid': validationErrors.type}" v-model="officeForm.type" required>
+                  <select class="form-select" :class="{'is-invalid': v$.type.$error}" v-model="v$.type.$model">
                       <option value="Private Suite">Private Suite</option>
                       <option value="Coworking Desk">Coworking Desk</option>
                       <option value="Virtual Office">Virtual Office</option>
                   </select>
-                  <div v-if="validationErrors.type" class="invalid-feedback">{{ validationErrors.type }}</div>
+                  <div v-if="v$.type.$error" class="invalid-feedback">
+                    <p v-for="error of v$.type.$errors" :key="error.$uid">{{ error.$message }}</p>
+                  </div>
               </div>
               <div class="mb-3">
                 <label for="officeCapacity" class="form-label">{{ t('offices.addEditOfficeModal.capacity') }}</label>
@@ -274,18 +295,23 @@ const changePage = (page) => {
               </div>
               <div class="mb-3">
                 <label class="form-label">{{ t('offices.addEditOfficeModal.status') }} <span class="text-danger">*</span></label>
-                <select class="form-select" :class="{'is-invalid': validationErrors.status}" v-model="officeForm.status" required>
+                <select class="form-select" :class="{'is-invalid': v$.status.$error}" v-model="v$.status.$model">
                   <option value="Available">{{ t('offices.status.available') }}</option>
                   <option value="Occupied">{{ t('offices.status.occupied') }}</option>
                   <option value="Maintenance">{{ t('offices.status.maintenance') }}</option>
                   <option value="Unavailable">{{ t('offices.status.unavailable') }}</option>
                 </select>
-                <div v-if="validationErrors.status" class="invalid-feedback">{{ validationErrors.status }}</div>
+                <div v-if="v$.status.$error" class="invalid-feedback">
+                    <p v-for="error of v$.status.$errors" :key="error.$uid">{{ error.$message }}</p>
+                </div>
               </div>
               <div class="mb-3">
                 <label for="officeAmenities" class="form-label">{{ t('offices.addEditOfficeModal.amenities') }}</label>
                 <input type="text" class="form-control" id="officeAmenities" v-model="officeForm.amenities" :placeholder="t('offices.amenities.wifi') + ', ' + t('offices.amenities.coffee')">
                  <small class="form-text text-muted">Comma-separated values.</small>
+              </div>
+              <div v-if="errors.server" class="alert alert-danger mt-3">
+                {{ errors.server }}
               </div>
             </form>
           </div>

@@ -7,6 +7,8 @@ import { getContracts, addContract, updateContract } from '@/services/ContractSe
 import { getClients } from '@/services/ClientService';
 import { getAvailableOffices } from '@/services/OfficeService';
 import { Modal } from 'bootstrap';
+import { useVuelidate } from '@vuelidate/core';
+import { required, minValue } from '@vuelidate/validators';
 
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import { formatCurrency, formatDate } from '@/helpers/utils.js';
@@ -20,6 +22,7 @@ const searchTerm = ref('');
 const isLoading = ref(true);
 const isSubmitting = ref(false);
 const activeProfileId = ref(null);
+const errors = ref({});
 
 // Pagination state
 const currentPage = ref(1);
@@ -57,6 +60,17 @@ const newContract = ref({
   payment_terms: '',
   service_type: ''
 });
+
+const rules = computed(() => ({
+    client_id: { required },
+    office_id: { required },
+    start_date: { required },
+    end_date: { required },
+    monthly_rate: { required, minValue: minValue(0) },
+    status: { required },
+}));
+
+const v$ = useVuelidate(rules, newContract);
 
 const clients = ref([]);
 const offices = ref([]);
@@ -259,6 +273,8 @@ const openAddContractModal = async (profileIdFromSlot = null) => {
     profile_id: profileIdFromSlot || activeProfileId.value,
     status: 'Active'
   };
+  errors.value = {};
+  v$.value.$reset();
   try {
     const [clientsResponse, officesResponse, taxesResponse] = await Promise.all([
       getClients(),
@@ -305,6 +321,9 @@ const openEditContractModal = async (contract) => {
     service_type: contractData.service_type || '',
     original_office_id: contractData.office_id // Keep track of the original office
   };
+  
+  errors.value = {};
+  v$.value.$reset();
 
   try {
     const [clientsResponse, officesResponse, taxesResponse] = await Promise.all([
@@ -325,6 +344,9 @@ const openEditContractModal = async (contract) => {
 };
 
 const submitNewContract = async () => {
+  v$.value.$touch();
+  if (v$.value.$invalid) return;
+  
   isSubmitting.value = true;
   const formData = new FormData();
 
@@ -358,13 +380,12 @@ const submitNewContract = async () => {
       const modalInstance = Modal.getInstance(addContractModal.value);
       modalInstance.hide();
       fetchContracts(activeProfileId.value);
-    } else {
-
     }
   } catch (error) {
-    // if the error is not in [officeBooked, officeNotAvailable]
-    if (error.status != 408 && error.status != 409){
-      console.error(`Error submitting ${isEditMode.value ? 'updated' : 'new'} contract:`, error);
+    if (error.response && error.response.status === 422) {
+        errors.value = error.response.data.errors;
+    } else {
+        console.error(`Error submitting ${isEditMode.value ? 'updated' : 'new'} contract:`, error);
     }
   } finally {
     isSubmitting.value = false;
@@ -527,17 +548,25 @@ const submitDocumentUpload = async () => {
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="client" class="form-label">{{ t('contracts.tableHeaders.client') }} <span class="text-danger">*</span></label>
-                                <select id="client" class="form-select" v-model="newContract.client_id" required>
+                                <select id="client" class="form-select" v-model="v$.client_id.$model" :class="{'is-invalid': v$.client_id.$error || errors.client_id}">
                                     <option :value="null" disabled>-- Select Client --</option>
                                     <option v-for="client in clients" :key="client.id" :value="client.id">{{ client.company_name }}</option>
                                 </select>
+                                <div v-if="v$.client_id.$error" class="invalid-feedback">
+                                    <p v-for="error of v$.client_id.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                </div>
+                                <div v-if="errors.client_id" class="invalid-feedback">{{ errors.client_id }}</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="office" class="form-label">{{ t('contracts.tableHeaders.office') }} <span class="text-danger">*</span></label>
-                                <select id="office" class="form-select" v-model="newContract.office_id" required>
+                                <select id="office" class="form-select" v-model="v$.office_id.$model" :class="{'is-invalid': v$.office_id.$error || errors.office_id}">
                                     <option :value="null" disabled>-- Select Office --</option>
                                     <option v-for="office in offices" :key="office.id" :value="office.id">{{ office.name }}</option>
                                 </select>
+                                <div v-if="v$.office_id.$error" class="invalid-feedback">
+                                    <p v-for="error of v$.office_id.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                </div>
+                                <div v-if="errors.office_id" class="invalid-feedback">{{ errors.office_id }}</div>
                             </div>
                         </div>
                         <div class="row">
@@ -564,11 +593,19 @@ const submitDocumentUpload = async () => {
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="start_date" class="form-label">{{ t('contracts.tableHeaders.startDate') }} <span class="text-danger">*</span></label>
-                                <input type="date" id="start_date" class="form-control" v-model="newContract.start_date" required>
+                                <input type="date" id="start_date" class="form-control" v-model="v$.start_date.$model" :class="{'is-invalid': v$.start_date.$error || errors.start_date}">
+                                <div v-if="v$.start_date.$error" class="invalid-feedback">
+                                    <p v-for="error of v$.start_date.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                </div>
+                                <div v-if="errors.start_date" class="invalid-feedback">{{ errors.start_date }}</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="end_date" class="form-label">{{ t('contracts.tableHeaders.endDate') }} <span class="text-danger">*</span></label>
-                                <input type="date" id="end_date" class="form-control" v-model="newContract.end_date" required>
+                                <input type="date" id="end_date" class="form-control" v-model="v$.end_date.$model" :class="{'is-invalid': v$.end_date.$error || errors.end_date}">
+                                <div v-if="v$.end_date.$error" class="invalid-feedback">
+                                    <p v-for="error of v$.end_date.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                </div>
+                                <div v-if="errors.end_date" class="invalid-feedback">{{ errors.end_date }}</div>
                                 <div v-if="!areDatesValid" class="text-danger mt-1">
                                     {{ t('contracts.endDateBeforeStartDateError') }}
                                 </div>
@@ -577,16 +614,24 @@ const submitDocumentUpload = async () => {
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="monthly_rate" class="form-label">{{ t('contracts.tableHeaders.monthlyRate', 'Monthly Rate') }}</label>
-                                <input type="number" id="monthly_rate" class="form-control" v-model.number="newContract.monthly_rate" step="0.01" min="0" placeholder="e.g., 50000.00">
+                                <input type="number" id="monthly_rate" class="form-control" v-model.number="v$.monthly_rate.$model" :class="{'is-invalid': v$.monthly_rate.$error || errors.monthly_rate}" step="0.01" min="0" placeholder="e.g., 50000.00">
+                                <div v-if="v$.monthly_rate.$error" class="invalid-feedback">
+                                    <p v-for="error of v$.monthly_rate.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                </div>
+                                <div v-if="errors.monthly_rate" class="invalid-feedback">{{ errors.monthly_rate }}</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="status" class="form-label">{{ t('contracts.tableHeaders.status') }} <span class="text-danger">*</span></label>
-                                <select id="status" class="form-select" v-model="newContract.status" required>
+                                <select id="status" class="form-select" v-model="v$.status.$model" :class="{'is-invalid': v$.status.$error || errors.status}">
                                     <option value="Active">{{ t('contracts.status.active', 'Active') }}</option>
                                     <option value="Pending">{{ t('contracts.status.pending', 'Pending') }}</option>
                                     <option value="Expired">{{ t('contracts.status.expired', 'Expired') }}</option>
                                     <option value="Terminated">{{ t('contracts.status.terminated', 'Terminated') }}</option>
                                 </select>
+                                <div v-if="v$.status.$error" class="invalid-feedback">
+                                    <p v-for="error of v$.status.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                </div>
+                                <div v-if="errors.status" class="invalid-feedback">{{ errors.status }}</div>
                             </div>
                         </div>
                          <div class="mb-3">

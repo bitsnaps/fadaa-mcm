@@ -7,6 +7,8 @@ import { getInvestors } from '@/services/UserService';
 import { getBranches } from '@/services/BranchService';
 import { Modal } from 'bootstrap';
 import ProfileTabs from '@/components/ProfileTabs.vue';
+import { useVuelidate } from '@vuelidate/core';
+import { required, minValue, maxValue } from '@vuelidate/validators';
 
 const { t } = useI18n();
 
@@ -17,6 +19,7 @@ const isLoading = ref(true);
 const searchTerm = ref('');
 const isSubmitting = ref(false);
 const activeProfileId = ref(null);
+const errors = ref({});
 
 // Table state
 const currentPage = ref(1);
@@ -120,6 +123,8 @@ const openAddModal = () => {
         investment_amount: 0,
         profile_id: activeProfileId.value // Set the current profile id
     };
+    errors.value = {};
+    v$.value.$reset();
     modalInstance.value.show();
 };
 
@@ -130,6 +135,8 @@ const openEditModal = (investment) => {
         starting_date: investment.starting_date ? new Date(investment.starting_date).toISOString().split('T')[0] : '',
         ending_date: investment.ending_date ? new Date(investment.ending_date).toISOString().split('T')[0] : ''
     };
+    errors.value = {};
+    v$.value.$reset();
     modalInstance.value.show();
 };
 
@@ -137,7 +144,21 @@ const hideModal = () => {
     modalInstance.value.hide();
 };
 
+const rules = computed(() => ({
+    name: { required },
+    percentage: { required, minValue: minValue(0), maxValue: maxValue(100) },
+    investor_id: { required },
+    branch_id: { required },
+    type: { required },
+    investment_amount: { required, minValue: minValue(0) },
+}));
+
+const v$ = useVuelidate(rules, currentInvestment);
+
 const handleSubmit = async () => {
+    v$.value.$touch();
+    if (v$.value.$invalid) return;
+
     isSubmitting.value = true;
     try {
         let response;
@@ -157,7 +178,11 @@ const handleSubmit = async () => {
         }
         hideModal();
     } catch (error) {
-        console.error('Failed to submit investment:', error);
+        if (error.response && error.response.status === 422) {
+            errors.value = error.response.data.errors;
+        } else {
+            console.error('Failed to submit investment:', error);
+        }
     } finally {
         isSubmitting.value = false;
     }
@@ -264,33 +289,53 @@ const handleDelete = async (id) => {
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="inv-client" class="form-label">{{ t('investments.tableHeaders.investor') }}</label>
-                                    <select id="inv-investor" class="form-select" v-model="currentInvestment.investor_id">
+                                    <select id="inv-investor" class="form-select" v-model="v$.investor_id.$model" :class="{'is-invalid': v$.investor_id.$error || errors.investor_id}">
                                         <option :value="null">Select an investor</option>
                                         <option v-for="investor in investors" :key="investor.id" :value="investor.id">{{ investor.first_name }} {{ investor.last_name }}</option>
                                     </select>
+                                    <div v-if="v$.investor_id.$error" class="invalid-feedback">
+                                       <p v-for="error of v$.investor_id.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                    </div>
+                                    <div v-if="errors.investor_id" class="invalid-feedback">{{ errors.investor_id }}</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="inv-branch" class="form-label">{{ t('investments.tableHeaders.branch') }}</label>
-                                    <select id="inv-branch" class="form-select" v-model="currentInvestment.branch_id">
+                                    <select id="inv-branch" class="form-select" v-model="v$.branch_id.$model" :class="{'is-invalid': v$.branch_id.$error || errors.branch_id}">
                                         <option :value="null">Select a branch</option>
                                         <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
                                     </select>
+                                     <div v-if="v$.branch_id.$error" class="invalid-feedback">
+                                       <p v-for="error of v$.branch_id.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                     </div>
+                                     <div v-if="errors.branch_id" class="invalid-feedback">{{ errors.branch_id }}</div>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label for="inv-name" class="form-label">{{ t('investments.tableHeaders.name') }} <span class="text-danger">*</span></label>
-                                <input type="text" id="inv-name" class="form-control" v-model="currentInvestment.name" required>
+                                <input type="text" id="inv-name" class="form-control" v-model="v$.name.$model" :class="{'is-invalid': v$.name.$error || errors.name}">
+                                <div v-if="v$.name.$error" class="invalid-feedback">
+                                   <p v-for="error of v$.name.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                </div>
+                                <div v-if="errors.name" class="invalid-feedback">{{ errors.name }}</div>
                             </div>
                             <div class="mb-3">
                                 <label for="inv-percentage" class="form-label">{{ t('investments.tableHeaders.percentage') }} <span class="text-danger">*</span></label>
-                                <input type="number" id="inv-percentage" class="form-control" v-model.number="currentInvestment.percentage" required>
+                                <input type="number" id="inv-percentage" class="form-control" v-model.number="v$.percentage.$model" :class="{'is-invalid': v$.percentage.$error || errors.percentage}">
+                                <div v-if="v$.percentage.$error" class="invalid-feedback">
+                                   <p v-for="error of v$.percentage.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                </div>
+                                <div v-if="errors.percentage" class="invalid-feedback">{{ errors.percentage }}</div>
                             </div>
                             <div class="mb-3">
                                 <label for="inv-type" class="form-label">{{ t('investments.tableHeaders.type') }} <span class="text-danger">*</span></label>
-                                <select id="inv-type" class="form-select" v-model="currentInvestment.type" required>
+                                <select id="inv-type" class="form-select" v-model="v$.type.$model" :class="{'is-invalid': v$.type.$error || errors.type}">
                                     <option value="Comprehensive">{{ t('investments.tableHeaders.comprehensive') }}</option>
                                     <option value="Contractual">{{ t('investments.tableHeaders.contractual') }}</option>
                                 </select>
+                                <div v-if="v$.type.$error" class="invalid-feedback">
+                                    <p v-for="error of v$.type.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                </div>
+                                <div v-if="errors.type" class="invalid-feedback">{{ errors.type }}</div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -304,7 +349,11 @@ const handleDelete = async (id) => {
                             </div>
                             <div class="mb-3">
                                 <label for="inv-amount" class="form-label">{{ t('investments.tableHeaders.investment_amount') }}</label>
-                                <input type="number" id="inv-amount" class="form-control" v-model.number="currentInvestment.investment_amount">
+                                <input type="number" id="inv-amount" class="form-control" v-model.number="v$.investment_amount.$model" :class="{'is-invalid': v$.investment_amount.$error || errors.investment_amount}">
+                                <div v-if="v$.investment_amount.$error" class="invalid-feedback">
+                                    <p v-for="error of v$.investment_amount.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                </div>
+                                <div v-if="errors.investment_amount" class="invalid-feedback">{{ errors.investment_amount }}</div>
                             </div>
                         </form>
                     </div>

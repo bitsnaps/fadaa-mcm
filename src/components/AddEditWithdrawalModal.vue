@@ -2,6 +2,8 @@
 import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getInvestmentsByInvestor } from '@/services/InvestmentService';
+import { useVuelidate } from '@vuelidate/core';
+import { required, minValue } from '@vuelidate/validators';
 
 const { t } = useI18n();
 
@@ -10,12 +12,21 @@ const props = defineProps({
   withdrawal: Object,
   investors: Array,
   profileId: Number,
+  errors: Object,
 });
 
 const emit = defineEmits(['close', 'save']);
 
 const form = ref({});
 const filteredInvestments = ref([]);
+
+const rules = computed(() => ({
+    investor_id: { required },
+    investment_id: { required },
+    amount: { required, minValue: minValue(0) },
+}));
+
+const v$ = useVuelidate(rules, form);
 
 watch(() => form.value.investor_id, async (newInvestorId) => {
   if (newInvestorId) {
@@ -56,12 +67,14 @@ watch(() => props.showModal, (isShown) => {
 }, { immediate: true });
 
 function closeModal() {
+  v$.value.$reset();
   emit('close');
 }
 
 function save() {
+    v$.value.$touch();
+    if (v$.value.$invalid) return;
   emit('save', { ...form.value });
-  closeModal();
 }
 </script>
 
@@ -77,23 +90,35 @@ function save() {
           <form @submit.prevent="save">
             <div class="mb-3">
               <label class="form-label">{{ t('manageWithdrawals.modal.investor') }} <span class="text-danger">*</span></label>
-              <select v-model="form.investor_id" class="form-select" required>
+              <select v-model="v$.investor_id.$model" class="form-select" :class="{'is-invalid': v$.investor_id.$error || (errors && errors.investor_id)}">
                 <option v-for="inv in investors" :key="inv.id" :value="inv.id">
                   {{ inv.first_name }} {{ inv.last_name }}
                 </option>
               </select>
+              <div v-if="v$.investor_id.$error" class="invalid-feedback">
+                <p v-for="error of v$.investor_id.$errors" :key="error.$uid">{{ error.$message }}</p>
+              </div>
+              <div v-if="errors && errors.investor_id" class="invalid-feedback">{{ errors.investor_id }}</div>
             </div>
             <div class="mb-3">
               <label class="form-label">{{ t('manageWithdrawals.modal.investment') }} <span class="text-danger">*</span></label>
-              <select v-model="form.investment_id" class="form-select" required>
+              <select v-model="v$.investment_id.$model" class="form-select" :class="{'is-invalid': v$.investment_id.$error || (errors && errors.investment_id)}">
                 <option v-for="inv in filteredInvestments" :key="inv.id" :value="inv.id">
                   {{ inv.name }}
                 </option>
               </select>
+              <div v-if="v$.investment_id.$error" class="invalid-feedback">
+                <p v-for="error of v$.investment_id.$errors" :key="error.$uid">{{ error.$message }}</p>
+              </div>
+              <div v-if="errors && errors.investment_id" class="invalid-feedback">{{ errors.investment_id }}</div>
             </div>
             <div class="mb-3">
-              <label class="form-label">{{ t('manageWithdrawals.modal.amount') }}</label>
-              <input type="number" v-model="form.amount" class="form-control" />
+              <label class="form-label">{{ t('manageWithdrawals.modal.amount') }} <span class="text-danger">*</span></label>
+              <input type="number" v-model="v$.amount.$model" class="form-control" :class="{'is-invalid': v$.amount.$error || (errors && errors.amount)}" />
+              <div v-if="v$.amount.$error" class="invalid-feedback">
+                <p v-for="error of v$.amount.$errors" :key="error.$uid">{{ error.$message }}</p>
+              </div>
+              <div v-if="errors && errors.amount" class="invalid-feedback">{{ errors.amount }}</div>
             </div>
             <div class="mb-3">
               <label class="form-label">{{ t('manageWithdrawals.modal.requestedAt') }}</label>

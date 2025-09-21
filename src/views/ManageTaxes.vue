@@ -60,11 +60,17 @@
             <form @submit.prevent="saveTax">
               <div class="mb-3">
                 <label for="taxName" class="form-label">{{ $t('manageTaxes.name') }} <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="taxName" v-model="currentTax.name" required>
+                <input type="text" class="form-control" id="taxName" v-model="v$.name.$model" :class="{ 'is-invalid': v$.name.$error }">
+                <div v-if="v$.name.$error" class="invalid-feedback">
+                  <p v-for="error of v$.name.$errors" :key="error.$uid">{{ error.$message }}</p>
+                </div>
               </div>
               <div class="mb-3">
                 <label for="taxRate" class="form-label">{{ $t('manageTaxes.rate') }} <span class="text-danger">*</span></label>
-                <input type="number" step="0.01" class="form-control" id="taxRate" v-model="currentTax.rate" required>
+                <input type="number" step="0.01" class="form-control" id="taxRate" v-model="v$.rate.$model" :class="{ 'is-invalid': v$.rate.$error }">
+                 <div v-if="v$.rate.$error" class="invalid-feedback">
+                  <p v-for="error of v$.rate.$errors" :key="error.$uid">{{ error.$message }}</p>
+                </div>
               </div>
               <div class="mb-3">
                 <label for="taxDescription" class="form-label">{{ $t('manageTaxes.description') }}</label>
@@ -76,6 +82,9 @@
                     <option value="Client">{{ t('manageTaxes.client') }}</option>
                     <option value="Company">{{ t('manageTaxes.company') }}</option>
                 </select>
+              </div>
+              <div v-if="errors.server" class="alert alert-danger mt-3">
+                {{ errors.server }}
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" @click="closeModal">{{ $t('manageTaxes.cancel') }}</button>
@@ -110,15 +119,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive, computed } from 'vue';
 import apiClient from '@/services/ApiClient';
 import { useI18n } from 'vue-i18n';
+import { useVuelidate } from '@vuelidate/core';
+import { required, numeric } from '@vuelidate/validators';
 
 const { t } = useI18n();
 const taxes = ref([]);
 const isModalOpen = ref(false);
 const isEditing = ref(false);
 const taxToDeleteId = ref(null);
+const errors = reactive({ server: '' });
 const currentTax = ref({
   id: null,
   name: '',
@@ -126,6 +138,13 @@ const currentTax = ref({
   description: '',
   bearer: 'Client'
 });
+
+const rules = computed(() => ({
+  name: { required },
+  rate: { required, numeric },
+}));
+
+const v$ = useVuelidate(rules, currentTax);
 
 const fetchTaxes = async () => {
   try {
@@ -140,12 +159,16 @@ const fetchTaxes = async () => {
 const openCreateModal = () => {
   isEditing.value = false;
   currentTax.value = { id: null, name: '', rate: '', description: '', bearer: 'Client' };
+  v$.value.$reset();
+  errors.server = '';
   isModalOpen.value = true;
 };
 
 const openEditModal = (tax) => {
   isEditing.value = true;
   currentTax.value = { ...tax };
+  v$.value.$reset();
+  errors.server = '';
   isModalOpen.value = true;
 };
 
@@ -156,6 +179,9 @@ const closeModal = () => {
 };
 
 const saveTax = async () => {
+  v$.value.$touch();
+  if (v$.value.$invalid) return;
+
   try {
     if (isEditing.value) {
       await apiClient.put(`/taxes/${currentTax.value.id}`, currentTax.value);
@@ -165,8 +191,18 @@ const saveTax = async () => {
     closeModal();
     fetchTaxes();
   } catch (error) {
-    console.error("Failed to save tax:", error);
-    // Add user-friendly notification here
+    if (error.response && error.response.status === 422) {
+      const backendErrors = error.response.data.errors;
+      for (const field in backendErrors) {
+        if (v$.value[field]) {
+          v$.value[field].$errors.push({ $uid: `server-error-${field}`, $message: backendErrors[field] });
+        }
+      }
+      errors.server = 'Please check the fields below for errors.';
+    } else {
+      errors.server = error.response?.data?.message || 'An unknown error occurred';
+    }
+    console.error('Failed to save tax:', error);
   }
 };
 

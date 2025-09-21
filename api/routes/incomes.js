@@ -148,9 +148,6 @@ incomesApp.get('/:id', async (c) => {
 incomesApp.post('/', async (c) => {
     try {
       const incomeData = await c.req.json();
-      if (!incomeData.profile_id) {
-        return c.json({ success: false, message: 'profile_id is required' }, 400);
-      }
       const newIncome = await models.Income.create(incomeData);
 
       // High-value transaction notification
@@ -184,8 +181,14 @@ incomesApp.post('/', async (c) => {
       });
       return c.json({ success: true, message: 'Income created successfully', data: finalIncome }, 201);
     } catch (error) {
-      console.error('Error creating income:', error);
-      return c.json({ success: false, message: 'Failed to create income' }, 500);
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
+      return handleRouteError(c, 'Error creating income', error);
     }
 });
 
@@ -209,6 +212,13 @@ incomesApp.put('/:id', async (c) => {
       });
       return c.json({ success: true, message: 'Income updated successfully', data: finalIncome });
     } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
       return handleRouteError(c, 'Error updating income', error);
     }
 });

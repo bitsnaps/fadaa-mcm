@@ -55,11 +55,17 @@
             <form @submit.prevent="handleSaveCategory">
               <div class="mb-3">
                 <label for="categoryName" class="form-label">{{ $t('manageServiceCategories.categoryNameLabel') }} <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="categoryName" v-model="currentCategory.name" required>
+                <input type="text" class="form-control" id="categoryName" v-model="v$.name.$model" :class="{ 'is-invalid': v$.name.$error }">
+                <div v-if="v$.name.$error" class="invalid-feedback">
+                  <p v-for="error of v$.name.$errors" :key="error.$uid">{{ error.$message }}</p>
+                </div>
               </div>
               <div class="mb-3">
                 <label for="categoryDescription" class="form-label">{{ $t('manageServiceCategories.descriptionLabel') }}</label>
                 <textarea class="form-control" id="categoryDescription" v-model="currentCategory.description" rows="3"></textarea>
+              </div>
+              <div v-if="errors.server" class="alert alert-danger mt-3">
+                {{ errors.server }}
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('manageServiceCategories.close') }}</button>
@@ -75,17 +81,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive, computed } from 'vue';
 import { Modal } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import apiClient from '@/services/ApiClient';
+import { useVuelidate } from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 
 const { t } = useI18n();
 const serviceCategories = ref([]);
 const loadingCategories = ref(false);
 const modalMode = ref('add');
 const currentCategory = ref({ id: null, name: '', description: '' });
+const errors = reactive({ server: '' });
 let categoryModal = null;
+
+const rules = computed(() => ({
+  name: { required },
+}));
+
+const v$ = useVuelidate(rules, currentCategory);
 
 const fetchServiceCategories = async () => {
   loadingCategories.value = true;
@@ -112,16 +127,23 @@ onMounted(() => {
 const openAddModal = () => {
   modalMode.value = 'add';
   currentCategory.value = { id: null, name: '', description: '' };
+  v$.value.$reset();
+  errors.server = '';
   if(categoryModal) categoryModal.show();
 };
 
 const openEditModal = (category) => {
   modalMode.value = 'edit';
   currentCategory.value = { ...category };
+  v$.value.$reset();
+  errors.server = '';
   if(categoryModal) categoryModal.show();
 };
 
 const handleSaveCategory = async () => {
+  v$.value.$touch();
+  if (v$.value.$invalid) return;
+
   try {
     if (modalMode.value === 'add') {
       await apiClient.post('/service-categories', currentCategory.value);
@@ -131,6 +153,17 @@ const handleSaveCategory = async () => {
     if(categoryModal) categoryModal.hide();
     fetchServiceCategories();
   } catch (error) {
+    if (error.response && error.response.status === 422) {
+      const backendErrors = error.response.data.errors;
+      for (const field in backendErrors) {
+        if (v$.value[field]) {
+          v$.value[field].$errors.push({ $uid: `server-error-${field}`, $message: backendErrors[field] });
+        }
+      }
+      errors.server = 'Please check the fields below for errors.';
+    } else {
+      errors.server = error.response?.data?.message || 'An unknown error occurred';
+    }
     console.error(`Failed to ${modalMode.value} category:`, error);
   }
 };

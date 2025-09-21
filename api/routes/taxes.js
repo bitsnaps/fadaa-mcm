@@ -21,14 +21,15 @@ taxApp.get('/', async (c) => {
 taxApp.post('/', async (c) => {
     try {
         const { name, rate, description, bearer } = await c.req.json();
-        if (!name || !rate) {
-            return c.json({ success: false, message: 'Name and rate are required' }, 400);
-        }
         const newTax = await models.Tax.create({ name, rate, description, bearer });
         return c.json({ success: true, message: 'Tax created successfully', tax: newTax }, 201);
     } catch (error) {
-        if (error.name === 'SequelizeUniqueConstraintError') {
-            return c.json({ success: false, message: 'A tax with this name already exists' }, 409);
+        if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
         }
         return handleRouteError(c, 'Error creating tax', error);
     }
@@ -61,8 +62,12 @@ taxApp.put('/:id', async (c) => {
         await tax.update({ name, rate, description, bearer });
         return c.json({ success: true, message: 'Tax updated successfully', tax });
     } catch (error) {
-        if (error.name === 'SequelizeUniqueConstraintError') {
-            return c.json({ success: false, message: 'A tax with this name already exists' }, 409);
+        if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
         }
         return handleRouteError(c, `Error updating tax ${c.req.param('id')}`, error);
     }

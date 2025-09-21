@@ -162,16 +162,17 @@ clientsApp.post('/', uploadMiddleware('attachments', 'attachments'), async (c) =
     const clientData = await c.req.parseBody();
     try {
 
-        // Validate required fields
-        // if (!clientData.company_name || !clientData.first_name || !clientData.last_name || !clientData.phone_number) {
-        //     return c.json({ success: false, message: 'Missing required fields: company_name, first_name, last_name, phone_number' }, 400);
-        // }
-
         const newClient = await models.Client.create({email: clientData.email || null, ...clientData});
         return c.json({ success: true, message: 'Client created successfully', data: newClient }, 201);
     } catch (error) {
-        console.error('Error creating client:', error);
-        return c.json({ success: false, message: `Failed to create client: ${error}. clientData: ${JSON.stringify(clientData)}` }, 500);
+        if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
+        return handleRouteError(c, 'Error creating client', error);
     }
 });
 
@@ -180,11 +181,6 @@ clientsApp.put('/:id', uploadMiddleware('attachments', 'attachments'), async (c)
     const { id } = c.req.param();
     try {
         const clientData = await c.req.parseBody();
-
-        // Validate required fields
-        if (!clientData.company_name || !clientData.first_name || !clientData.last_name || !clientData.phone_number) {
-            return c.json({ success: false, message: 'Missing required fields: company_name, first_name, last_name, phone_number' }, 400);
-        }
 
         const client = await models.Client.findByPk(id);
         if (!client) {
@@ -201,6 +197,13 @@ clientsApp.put('/:id', uploadMiddleware('attachments', 'attachments'), async (c)
         await client.update(clientData);
         return c.json({ success: true, message: 'Client updated successfully', data: client });
     } catch (error) {
+        if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
         return handleRouteError(c, `Error updating client ${id}`, error);
     }
 });

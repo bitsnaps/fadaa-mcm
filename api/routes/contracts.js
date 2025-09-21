@@ -71,13 +71,9 @@ contractApp.post('/', uploadMiddleware('contracts', 'document'), async (c) => {
         const { client_id, office_id, start_date, end_date, monthly_rate, profile_id, notes, payment_terms, service_type } = body;
         const documentUrl = c.req.filePath;
 
-        if (!client_id || !office_id || !start_date || !end_date || !monthly_rate || !profile_id) {
-            return c.json({ success: false, message: 'Missing required fields, including profile_id' }, 400);
-        }
-
         const office = await models.Office.findByPk(office_id);
         if (!office || office.status == 'Maintenance' || office.status == 'Unavailable') {
-            return c.json({ success: false, message: 'contracts.errors.officeNotAvailable' }, 408);
+            return c.json({ errors: { office_id: 'This office is not available for booking.' } }, 422);
         }
 
         const existingContract = await models.Contract.findOne({
@@ -107,7 +103,7 @@ contractApp.post('/', uploadMiddleware('contracts', 'document'), async (c) => {
         });
 
         if (existingContract) {
-            return c.json({ success: false, message: 'contracts.errors.officeBooked' }, 409);
+            return c.json({ errors: { office_id: 'This office is already booked for the selected dates.' } }, 422);
         }
 
         const newContract = await models.Contract.create({
@@ -144,8 +140,14 @@ contractApp.post('/', uploadMiddleware('contracts', 'document'), async (c) => {
         return c.json({ success: true, message: 'Contract created successfully', contract: newContract }, 201);
 
     } catch (error) {
-        console.error('Error creating contract:', error);
-        return c.json({ success: false, message: 'Failed to create contract' }, 500);
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
+        return handleRouteError(c, 'Error creating contract', error);
     }
 });
 
@@ -165,7 +167,7 @@ contractApp.put('/:id', uploadMiddleware('contracts', 'document'), async (c) => 
             const targetOfficeId = office_id || contract.office_id;
             const office = await models.Office.findByPk(targetOfficeId);
             if (office && office.status !== 'Maintenance' && office.status !== 'Unavailable' && office.id !== contract.office_id) {
-                return c.json({ success: false, message: 'contracts.errors.officeNotAvailable' }, 408);
+                return c.json({ errors: { office_id: 'This office is not available for booking.' } }, 422);
             }
 
             const existingContract = await models.Contract.findOne({
@@ -196,7 +198,7 @@ contractApp.put('/:id', uploadMiddleware('contracts', 'document'), async (c) => 
             });
 
             if (existingContract) {
-                return c.json({ success: false, message: 'contracts.errors.officeBooked' }, 409);
+                return c.json({ errors: { office_id: 'This office is already booked for the selected dates.' } }, 422);
             }
         }
 
@@ -236,6 +238,13 @@ contractApp.put('/:id', uploadMiddleware('contracts', 'document'), async (c) => 
 
         return c.json({ success: true, message: 'Contract updated successfully', contract });
     } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
         return handleRouteError(c, `Error updating contract ${id}`, error);
     }
 });

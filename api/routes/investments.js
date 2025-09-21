@@ -107,9 +107,6 @@ investmentsApp.get('/by-investor/:investorId', async (c) => {
 investmentsApp.post('/', async (c) => {
     try {
         const investmentData = await c.req.json();
-        if (!investmentData.profile_id) {
-            return c.json({ success: false, message: 'profile_id is required' }, 400);
-        }
         const newInvestment = await models.Investment.create({
             ...investmentData
         });
@@ -121,8 +118,14 @@ investmentsApp.post('/', async (c) => {
         });
         return c.json({ success: true, message: 'Investment created successfully', data: finalInvestment }, 201);
     } catch (error) {
-        console.error('Error creating investment:', error);
-        return c.json({ success: false, message: 'Failed to create investment' }, 500);
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
+        return handleRouteError(c, 'Error creating investment', error);
     }
 });
 
@@ -148,6 +151,13 @@ investmentsApp.put('/:id', async (c) => {
 
         return c.json({ success: true, message: 'Investment updated successfully', data: finalInvestment });
     } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
         return handleRouteError(c, 'Error updating investment', error);
     }
 });

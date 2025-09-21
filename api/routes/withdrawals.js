@@ -48,10 +48,6 @@ withdrawalsApp.post('/', async (c) => {
       requested_at
     } = await c.req.json();
 
-    if (!profile_id || !investor_id || !investment_id || !amount) {
-      return c.json({ success: false, message: 'Missing required fields for withdrawal creation.' }, 400);
-    }
-
     const newWithdrawal = await models.Withdrawal.create({
       profile_id,
       investor_id,
@@ -70,6 +66,13 @@ withdrawalsApp.post('/', async (c) => {
 
     return c.json({ success: true, message: 'Withdrawal created successfully', data: finalWithdrawal }, 201);
   } catch (error) {
+    if (error.name === 'SequelizeValidationError') {
+        const errors = error.errors.reduce((acc, err) => {
+            acc[err.path] = err.message;
+            return acc;
+        }, {});
+        return c.json({ errors }, 422);
+    }
     return handleRouteError(c, 'Error creating withdrawal', error);
   }
 });
@@ -119,6 +122,13 @@ withdrawalsApp.put('/:id', async (c) => {
 
     return c.json({ success: true, message: 'Withdrawal updated successfully', data: finalWithdrawal });
   } catch (error) {
+    if (error.name === 'SequelizeValidationError') {
+        const errors = error.errors.reduce((acc, err) => {
+            acc[err.path] = err.message;
+            return acc;
+        }, {});
+        return c.json({ errors }, 422);
+    }
     return handleRouteError(c, `Error updating withdrawal ${c.req.param('id')}`, error);
   }
 });

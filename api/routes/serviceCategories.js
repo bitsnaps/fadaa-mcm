@@ -20,14 +20,17 @@ serviceCategoriesApp.get('/', authMiddleware, async (c) => {
 serviceCategoriesApp.post('/', authMiddleware, async (c) => {
     try {
         const { name, description } = await c.req.json();
-        if (!name) {
-            return c.json({ success: false, message: 'Name is required' }, 400);
-        }
         const newCategory = await models.ServiceCategory.create({ name, description });
         return c.json({ success: true, message: 'Service category created successfully', data: newCategory }, 201);
     } catch (error) {
-        console.error('Error creating service category:', error);
-        return c.json({ success: false, message: 'Failed to create service category' }, 500);
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
+        return handleRouteError(c, 'Error creating service category', error);
     }
 });
 

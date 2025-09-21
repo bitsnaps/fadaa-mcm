@@ -15,6 +15,7 @@ import AddEditWithdrawalModal from '@/components/AddEditWithdrawalModal.vue';
 const { t } = useI18n();
 const isLoading = ref(true);
 const error = ref(null);
+const formErrors = ref({});
 const withdrawals = ref([]);
 const investors = ref([]);
 const statusFilter = ref(''); // '', 'pending', 'paid', 'cancelled'
@@ -47,11 +48,17 @@ async function handleSave(withdrawalData) {
       await createWithdrawalAsAdmin(withdrawalData);
     }
     await loadWithdrawals();
-  } catch (e) {
-    error.value = `Failed to save withdrawal: ${e.message}`;
-    console.error('Error saving withdrawal:', e);
-  } finally {
     closeModal();
+  } catch (e) {
+    if (e.response && e.response.status === 422) {
+        formErrors.value = e.response.data.errors;
+        // Re-open the modal to show errors
+        showModal.value = true;
+    } else {
+        error.value = `Failed to save withdrawal: ${e.message}`;
+        console.error('Error saving withdrawal:', e);
+        closeModal();
+    }
   }
 }
 
@@ -281,6 +288,7 @@ onMounted(() => {
     :withdrawal="editingWithdrawal"
     :investors="investors"
     :profile-id="activeProfileId"
+    :errors="formErrors"
     @close="closeModal"
     @save="handleSave"
   />

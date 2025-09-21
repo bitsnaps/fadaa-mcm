@@ -3,6 +3,8 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import apiClient from '@/services/ApiClient';
+import { useVuelidate } from '@vuelidate/core';
+import { required, email } from '@vuelidate/validators';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -30,20 +32,19 @@ const client = ref({
   attachments: [],
 });
 
+const rules = computed(() => ({
+  company_name: { required },
+  first_name: { required },
+  last_name: { required },
+  email: { email },
+  phone_number: { required },
+}));
+
+const v$ = useVuelidate(rules, client);
+const errors = ref({});
+
 const pageTitle = computed(() => clientId.value ? t('addClient.editTitle') : t('addClient.addTitle'));
 const submitButtonText = computed(() => clientId.value ? t('addClient.submitButtonUpdate') : t('addClient.submitButtonAdd'));
-const validationErrors = ref({});
-
-const validateForm = () => {
-    const errors = {};
-    if (!client.value.company_name) errors.company_name = 'Company name is required.';
-    if (!client.value.first_name) errors.first_name = 'First name is required.';
-    if (!client.value.last_name) errors.last_name = 'Last name is required.';
-    if (!client.value.phone_number) errors.phone_number = 'Phone number is required.';
-
-    validationErrors.value = errors;
-    return Object.keys(errors).length === 0;
-};
 
 onMounted(async () => {
   if (clientId.value) {
@@ -63,9 +64,9 @@ onMounted(async () => {
 });
 
 const submitForm = async () => {
-    if (!validateForm()) {
-        return;
-    }
+    v$.value.$touch();
+    if (v$.value.$invalid) return;
+
     try {
         const formData = new FormData();
         Object.keys(client.value).forEach(key => {
@@ -77,20 +78,18 @@ const submitForm = async () => {
                 formData.append(key, client.value[key]);
             }
         });
-        
+
         let response;
         if (clientId.value) {
             response = await apiClient.put(`/clients/${clientId.value}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            console.log(t('addClient.messages.updateSuccess'));
         } else {
             response = await apiClient.post('/clients', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            console.log(t('addClient.messages.addSuccess'));
         }
-        
+
         if (response.data.success && client.value.attachments && client.value.attachments.length > 0) {
             const newClientId = response.data.data.id;
             const attachmentFormData = new FormData();
@@ -106,10 +105,10 @@ const submitForm = async () => {
 
         router.push('/manage-clients');
     } catch (error) {
-        console.error(`${clientId.value ? 'Update' : 'Add'} client error:`, error);
-        // API error toasts are handled globally by ApiClient interceptor
-        if (error.response && error.response.data && error.response.data.message) {
-            // Optionally map backend validation errors to form fields here
+        if (error.response && error.response.status === 422) {
+            errors.value = error.response.data.errors;
+        } else {
+            console.error(`${clientId.value ? 'Update' : 'Add'} client error:`, error);
         }
     }
 };
@@ -126,33 +125,48 @@ const handleFileUpload = (event) => {
       <form @submit.prevent="submitForm">
         <div class="mb-3">
           <label for="companyName" class="form-label">{{ t('addClient.form.clientName') }} <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" :class="{'is-invalid': validationErrors.company_name}" id="companyName" v-model="client.company_name" required>
-          <div v-if="validationErrors.company_name" class="invalid-feedback">{{ validationErrors.company_name }}</div>
+          <input type="text" class="form-control" :class="{'is-invalid': v$.company_name.$error || errors.company_name}" id="companyName" v-model="client.company_name">
+          <div v-if="v$.company_name.$error" class="invalid-feedback">
+            <p v-for="error of v$.company_name.$errors" :key="error.$uid">{{ error.$message }}</p>
+          </div>
+          <div v-if="errors.company_name" class="invalid-feedback">{{ errors.company_name }}</div>
         </div>
 
         <h5 class="mt-4">{{ t('addClient.form.contactPerson') }}</h5>
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="firstName" class="form-label">{{ t('userProfile.firstName') }} <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" :class="{'is-invalid': validationErrors.first_name}" id="firstName" v-model="client.first_name" required>
-                <div v-if="validationErrors.first_name" class="invalid-feedback">{{ validationErrors.first_name }}</div>
+                <input type="text" class="form-control" :class="{'is-invalid': v$.first_name.$error || errors.first_name}" id="firstName" v-model="client.first_name">
+                 <div v-if="v$.first_name.$error" class="invalid-feedback">
+                    <p v-for="error of v$.first_name.$errors" :key="error.$uid">{{ error.$message }}</p>
+                </div>
+                <div v-if="errors.first_name" class="invalid-feedback">{{ errors.first_name }}</div>
             </div>
             <div class="col-md-6">
                 <label for="lastName" class="form-label">{{ t('userProfile.lastName') }} <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" :class="{'is-invalid': validationErrors.last_name}" id="lastName" v-model="client.last_name" required>
-                <div v-if="validationErrors.last_name" class="invalid-feedback">{{ validationErrors.last_name }}</div>
+                <input type="text" class="form-control" :class="{'is-invalid': v$.last_name.$error || errors.last_name}" id="lastName" v-model="client.last_name">
+                <div v-if="v$.last_name.$error" class="invalid-feedback">
+                    <p v-for="error of v$.last_name.$errors" :key="error.$uid">{{ error.$message }}</p>
+                </div>
+                <div v-if="errors.last_name" class="invalid-feedback">{{ errors.last_name }}</div>
             </div>
         </div>
 
         <div class="mb-3">
           <label for="clientEmail" class="form-label">{{ t('addClient.form.email') }}</label>
-          <input type="email" class="form-control" :class="{'is-invalid': validationErrors.email}" id="clientEmail" v-model="client.email">
-          <div v-if="validationErrors.email" class="invalid-feedback">{{ validationErrors.email }}</div>
+          <input type="email" class="form-control" :class="{'is-invalid': v$.email.$error || errors.email}" id="clientEmail" v-model="client.email">
+          <div v-if="v$.email.$error" class="invalid-feedback">
+            <p v-for="error of v$.email.$errors" :key="error.$uid">{{ error.$message }}</p>
+          </div>
+          <div v-if="errors.email" class="invalid-feedback">{{ errors.email }}</div>
         </div>
         <div class="mb-3">
           <label for="clientPhone" class="form-label">{{ t('addClient.form.phone') }} <span class="text-danger">*</span></label>
-          <input type="tel" class="form-control" :class="{'is-invalid': validationErrors.phone_number}" id="clientPhone" v-model="client.phone_number" required>
-          <div v-if="validationErrors.phone_number" class="invalid-feedback">{{ validationErrors.phone_number }}</div>
+          <input type="tel" class="form-control" :class="{'is-invalid': v$.phone_number.$error || errors.phone_number}" id="clientPhone" v-model="client.phone_number">
+           <div v-if="v$.phone_number.$error" class="invalid-feedback">
+            <p v-for="error of v$.phone_number.$errors" :key="error.$uid">{{ error.$message }}</p>
+          </div>
+          <div v-if="errors.phone_number" class="invalid-feedback">{{ errors.phone_number }}</div>
         </div>
         <div class="mb-3">
           <label for="clientAddress" class="form-label">{{ t('addClient.form.address') }}</label>

@@ -7,6 +7,8 @@ import { getBranches } from '@/services/BranchService';
 import { useAuthStore } from '@/stores/auth'; // To get registered_by user ID
 import { Modal } from 'bootstrap';
 import ProfileTabs from '@/components/ProfileTabs.vue';
+import { useVuelidate } from '@vuelidate/core';
+import { required, minValue } from '@vuelidate/validators';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -17,6 +19,7 @@ const isLoading = ref(true);
 const searchTerm = ref('');
 const isSubmitting = ref(false);
 const activeProfileId = ref(null);
+const errors = ref({});
 
 // Table state
 const currentPage = ref(1);
@@ -111,12 +114,16 @@ const openAddModal = () => {
         registered_by: authStore.user.id, // Set current user as registered_by
         profile_id: activeProfileId.value,
     };
+    errors.value = {};
+    v$.value.$reset();
     modalInstance.value.show();
 };
 
 const openEditModal = (expense) => {
     isEditMode.value = true;
     currentExpense.value = { ...expense, transaction_date: expense.transaction_date.slice(0, 10) }; // Format date for input
+    errors.value = {};
+    v$.value.$reset();
     modalInstance.value.show();
 };
 
@@ -124,7 +131,19 @@ const hideModal = () => {
     modalInstance.value.hide();
 };
 
+const rules = computed(() => ({
+    amount: { required, minValue: minValue(0) },
+    description: { required },
+    transaction_date: { required },
+    branch_id: { required },
+}));
+
+const v$ = useVuelidate(rules, currentExpense);
+
 const handleSubmit = async () => {
+    v$.value.$touch();
+    if (v$.value.$invalid) return;
+
     isSubmitting.value = true;
     try {
         let response;
@@ -134,13 +153,15 @@ const handleSubmit = async () => {
             response = await addExpense(currentExpense.value);
         }
         if (response.data.success) {
-            fetchExpenses(activeProfileId.value); // Re-fetch all expenses to update the list
+            fetchExpenses(activeProfileId.value);
             hideModal();
-        } else {
-            console.error('Failed to submit expense:', response.data.message);
         }
     } catch (error) {
-        console.error('An error occurred while submitting expense:', error);
+        if (error.response && error.response.status === 422) {
+            errors.value = error.response.data.errors;
+        } else {
+            console.error('An error occurred while submitting expense:', error);
+        }
     } finally {
         isSubmitting.value = false;
     }
@@ -238,23 +259,39 @@ const handleDelete = async (id) => {
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="exp-amount" class="form-label">{{ t('expenses.tableHeaders.amount') }} <span class="text-danger">*</span></label>
-                                    <input type="number" id="exp-amount" class="form-control" v-model.number="currentExpense.amount" required>
+                                    <input type="number" id="exp-amount" class="form-control" v-model.number="v$.amount.$model" :class="{'is-invalid': v$.amount.$error || errors.amount}">
+                                    <div v-if="v$.amount.$error" class="invalid-feedback">
+                                       <p v-for="error of v$.amount.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                    </div>
+                                    <div v-if="errors.amount" class="invalid-feedback">{{ errors.amount }}</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="exp-branch" class="form-label">{{ t('expenses.tableHeaders.branch') }} <span class="text-danger">*</span></label>
-                                    <select id="exp-branch" class="form-select" v-model="currentExpense.branch_id" required>
+                                    <select id="exp-branch" class="form-select" v-model="v$.branch_id.$model" :class="{'is-invalid': v$.branch_id.$error || errors.branch_id}">
                                         <option :value="null">Select a branch</option>
                                         <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
                                     </select>
+                                    <div v-if="v$.branch_id.$error" class="invalid-feedback">
+                                       <p v-for="error of v$.branch_id.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                    </div>
+                                    <div v-if="errors.branch_id" class="invalid-feedback">{{ errors.branch_id }}</div>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label for="exp-description" class="form-label">{{ t('expenses.tableHeaders.description') }} <span class="text-danger">*</span></label>
-                                <textarea id="exp-description" class="form-control" v-model="currentExpense.description" required></textarea>
+                                <textarea id="exp-description" class="form-control" v-model="v$.description.$model" :class="{'is-invalid': v$.description.$error || errors.description}"></textarea>
+                                <div v-if="v$.description.$error" class="invalid-feedback">
+                                    <p v-for="error of v$.description.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                </div>
+                                <div v-if="errors.description" class="invalid-feedback">{{ errors.description }}</div>
                             </div>
                             <div class="mb-3">
                                 <label for="exp-transaction-date" class="form-label">{{ t('expenses.tableHeaders.transaction_date') }} <span class="text-danger">*</span></label>
-                                <input type="date" id="exp-transaction-date" class="form-control" v-model="currentExpense.transaction_date" required>
+                                <input type="date" id="exp-transaction-date" class="form-control" v-model="v$.transaction_date.$model" :class="{'is-invalid': v$.transaction_date.$error || errors.transaction_date}">
+                                <div v-if="v$.transaction_date.$error" class="invalid-feedback">
+                                    <p v-for="error of v$.transaction_date.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                </div>
+                                <div v-if="errors.transaction_date" class="invalid-feedback">{{ errors.transaction_date }}</div>
                             </div>
                         </form>
                     </div>

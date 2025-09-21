@@ -7,6 +7,8 @@ import { getBranches } from '@/services/BranchService';
 import { useAuthStore } from '@/stores/auth'; // To get registered_by user ID
 import { Modal } from 'bootstrap';
 import ProfileTabs from '@/components/ProfileTabs.vue';
+import { useVuelidate } from '@vuelidate/core';
+import { required, minValue } from '@vuelidate/validators';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -17,6 +19,7 @@ const isLoading = ref(true);
 const searchTerm = ref('');
 const isSubmitting = ref(false);
 const activeProfileId = ref(null);
+const errors = ref({});
 
 // Table state
 const currentPage = ref(1);
@@ -111,12 +114,16 @@ const openAddModal = () => {
         registered_by: authStore.user.id, // Set current user as registered_by
         profile_id: activeProfileId.value,
     };
+    errors.value = {};
+    v$.value.$reset();
     modalInstance.value.show();
 };
 
 const openEditModal = (income) => {
     isEditMode.value = true;
     currentIncome.value = { ...income, transaction_date: income.transaction_date.slice(0, 10) }; // Format date for input
+    errors.value = {};
+    v$.value.$reset();
     modalInstance.value.show();
 };
 
@@ -124,7 +131,19 @@ const hideModal = () => {
     modalInstance.value.hide();
 };
 
+const rules = computed(() => ({
+    amount: { required, minValue: minValue(0) },
+    description: { required },
+    transaction_date: { required },
+    branch_id: { required },
+}));
+
+const v$ = useVuelidate(rules, currentIncome);
+
 const handleSubmit = async () => {
+    v$.value.$touch();
+    if (v$.value.$invalid) return;
+
     isSubmitting.value = true;
     try {
         let response;
@@ -134,13 +153,15 @@ const handleSubmit = async () => {
             response = await addIncome(currentIncome.value);
         }
         if (response.data.success) {
-            fetchIncomes(activeProfileId.value); // Re-fetch all incomes to update the list
+            fetchIncomes(activeProfileId.value);
             hideModal();
-        } else {
-            console.error('Failed to submit income:', response.data.message);
         }
     } catch (error) {
-        console.error('An error occurred while submitting income:', error);
+        if (error.response && error.response.status === 422) {
+            errors.value = error.response.data.errors;
+        } else {
+            console.error('An error occurred while submitting income:', error);
+        }
     } finally {
         isSubmitting.value = false;
     }
@@ -244,23 +265,39 @@ const handleDelete = async (id) => {
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="inc-amount" class="form-label">{{ t('incomes.tableHeaders.amount') }} <span class="text-danger">*</span></label>
-                                    <input type="number" id="inc-amount" class="form-control" v-model.number="currentIncome.amount" required>
+                                    <input type="number" id="inc-amount" class="form-control" v-model.number="v$.amount.$model" :class="{'is-invalid': v$.amount.$error || errors.amount}">
+                                    <div v-if="v$.amount.$error" class="invalid-feedback">
+                                       <p v-for="error of v$.amount.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                    </div>
+                                    <div v-if="errors.amount" class="invalid-feedback">{{ errors.amount }}</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="inc-branch" class="form-label">{{ t('incomes.tableHeaders.branch') }} <span class="text-danger">*</span></label>
-                                    <select id="inc-branch" class="form-select" v-model="currentIncome.branch_id" required>
+                                    <select id="inc-branch" class="form-select" v-model="v$.branch_id.$model" :class="{'is-invalid': v$.branch_id.$error || errors.branch_id}">
                                         <option :value="null">Select a branch</option>
                                         <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
                                     </select>
+                                    <div v-if="v$.branch_id.$error" class="invalid-feedback">
+                                       <p v-for="error of v$.branch_id.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                    </div>
+                                    <div v-if="errors.branch_id" class="invalid-feedback">{{ errors.branch_id }}</div>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label for="inc-description" class="form-label">{{ t('incomes.tableHeaders.description') }} <span class="text-danger">*</span></label>
-                                <textarea id="inc-description" class="form-control" :placeholder="t('incomes.description.placeholder','Please enter the name of the entity')" v-model="currentIncome.description" required></textarea>
+                                <textarea id="inc-description" class="form-control" :placeholder="t('incomes.description.placeholder','Please enter the name of the entity')" v-model="v$.description.$model" :class="{'is-invalid': v$.description.$error || errors.description}"></textarea>
+                                <div v-if="v$.description.$error" class="invalid-feedback">
+                                    <p v-for="error of v$.description.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                </div>
+                                <div v-if="errors.description" class="invalid-feedback">{{ errors.description }}</div>
                             </div>
                             <div class="mb-3">
                                 <label for="inc-transaction-date" class="form-label">{{ t('incomes.tableHeaders.transaction_date') }} <span class="text-danger">*</span></label>
-                                <input type="date" id="inc-transaction-date" class="form-control" v-model="currentIncome.transaction_date" required>
+                                <input type="date" id="inc-transaction-date" class="form-control" v-model="v$.transaction_date.$model" :class="{'is-invalid': v$.transaction_date.$error || errors.transaction_date}">
+                                <div v-if="v$.transaction_date.$error" class="invalid-feedback">
+                                    <p v-for="error of v$.transaction_date.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                </div>
+                                <div v-if="errors.transaction_date" class="invalid-feedback">{{ errors.transaction_date }}</div>
                             </div>
                         </form>
                     </div>

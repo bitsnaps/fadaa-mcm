@@ -31,14 +31,17 @@ officesApp.get('/:id', authMiddleware, async (c) => {
 officesApp.post('/', authMiddleware, async (c) => {
     try {
         const { name, branch_id, capacity, status, amenities, type } = await c.req.json();
-        if (!name || !branch_id || !status || !type) {
-            return c.json({ success: false, message: 'Name, branch, status, and type are required' }, 400);
-        }
         const newOffice = await models.Office.create({ name, branch_id, capacity, status, amenities, type });
         return c.json({ success: true, message: 'Office created successfully', data: newOffice }, 201);
     } catch (error) {
-        console.error('Error creating office:', error);
-        return c.json({ success: false, message: 'Failed to create office' }, 500);
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
+        return handleRouteError(c, 'Error creating office', error);
     }
 });
 
@@ -72,6 +75,13 @@ officesApp.put('/:id', authMiddleware, async (c) => {
         await office.update({ name, branch_id, capacity, status, amenities, type });
         return c.json({ success: true, message: 'Office updated successfully', data: office });
     } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
         return handleRouteError(c, `Error updating office ${id}`, error);
     }
 });

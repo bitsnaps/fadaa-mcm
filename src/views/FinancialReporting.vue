@@ -147,7 +147,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { Line, Bar } from 'vue-chartjs';
+import { Line, Bar, Doughnut } from 'vue-chartjs';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import {
   Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler, ArcElement

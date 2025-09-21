@@ -91,9 +91,6 @@ expensesApp.get('/:id', async (c) => {
 expensesApp.post('/', async (c) => {
     try {
       const expenseData = await c.req.json();
-      if (!expenseData.profile_id) {
-        return c.json({ success: false, message: 'profile_id is required' }, 400);
-      }
       const newExpense = await models.Expense.create(expenseData);
 
       // High-value transaction notification
@@ -127,8 +124,14 @@ expensesApp.post('/', async (c) => {
       });
       return c.json({ success: true, message: 'Expense created successfully', data: finalExpense }, 201);
     } catch (error) {
-      console.error('Error creating expense:', error);
-      return c.json({ success: false, message: 'Failed to create expense' }, 500);
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
+      return handleRouteError(c, 'Error creating expense', error);
     }
 });
 
@@ -152,6 +155,13 @@ expensesApp.put('/:id', async (c) => {
       });
       return c.json({ success: true, message: 'Expense updated successfully', data: finalExpense });
     } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
       return handleRouteError(c, 'Error updating expense', error);
     }
 });

@@ -46,10 +46,6 @@ clientServicesApp.post('/:clientId', async (c) => {
     try {
         const { categoryId, paymentType, price, notes, taxId, profile_id, status, transaction_date } = await c.req.json();
 
-        if (!categoryId || !paymentType || !price || !profile_id || !status) {
-            return c.json({ success: false, message: 'Missing required fields, including profile_id and status' }, 400);
-        }
-
         const newService = await models.ClientService.create({
             client_id: clientId,
             profile_id: profile_id,
@@ -64,6 +60,13 @@ clientServicesApp.post('/:clientId', async (c) => {
 
         return c.json({ success: true, message: 'Service added successfully', service: newService }, 201);
     } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
         return handleRouteError(c, `Error adding client service for client ${c.req.param('clientId')}`, error);
     }
 });
@@ -73,10 +76,6 @@ clientServicesApp.put('/:serviceId', async (c) => {
     const { serviceId } = c.req.param();
     try {
         const { categoryId, paymentType, price, notes, taxId, status, transaction_date } = await c.req.json();
-
-        if (!categoryId || !paymentType || !price || !status) {
-            return c.json({ success: false, message: 'Missing required fields' }, 400);
-        }
 
         const service = await models.ClientService.findByPk(serviceId);
         if (!service) {
@@ -95,6 +94,13 @@ clientServicesApp.put('/:serviceId', async (c) => {
 
         return c.json({ success: true, message: 'Service updated successfully', service });
     } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.reduce((acc, err) => {
+                acc[err.path] = err.message;
+                return acc;
+            }, {});
+            return c.json({ errors }, 422);
+        }
         return handleRouteError(c, `Error updating client service ${c.req.param('serviceId')}`, error);
     }
 });
