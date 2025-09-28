@@ -437,8 +437,13 @@
       "assistant": "Assistant",
       "investor": "Investor",
       "client": "Client"
-    }
-  },
+   },
+   "resetPasswordTitle": "Reset Password",
+   "newPassword": "New Password",
+   "confirmPassword": "Confirm Password",
+   "resetPassword": "Reset Password",
+   "passwordChangedSuccess": "Password changed successfully."
+ },
   "manageBranches": {
     "id": "ID",
     "title": "Branch Management",
@@ -984,7 +989,7 @@
       "profileUpdateFailed": "Profile update failed.",
       "pictureUpdateFailed": "Profile picture update failed.",
       "passwordsDoNotMatch": "The new passwords do not match.",
-      "passwordTooShort": "The new password must be at least 6 characters long.",
+      "passwordTooShort": "The new password must be at least 3 characters long.",
       "passwordChanged": "Password changed successfully.",
       "passwordChangeFailed": "Failed to change password. Please try again."
     }

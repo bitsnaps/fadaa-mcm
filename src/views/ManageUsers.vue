@@ -38,6 +38,13 @@
                   <button class="btn btn-sm btn-outline-primary me-2" @click="editUser(user)">
                     <i class="bi bi-pencil-fill"></i>
                   </button>
+                  <button
+                    v-if="['assistant','investor'].includes(user.role.name.toLowerCase())"
+                    class="btn btn-sm btn-outline-warning me-2"
+                    @click="showResetPasswordModal(user)"
+                  >
+                    <i class="bi bi-key-fill"></i>
+                  </button>
                   <button class="btn btn-sm btn-outline-danger" @click="confirmDeleteUser(user)">
                     <i class="bi bi-trash-fill"></i>
                   </button>
@@ -155,13 +162,44 @@
       </div>
     </div>
 
+    <!-- Reset Password Modal -->
+    <div v-if="userToResetPassword" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ $t('manageUsers.resetPasswordTitle') }}</h5>
+            <button type="button" class="btn-close" @click="userToResetPassword = null"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="resetPassword">
+              <div class="mb-3">
+                <label for="newPassword" class="form-label">{{ $t('manageUsers.newPassword') }}</label>
+                <input type="password" class="form-control" id="newPassword" v-model="newPassword" required>
+              </div>
+              <div class="mb-3">
+                <label for="confirmPassword" class="form-label">{{ $t('manageUsers.confirmPassword') }}</label>
+                <input type="password" class="form-control" id="confirmPassword" v-model="confirmPassword" required>
+              </div>
+               <div v-if="errors.password" class="alert alert-danger mt-3">
+                  {{ errors.password }}
+                </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @click="userToResetPassword = null">{{ $t('manageUsers.cancel') }}</button>
+                <button type="submit" class="btn btn-primary">{{ $t('manageUsers.resetPassword') }}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, reactive, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getUsers, getRoles, getBranches, updateUser, addUser, deleteUser as deleteUserApi } from '@/services/UserService';
+import { getUsers, getRoles, getBranches, updateUser, addUser, deleteUser as deleteUserApi, resetPassword as resetPasswordApi } from '@/services/UserService';
 import { formatDate } from '@/helpers/utils';
 import { useVuelidate } from '@vuelidate/core';
 import { required, email, minLength } from '@vuelidate/validators';
@@ -174,6 +212,9 @@ const branches = ref([]);
 const showAddUserModal = ref(false);
 const editingUser = ref(null);
 const userToDelete = ref(null);
+const userToResetPassword = ref(null);
+const newPassword = ref('');
+const confirmPassword = ref('');
 
 const defaultUser = {
   first_name: '',
@@ -187,7 +228,7 @@ const defaultUser = {
 };
 
 const currentUser = ref({ ...defaultUser });
-const errors = reactive({ server: '' });
+const errors = reactive({ server: '', password: '' });
 
 const rules = computed(() => ({
   first_name: { required },
@@ -319,6 +360,31 @@ const deleteUser = async () => {
   }
 };
 
+const showResetPasswordModal = (user) => {
+  userToResetPassword.value = user;
+  newPassword.value = '';
+  confirmPassword.value = '';
+  errors.password = '';
+};
+
+const resetPassword = async () => {
+  if (newPassword.value !== confirmPassword.value) {
+    errors.password = t('userProfile.alerts.passwordsDoNotMatch');// Passwords do not match
+    return;
+  }
+  if (newPassword.value.length < 3) {
+    errors.password = t('userProfile.alerts.passwordTooShort');// Password is too short
+    return;
+  }
+
+  try {
+    await resetPasswordApi(userToResetPassword.value.id, { password: newPassword.value });
+    userToResetPassword.value = null;
+  } catch (error) {
+    errors.password = error.response?.data?.message || 'An unknown error occurred';
+    console.error('Failed to reset password:', error);
+  }
+};
 </script>
 
 <style scoped>

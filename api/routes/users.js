@@ -26,6 +26,9 @@ userApp.put('/profile/:id', authMiddleware, userController.updateUserProfile);
 // Change password
 userApp.post('/change-password/:id', authMiddleware, userController.changePassword);
 
+// Reset password
+userApp.post('/reset-password/:id', authMiddleware, userController.resetPassword);
+
 // Update user preferences
 userApp.put('/preferences/:id', authMiddleware, userController.updateUserPreferences);
 

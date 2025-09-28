@@ -438,8 +438,13 @@
       "assistant": "Assistant",
       "investor": "Investisseur",
       "client": "Client"
-    }
-  },
+   },
+   "resetPasswordTitle": "Réinitialiser le mot de passe",
+   "newPassword": "Nouveau mot de passe",
+   "confirmPassword": "Confirmer le mot de passe",
+   "resetPassword": "Réinitialiser le mot de passe",
+   "passwordChangedSuccess": "Mot de passe changé avec succès."
+ },
   "manageBranches": {
     "id": "ID",
     "title": "Gestion des Agences",
@@ -985,7 +990,7 @@
       "profileUpdateFailed": "La mise à jour du profil a échoué.",
       "pictureUpdateFailed": "La mise à jour de la photo de profil a échoué.",
       "passwordsDoNotMatch": "Les nouveaux mots de passe ne correspondent pas.",
-      "passwordTooShort": "Le nouveau mot de passe doit comporter au moins 6 caractères.",
+      "passwordTooShort": "Le nouveau mot de passe doit comporter au moins 3 caractères.",
       "passwordChanged": "Mot de passe changé avec succès.",
       "passwordChangeFailed": "Échec du changement de mot de passe. Veuillez réessayer."
     }

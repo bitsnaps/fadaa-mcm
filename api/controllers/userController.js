@@ -232,3 +232,23 @@ exports.updateUserPreferences = async (c) => {
         return handleRouteError(c, `Error updating preferences for user ${id}`, error);
     }
 };
+
+exports.resetPassword = async (c) => {
+    const { id } = c.req.param();
+    try {
+        const { password } = await c.req.json();
+        
+        const user = await User.findByPk(id);
+        if (!user) {
+            return c.json({ success: false, message: 'User not found' }, 404);
+        }
+
+        await user.update({
+            password_hash: hashPassword(password),
+        });
+
+        return c.json({ success: true, message: 'Password reset successfully' });
+    } catch (error) {
+        return handleRouteError(c, `Error resetting password for user ${id}`, error);
+    }
+};

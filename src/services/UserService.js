@@ -50,3 +50,7 @@ export const uploadProfilePicture = (id, formData) => {
         },
     });
 };
+
+export const resetPassword = (id, passwordData) => {
+    return apiClient.post(`/users/reset-password/${id}`, passwordData);
+};

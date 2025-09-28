@@ -436,8 +436,13 @@
       "assistant": "مساعد",
       "investor": "مستثمر",
       "client": "عميل"
-    }
-  },
+   },
+   "resetPasswordTitle": "إعادة تعيين كلمة المرور",
+   "newPassword": "كلمة المرور الجديدة",
+   "confirmPassword": "تأكيد كلمة المرور",
+   "resetPassword": "إعادة تعيين كلمة المرور",
+   "passwordChangedSuccess": "تم تغيير كلمة المرور بنجاح."
+ },
   "manageBranches": {
     "id": "المعرف",
     "title": "إدارة الفروع",
@@ -983,7 +988,7 @@
       "profileUpdateFailed": "فشل تحديث الملف الشخصي.",
       "pictureUpdateFailed": "فشل تحديث صورة الملف الشخصي.",
       "passwordsDoNotMatch": "كلمتا المرور الجديدتان غير متطابقتين.",
-      "passwordTooShort": "يجب أن تكون كلمة المرور الجديدة 6 أحرف على الأقل.",
+      "passwordTooShort": "يجب أن تكون كلمة المرور الجديدة 3 أحرف على الأقل.",
       "passwordChanged": "تم تغيير كلمة المرور بنجاح.",
       "passwordChangeFailed": "فشل تغيير كلمة المرور. يرجى المحاولة مرة أخرى."
     }

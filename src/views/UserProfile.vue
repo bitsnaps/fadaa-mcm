@@ -106,7 +106,7 @@ const handleChangePassword = async () => {
     showErrorToast(t('userProfile.alerts.passwordsDoNotMatch'));
     return;
   }
-  if (passwordForm.newPassword.length < 6) {
+  if (passwordForm.newPassword.length < 3) {
     showErrorToast(t('userProfile.alerts.passwordTooShort'));
     return;
   }
