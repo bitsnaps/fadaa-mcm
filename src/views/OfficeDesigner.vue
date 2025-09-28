@@ -74,8 +74,8 @@
 
         <h5 class="mb-3">{{ $t('officeDesigner.main.tools') }}</h5>
         <div class="d-grid gap-2 mb-4">
-            <button class="btn btn-primary" @click="addOffice('rectangle')"><i class="bi bi-plus-square-fill me-2"></i>{{ $t('officeDesigner.main.addOffice') }}</button>
-            <button class="btn btn-info" @click="addOffice('circle')"><i class="bi bi-plus-circle-fill me-2"></i>{{ $t('officeDesigner.main.addDesk') }}</button>
+            <button class="btn btn-primary" @click="addShape('rectangle')"><i class="bi bi-plus-square-fill me-2"></i>{{ $t('officeDesigner.main.addOffice') }}</button>
+            <button class="btn btn-info" @click="addShape('circle')"><i class="bi bi-plus-circle-fill me-2"></i>{{ $t('officeDesigner.main.addDesk') }}</button>
         </div>
 
         <div v-if="selectedOfficeIds.length > 0" class="flex-grow-1">
@@ -151,11 +151,14 @@
 
 <script setup>
 import { ref, reactive, onMounted, onUnmounted, nextTick, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import interact from 'interactjs';
 import { Modal } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { useToast } from '@/helpers/toast';
 import { getBranches } from '@/services/BranchService';
+
+const router = useRouter();
 
 const { t } = useI18n();
 const { showSuccessToast, showErrorToast } = useToast();
@@ -248,13 +251,13 @@ const deleteBranchDesign = (index) => {
     }
 };
 
-const addOffice = (shape) => {
+const addShape = (shape) => {
     const newId = Date.now();
     currentDesign.value.offices.push({
         id: newId,
-        name: `Office ${currentDesign.value.offices.length + 1}`,
+        name: `${shape=='circle'?'Desk':'Office'} ${currentDesign.value.offices.length + 1}`,
         x: 50, y: 50, width: 150, height: 100, rotation: 0,
-        shape: shape, colorClass: 'bg-primary', customColor: '#0d6efd',
+        shape: shape, colorClass: `${shape=='circle'?'bg-info':'bg-primary'}`, customColor: '#0d6efd',
         zIndex: currentDesign.value.offices.length + 1
     });
     nextTick(initInteract);
@@ -401,7 +404,12 @@ const loadDesigns = () => {
 const clearDesign = () => {
     if (confirm(t('officeDesigner.main.confirmReset'))) {
         localStorage.removeItem('branchDesigns');
-        window.location.reload();
+        // Reset state instead of reloading the page
+        designs.value = [];
+        currentDesignIndex.value = -1;
+        projectInitialized.value = false;
+        selectedOfficeIds.value = [];
+        openSetupModal();
     }
 };
 

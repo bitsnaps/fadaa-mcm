@@ -949,7 +949,7 @@
       "deleteBranchConfirm": "هل أنت متأكد من رغبتك في حذف تصميم \"{branchName}\"؟ هذا الإجراء لا يمكن التراجع عنه.",
       "tools": "الأدوات",
       "addOffice": "إضافة مكتب",
-      "addDesk": "إضافة مكتب",
+      "addDesk": "إضافة طاولة",
       "selection": "التحديد ({count} عنصر(s))",
       "shape": "الشكل",
       "rectangle": "مستطيل",
