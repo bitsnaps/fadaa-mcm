@@ -5,8 +5,10 @@ import { useAuthStore } from '@/stores/auth';
 import { useI18n } from 'vue-i18n';
 import { updateUserProfile, changePassword, uploadProfilePicture } from '@/services/UserService';
 import { useToast } from '@/helpers/toast';
+import { usePasswordToggle } from '@/composables/usePasswordToggle';
 
 const { t } = useI18n();
+const { passwordFieldType, isPasswordVisible, togglePasswordVisibility } = usePasswordToggle();
 const authStore = useAuthStore();
 const { showErrorToast } = useToast(); // Keep page-level validation errors only; API toasts handled globally
 
@@ -201,15 +203,30 @@ const handleChangePassword = async () => {
             <form @submit.prevent="handleChangePassword">
               <div class="mb-3">
                 <label for="currentPassword" class="form-label">{{ $t('userProfile.currentPassword') }} <span class="text-danger">*</span></label>
-                <input type="password" class="form-control" id="currentPassword" v-model="passwordForm.currentPassword" required>
+                <div class="input-group">
+                  <input :type="passwordFieldType" class="form-control" id="currentPassword" v-model="passwordForm.currentPassword" required>
+                  <button class="btn btn-outline-secondary" type="button" @click="togglePasswordVisibility">
+                    <i class="bi" :class="isPasswordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+                  </button>
+                </div>
               </div>
               <div class="mb-3">
                 <label for="newPassword" class="form-label">{{ $t('userProfile.newPassword') }} <span class="text-danger">*</span></label>
-                <input type="password" class="form-control" id="newPassword" v-model="passwordForm.newPassword" required>
+                <div class="input-group">
+                  <input :type="passwordFieldType" class="form-control" id="newPassword" v-model="passwordForm.newPassword" required>
+                  <button class="btn btn-outline-secondary" type="button" @click="togglePasswordVisibility">
+                    <i class="bi" :class="isPasswordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+                  </button>
+                </div>
               </div>
               <div class="mb-3">
                 <label for="confirmPassword" class="form-label">{{ $t('userProfile.confirmNewPassword') }} <span class="text-danger">*</span></label>
-                <input type="password" class="form-control" id="confirmPassword" v-model="passwordForm.confirmPassword" required>
+                <div class="input-group">
+                  <input :type="passwordFieldType" class="form-control" id="confirmPassword" v-model="passwordForm.confirmPassword" required>
+                  <button class="btn btn-outline-secondary" type="button" @click="togglePasswordVisibility">
+                    <i class="bi" :class="isPasswordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+                  </button>
+                </div>
               </div>
               <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary">{{ $t('userProfile.changePassword') }}</button>

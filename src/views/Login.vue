@@ -10,7 +10,12 @@
           </div>
           <div class="mb-3">
             <label for="password" class="form-label">{{ t('login.passwordLabel') }}</label>
-            <input type="password" class="form-control" id="password" v-model="password" required :placeholder="t('login.passwordPlaceholder')">
+            <div class="input-group">
+              <input :type="passwordFieldType" class="form-control" id="password" v-model="password" required :placeholder="t('login.passwordPlaceholder')">
+              <button class="btn btn-outline-secondary" type="button" @click="togglePasswordVisibility">
+                <i class="bi" :class="isPasswordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+              </button>
+            </div>
           </div>
           <BButton type="submit" variant="fadaa-primary" class="w-100" :disabled="isLoading">
             <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -30,8 +35,10 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useI18n } from 'vue-i18n';
 import { useToast } from '@/helpers/toast';
+import { usePasswordToggle } from '@/composables/usePasswordToggle';
 
 const { t } = useI18n();
+const { passwordFieldType, isPasswordVisible, togglePasswordVisibility } = usePasswordToggle();
 const email = ref(import.meta.env.DEV?import.meta.env.VITE_DEFAULT_USER:'');
 const password = ref(import.meta.env.DEV?import.meta.env.VITE_DEFAULT_PASSWORD:'');
 

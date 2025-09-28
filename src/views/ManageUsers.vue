@@ -117,7 +117,12 @@
                 </div>
                 <div class="mb-3" v-if="!editingUser">
                   <label for="userPassword" class="form-label">{{ $t('manageUsers.password') }} <span class="text-danger">*</span></label>
-                  <input type="password" class="form-control" id="userPassword" v-model="currentUser.password" :class="{ 'is-invalid': v$.password.$error }" :required="!editingUser">
+                  <div class="input-group">
+                    <input :type="passwordFieldType" class="form-control" id="userPassword" v-model="currentUser.password" :class="{ 'is-invalid': v$.password.$error }" :required="!editingUser">
+                    <button class="btn btn-outline-secondary" type="button" @click="togglePasswordVisibility">
+                      <i class="bi" :class="isPasswordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+                    </button>
+                  </div>
                    <div v-if="v$.password.$error" class="invalid-feedback">
                     <p v-for="error of v$.password.$errors" :key="error.$uid">{{ error.$message }}</p>
                   </div>
@@ -174,11 +179,21 @@
             <form @submit.prevent="resetPassword">
               <div class="mb-3">
                 <label for="newPassword" class="form-label">{{ $t('manageUsers.newPassword') }}</label>
-                <input type="password" class="form-control" id="newPassword" v-model="newPassword" required>
+                <div class="input-group">
+                  <input :type="passwordFieldType" class="form-control" id="newPassword" v-model="newPassword" required>
+                  <button class="btn btn-outline-secondary" type="button" @click="togglePasswordVisibility">
+                    <i class="bi" :class="isPasswordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+                  </button>
+                </div>
               </div>
               <div class="mb-3">
                 <label for="confirmPassword" class="form-label">{{ $t('manageUsers.confirmPassword') }}</label>
-                <input type="password" class="form-control" id="confirmPassword" v-model="confirmPassword" required>
+                <div class="input-group">
+                  <input :type="passwordFieldType" class="form-control" id="confirmPassword" v-model="confirmPassword" required>
+                  <button class="btn btn-outline-secondary" type="button" @click="togglePasswordVisibility">
+                    <i class="bi" :class="isPasswordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+                  </button>
+                </div>
               </div>
                <div v-if="errors.password" class="alert alert-danger mt-3">
                   {{ errors.password }}
@@ -200,11 +215,13 @@
 import { ref, onMounted, reactive, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getUsers, getRoles, getBranches, updateUser, addUser, deleteUser as deleteUserApi, resetPassword as resetPasswordApi } from '@/services/UserService';
+import { usePasswordToggle } from '@/composables/usePasswordToggle';
 import { formatDate } from '@/helpers/utils';
 import { useVuelidate } from '@vuelidate/core';
 import { required, email, minLength } from '@vuelidate/validators';
 
 const { t } = useI18n();
+const { passwordFieldType, isPasswordVisible, togglePasswordVisibility } = usePasswordToggle();
 
 const users = ref([]);
 const roles = ref([]);

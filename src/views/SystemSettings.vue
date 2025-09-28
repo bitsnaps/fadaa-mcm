@@ -53,7 +53,12 @@
               </div>
               <div class="mb-3">
                 <label for="smtpPassword" class="form-label">{{ $t('systemSettings.emailSettings.smtpPassword') }}</label>
-                <input type="password" class="form-control" id="smtpPassword" v-model="settings.smtpPassword">
+                <div class="input-group">
+                  <input :type="passwordFieldType" class="form-control" id="smtpPassword" v-model="settings.smtpPassword">
+                  <button class="btn btn-outline-secondary" type="button" @click="togglePasswordVisibility">
+                    <i class="bi" :class="isPasswordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+                  </button>
+                </div>
               </div>
               <button type="submit" class="btn btn-primary">{{ $t('systemSettings.emailSettings.saveButton') }}</button>
             </form>
@@ -96,6 +101,7 @@
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getSettings, updateSettings } from '@/services/SystemSettingsService';
+import { usePasswordToggle } from '@/composables/usePasswordToggle';
 import { useThemeStore } from '@/stores/theme';
 // import { useToast } from '@/helpers/toast';
 
@@ -104,6 +110,7 @@ const themeStore = useThemeStore();
 // import { useToast } from '@/helpers/toast';
 
 const { t } = useI18n();
+const { passwordFieldType, isPasswordVisible, togglePasswordVisibility } = usePasswordToggle();
 // Globally managed in axios interceptor
 // const { showSuccessToast, showErrorToast } = useToast();
 
