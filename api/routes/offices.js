@@ -3,13 +3,14 @@ const { Op } = require('sequelize');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const officeController = require('../controllers/officeController');
+const branchRestriction = require('../middleware/branchRestriction');
 const { createNotification } = require('../services/notificationService');
 const { handleRouteError } = require('../lib/errorHandler');
 
 const officesApp = new Hono();
 
 // GET all offices with pagination and search
-officesApp.get('/', authMiddleware, officeController.getOffices);
+officesApp.get('/', authMiddleware, branchRestriction(), officeController.getOffices);
 
 // GET single office by ID
 officesApp.get('/:id', authMiddleware, async (c) => {

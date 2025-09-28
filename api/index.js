@@ -407,8 +407,11 @@ app.post('/api/create-client', async (c) => {
     }
 });
 
-serve(app, (info) => {
-  //console.log(`Listening on http://localhost:${info.port}`);
-});
+// We don't need to run the app in test mode, since it'll be running during the test
+if (process.env.NODE_ENV !== 'test') {
+  serve(app, (info) => {
+    //console.log(`Listening on http://localhost:${info.port}`);
+  });
+}
 
 module.exports = app;

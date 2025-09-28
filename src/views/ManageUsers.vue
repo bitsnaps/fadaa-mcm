@@ -20,6 +20,7 @@
                 <th>{{ $t('manageUsers.id') }}</th>
                 <th>{{ $t('manageUsers.fullName') }}</th>
                 <th>{{ $t('manageUsers.email') }}</th>
+                <th>{{ $t('manageUsers.branch') }}</th>
                 <th>{{ $t('manageUsers.role') }}</th>
                 <th>{{ $t('manageUsers.status') }}</th>
                 <th>{{ $t('manageUsers.createdAt') }}</th>
@@ -31,6 +32,7 @@
                 <td>{{ user.id }}</td>
                 <td>{{ user.first_name }} {{ user.last_name }}</td>
                 <td>{{ user.email }}</td>
+                <td>{{ user.branch.name }}</td>
                 <td><span :class="`badge bg-${getRoleClass(user.role.name)}`">{{ user.role.name }}</span></td>
                 <td><span :class="`badge bg-${user.is_active ? 'success' : 'secondary'}`">{{ user.is_active ? $t('manageUsers.active') : $t('manageUsers.inactive') }}</span></td>
                 <td>{{ formatDate(user.created_at) }}</td>

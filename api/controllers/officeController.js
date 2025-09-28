@@ -4,6 +4,7 @@ const models = require('../models');
 const getOffices = async (c) => {
     try {
         const { page = 1, limit = 10, search = '', profile_id } = c.req.query();
+        const branchId = c.get('user').isAdmin()?null:(c.req.query('branchId') || c.req.branch_id || c.get('user')['branch_id']);
         const offset = (page - 1) * limit;
 
         const whereClause = search ? {
@@ -13,6 +14,10 @@ const getOffices = async (c) => {
                 { status: { [Op.like]: `%${search}%` } }
             ]
         } : {};
+
+        if (branchId) {
+            whereClause.branch_id = branchId;
+        }
 
         const includeClause = [{ model: models.Branch, as: 'branch' }];
 

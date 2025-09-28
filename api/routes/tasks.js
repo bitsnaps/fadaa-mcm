@@ -7,12 +7,13 @@ const {
   deleteTask,
 } = require('../controllers/taskController');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth');
+const branchRestriction = require('../middleware/branchRestriction');
 
 const taskApp = new Hono();
 
 // Middleware for all task routes
-// taskApp.use('/*', authMiddleware);
-// taskApp.use('/*', adminMiddleware);
+taskApp.use('*', authMiddleware);
+taskApp.use('/', branchRestriction());
 
 // Routes
 taskApp.get('/', getTasks);

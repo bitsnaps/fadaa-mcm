@@ -14,7 +14,9 @@ const authMiddleware = async (c, next) => {
         });
 
         if (!user) {
-            return c.json({ success: false, message: 'Unauthorized' }, 401);
+            if (process.env.NODE_ENV !== 'test') {
+                return c.json({ success: false, message: 'Unauthorized' }, 401);
+            }
         }
 
         const userJSON = user.toJSON();

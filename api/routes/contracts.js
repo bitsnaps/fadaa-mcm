@@ -3,18 +3,35 @@ const { Op } = require('sequelize');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
+const branchRestriction = require('../middleware/branchRestriction');
 const { handleRouteError } = require('../lib/errorHandler');
 const { downloadFile } = require('../services/fileService');
 
 const contractApp = new Hono();
 
 contractApp.use('*', authMiddleware);
+contractApp.use('/', branchRestriction());
 
 // GET /api/contracts - Get all contracts
 contractApp.get('/', async (c) => {
     try {
         const { profile_id, expiring_within_days } = c.req.query();
+        const branchId = c.get('user').isAdmin()?null:(c.req.query('branchId') || c.req.branch_id || c.get('user')['branch_id']);
         let whereClause = {};
+        let includeClause = [
+            { model: models.Client, attributes: ['id', 'company_name'] },
+            { model: models.Profile },
+            { model: models.Office, attributes: ['id', 'name'] },
+            { model: models.Tax, as: 'taxes' }
+        ];
+
+        if (branchId) {
+            includeClause.push({
+                model: models.Office,
+                where: { branch_id: branchId },
+                required: true
+            });
+        }
 
         if (profile_id) {
             whereClause.profile_id = profile_id;
@@ -31,12 +48,7 @@ contractApp.get('/', async (c) => {
 
         const contracts = await models.Contract.findAll({
             where: whereClause,
-            include: [
-                { model: models.Client, attributes: ['id', 'company_name'] },
-                { model: models.Profile },
-                { model: models.Office, attributes: ['id', 'name'] },
-                { model: models.Tax, as: 'taxes' }
-            ]
+            include: includeClause
         });
         return c.json({ success: true, contracts });
     } catch (error) {

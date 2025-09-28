@@ -1,33 +1,54 @@
-const { Task, Op } = require('../models');
+const { Task, Client, Contract, Office, Op } = require('../models');
 const { handleRouteError } = require('../lib/errorHandler');
 
 // @desc    Get all tasks, with optional filtering by category
 // @route   GET /api/tasks
 // @access  Private
 const getTasks = async (c) => {
-  try {
-    const { category, status } = c.req.query();
-    const whereClause = {};
+    try {
+        const { category, status } = c.req.query();
+        const branchId = c.get('user').isAdmin()?null:(c.req.query('branchId') || c.req.branch_id || c.get('user')['branch_id']);
+        const whereClause = {};
+        let includeClause = [];
 
-    if (category) {
-      whereClause.category = category;
+        if (category) {
+            whereClause.category = category;
+        }
+
+        if (status) {
+            const statuses = status.split(',').map(s => s.trim());
+            if (statuses.length > 1) {
+                whereClause.status = { [Op.in]: statuses };
+            } else {
+                whereClause.status = statuses[0];
+            }
+        }
+
+        if (branchId) {
+            includeClause.push({
+                model: Client,
+                required: true,
+                include: [{
+                    model: Contract,
+                    required: true,
+                    include: [{
+                        model: Office,
+                        required: true,
+                        where: { branch_id: branchId }
+                    }]
+                }]
+            });
+        }
+
+        const tasks = await Task.findAll({
+            where: whereClause,
+            include: includeClause,
+            order: [['due_date', 'ASC']]
+        });
+        return c.json(tasks);
+    } catch (error) {
+        return handleRouteError(c, 'Error fetching tasks', error);
     }
-
-    if (status) {
-      // Handle single or multiple statuses
-      const statuses = status.split(',').map(s => s.trim());
-      if (statuses.length > 1) {
-        whereClause.status = { [Op.in]: statuses };
-      } else {
-        whereClause.status = statuses[0];
-      }
-    }
-
-    const tasks = await Task.findAll({ where: whereClause, order: [['due_date', 'ASC']] });
-    return c.json(tasks);
-  } catch (error) {
-    return handleRouteError(c, 'Error fetching tasks', error);
-  }
 };
 
 // @desc    Create a new task

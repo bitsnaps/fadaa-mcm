@@ -2,13 +2,14 @@ const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
+const branchRestriction = require('../middleware/branchRestriction');
 const { createNotification } = require('../services/notificationService');
 const { Op } = require('sequelize');
 const { handleRouteError } = require('../lib/errorHandler');
 
 const clientsApp = new Hono();
 
-clientsApp.use('*', authMiddleware);
+clientsApp.use('*', authMiddleware, branchRestriction());
 
 // GET total number of clients
 clientsApp.get('/total', async (c) => {
@@ -24,7 +25,8 @@ clientsApp.get('/total', async (c) => {
 // GET all clients
 clientsApp.get('/', async (c) => {
     try {
-        const { profile_id, branchId } = c.req.query();
+        const { profile_id } = c.req.query();
+        const branchId = c.get('user').isAdmin()?null:(c.req.query('branchId') || c.req.branch_id || c.get('user')['branch_id']);
 
         let findOptions = {
             attributes: [
@@ -61,15 +63,21 @@ clientsApp.get('/', async (c) => {
         } else if (branchId) {
             findOptions.include.push({
                 model: models.Contract,
-                required: true, // Use INNER JOIN for branch filtering
+                required: false, // Use LEFT JOIN to include clients without contracts
                 attributes: [],
                 include: [{
                     model: models.Office,
-                    required: true,
-                    where: { branch_id: branchId },
+                    required: false,
                     attributes: []
                 }]
             });
+
+            findOptions.where = {
+                [Op.or]: [
+                    { '$Contracts.id$': null }, // Clients with no contracts
+                    { '$Contracts.Office.branch_id$': branchId } // Clients with contracts in the specified branch
+                ]
+            };
         }
 
         const clients = await models.Client.findAll(findOptions);
