@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="d-flex vh-100 vw-100">
+  <div id="app" class="d-flex vh-100">
     <!-- SETUP MODAL -->
     <div class="modal fade" id="setupModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -541,7 +541,7 @@ body {
 #app {
     display: flex;
     height: 100vh;
-    width: 100vw;
+    width: auto;
 }
 .control-panel {
     width: 320px;
