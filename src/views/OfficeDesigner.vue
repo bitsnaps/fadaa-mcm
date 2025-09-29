@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="d-flex vh-100">
+  <div id="main" class="d-flex vh-100">
     <!-- SETUP MODAL -->
     <div class="modal fade" id="setupModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -61,16 +61,18 @@
             <small class="text-muted">{{ $t('officeDesigner.main.title') }}</small>
         </div>
 
-        <h5 class="mb-3">{{ $t('officeDesigner.main.branches') }}</h5>
-        <ul class="nav nav-pills flex-column mb-3">
-            <li v-for="(design, index) in designs" :key="design.branchId" class="nav-item mb-1">
-                <a href="javascript:void(0)" class="nav-link d-flex justify-content-between align-items-center" :class="{ active: currentDesignIndex === index }" @click.prevent="switchBranch(index)">
-                    <span>{{ design.branchName }}</span>
-                    <i class="bi bi-x-circle" @click.stop="deleteBranchDesign(index)"></i>
-                </a>
-            </li>
-        </ul>
-        <button class="btn btn-sm btn-outline-secondary mb-4" @click="openSetupModal">{{ $t('officeDesigner.main.addBranch') }}</button>
+        <div v-if="authStore.userRole !== 'assistant'">
+            <h5 class="mb-3">{{ $t('officeDesigner.main.branches') }}</h5>
+            <ul class="nav nav-pills flex-column mb-3">
+                <li v-for="(design, index) in designs" :key="design.branchId" class="nav-item mb-1">
+                    <a href="javascript:void(0)" class="nav-link d-flex justify-content-between align-items-center" :class="{ active: currentDesignIndex === index }" @click.prevent="switchBranch(index)">
+                        <span>{{ design.branchName }}</span>
+                        <i class="bi bi-x-circle" @click.stop="deleteBranchDesign(index)"></i>
+                    </a>
+                </li>
+            </ul>
+            <button class="btn btn-sm btn-outline-secondary mb-4" @click="openSetupModal">{{ $t('officeDesigner.main.addBranch') }}</button>
+        </div>
 
         <h5 class="mb-3">{{ $t('officeDesigner.main.tools') }}</h5>
         <div class="d-grid gap-2 mb-4">
@@ -151,14 +153,16 @@
 
 <script setup>
 import { ref, reactive, onMounted, onUnmounted, nextTick, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import interact from 'interactjs';
 import { Modal } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { useToast } from '@/helpers/toast';
+import { useAuthStore } from '@/stores/auth';
 import { getBranches } from '@/services/BranchService';
 
 const router = useRouter();
+const authStore = useAuthStore();
 
 const { t } = useI18n();
 const { showSuccessToast, showErrorToast } = useToast();
@@ -189,7 +193,13 @@ const currentDesign = computed(() => {
 
 const availableBranches = computed(() => {
     const designedBranchIds = designs.value.map(d => d.branchId);
-    return allBranches.value.filter(b => !designedBranchIds.includes(b.id));
+    let branches = allBranches.value.filter(b => !designedBranchIds.includes(b.id));
+    
+    if (authStore.userRole === 'assistant') {
+        return branches.filter(b => b.id === authStore.user.branch_id);
+    }
+    
+    return branches;
 });
 
 const officeStyle = (office) => ({
@@ -219,9 +229,9 @@ const openSetupModal = () => {
 const closeSetup = () => {
     setupModal.hide();
     if (!projectInitialized.value) {
-        router.back();    
+        router.back();
     }
-}
+};
 
 const addBranchDesign = () => {
     if (!setup.branchId) return;
@@ -442,6 +452,9 @@ const initInteract = () => {
                         if(office){
                            office.x += event.dx;
                            office.y += event.dy;
+                           if (selectedOfficeIds.value.length === 1) {
+                                transformInputs.value = { x: office.x, y: office.y, width: office.width, height: office.height };
+                           }
                         }
                     });
                 }
@@ -466,6 +479,9 @@ const initInteract = () => {
                             office.height = event.rect.height;
                             office.x += event.deltaRect.left;
                             office.y += event.deltaRect.top;
+                            if (selectedOfficeIds.value.length === 1) {
+                                transformInputs.value = { x: office.x, y: office.y, width: office.width, height: office.height };
+                            }
                         }
                     });
                 }
@@ -509,26 +525,32 @@ onMounted(async () => {
 
     await fetchBranches();
 
-    if (!loadDesigns()) {
-        openSetupModal();
+    if (authStore.userRole === 'assistant') {
+        const assistantBranch = allBranches.value.find(b => b.id === authStore.user.branch_id);
+        if (assistantBranch) {
+            const existingDesign = designs.value.find(d => d.branchId === assistantBranch.id);
+            if (!existingDesign) {
+                designs.value.push({
+                    branchId: assistantBranch.id,
+                    branchName: assistantBranch.name,
+                    offices: []
+                });
+            }
+            projectInitialized.value = true;
+            switchBranch(designs.value.findIndex(d => d.branchId === assistantBranch.id));
+        } else if (!loadDesigns()) {
+            openSetupModal();
+        }
+    } else {
+        if (!loadDesigns()) {
+            openSetupModal();
+        }
     }
-    
+
     const handleKeyDown = (e) => { if (e.key === 'Shift') isShiftPressed.value = true; };
     const handleKeyUp = (e) => { if (e.key === 'Shift') isShiftPressed.value = false; };
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
-    
-    watch(selectedOfficeIds, (newVal) => {
-        if (newVal.length === 1) {
-            const office = currentDesign.value.offices.find(o => o.id === newVal[0]);
-            if (office) {
-                transformInputs.value = { x: office.x, y: office.y, width: office.width, height: office.height };
-            }
-        } else {
-            // Clear inputs if multiple or no items are selected, as their values might differ.
-            transformInputs.value = { x: null, y: null, width: null, height: null };
-        }
-    }, { deep: true });
 
     onUnmounted(() => {
         window.removeEventListener('keydown', handleKeyDown);
@@ -545,7 +567,7 @@ body {
     background-color: #f0f2f5;
     overflow: hidden; /* Prevent body scroll */
 }
-#app {
+#main {
     display: flex;
     height: 100vh;
     width: auto;
