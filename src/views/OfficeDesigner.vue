@@ -17,7 +17,7 @@
                     <p v-if="!availableBranches.length" class="text-danger">{{ $t('officeDesigner.setupModal.noAvailableBranches') }}</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-info" @click="() => $router.back()">{{ $t('common.cancel') }}</button>
+                    <button type="button" class="btn btn-info" @click="closeSetup">{{ $t('common.cancel') }}</button>
                     <button type="button" class="btn btn-primary" @click="addBranchDesign" :disabled="!setup.branchId">{{ $t('officeDesigner.setupModal.startDesigning') }}</button>
                 </div>
             </div>
@@ -214,6 +214,13 @@ const openSetupModal = () => {
     }
     setup.branchId = availableBranches.value[0]?.id || null;
     setupModal.show();
+}
+
+const closeSetup = () => {
+    setupModal.hide();
+    if (!projectInitialized.value) {
+        router.back();    
+    }
 }
 
 const addBranchDesign = () => {

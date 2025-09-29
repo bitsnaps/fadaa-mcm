@@ -187,7 +187,7 @@ const routes = [
     path: '/office-designer',
     name: 'OfficeDesigner',
     components: { default: OfficeDesigner, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin'] }
+    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
   },
   {
     path: '/monthly-report',
