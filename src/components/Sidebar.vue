@@ -137,7 +137,13 @@ const toggleFinancial = () => {
                 <i class="bi bi-gear-fill me-2"></i>
                 {{ $t('systemSettings.title') }}
               </router-link>
-            </li>            
+            </li>
+            <li class="nav-item" v-if="userRole === 'admin'">
+              <router-link to="/manage-pending-deletions" class="nav-link" active-class="active-fadaa">
+                <i class="bi bi-trash-fill me-2"></i>
+                {{ $t('sidebar.managePendingDeletions') }}
+              </router-link>
+            </li>
           </ul>
         </li>
 

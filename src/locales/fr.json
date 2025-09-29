@@ -97,7 +97,25 @@
     "manageProfiles": "Gestion des Profils",
     "managementOperations": "Gestion & Opérations",
     "financialAnalytics": "Analyses Financières & Suivi",
-    "fileManager": "Gestionnaire de Fichiers"
+    "fileManager": "Gestionnaire de Fichiers",
+    "managePendingDeletions": "Suppressions en attente"
+  },
+  "managePendingDeletions": {
+    "date": "Date",
+    "title": "Gérer les suppressions en attente",
+    "loading": "Chargement...",
+    "requester": "Demandeur",
+    "entityType": "Type d'entité",
+    "entityId": "ID de l'entité",
+    "actions": "Actions",
+    "approve": "Approuver",
+    "reject": "Rejeter",
+    "noPendingDeletions": "Aucune suppression en attente.",
+    "successApprove": "Suppression approuvée.",
+    "failApprove": "Échec de l'approbation de la suppression.",
+    "successReject": "Suppression rejetée.",
+    "failReject": "Échec du rejet de la suppression.",
+    "failLoad": "Échec du chargement des suppressions en attente."
   },
   "fileManager": {
     "title": "Gestionnaire de Fichiers",
@@ -1321,7 +1339,8 @@
         "InvestorContractExpiry": "Expiration de Contrat Investisseur",
         "HighValueTransaction": "Transaction de Haute Valeur",
         "OfficeBookingRequest": "Demande de Réservation de Bureau",
-        "ClientDeletion": "Suppression de Client"
+        "ClientDeletion": "Suppression de Client",
+        "DeletionRequest": "Demande de suppression"
     },
     "markAllAsRead": "Marquer tout comme lu",
     "editModalTitle": "Modifier la Notification",
@@ -1350,7 +1369,8 @@
     "validation": "Certaines entrées sont invalides. Veuillez vérifier vos saisies.",
     "server": "Le serveur a rencontré une erreur. Veuillez réessayer plus tard.",
     "unknown": "Une erreur inconnue est survenue. Veuillez réessayer.",
-    "fetchFailed": "Échec de la récupération de {entity}."
+    "fetchFailed": "Échec de la récupération de {entity}.",
+    "deletionRequestExists": "Une demande de suppression pour ce {entity} existe déjà."
   },
   "locale": "fr"
 }

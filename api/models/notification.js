@@ -20,7 +20,8 @@ module.exports = (sequelize) => {
         'InvestorContractExpiry',
         'HighValueTransaction',
         'OfficeBookingRequest',
-        'ClientDeletion'
+        'ClientDeletion',
+        'DeletionRequest'
       ),
       allowNull: false,
     },

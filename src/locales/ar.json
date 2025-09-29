@@ -97,7 +97,25 @@
     "manageProfiles": "إدارة الحسابات",
     "managementOperations": "الإدارة والعمليات",
     "financialAnalytics": "التحليلات المالية والتتبع",
-    "fileManager": "إدارة الملفات"
+    "fileManager": "إدارة الملفات",
+    "managePendingDeletions": "عمليات الحذف المعلقة"
+  },
+  "managePendingDeletions": {
+    "date": "التاريخ",
+    "title": "إدارة عمليات الحذف المعلقة",
+    "loading": "جار التحميل...",
+    "requester": "الطالب",
+    "entityType": "نوع الكيان",
+    "entityId": "معرف الكيان",
+    "actions": "الإجراءات",
+    "approve": "موافقة",
+    "reject": "رفض",
+    "noPendingDeletions": "لا توجد عمليات حذف معلقة.",
+    "successApprove": "تمت الموافقة على الحذف.",
+    "failApprove": "فشل في الموافقة على الحذف.",
+    "successReject": "تم رفض الحذف.",
+    "failReject": "فشل في رفض الحذف.",
+    "failLoad": "فشل في تحميل عمليات الحذف المعلقة."
   },
   "fileManager": {
     "title": "إدارة الملفات",
@@ -1316,8 +1334,9 @@
       "InvestorContractExpiry": "انتهاء صلاحية عقد المستثمر",
       "HighValueTransaction": "معاملة ذات قيمة عالية",
       "OfficeBookingRequest": "طلب حجز مكتب",
-      "ClientDeletion": "حذف العميل"
-    },
+      "ClientDeletion": "حذف العميل",
+      "DeletionRequest": "طلب حذف"
+  },
     "markAllAsRead": "وضع علامة على الكل كمقروء",
     "editModalTitle": "تحرير الإشعار",
     "deleteConfirm": "هل أنت متأكد من رغبتك في حذف هذا الإشعار؟",
@@ -1345,6 +1364,7 @@
     "validation": "بعض المدخلات غير صالحة. يرجى مراجعة إدخالاتك.",
     "server": "واجه الخادم خطأ. يرجى المحاولة مرة أخرى لاحقًا.",
     "unknown": "حدث خطأ غير معروف. يرجى المحاولة مرة أخرى.",
-    "fetchFailed": "فشل في جلب {entity}."
+    "fetchFailed": "فشل في جلب {entity}.",
+    "deletionRequestExists": "طلب حذف لهذا {entity} موجود بالفعل."
   }
 }

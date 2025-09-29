@@ -97,7 +97,25 @@
     "manageProfiles": "Accounts Management",
     "managementOperations": "Management & Operations",
     "financialAnalytics": "Financial Analytics & Tracking",
-    "fileManager": "File Manager"
+    "fileManager": "File Manager",
+    "managePendingDeletions": "Pending Deletions"
+  },
+  "managePendingDeletions": {
+    "date": "Date",
+    "title": "Manage Pending Deletions",
+    "loading": "Loading...",
+    "requester": "Requester",
+    "entityType": "Entity Type",
+    "entityId": "Entity ID",
+    "actions": "Actions",
+    "approve": "Approve",
+    "reject": "Reject",
+    "noPendingDeletions": "No pending deletions.",
+    "successApprove": "Deletion approved.",
+    "failApprove": "Failed to approve deletion.",
+    "successReject": "Deletion rejected.",
+    "failReject": "Failed to reject deletion.",
+    "failLoad": "Failed to load pending deletions."
   },
   "fileManager": {
     "title": "File Manager",
@@ -1317,7 +1335,8 @@
         "InvestorContractExpiry": "Investor Contract Expiry",
         "HighValueTransaction": "High Value Transaction",
         "OfficeBookingRequest": "Office Booking Request",
-        "ClientDeletion": "Client Deletion"
+        "ClientDeletion": "Client Deletion",
+        "DeletionRequest": "Deletion Request"
     },
     "markAllAsRead": "Mark all as read",
     "editModalTitle": "Edit Notification",
@@ -1346,6 +1365,7 @@
     "validation": "Some inputs are invalid. Please review your entries.",
     "server": "The server encountered an error. Please try again later.",
     "unknown": "Something went wrong. Please try again.",
-    "fetchFailed": "Failed to fetch {entity}."
+    "fetchFailed": "Failed to fetch {entity}.",
+    "deletionRequestExists": "A deletion request for this {entity} already exists."
   }
 }

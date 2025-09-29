@@ -6,6 +6,7 @@ const { uploadMiddleware } = require('../middleware/upload');
 const branchRestriction = require('../middleware/branchRestriction');
 const { handleRouteError } = require('../lib/errorHandler');
 const { downloadFile } = require('../services/fileService');
+const { createNotification } = require('../services/notificationService');
 
 const contractApp = new Hono();
 
@@ -292,15 +293,55 @@ contractApp.put('/:id/status', authMiddleware, async (c) => {
 // DELETE /api/contracts/:id - Delete a contract
 contractApp.delete('/:id', authMiddleware, async (c) => {
     const { id } = c.req.param();
+    const user = c.get('user');
     try {
         const contract = await models.Contract.findByPk(id);
         if (!contract) {
             return c.json({ success: false, message: 'Contract not found' }, 404);
         }
 
-        await contract.destroy();
+        if (user.isAdmin()) {
+            await contract.destroy();
+            return c.json({ success: true, message: 'Contract deleted successfully' });
+        } else {
+            const existingRequest = await models.PendingDeletion.findOne({
+                where: {
+                    entity_type: 'contract',
+                    entity_id: id,
+                    status: 'pending',
+                },
+            });
 
-        return c.json({ success: true, message: 'Contract deleted successfully' });
+            if (existingRequest) {
+                return c.json({ success: false, message: 'A deletion request for this contract already exists.' }, 409);
+            }
+
+            await models.PendingDeletion.create({
+                requester_id: user.id,
+                entity_type: 'contract',
+                entity_id: id,
+            });
+            const admins = await models.User.findAll({
+                include: [{
+                    model: models.Role,
+                    as: 'role',
+                    where: { name: 'Admin' },
+                    attributes: [],
+                }],
+            });
+            const message = `User ${user.email} has requested to delete contract #${id}.`;
+
+            for (const admin of admins) {
+                await createNotification({
+                    userId: admin.id,
+                    type: 'DeletionRequest',
+                    message: message,
+                    relatedEntityType: 'contract',
+                    relatedEntityId: parseInt(id),
+                });
+            }
+            return c.json({ success: true, message: 'Contract deletion request submitted for admin approval' });
+        }
     } catch (error) {
         return handleRouteError(c, `Error deleting contract ${id}`, error);
     }

@@ -50,7 +50,7 @@ const {
   User, Role, Branch, Client, Office, Contract, ServiceCategory,
   ClientService, Document, Task, Notification, FinancialReport,
   ComplianceReport, Investment, OfficeDesign,
-  SystemSetting, ActivityLog, Tax, ContractTax, Income, Expense, Profile, Withdrawal, ClientAttachment
+  SystemSetting, ActivityLog, Tax, ContractTax, Income, Expense, Profile, Withdrawal, ClientAttachment, PendingDeletion
 } = db;
 
 // User associations
@@ -177,6 +177,11 @@ Expense.belongsTo(Branch, { foreignKey: 'branch_id' });
 Branch.hasMany(Expense, { foreignKey: 'branch_id' });
 Expense.belongsTo(User, { as: 'registered_by_user', foreignKey: 'registered_by' });
 User.hasMany(Expense, { as: 'registered_expenses', foreignKey: 'registered_by' });
+// PendingDeletion associations
+if (PendingDeletion) {
+  User.hasMany(PendingDeletion, { as: 'deletion_requests', foreignKey: 'requester_id' });
+  User.hasMany(PendingDeletion, { as: 'approved_deletions', foreignKey: 'approved_by' });
+}
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

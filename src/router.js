@@ -35,6 +35,7 @@ import ManageExpenses from './views/ManageExpenses.vue';
 import ManageProfiles from './views/ManageProfiles.vue';
 import ManageWithdrawals from './views/ManageWithdrawals.vue';
 import FileManager from './views/FileManager.vue';
+import ManagePendingDeletions from './views/ManagePendingDeletions.vue';
 import Navbar from './components/Navbar.vue';
 
 const routes = [
@@ -241,6 +242,12 @@ const routes = [
     path: '/file-manager',
     name: 'FileManager',
     components: { default: FileManager, header: Navbar },
+    meta: { requiresAuth: true, roles: ['admin'] }
+  },
+  {
+    path: '/manage-pending-deletions',
+    name: 'ManagePendingDeletions',
+    components: { default: ManagePendingDeletions, header: Navbar },
     meta: { requiresAuth: true, roles: ['admin'] }
   },
 ];

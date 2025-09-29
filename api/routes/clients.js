@@ -219,37 +219,81 @@ clientsApp.put('/:id', uploadMiddleware('attachments', 'attachments'), async (c)
 // DELETE a client
 clientsApp.delete('/:id', async (c) => {
     const { id } = c.req.param();
+    const user = c.get('user');
+
     try {
         const client = await models.Client.findByPk(id);
         if (!client) {
             return c.json({ success: false, message: 'Client not found' }, 404);
         }
 
-        const deletedClientName = client.company_name || `${client.first_name} ${client.last_name}`;
-        await client.destroy();
+        if (user.isAdmin()) {
+            const deletedClientName = client.company_name || `${client.first_name} ${client.last_name}`;
+            await client.destroy();
 
-        // Notify admins about the client deletion
-        const admins = await models.User.findAll({
-            include: [{
-                model: models.Role,
-                as: 'role',
-                where: { name: 'Admin' },
-                attributes: [],
-            }],
-        });
-        const message = `Client ${deletedClientName} has been deleted by ${c.get('user').email}.`;
-
-        for (const admin of admins) {
-            await createNotification({
-                userId: admin.id,
-                type: 'ClientDeletion',
-                message: message,
-                relatedEntityType: 'client',
-                relatedEntityId: parseInt(id),
+            // Notify admins about the client deletion
+            const admins = await models.User.findAll({
+                include: [{
+                    model: models.Role,
+                    as: 'role',
+                    where: { name: 'Admin' },
+                    attributes: [],
+                }],
             });
-        }
+            const message = `Client ${deletedClientName} has been deleted by ${user.email}.`;
 
-        return c.json({ success: true, message: 'Client deleted successfully' });
+            for (const admin of admins) {
+                await createNotification({
+                    userId: admin.id,
+                    type: 'ClientDeletion',
+                    message: message,
+                    relatedEntityType: 'client',
+                    relatedEntityId: parseInt(id),
+                });
+            }
+
+            return c.json({ success: true, message: 'Client deleted successfully' });
+        } else {
+            const existingRequest = await models.PendingDeletion.findOne({
+                where: {
+                    entity_type: 'client',
+                    entity_id: id,
+                    status: 'pending',
+                },
+            });
+
+            if (existingRequest) {
+                return c.json({ success: false, message: 'A deletion request for this client already exists.' }, 409);
+            }
+
+            await models.PendingDeletion.create({
+                requester_id: user.id,
+                entity_type: 'client',
+                entity_id: id,
+            });
+
+            const admins = await models.User.findAll({
+                include: [{
+                    model: models.Role,
+                    as: 'role',
+                    where: { name: 'Admin' },
+                    attributes: [],
+                }],
+            });
+            const message = `User ${user.email} has requested to delete client ${client.company_name || `${client.first_name} ${client.last_name}`}.`;
+
+            for (const admin of admins) {
+                await createNotification({
+                    userId: admin.id,
+                    type: 'DeletionRequest',
+                    message: message,
+                    relatedEntityType: 'client',
+                    relatedEntityId: parseInt(id),
+                });
+            }
+
+            return c.json({ success: true, message: 'Client deletion request submitted for admin approval' });
+        }
     } catch (error) {
         return handleRouteError(c, `Error deleting client ${id}`, error);
     }

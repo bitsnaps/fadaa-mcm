@@ -47,7 +47,11 @@ apiClient.interceptors.response.use(
     let message = t('errors.unknown');
     const status = error?.response?.status;
 
-    if (error.code === 'ECONNABORTED') {
+    const backendMsg = error.response?.data?.message;
+
+    if (backendMsg) {
+      message = backendMsg;
+    } else if (error.code === 'ECONNABORTED') {
       message = t('errors.timeout');
     } else if (!error.response) {
       message = t('errors.network');
@@ -60,16 +64,13 @@ apiClient.interceptors.response.use(
     } else if (status === 404) {
       message = t('errors.notFound');
     } else if (status === 408) {
-      message = t('contracts.errors.officeNotAvailable');
+        message = t('contracts.errors.officeNotAvailable');
     } else if (status === 409) {
-      message = t('contracts.errors.officeBooked');
+        message = t('contracts.errors.officeBooked');
     } else if (status === 422 || status === 400) {
-      const backendMsg = error.response.data?.message;
-      message = backendMsg ? backendMsg : t('errors.validation');
+      message = t('errors.validation');
     } else if (status >= 500) {
       message = t('errors.server');
-    } else if (error.response?.data?.message) {
-      message = error.response.data.message;
     }
 
     notificationStore.setNotification({ message, type: 'error' });
