@@ -25,67 +25,59 @@ clientsApp.get('/total', async (c) => {
 // GET all clients
 clientsApp.get('/', async (c) => {
     try {
-        const { profile_id, client_id } = c.req.query();
-        const branchId = c.get('user').isAdmin()?null:(c.req.query('branchId') || c.req.branch_id || c.get('user')['branch_id']);
+        const { profile_id, client_id, q, page = 1, pageSize = 20 } = c.req.query();
+        const branchId = c.get('user').isAdmin() ? null : (c.req.query('branchId') || c.req.branch_id || c.get('user')['branch_id']);
 
+        let where = {};
         let findOptions = {
             attributes: [
                 'id', 'company_name', 'first_name', 'last_name', 'email',
                 'phone_number', 'address', 'status', 'created_at'
             ],
-            include: [
-                { model: models.User, as: 'managed_by', attributes: ['id', 'first_name', 'last_name'] },
-                {
-                    model: models.ClientService,
-                    attributes: ['id', 'price', 'taxId', 'profile_id'],
-                    include: [{ model: models.Tax, attributes: ['rate', 'bearer'] }],
-                    required: false
-                }
-            ],
+            include: [],
             order: [['company_name', 'ASC']],
-            subQuery: false // Important for where clauses on includes
+            subQuery: false
         };
 
+        if (q) {
+            where.company_name = { [Op.like]: `%${q}%` };
+        }
+
         if (client_id) {
-            findOptions.where = { id: client_id };
+            where.id = client_id;
         } else if (profile_id) {
-            // We need to find clients that have EITHER a contract OR a service with this profile
-            findOptions.where = {
-                [Op.or]: [
-                    { '$Contracts.profile_id$': profile_id },
-                    { '$ClientServices.profile_id$': profile_id }
-                ]
-            };
-            // We need to make sure the includes are there for the where clause to work
-            findOptions.include.push({
-                model: models.Contract,
-                attributes: [],
-                required: false // Use LEFT JOIN to be able to use Op.or
-            });
+            where[Op.or] = [
+                { '$Contracts.profile_id$': profile_id },
+                { '$ClientServices.profile_id$': profile_id }
+            ];
+            findOptions.include.push({ model: models.Contract, attributes: [], required: false });
+            findOptions.include.push({ model: models.ClientService, attributes: [], required: false });
         } else if (branchId) {
             findOptions.include.push({
                 model: models.Contract,
-                required: false, // Use LEFT JOIN to include clients without contracts
+                required: false,
                 attributes: [],
-                include: [{
-                    model: models.Office,
-                    required: false,
-                    attributes: []
-                }]
+                include: [{ model: models.Office, required: false, attributes: [] }]
             });
-
-            findOptions.where = {
-                [Op.or]: [
-                    { '$Contracts.id$': null }, // Clients with no contracts
-                    { '$Contracts.Office.branch_id$': branchId } // Clients with contracts in the specified branch
-                ]
-            };
+            where[Op.or] = [
+                { '$Contracts.id$': null },
+                { '$Contracts.Office.branch_id$': branchId }
+            ];
         }
 
-        const clients = await models.Client.findAll(findOptions);
+        findOptions.where = where;
 
-        // The admin view relies on these stats, so we keep this calculation block.
-        const clientsWithStats = clients.map(client => {
+        if (c.req.url.includes('page')) {
+            const limit = parseInt(pageSize, 10);
+            const offset = (parseInt(page, 10) - 1) * limit;
+            findOptions.limit = limit;
+            findOptions.offset = offset;
+
+            const { count, rows } = await models.Client.findAndCountAll(findOptions);
+            return c.json({ success: true, items: rows, total: count });
+        } else {
+             const clients = await models.Client.findAll(findOptions);
+            const clientsWithStats = clients.map(client => {
             const clientData = client.toJSON();
             const services = clientData.ClientServices || [];
             clientData.total_services = services.length;
@@ -111,6 +103,7 @@ clientsApp.get('/', async (c) => {
         });
 
         return c.json({ success: true, data: clientsWithStats });
+        }
 
     } catch (error) {
         console.error('Error fetching clients:', error);

@@ -638,6 +638,8 @@
     "title": "إدارة العقود",
     "addNewContract": "إضافة عقد جديد",
     "searchPlaceholder": "البحث بالعميل أو المكتب أو الحالة...",
+    "selectClientPlaceholder": "حدد العميل",
+    "selectOfficePlaceholder": "حدد المكتب",    
     "tableHeaders": {
       "client": "العميل",
       "office": "المكتب",

@@ -640,6 +640,8 @@
     "title": "Gestion des Contrats",
     "addNewContract": "Ajouter un Nouveau Contrat",
     "searchPlaceholder": "Rechercher par client, bureau ou statut...",
+    "selectClientPlaceholder": "Selectioner un Client",
+    "selectOfficePlaceholder": "Selectionner un bureau",    
     "tableHeaders": {
       "client": "Client",
       "office": "Bureau",

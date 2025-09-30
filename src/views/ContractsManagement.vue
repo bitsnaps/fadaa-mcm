@@ -4,11 +4,10 @@ import { useI18n } from 'vue-i18n';
 import { BTable, BPagination } from 'bootstrap-vue-next';
 import apiClient from '@/services/ApiClient';
 import { getContracts, addContract, updateContract } from '@/services/ContractService';
-import { getClients } from '@/services/ClientService';
-import { getAvailableOffices } from '@/services/OfficeService';
 import { Modal } from 'bootstrap';
 import { useVuelidate } from '@vuelidate/core';
 import { required, minValue } from '@vuelidate/validators';
+import SmartSelect from '@/components/SmartSelect.vue';
 
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import { formatCurrency, formatDate } from '@/helpers/utils.js';
@@ -72,8 +71,6 @@ const rules = computed(() => ({
 
 const v$ = useVuelidate(rules, newContract);
 
-const clients = ref([]);
-const offices = ref([]);
 const availableTaxes = ref([]);
 
 const viewContractModal = ref(null);
@@ -276,17 +273,9 @@ const openAddContractModal = async (profileIdFromSlot = null) => {
   errors.value = {};
   v$.value.$reset();
   try {
-    const [clientsResponse, officesResponse, taxesResponse] = await Promise.all([
-      getClients(),
-      getAvailableOffices(),
+    const [taxesResponse] = await Promise.all([
       apiClient.get('/taxes')
     ]);
-    if (clientsResponse.data.success) {
-      clients.value = clientsResponse.data.data;
-    }
-    if (officesResponse.data.success) {
-        offices.value = officesResponse.data.data;
-    }
     if (taxesResponse.data.success) {
        availableTaxes.value = taxesResponse.data.taxes;
     }
@@ -326,14 +315,10 @@ const openEditContractModal = async (contract) => {
   v$.value.$reset();
 
   try {
-    const [clientsResponse, officesResponse, taxesResponse] = await Promise.all([
-      getClients(),
-      getAvailableOffices(),
+    const [taxesResponse] = await Promise.all([
       apiClient.get('/taxes')
     ]);
     
-    if (clientsResponse.data.success) clients.value = clientsResponse.data.data;
-    if (officesResponse.data.success) offices.value = officesResponse.data.data;
     if (taxesResponse.data.success) availableTaxes.value = taxesResponse.data.taxes;
 
     const modalInstance = Modal.getOrCreateInstance(addContractModal.value);
@@ -548,10 +533,16 @@ const submitDocumentUpload = async () => {
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="client" class="form-label">{{ t('contracts.tableHeaders.client') }} <span class="text-danger">*</span></label>
-                                <select id="client" class="form-select" v-model="v$.client_id.$model" :class="{'is-invalid': v$.client_id.$error || errors.client_id}">
-                                    <option :value="null" disabled>-- Select Client --</option>
-                                    <option v-for="client in clients" :key="client.id" :value="client.id">{{ client.company_name }}</option>
-                                </select>
+                                <SmartSelect
+                                  id="client"
+                                  v-model="v$.client_id.$model"
+                                  :class="{'is-invalid': v$.client_id.$error || errors.client_id}"
+                                  fetch-url="/clients"
+                                  label-key="company_name"
+                                  value-key="id"
+                                  :placeholder="t('contracts.selectClientPlaceholder', 'Search and select a client...')"
+                                  :clearable="true"
+                                />
                                 <div v-if="v$.client_id.$error" class="invalid-feedback">
                                     <p v-for="error of v$.client_id.$errors" :key="error.$uid">{{ error.$message }}</p>
                                 </div>
@@ -559,10 +550,20 @@ const submitDocumentUpload = async () => {
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="office" class="form-label">{{ t('contracts.tableHeaders.office') }} <span class="text-danger">*</span></label>
-                                <select id="office" class="form-select" v-model="v$.office_id.$model" :class="{'is-invalid': v$.office_id.$error || errors.office_id}">
+                                <!-- <select id="office" class="form-select" v-model="v$.office_id.$model" :class="{'is-invalid': v$.office_id.$error || errors.office_id}">
                                     <option :value="null" disabled>-- Select Office --</option>
                                     <option v-for="office in offices" :key="office.id" :value="office.id">{{ office.name }}</option>
-                                </select>
+                                </select> -->
+                                <SmartSelect
+                                  id="office"
+                                  v-model="v$.office_id.$model"
+                                  :class="{'is-invalid': v$.office_id.$error || errors.office_id}"
+                                  fetch-url="/offices"
+                                  label-key="name"
+                                  value-key="id"
+                                  :placeholder="t('contracts.selectOfficePlaceholder', 'Search and select a office...')"
+                                  :clearable="true"
+                                />                                
                                 <div v-if="v$.office_id.$error" class="invalid-feedback">
                                     <p v-for="error of v$.office_id.$errors" :key="error.$uid">{{ error.$message }}</p>
                                 </div>

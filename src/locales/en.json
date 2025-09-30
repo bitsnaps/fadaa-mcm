@@ -639,6 +639,8 @@
     "title": "Contract Management",
     "addNewContract": "Add New Contract",
     "searchPlaceholder": "Search by client, office, or status...",
+    "selectClientPlaceholder": "Select a Client",
+    "selectOfficePlaceholder": "Select an office",
     "tableHeaders": {
       "client": "Client",
       "office": "Office",
