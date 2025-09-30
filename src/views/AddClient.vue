@@ -58,6 +58,13 @@ onMounted(async () => {
             if (!client.value.attachments) {
               client.value.attachments = [];
             }
+            const attachmentsResponse = await apiClient.get(`/client-attachments/${clientId.value}`);
+            if (attachmentsResponse.data.success) {
+                client.value.attachments = attachmentsResponse.data.data.map(file => ({
+                    name: file.file_name,
+                    file_path: file.file_path,
+                }));
+            }
         } else {
             console.error(t('addClient.messages.clientNotFound'));
             router.push('/manage-clients');

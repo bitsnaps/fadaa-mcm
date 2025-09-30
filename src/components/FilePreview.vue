@@ -1,6 +1,7 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import apiClient from '@/services/ApiClient';
 
 const props = defineProps({
   file: {
@@ -13,9 +14,42 @@ const { t } = useI18n();
 const fileUrl = ref(null);
 const fileType = ref('');
 
+const getMimeType = (fileName) => {
+  if (!fileName) return '';
+  const extension = fileName.split('.').pop().toLowerCase();
+  switch (extension) {
+    case 'jpg':
+    case 'jpeg':
+      return 'image/jpeg';
+    case 'png':
+      return 'image/png';
+    case 'gif':
+      return 'image/gif';
+    case 'pdf':
+      return 'application/pdf';
+    case 'txt':
+      return 'text/plain';
+    default:
+      return ''; // Unsupported
+  }
+};
+
 const isImage = computed(() => fileType.value.startsWith('image/'));
 const isPdf = computed(() => fileType.value === 'application/pdf');
 const isText = computed(() => fileType.value.startsWith('text/'));
+
+const fetchAndSetFile = async (file) => {
+  try {
+    const response = await apiClient.get(`/files/download/${encodeURIComponent(file.file_path)}`, {
+      responseType: 'blob',
+    });
+    const blob = new Blob([response.data], { type: getMimeType(file.name) });
+    fileUrl.value = URL.createObjectURL(blob);
+    fileType.value = getMimeType(file.name);
+  } catch (error) {
+    console.error('Error fetching file for preview:', error);
+  }
+};
 
 watch(() => props.file, (newFile) => {
   if (newFile) {
@@ -23,11 +57,16 @@ watch(() => props.file, (newFile) => {
       fileUrl.value = URL.createObjectURL(newFile);
       fileType.value = newFile.type;
     } else {
-      fileUrl.value = newFile.file_path;
-      fileType.value = newFile.file_name.split('.').pop();
+      fetchAndSetFile(newFile);
     }
   }
 }, { immediate: true });
+
+onUnmounted(() => {
+  if (fileUrl.value && fileUrl.value.startsWith('blob:')) {
+    URL.revokeObjectURL(fileUrl.value);
+  }
+});
 
 </script>
 
