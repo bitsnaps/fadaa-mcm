@@ -584,6 +584,7 @@
       "contractStartDate": "Contract Start Date",
       "contractEndDate": "Contract End Date",
       "attachments": "Attachments",
+      "selectedAttachments": "Selected Attachments",
       "cancel": "Cancel"
     },
     "messages": {

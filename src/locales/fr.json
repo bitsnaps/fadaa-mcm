@@ -585,6 +585,7 @@
       "contractStartDate": "Date de Début du Contrat",
       "contractEndDate": "Date de Fin du Contrat",
       "attachments": "Pièces Jointes",
+      "selectedAttachments": "Pièce(s) jointe(s) sélectionnée(s)",
       "cancel": "Annuler"
     },
     "messages": {

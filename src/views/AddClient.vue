@@ -5,11 +5,14 @@ import { useI18n } from 'vue-i18n';
 import apiClient from '@/services/ApiClient';
 import { useVuelidate } from '@vuelidate/core';
 import { required, email } from '@vuelidate/validators';
+import { useFilePreview } from '@/composables/useFilePreview';
+import FilePreview from '@/components/FilePreview.vue';
 
 const { t } = useI18n();
 const router = useRouter();
 const route = useRoute();
 const clientId = ref(route.params.clientId || null);
+const { selectedFile, openPreviewModal } = useFilePreview();
 
 const client = ref({
   company_name: '',
@@ -52,6 +55,9 @@ onMounted(async () => {
         const response = await apiClient.get(`/clients/${clientId.value}`);
         if(response.data.success) {
             client.value = response.data.data;
+            if (!client.value.attachments) {
+              client.value.attachments = [];
+            }
         } else {
             console.error(t('addClient.messages.clientNotFound'));
             router.push('/manage-clients');
@@ -70,11 +76,7 @@ const submitForm = async () => {
     try {
         const formData = new FormData();
         Object.keys(client.value).forEach(key => {
-            if (key === 'attachments') {
-                client.value.attachments.forEach(file => {
-                    formData.append('attachments', file);
-                });
-            } else {
+            if (key !== 'attachments') {
                 formData.append(key, client.value[key]);
             }
         });
@@ -114,7 +116,10 @@ const submitForm = async () => {
 };
 
 const handleFileUpload = (event) => {
-  client.value.attachments = Array.from(event.target.files);
+  const files = Array.from(event.target.files);
+  if (files.length > 0) {
+    client.value.attachments.push(...files);
+  }
 };
 
 </script>
@@ -244,9 +249,41 @@ const handleFileUpload = (event) => {
           <label for="attachments" class="form-label">{{ t('addClient.form.attachments') }}</label>
           <input type="file" class="form-control" id="attachments" @change="handleFileUpload" multiple>
         </div>
+
+        <div class="mb-3">
+          <span>Nbr of Attachments: {{ client.attachments ? client.attachments.length:0 }}</span>
+        </div>
+
+        <div v-if="client.attachments && client.attachments.length" class="mb-3">
+            <h5>{{ t('addClient.form.selectedAttachments') }}</h5>
+            <ul class="list-group">
+                <li v-for="(file, index) in client.attachments" :key="index" class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ file.name }}
+                    <button type="button" class="btn btn-sm btn-outline-primary" @click="openPreviewModal(file)">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
         <button type="submit" class="btn btn-primary me-2">{{ submitButtonText }}</button>
         <router-link to="/manage-clients" class="btn btn-secondary">{{ t('addClient.form.cancel') }}</router-link>
       </form>
+
+        <!-- File Preview Modal -->
+        <div class="modal fade" id="filePreviewModal" tabindex="-1" aria-labelledby="filePreviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="filePreviewModalLabel">{{ selectedFile?.name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <FilePreview v-if="selectedFile" :file="selectedFile" />
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
   </template>
   

@@ -583,6 +583,7 @@
       "contractStartDate": "تاريخ بدء العقد",
       "contractEndDate": "تاريخ انتهاء العقد",
       "attachments": "المرفقات",
+      "selectedAttachments": "المرفقات المحددة",
       "cancel": "إلغاء"
     },
     "messages": {

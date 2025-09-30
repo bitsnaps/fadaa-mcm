@@ -111,8 +111,33 @@ const downloadFile = async (c) => {
     }
 };
 
+const previewFile = async (c) => {
+    try {
+        const { filePath } = c.req.param();
+        const decodedPath = decodeURIComponent(filePath);
+        const sourcePath = resolveFilePath(decodedPath);
+
+        if (fs.existsSync(sourcePath)) {
+            const fileStream = fs.createReadStream(sourcePath);
+            const fileName = path.basename(sourcePath);
+            const contentType = getContentType(fileName);
+
+            c.header('Content-Type', contentType);
+            c.header('Content-Disposition', `inline; filename=${encodeURIComponent(fileName)}`);
+
+            return c.body(fileStream);
+        }
+
+        return c.json({ success: false, message: 'File not found' }, 404);
+    } catch (error) {
+        console.error('Error previewing file:', error);
+        return c.json({ success: false, message: 'Failed to preview file' }, 500);
+    }
+};
+
 module.exports = {
     listFiles,
     deleteFile,
     downloadFile,
+    previewFile,
 };
