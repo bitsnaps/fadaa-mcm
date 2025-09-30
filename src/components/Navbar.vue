@@ -142,9 +142,9 @@ onMounted(() => {
     <BCollapse id="nav-collapse" is-nav>
       <BNavbarNav :class="[locale === 'ar' ? 'me-auto' : 'ms-auto', 'align-items-center']">
         <BNavItemDropdown :text="t('navbar.language')" right>
-          <BDropdownItem @click="setLocale('en')">{{ t('navbar.english') }}</BDropdownItem>
-          <BDropdownItem @click="setLocale('fr')">{{ t('navbar.french') }}</BDropdownItem>
-          <BDropdownItem @click="setLocale('ar')">{{ t('navbar.arabic') }}</BDropdownItem>
+          <BDropdownItem @click="setLocale('en')">🇺🇸 English</BDropdownItem>
+          <BDropdownItem @click="setLocale('fr')">🇫🇷 Français</BDropdownItem>
+          <BDropdownItem @click="setLocale('ar')">🇩🇿 العربية</BDropdownItem>
         </BNavItemDropdown>
         <BNavItem v-show="!route.path.endsWith('/login')" v-if="!isAuthenticated" :to="{ path: '/login' }" :active="$route.path === '/login'" link-classes="nav-link">
           {{ t('navbar.login') }}

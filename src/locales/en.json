@@ -1049,9 +1049,6 @@
   },
   "navbar": {
     "language": "Language",
-    "english": "English",
-    "french": "Français",
-    "arabic": "Arabic",
     "login": "Login",
     "notifications": {
       "title": "Notifications",

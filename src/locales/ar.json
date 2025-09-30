@@ -1048,9 +1048,6 @@
   },
   "navbar": {
     "language": "اللغة",
-    "english": "الإنجليزية",
-    "french": "الفرنسية",
-    "arabic": "العربية",
     "login": "تسجيل الدخول",
     "notifications": {
       "title": "الإشعارات",
