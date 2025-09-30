@@ -1,7 +1,8 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-
+import { useFilePreview } from '@/composables/useFilePreview';
+import FilePreview from '@/components/FilePreview.vue';
 import { getDocuments, addDocument, updateDocument, deleteDocument } from '@/services/DocumentService';
 import { getClients, getClientInvestments } from '@/services/ClientService';
 import { getInvestmentsList } from '@/services/InvestmentService';
@@ -12,6 +13,7 @@ import { downloadFile } from '../helpers/files';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
+const { selectedFile, openPreviewModal } = useFilePreview();
 
 
 const documents = ref([]);
@@ -119,12 +121,11 @@ const formatDate = (date) => {
   return format(new Date(date), 'yyyy-MM-dd');
 };
 
-const viewDocument = (docUrl) => {
-  if (docUrl) {
-    window.open(docUrl, '_blank');
-  } else {
-    console.log('No document URL to view.');
-  }
+const viewDocument = (doc) => {
+  openPreviewModal({
+    name: doc.title,
+    file_path: doc.file_path,
+  });
 };
 
 const downloadDocument = (docUrl) => {
@@ -263,7 +264,7 @@ const confirmDeleteDocument = async () => {
             <td>{{ doc.type }}</td>
             <td>{{ formatDate(doc.created_at) }}</td>
             <td class="text-center">
-              <button @click="viewDocument(doc.file_path)" :disabled="!doc.file_path" class="btn btn-sm btn-outline-info me-1" :title="t('documents.view')">
+              <button @click="viewDocument(doc)" :disabled="!doc.file_path" class="btn btn-sm btn-outline-info me-1" :title="t('documents.view')">
                 <i class="bi bi-eye"></i>
               </button>
               <button @click="downloadDocument(doc.file_path)" :disabled="!doc.file_path" class="btn btn-sm btn-outline-primary me-1" :title="t('documents.download')">
@@ -410,6 +411,20 @@ const confirmDeleteDocument = async () => {
         </div>
       </div>
     </div>
+  </div>
+  <!-- File Preview Modal -->
+  <div class="modal fade" id="filePreviewModal" tabindex="-1" aria-labelledby="filePreviewModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="filePreviewModalLabel">{{ selectedFile?.name }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <FilePreview v-if="selectedFile" :file="selectedFile" />
+              </div>
+          </div>
+      </div>
   </div>
 </template>
 

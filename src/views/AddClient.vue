@@ -271,10 +271,6 @@ const handleFileUpload = (event) => {
           <input type="file" class="form-control" id="attachments" @change="handleFileUpload" multiple>
         </div>
 
-        <div class="mb-3">
-          <span>Nbr of Attachments: {{ client.attachments ? client.attachments.length:0 }}</span>
-        </div>
-
         <div v-if="client.attachments && client.attachments.length" class="mb-3">
             <h5>{{ t('addClient.form.selectedAttachments') }}</h5>
             <ul class="list-group">

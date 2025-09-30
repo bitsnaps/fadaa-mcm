@@ -130,6 +130,11 @@
     },
     "deleteConfirm": "هل أنت متأكد من رغبتك في حذف {fileName}؟"
   },
+  "filePreview": {
+    "imageAlt": "معاينة الملف",
+    "pdfNotSupported": "متصفحك لا يدعم تضمين ملفات PDF. يُرجى تنزيل الملف لعرضه.",
+    "unsupported": "نوع الملف غير مدعوم للمعاينة."
+  },  
   "trash": {
     "title": "سلة المهملات",
     "emptyTrash": "إفراغ سلة المهملات",

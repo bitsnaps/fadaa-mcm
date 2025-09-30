@@ -130,6 +130,11 @@
     },
     "deleteConfirm": "Êtes-vous sûr de vouloir supprimer {fileName} ?"
   },
+  "filePreview": {
+    "imageAlt": "Aperçu du fichier",
+    "pdfNotSupported": "Votre navigateur ne prend pas en charge l'intégration de PDF. Veuillez télécharger le fichier pour le voir.",
+    "unsupported": "Type de fichier non pris en charge pour l'aperçu."
+  },
   "trash": {
     "title": "Corbeille",
     "emptyTrash": "Vider la corbeille",

@@ -17,21 +17,15 @@ const fileType = ref('');
 const getMimeType = (fileName) => {
   if (!fileName) return '';
   const extension = fileName.split('.').pop().toLowerCase();
-  switch (extension) {
-    case 'jpg':
-    case 'jpeg':
-      return 'image/jpeg';
-    case 'png':
-      return 'image/png';
-    case 'gif':
-      return 'image/gif';
-    case 'pdf':
-      return 'application/pdf';
-    case 'txt':
-      return 'text/plain';
-    default:
-      return ''; // Unsupported
-  }
+  const mimeTypes = {
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    gif: 'image/gif',
+    pdf: 'application/pdf',
+    txt: 'text/plain',
+  };
+  return mimeTypes[extension] || ''; // Unsupported
 };
 
 const isImage = computed(() => fileType.value.startsWith('image/'));
@@ -43,9 +37,9 @@ const fetchAndSetFile = async (file) => {
     const response = await apiClient.get(`/files/download/${encodeURIComponent(file.file_path)}`, {
       responseType: 'blob',
     });
-    const blob = new Blob([response.data], { type: getMimeType(file.name) });
+    const blob = new Blob([response.data], { type: response.headers['content-type'] });
     fileUrl.value = URL.createObjectURL(blob);
-    fileType.value = getMimeType(file.name);
+    fileType.value = response.headers['content-type'];
   } catch (error) {
     console.error('Error fetching file for preview:', error);
   }
@@ -60,7 +54,7 @@ watch(() => props.file, (newFile) => {
       fetchAndSetFile(newFile);
     }
   }
-}, { immediate: true });
+}, { immediate: true, deep: true });
 
 onUnmounted(() => {
   if (fileUrl.value && fileUrl.value.startsWith('blob:')) {
@@ -84,7 +78,7 @@ onUnmounted(() => {
       <iframe :src="fileUrl" width="100%" height="500px"></iframe>
     </div>
     <div v-else>
-      <p>{{ t('filePreview.unsupported') }}</p>
+      <p>{{ t('filePreview.unsupported') }} - {{ fileUrl }}</p>
     </div>
   </div>
 </template>

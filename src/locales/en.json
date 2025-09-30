@@ -130,6 +130,11 @@
     },
     "deleteConfirm": "Are you sure you want to delete {fileName}?"
   },
+  "filePreview": {
+    "imageAlt": "File Preview",
+    "pdfNotSupported": "Your browser does not support embedding PDFs. Please download the file to view it.",
+    "unsupported": "File type not supported for preview."
+  },
   "trash": {
     "title": "Trash",
     "emptyTrash": "Empty Trash",
