@@ -531,6 +531,7 @@
     "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذا العميل؟",
     "manageServices": "إدارة الخدمات",
     "noClientsFoundSearch": "لم يتم العثور على عملاء مطابقين لمعايير البحث الخاصة بك \"{searchTerm}\".",
+    "noClientsFound": "لم يتم العثور على عملاء.",
     "noClientsAvailable": "لا توجد عملاء متاحة.",
     "addClientLink": "إضافة عميل جديد",
     "clientDetailsTitle": "تفاصيل العميل: {companyName}",

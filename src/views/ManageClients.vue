@@ -1,6 +1,7 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { BTable, BPagination } from 'bootstrap-vue-next';
 import * as bootstrap from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { getClients, deleteClient } from '@/services/ClientService';
@@ -18,15 +19,38 @@ const selectedBranch = ref(null);
 const searchTerm = ref('');
 const selectedClient = ref(null);
 let viewClientModal = null;
+const totalRows = ref(0);
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+const isLoading = ref(true);
+
+const tableFields = [
+  { key: 'id', label: 'ID', sortable: true },
+  { key: 'company_name', label: 'Company Name', sortable: true },
+  { key: 'email', label: 'Email', sortable: true },
+  { key: 'phone_number', label: 'Phone', sortable: true },
+  { key: 'status', label: 'Status', sortable: true },
+  { key: 'actions', label: 'Actions' }
+];
 
 const fetchClients = async () => {
+  isLoading.value = true;
   try {
-    const response = await getClients({ branchId: selectedBranch.value });
+    const params = {
+      page: currentPage.value,
+      pageSize: itemsPerPage.value,
+      q: searchTerm.value,
+      branchId: selectedBranch.value
+    };
+    const response = await getClients(params);
     if (response.data.success) {
-      clients.value = response.data.data;
+      clients.value = response.data.items;
+      totalRows.value = response.data.total;
     }
   } catch (error) {
     console.error("Failed to fetch clients:", error);
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -42,8 +66,12 @@ const fetchBranches = async () => {
 };
 
 const applyBranchFilter = () => {
+  currentPage.value = 1;
   fetchClients();
 };
+
+watch([currentPage, searchTerm, selectedBranch], fetchClients, { deep: true });
+
 
 onMounted(() => {
   fetchClients();
@@ -52,21 +80,6 @@ onMounted(() => {
   if (modalElement) {
     viewClientModal = new bootstrap.Modal(modalElement);
   }
-});
-
-const filteredClients = computed(() => {
-  if (!searchTerm.value) {
-    return clients.value;
-  }
-  const lowerSearchTerm = searchTerm.value.toLowerCase();
-  return clients.value.filter(client =>
-    (client.company_name && client.company_name.toLowerCase().includes(lowerSearchTerm)) ||
-    (client.first_name && client.first_name.toLowerCase().includes(lowerSearchTerm)) ||
-    (client.last_name && client.last_name.toLowerCase().includes(lowerSearchTerm)) ||
-    (client.email && client.email.toLowerCase().includes(lowerSearchTerm)) ||
-    (client.phone_number && client.phone_number.toLowerCase().includes(lowerSearchTerm)) ||
-    (client.status && client.status.toLowerCase().includes(lowerSearchTerm))
-  );
 });
 
 const viewClientDetails = (client) => {
@@ -125,57 +138,52 @@ const removeClient = async (clientId) => {
       </div>
     </div>
 
-    <div v-if="filteredClients.length > 0" class="table-responsive">
-      <table class="table table-hover align-middle">
-        <thead class="table-light">
-          <tr>
-            <th scope="col">{{ $t('manageClients.idHeader') }}</th>
-            <th scope="col">{{ $t('manageClients.companyName') }}</th>
-            <th scope="col">{{ $t('manageClients.emailHeader') }}</th>
-            <th scope="col">{{ $t('manageClients.phoneHeader') }}</th>
-            <th scope="col">{{ $t('manageClients.statusHeader') }}</th>
-            <th scope="col">{{ $t('manageClients.actionsHeader') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="client in filteredClients" :key="client.id">
-            <td>{{ client.id }}</td>
-            <td>{{ client.company_name }}</td>
-            <td>{{ client.email }}</td>
-            <td>{{ client.phone_number }}</td>
-            <td>
-              <span 
-                :class="['badge', 
-                         client.status === 'Active' ? 'bg-success' : 
-                         client.status === 'Inactive' ? 'bg-secondary' : 
-                         'bg-warning text-dark']">
-                {{ client.status === 'Active' ? $t('manageClients.statusActive') : client.status === 'Inactive' ? $t('manageClients.statusInactive') : $t('manageClients.statusPending') }}
-              </span>
-            </td>
-            <td>
-              <button @click="viewClientDetails(client)" class="btn btn-sm btn-outline-info me-1" :title="$t('manageClients.viewDetails')">
-                <i class="bi bi-eye"></i>
-              </button>
-              <button @click="editClient(client.id)" class="btn btn-sm btn-outline-warning me-1" :title="$t('manageClients.editClient')">
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button @click="manageClientServices(client.id)" class="btn btn-sm btn-outline-primary" :title="$t('manageClients.manageServices')">
-               <i class="bi bi-gear"></i>
-             </button>
-             <button @click="removeClient(client.id)" class="btn btn-sm btn-outline-danger" :title="$t('manageClients.deleteClient')">
-               <i class="bi bi-trash"></i>
-             </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div v-else class="alert alert-info text-center" role="alert">
-      <div v-if="searchTerm && filteredClients.length === 0">
-        {{ $t('manageClients.noClientsFoundSearch', { searchTerm: searchTerm }) }}
+    <div v-if="isLoading" class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
       </div>
-      <div v-else>
-        {{ $t('manageClients.noClientsAvailable') }} <router-link to="/add-client">{{ $t('manageClients.addClientLink') }}</router-link> to get started.
+    </div>
+    <div v-else>
+      <BTable
+        :items="clients"
+        :fields="tableFields"
+        striped
+        hover
+        responsive
+        show-empty
+        :empty-text="$t('manageClients.noClientsFound')"
+      >
+        <template #cell(status)="data">
+          <span
+            :class="['badge',
+                     data.value === 'Active' ? 'bg-success' :
+                     data.value === 'Inactive' ? 'bg-secondary' :
+                     'bg-warning text-dark']"
+          >
+            {{ $t(`manageClients.statuses.${data.value.toLowerCase()}`) }}
+          </span>
+        </template>
+        <template #cell(actions)="data">
+          <button @click="viewClientDetails(data.item)" class="btn btn-sm btn-outline-info me-1" :title="$t('manageClients.viewDetails')">
+            <i class="bi bi-eye"></i>
+          </button>
+          <button @click="editClient(data.item.id)" class="btn btn-sm btn-outline-warning me-1" :title="$t('manageClients.editClient')">
+            <i class="bi bi-pencil-square"></i>
+          </button>
+          <button @click="manageClientServices(data.item.id)" class="btn btn-sm btn-outline-primary" :title="$t('manageClients.manageServices')">
+            <i class="bi bi-gear"></i>
+          </button>
+          <button @click="removeClient(data.item.id)" class="btn btn-sm btn-outline-danger" :title="$t('manageClients.deleteClient')">
+            <i class="bi bi-trash"></i>
+          </button>
+        </template>
+      </BTable>
+      <div class="d-flex justify-content-center mt-4" v-if="totalRows > itemsPerPage">
+        <BPagination
+          v-model="currentPage"
+          :total-rows="totalRows"
+          :per-page="itemsPerPage"
+        />
       </div>
     </div>
 

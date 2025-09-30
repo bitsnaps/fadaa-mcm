@@ -533,6 +533,7 @@
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce client ?",
     "manageServices": "Gérer les Services",
     "noClientsFoundSearch": "Aucun client trouvé correspondant à votre recherche \"{searchTerm}\".",
+    "noClientsFound": "Aucun client trouvé.",
     "noClientsAvailable": "Aucun client disponible.",
     "addClientLink": "Ajouter un nouveau client",
     "clientDetailsTitle": "Détails du Client : {companyName}",
