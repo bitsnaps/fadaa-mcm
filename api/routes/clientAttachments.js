@@ -3,9 +3,8 @@ const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
 const path = require('path');
-const fs = require('fs');
 const { handleRouteError } = require('../lib/errorHandler');
-const { getUploadDir } = require('../lib/filesHelper');
+const { moveFileToTrash } = require('../services/trashService');
 
 const clientAttachmentsApp = new Hono();
 clientAttachmentsApp.use('*', authMiddleware);
@@ -68,6 +67,25 @@ clientAttachmentsApp.post('/:clientId', uploadMiddleware('attachments', 'attachm
 
     } catch (error) {
         return handleRouteError(c, `Error uploading client attachments for client ${c.req.param('clientId')}`, error);
+    }
+});
+
+// DELETE /api/client-attachments/:attachmentId - Delete an attachment
+clientAttachmentsApp.delete('/:attachmentId', async (c) => {
+    try {
+        const { attachmentId } = c.req.param();
+        const attachment = await models.ClientAttachment.findByPk(attachmentId);
+
+        if (!attachment) {
+            return c.json({ success: false, message: 'Attachment not found' }, 404);
+        }
+
+        await moveFileToTrash(attachment.file_path);
+        await attachment.destroy();
+
+        return c.json({ success: true, message: 'Attachment deleted successfully' });
+    } catch (error) {
+        return handleRouteError(c, `Error deleting client attachment ${c.req.param('attachmentId')}`, error);
     }
 });
 

@@ -61,8 +61,9 @@ onMounted(async () => {
             const attachmentsResponse = await apiClient.get(`/client-attachments/${clientId.value}`);
             if (attachmentsResponse.data.success) {
                 client.value.attachments = attachmentsResponse.data.data.map(file => ({
-                    name: file.file_name,
-                    file_path: file.file_path,
+                   id: file.id,
+                   name: file.file_name,
+                   file_path: file.file_path,
                 }));
             }
         } else {
@@ -75,6 +76,19 @@ onMounted(async () => {
     }
   }
 });
+
+const deleteAttachment = async (attachment, index) => {
+  if (confirm(t('addClient.messages.confirmDeleteAttachment'))) {
+    try {
+      if (attachment.id) {
+        await apiClient.delete(`/client-attachments/${attachment.id}`);
+      }
+      client.value.attachments.splice(index, 1);
+    } catch (error) {
+      console.error('Failed to delete attachment:', error);
+    }
+  }
+};
 
 const submitForm = async () => {
     v$.value.$touch();
@@ -266,9 +280,14 @@ const handleFileUpload = (event) => {
             <ul class="list-group">
                 <li v-for="(file, index) in client.attachments" :key="index" class="list-group-item d-flex justify-content-between align-items-center">
                     {{ file.name }}
-                    <button type="button" class="btn btn-sm btn-outline-primary" @click="openPreviewModal(file)">
-                        <i class="bi bi-eye"></i>
-                    </button>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-primary me-2" @click="openPreviewModal(file)">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" @click="deleteAttachment(file, index)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
                 </li>
             </ul>
         </div>
