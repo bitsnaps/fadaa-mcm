@@ -3,15 +3,20 @@ const models = require('../models');
 
 const getOffices = async (c) => {
     try {
-        const { page = 1, pageSize = 10, q = '', profile_id } = c.req.query();
-        const branchId = c.get('user').isAdmin()?null:(c.req.query('branchId') || c.req.branch_id || c.get('user')['branch_id']);
-        const offset = (page - 1) * pageSize;
+        const { page, pageSize, q, profile_id, limit, search } = c.req.query();
+        const isSmartSelect = page && pageSize;
+        const pageNumber = parseInt(page) || 1;
+        const limitNumber = parseInt(pageSize || limit) || 10;
+        const searchQuery = q || search || '';
+        const offset = (pageNumber - 1) * limitNumber;
 
-        const whereClause = q ? {
+        const branchId = c.get('user').isAdmin()?null:(c.req.query('branchId') || c.req.branch_id || c.get('user')['branch_id']);
+
+        const whereClause = searchQuery ? {
             [Op.or]: [
-                { name: { [Op.like]: `%${q}%` } },
-                { '$branch.name$': { [Op.like]: `%${q}%` } },
-                { status: { [Op.like]: `%${q}%` } }
+                { name: { [Op.like]: `%${searchQuery}%` } },
+                { '$branch.name$': { [Op.like]: `%${searchQuery}%` } },
+                { status: { [Op.like]: `%${searchQuery}%` } }
             ]
         } : {};
 
@@ -34,15 +39,28 @@ const getOffices = async (c) => {
             where: whereClause,
             include: includeClause,
             order: [['name', 'ASC']],
-            limit: parseInt(pageSize),
-            offset: parseInt(offset),
+            limit: limitNumber,
+            offset: offset,
         });
 
-        return c.json({
-            success: true,
-            items: rows,
-            total: count,
-        });
+        if (isSmartSelect) {
+            return c.json({
+                success: true,
+                items: rows,
+                total: count,
+            });
+        } else {
+            return c.json({
+                success: true,
+                data: rows,
+                pagination: {
+                    total: count,
+                    page: pageNumber,
+                    limit: limitNumber,
+                    totalPages: Math.ceil(count / limitNumber),
+                }
+            });
+        }
     } catch (error) {
         console.error('Error fetching offices:', error);
         return c.json({ success: false, message: 'Failed to fetch offices' }, 500);
