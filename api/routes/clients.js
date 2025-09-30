@@ -25,7 +25,7 @@ clientsApp.get('/total', async (c) => {
 // GET all clients
 clientsApp.get('/', async (c) => {
     try {
-        const { profile_id } = c.req.query();
+        const { profile_id, client_id } = c.req.query();
         const branchId = c.get('user').isAdmin()?null:(c.req.query('branchId') || c.req.branch_id || c.get('user')['branch_id']);
 
         let findOptions = {
@@ -46,7 +46,9 @@ clientsApp.get('/', async (c) => {
             subQuery: false // Important for where clauses on includes
         };
 
-        if (profile_id) {
+        if (client_id) {
+            findOptions.where = { id: client_id };
+        } else if (profile_id) {
             // We need to find clients that have EITHER a contract OR a service with this profile
             findOptions.where = {
                 [Op.or]: [

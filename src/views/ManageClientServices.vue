@@ -72,6 +72,7 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useModal } from 'bootstrap-vue-next';
+import { useRouter, useRoute } from 'vue-router';
 import apiClient from '@/services/ApiClient';
 import AddServiceModal from '@/components/AddServiceModal.vue';
 import ClientServicesModal from '@/components/ClientServicesModal.vue';
@@ -79,6 +80,8 @@ import ProfileTabs from '@/components/ProfileTabs.vue';
 import { formatCurrency } from '@/helpers/utils.js';
 
 const { t } = useI18n();
+const router = useRouter();
+const route = useRoute();
 const addServiceModal = useModal('add-service-modal');
 const viewServicesModal = useModal('client-services-modal');
 
@@ -109,8 +112,13 @@ const fetchClients = async () => {
     if (activeProfileId.value) {
       params.profile_id = activeProfileId.value;
     }
+    const clientId = route.query.clientId;
+    if (clientId) {
+      params.client_id = clientId;
+    }
     const response = await apiClient.get('/clients', { params });
     clients.value = response.data.data;
+    
   } catch (error) {
     console.error('Failed to fetch clients:', error);
     // Handle error appropriately, e.g., show a notification
