@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename);
 const CONFIG = {
   srcDir: path.join(__dirname, '../src'),
   localesDir: path.join(__dirname, '../src/locales'),
-  supportedLocales: ['en', 'fr'],
+  supportedLocales: ['en', 'fr', 'ar'],
   fileExtensions: ['.vue', '.js', '.ts'],
   excludeDirs: ['node_modules', 'dist', '.git'],
   // Regex patterns to find translation keys

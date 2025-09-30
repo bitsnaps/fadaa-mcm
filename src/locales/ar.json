@@ -599,7 +599,8 @@
       "updateSuccess": "تم تحديث العميل بنجاح!",
       "addSuccess": "تم إضافة العميل بنجاح!",
       "updateError": "فشل في تحديث العميل.",
-      "addError": "فشل في إضافة العميل."
+      "addError": "فشل في إضافة العميل.",
+      "confirmDeleteAttachment": "هل أنت متأكد من رغبتك في حذف هذا الملف؟"
     }
   },
   "documents": {

@@ -4,6 +4,7 @@ const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
 const path = require('path');
 const { handleRouteError } = require('../lib/errorHandler');
+const { getUploadDir } = require('../lib/filesHelper');
 const { moveFileToTrash } = require('../services/trashService');
 
 const clientAttachmentsApp = new Hono();

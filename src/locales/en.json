@@ -600,7 +600,8 @@
       "updateSuccess": "Client updated successfully!",
       "addSuccess": "Client added successfully!",
       "updateError": "Failed to update client.",
-      "addError": "Failed to add client."
+      "addError": "Failed to add client.",
+      "confirmDeleteAttachment": "Are you sure you want to delete this attachment?"
     }
   },
   "documents": {

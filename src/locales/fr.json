@@ -601,7 +601,8 @@
       "updateSuccess": "Client mis à jour avec succès !",
       "addSuccess": "Client ajouté avec succès !",
       "updateError": "Échec de la mise à jour du client.",
-      "addError": "Échec de l'ajout du client."
+      "addError": "Échec de l'ajout du client.",
+      "confirmDeleteAttachment": "Êtes-vous sûr de vouloir supprimer cette pièce jointe?"
     }
   },
   "documents": {
