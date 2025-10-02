@@ -4,8 +4,10 @@ import { computed, ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useSidebarStore } from '@/stores/sidebar';
+import { useNotificationStore } from '@/stores/notification';
 import { useI18n } from 'vue-i18n';
-import { getNotifications, markNotificationsAsRead } from '@/services/notificationService';
+import { getUnreadNotifications, markNotificationsAsRead } from '@/services/notificationService';
+import { useToast } from '@/helpers/toast';
 import {
   BNavbar,
   BNavbarBrand,
@@ -22,11 +24,11 @@ const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 const sidebarStore = useSidebarStore();
+const notificationStore = useNotificationStore();
+const { showInfoToast } = useToast();
 
-const notifications = ref([]);
-const unreadCount = computed(() => notifications.value?.filter(n => !n.is_read).length || 0);
-
-
+const unreadCount = computed(() => notificationStore.unreadCount);
+const latestUnread = computed(() => notificationStore.latestUnread);
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const userRole = computed(() => authStore.userRole);
 
@@ -51,28 +53,44 @@ const handleLogout = () => {
   authStore.logout();
   router.push('/login');
 };
-const fetchNotifications = async () => {
-  if (isAuthenticated.value)
-    try {
-      const response = await getNotifications();
-      if (response.data.success) {
-        notifications.value = response.data.notifications;
+let pollingInterval = null;
+
+const pollNotifications = async () => {
+  if (!isAuthenticated.value) return;
+
+  try {
+    const response = await getUnreadNotifications();
+    if (response.data.success) {
+      const newCount = response.data.unreadCount;
+      const newLatest = response.data.latestUnread;
+
+      // If there's a new notification, show a toast
+      if (newCount > unreadCount.value) {
+         // Find which notifications are actually new since the last poll
+        const newNotifications = newLatest.filter(newN =>
+          !latestUnread.value.some(oldN => oldN.id === newN.id)
+        );
+        
+        newNotifications.forEach(n => {
+          showInfoToast(n.message);
+        });
       }
-    } catch (error) {
-      console.error('Failed to fetch notifications:', error);
+
+      notificationStore.setUnreadNotifications(response.data);
     }
+  } catch (error) {
+    console.error('Failed to poll notifications:', error);
+  }
 };
 
 const handleNotificationDropdownClick = async () => {
-  if (!isAuthenticated.value){
-    return;
-  }
-  const unreadIds = notifications.value.filter(n => !n.is_read).map(n => n.id);
+  if (unreadCount.value === 0) return;
+
+  const unreadIds = latestUnread.value.filter(n => !n.is_read).map(n => n.id);
   if (unreadIds.length > 0) {
     try {
       await markNotificationsAsRead(unreadIds);
-      // Refresh notifications to update read status
-      fetchNotifications();
+      pollNotifications(); // Re-poll to update the count immediately
     } catch (error) {
       console.error('Failed to mark notifications as read:', error);
     }
@@ -115,8 +133,14 @@ const getNotificationLink = (notification) => {
 
 onMounted(() => {
   if (isAuthenticated.value) {
-    fetchNotifications();
-    setInterval(fetchNotifications, 60000); // Refresh every minute
+    pollNotifications();
+    pollingInterval = setInterval(pollNotifications, 10000); // Poll every 10 seconds
+  }
+});
+
+onUnmounted(() => {
+  if (pollingInterval) {
+    clearInterval(pollingInterval);
   }
 });
 </script>
@@ -155,17 +179,14 @@ onMounted(() => {
               <i class="bi bi-bell-fill"></i>
               <span v-if="unreadCount > 0" class="badge rounded-pill bg-danger">{{ unreadCount }}</span>
             </template>
-            <BDropdownItem v-for="notification in notifications" :key="notification.id" :to="getNotificationLink(notification)" link-class="d-flex align-items-center">
+            <BDropdownItem v-for="notification in latestUnread" :key="notification.id" :to="getNotificationLink(notification)" link-class="d-flex align-items-center">
                 <i :class="['bi', getNotificationIcon(notification.type), 'm-2']"></i>
                 <div class="flex-grow-1">
-                    <p class="mb-0" :class="{'fw-bold': !notification.is_read}">{{ notification.message }}</p>
+                    <p class="mb-0 fw-bold">{{ notification.message }}</p>
                     <small class="text-muted">{{ new Date(notification.created_at).toLocaleString() }}</small>
                 </div>
-                <BButton variant="light" size="sm" class="ms-2" @click.stop.prevent="markNotificationsAsRead([notification.id])" v-if="!notification.is_read">
-                    <i class="bi bi-check"></i>
-                </BButton>
             </BDropdownItem>
-            <BDropdownItem v-if="notifications.length === 0" disabled>{{ t('navbar.notifications.noNewNotifications') }}</BDropdownItem>
+            <BDropdownItem v-if="latestUnread.length === 0" disabled>{{ t('navbar.notifications.noNewNotifications') }}</BDropdownItem>
             <BDropdownItem divider />
             <BDropdownItem :to="{ path: '/manage-notifications' }">{{ t('navbar.notifications.viewAll') }}</BDropdownItem>
           </BNavItemDropdown>

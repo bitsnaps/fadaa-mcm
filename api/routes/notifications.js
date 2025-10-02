@@ -97,6 +97,29 @@ notificationApp.post('/', async (c) => {
     return handleRouteError(c, 'Error creating notification', error);
   }
 });
+notificationApp.get('/unread', async (c) => {
+  const user = c.get('user');
+  try {
+    const where = { user_id: user.id, is_read: false };
+
+    const unreadCount = await models.Notification.count({ where });
+
+    const latestUnread = await models.Notification.findAll({
+      where,
+      order: [['created_at', 'DESC']],
+      limit: 5,
+    });
+
+    return c.json({
+      success: true,
+      unreadCount,
+      latestUnread,
+    });
+  } catch (error) {
+    return handleRouteError(c, 'Error fetching unread notifications', error);
+  }
+});
+
 notificationApp.post('/mark-read', async (c) => {
   const user = c.get('user');
   try {
