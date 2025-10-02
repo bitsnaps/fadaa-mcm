@@ -1,4 +1,4 @@
-const { Task, Client, Contract, Office, Op } = require('../models');
+const { Task, User, Op } = require('../models');
 const { handleRouteError } = require('../lib/errorHandler');
 
 // @desc    Get all tasks, with optional filtering by category
@@ -26,17 +26,10 @@ const getTasks = async (c) => {
 
         if (branchId) {
             includeClause.push({
-                model: Client,
+                model: User,
+                as: 'user',
                 required: true,
-                include: [{
-                    model: Contract,
-                    required: true,
-                    include: [{
-                        model: Office,
-                        required: true,
-                        where: { branch_id: branchId }
-                    }]
-                }]
+                where: { branch_id: branchId }
             });
         }
 
@@ -56,11 +49,12 @@ const getTasks = async (c) => {
 // @access  Private
 const createTask = async (c) => {
   try {
+    const user = c.get('user');
     const { title, description, category, status, priority, due_date } = await c.req.json();
     if (!title || !priority || !due_date) {
       return c.json({ message: 'Title, priority, and due date are required.' }, 400);
     }
-    const newTask = await Task.create({ title, description, category, status, priority, due_date });
+    const newTask = await Task.create({ title, description, category, status, priority, due_date, user_id: user.id });
     return c.json(newTask, 201);
   } catch (error) {
     return handleRouteError(c, 'Error creating task', error);

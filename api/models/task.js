@@ -36,12 +36,28 @@ module.exports = (sequelize) => {
     completed_at: {
       type: DataTypes.DATE,
     },
+    user_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'users',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL'
+    },
   }, {
     tableName: 'tasks',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   });
+
+  Task.associate = (models) => {
+    Task.belongsTo(models.User, {
+      foreignKey: 'user_id',
+      as: 'user'
+    });
+  };
 
   return Task;
 };

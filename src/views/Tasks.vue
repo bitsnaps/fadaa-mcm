@@ -108,6 +108,7 @@ const handleSaveTask = async (taskData) => {
     if (taskData.id) {
       await apiUpdateTask(taskData.id, taskData);
       showSuccessToast(t('tasks.success.updated'));
+      await fetchTasks();
     } else {
       await apiCreateTask(taskData);
       showSuccessToast(t('tasks.success.created'));
