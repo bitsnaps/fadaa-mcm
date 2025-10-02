@@ -73,24 +73,38 @@ onMounted(() => {
 });
 
 const filteredExpenses = computed(() => {
-    if (!searchTerm.value) {
-        return expenses.value;
+    let filtered = expenses.value;
+
+    if (!isAdmin.value) {
+        filtered = filtered.filter(exp => exp.branch_id === authStore?.user?.branch_id);
     }
-    return expenses.value.filter(exp =>
+
+    if (!searchTerm.value) {
+        return filtered;
+    }
+    return filtered.filter(exp =>
         (exp.description && exp.description.toLowerCase().includes(searchTerm.value.toLowerCase())) ||
         (exp.Branch && exp.Branch.name.toLowerCase().includes(searchTerm.value.toLowerCase())) ||
         (exp.registered_by_user && `${exp.registered_by_user.first_name} ${exp.registered_by_user.last_name}`.toLowerCase().includes(searchTerm.value.toLowerCase()))
     );
 });
 
-const tableFields = computed(() => [
-    { key: 'amount', label: t('expenses.tableHeaders.amount'), sortable: true },
-    { key: 'description', label: t('expenses.tableHeaders.description'), sortable: true },
-    { key: 'transaction_date', label: t('expenses.tableHeaders.transaction_date'), sortable: true },
-    { key: 'branch_name', label: t('expenses.tableHeaders.branch'), sortable: true },
-    { key: 'registered_by_name', label: t('expenses.tableHeaders.registered_by'), sortable: true },
-    { key: 'actions', label: t('expenses.tableHeaders.actions') }
-]);
+const tableFields = computed(() => {
+    const fields = [
+        { key: 'amount', label: t('expenses.tableHeaders.amount'), sortable: true },
+        { key: 'description', label: t('expenses.tableHeaders.description'), sortable: true },
+        { key: 'transaction_date', label: t('expenses.tableHeaders.transaction_date'), sortable: true },
+    ];
+
+    if (isAdmin.value) {
+        fields.push({ key: 'branch_name', label: t('expenses.tableHeaders.branch'), sortable: true });
+    }
+
+    fields.push({ key: 'registered_by_name', label: t('expenses.tableHeaders.registered_by'), sortable: true });
+    fields.push({ key: 'actions', label: t('expenses.tableHeaders.actions') });
+
+    return fields;
+});
 
 const tableItems = computed(() =>
     filteredExpenses.value.map(exp => ({
@@ -110,7 +124,7 @@ const openAddModal = () => {
         amount: 0,
         description: null,
         transaction_date: new Date().toISOString().slice(0, 10), // Default to today's date
-        branch_id: null,
+        branch_id: isAdmin.value ? null : authStore.user.branch_id,
         registered_by: authStore.user.id, // Set current user as registered_by
         profile_id: activeProfileId.value,
     };
@@ -139,6 +153,8 @@ const rules = computed(() => ({
 }));
 
 const v$ = useVuelidate(rules, currentExpense);
+
+const isAdmin = computed(() => authStore.userRole === 'admin');
 
 const handleSubmit = async () => {
     v$.value.$touch();
@@ -209,36 +225,34 @@ const handleDelete = async (id) => {
                     </div>
                 </div>
 
-                <div v-else-if="filteredExpenses.length > 0" class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th scope="col">{{ t('expenses.tableHeaders.amount') }}</th>
-                                <th scope="col">{{ t('expenses.tableHeaders.description') }}</th>
-                                <th scope="col">{{ t('expenses.tableHeaders.transaction_date') }}</th>
-                                <th scope="col">{{ t('expenses.tableHeaders.branch') }}</th>
-                                <th scope="col">{{ t('expenses.tableHeaders.registered_by') }}</th>
-                                <th scope="col" class="text-center">{{ t('expenses.tableHeaders.actions') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="expense in filteredExpenses" :key="expense.id">
-                                <td>{{ expense.amount }}</td>
-                                <td>{{ expense.description }}</td>
-                                <td>{{ expense.transaction_date ? new Date(expense.transaction_date).toLocaleDateString() : 'N/A' }}</td>
-                                <td>{{ expense.Branch ? expense.Branch.name : 'N/A' }}</td>
-                                <td>{{ expense.registered_by_user ? `${expense.registered_by_user.first_name} ${expense.registered_by_user.last_name}` : 'N/A' }}</td>
-                                <td class="text-center">
-                                    <button @click="openEditModal(expense)" class="btn btn-sm btn-outline-info me-1" :title="t('expenses.edit')">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button @click="handleDelete(expense.id)" class="btn btn-sm btn-outline-danger" :title="t('expenses.delete')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div v-else-if="tableItems.length > 0">
+                    <BTable
+                        :items="tableItems"
+                        :fields="tableFields"
+                        :current-page="currentPage"
+                        :per-page="perPage"
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
+                        responsive
+                        striped
+                        hover
+                        show-empty
+                        :empty-text="t('expenses.noExpensesFound')"
+                    >
+                        <template #cell(transaction_date)="data">
+                            {{ data.value ? new Date(data.value).toLocaleDateString() : 'N/A' }}
+                        </template>
+                        <template #cell(actions)="data">
+                            <div class="text-center">
+                                <button @click="openEditModal(data.item)" class="btn btn-sm btn-outline-info me-1" :title="t('expenses.edit')">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button @click="handleDelete(data.item.id)" class="btn btn-sm btn-outline-danger" :title="t('expenses.delete')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </template>
+                    </BTable>
                 </div>
                 <div v-else class="alert alert-info text-center" role="alert">
                     {{ t('expenses.noExpensesFound') }}
@@ -265,7 +279,7 @@ const handleDelete = async (id) => {
                                     </div>
                                     <div v-if="errors.amount" class="invalid-feedback">{{ errors.amount }}</div>
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-6 mb-3" v-if="isAdmin">
                                     <label for="exp-branch" class="form-label">{{ t('expenses.tableHeaders.branch') }} <span class="text-danger">*</span></label>
                                     <select id="exp-branch" class="form-select" v-model="v$.branch_id.$model" :class="{'is-invalid': v$.branch_id.$error || errors.branch_id}">
                                         <option :value="null">Select a branch</option>

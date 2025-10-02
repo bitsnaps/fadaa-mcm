@@ -73,24 +73,39 @@ onMounted(() => {
 });
 
 const filteredIncomes = computed(() => {
-    if (!searchTerm.value) {
-        return incomes.value;
+    let filtered = incomes.value;
+
+    if (!isAdmin.value) {
+        filtered = filtered.filter(inc => inc.branch_id === authStore?.user?.branch_id);
     }
-    return incomes.value.filter(inc =>
+
+    if (!searchTerm.value) {
+        return filtered;
+    }
+
+    return filtered.filter(inc =>
         (inc.description && inc.description.toLowerCase().includes(searchTerm.value.toLowerCase())) ||
         (inc.Branch && inc.Branch.name.toLowerCase().includes(searchTerm.value.toLowerCase())) ||
         (inc.registered_by_user && `${inc.registered_by_user.first_name} ${inc.registered_by_user.last_name}`.toLowerCase().includes(searchTerm.value.toLowerCase()))
     );
 });
 
-const tableFields = computed(() => [
-    { key: 'amount', label: t('incomes.tableHeaders.amount'), sortable: true },
-    { key: 'description', label: t('incomes.tableHeaders.description'), sortable: true },
-    { key: 'transaction_date', label: t('incomes.tableHeaders.transaction_date'), sortable: true },
-    { key: 'branch_name', label: t('incomes.tableHeaders.branch'), sortable: true },
-    { key: 'registered_by_name', label: t('incomes.tableHeaders.registered_by'), sortable: true },
-    { key: 'actions', label: t('incomes.tableHeaders.actions') }
-]);
+const tableFields = computed(() => {
+    const fields = [
+        { key: 'amount', label: t('incomes.tableHeaders.amount'), sortable: true },
+        { key: 'description', label: t('incomes.tableHeaders.description'), sortable: true },
+        { key: 'transaction_date', label: t('incomes.tableHeaders.transaction_date'), sortable: true },
+    ];
+
+    if (isAdmin.value) {
+        fields.push({ key: 'branch_name', label: t('incomes.tableHeaders.branch'), sortable: true });
+    }
+
+    fields.push({ key: 'registered_by_name', label: t('incomes.tableHeaders.registered_by'), sortable: true });
+    fields.push({ key: 'actions', label: t('incomes.tableHeaders.actions') });
+
+    return fields;
+});
 
 const tableItems = computed(() =>
     filteredIncomes.value.map(inc => ({
@@ -110,7 +125,7 @@ const openAddModal = () => {
         amount: 0,
         description: null,
         transaction_date: new Date().toISOString().slice(0, 10), // Default to today's date
-        branch_id: null,
+        branch_id: isAdmin.value ? null : authStore.user.branch_id,
         registered_by: authStore.user.id, // Set current user as registered_by
         profile_id: activeProfileId.value,
     };
@@ -139,6 +154,8 @@ const rules = computed(() => ({
 }));
 
 const v$ = useVuelidate(rules, currentIncome);
+
+const isAdmin = computed(() => authStore.userRole === 'admin');
 
 const handleSubmit = async () => {
     v$.value.$touch();
@@ -271,7 +288,7 @@ const handleDelete = async (id) => {
                                     </div>
                                     <div v-if="errors.amount" class="invalid-feedback">{{ errors.amount }}</div>
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-6 mb-3" v-if="isAdmin">
                                     <label for="inc-branch" class="form-label">{{ t('incomes.tableHeaders.branch') }} <span class="text-danger">*</span></label>
                                     <select id="inc-branch" class="form-select" v-model="v$.branch_id.$model" :class="{'is-invalid': v$.branch_id.$error || errors.branch_id}">
                                         <option :value="null">Select a branch</option>
