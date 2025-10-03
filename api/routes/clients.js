@@ -34,9 +34,22 @@ clientsApp.get('/', async (c) => {
                 'id', 'company_name', 'first_name', 'last_name', 'email',
                 'phone_number', 'address', 'status', 'created_at'
             ],
-            include: [],
+            include: [
+                {
+                    model: models.Contract,
+                    attributes: [],
+                    required: false
+                },
+                {
+                    model: models.ClientService,
+                    attributes: ['price', 'taxId'],
+                    required: false,
+                    include: [{ model: models.Tax, attributes: ['rate', 'bearer'], required: false }]
+                }
+            ],
             order: [['company_name', 'ASC']],
-            subQuery: false
+            subQuery: false,
+            distinct: true
         };
 
         if (q) {
@@ -45,14 +58,14 @@ clientsApp.get('/', async (c) => {
 
         if (client_id) {
             where.id = client_id;
-        } else if (profile_id) {
-            where[Op.or] = [
-                { '$Contracts.profile_id$': profile_id },
-                { '$ClientServices.profile_id$': profile_id }
-            ];
-            findOptions.include.push({ model: models.Contract, attributes: [], required: false });
-            findOptions.include.push({ model: models.ClientService, attributes: [], required: false });
-        } else if (branchId) {
+        }
+        
+        if (profile_id) {
+            findOptions.include[0].where = { profile_id: profile_id };
+            findOptions.include[1].where = { profile_id: profile_id };
+        }
+
+        if (branchId) {
             findOptions.include.push({
                 model: models.Contract,
                 required: false,
@@ -76,33 +89,32 @@ clientsApp.get('/', async (c) => {
             const { count, rows } = await models.Client.findAndCountAll(findOptions);
             return c.json({ success: true, items: rows, total: count });
         } else {
-             const clients = await models.Client.findAll(findOptions);
+            const clients = await models.Client.findAll(findOptions);
             const clientsWithStats = clients.map(client => {
-            const clientData = client.toJSON();
-            const services = clientData.ClientServices || [];
-            clientData.total_services = services.length;
-            let totalAmountWithTaxes = 0;
-            let totalAmountWithoutTaxes = 0;
-            services.forEach(service => {
-                const servicePrice = parseFloat(service.price) || 0;
-                totalAmountWithoutTaxes += servicePrice;
-                let serviceAmountWithTax = servicePrice;
-                if (service.Tax && service.Tax.rate) {
-                    const taxRate = parseFloat(service.Tax.rate) || 0;
-                    const taxAmount = servicePrice * (taxRate / 100);
-                    if (service.Tax.bearer === 'Company') {
-                        serviceAmountWithTax += taxAmount;
+                const clientData = client.toJSON();
+                const services = client.ClientServices || [];
+                clientData.total_services = services.length;
+                let totalAmountWithTaxes = 0;
+                let totalAmountWithoutTaxes = 0;
+                services.forEach(service => {
+                    const servicePrice = parseFloat(service.price) || 0;
+                    totalAmountWithoutTaxes += servicePrice;
+                    let serviceAmountWithTax = servicePrice;
+                    if (service.Tax && service.Tax.rate) {
+                        const taxRate = parseFloat(service.Tax.rate) || 0;
+                        const taxAmount = servicePrice * (taxRate / 100);
+                        if (service.Tax.bearer === 'Company') {
+                            serviceAmountWithTax += taxAmount;
+                        }
                     }
-                }
-                totalAmountWithTaxes += serviceAmountWithTax;
+                    totalAmountWithTaxes += serviceAmountWithTax;
+                });
+                clientData.total_amount_with_taxes = totalAmountWithTaxes;
+                clientData.total_amount_without_taxes = totalAmountWithoutTaxes;
+                delete clientData.ClientServices;
+                return clientData;
             });
-            clientData.total_amount_with_taxes = totalAmountWithTaxes;
-            clientData.total_amount_without_taxes = totalAmountWithoutTaxes;
-            delete clientData.ClientServices;
-            return clientData;
-        });
-
-        return c.json({ success: true, data: clientsWithStats });
+            return c.json({ success: true, data: clientsWithStats });
         }
 
     } catch (error) {

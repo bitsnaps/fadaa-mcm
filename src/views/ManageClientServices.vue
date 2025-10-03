@@ -89,7 +89,7 @@ const clients = ref([]);
 const filter = ref('');
 const currentPage = ref(1);
 const perPage = ref(10);
-const totalRows = computed(() => clients.value.length);
+const totalRows = ref(0);
 const selectedClient = ref(null);
 const activeProfileId = ref(null);
 
@@ -148,6 +148,7 @@ const onProfileChange = (profileId) => {
 onMounted(() => {
   fetchClients();
 });
+
 
 </script>
 
