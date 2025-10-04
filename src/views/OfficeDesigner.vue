@@ -45,12 +45,15 @@
     <div v-if="projectInitialized" class="main-canvas-area">
         <div class="canvas">
             <div v-for="office in currentDesign.offices" :key="office.id"
-                 class="office-object"
-                 :class="[office.colorClass, `shape-${office.shape}`, { selected: selectedOfficeIds.includes(office.id) }]"
-                 :style="officeStyle(office)"
+                 class="office-container"
+                 :style="containerStyle(office)"
                  :data-id="office.id"
                  @click="handleSelection($event, office.id)">
-                {{ office.name }}
+                <div class="office-name">{{ office.name }}</div>
+                <div class="office-object"
+                     :class="[office.colorClass, `shape-${office.shape}`, { selected: selectedOfficeIds.includes(office.id) }]"
+                     :style="officeStyle(office)">
+                </div>
             </div>
         </div>
     </div>
@@ -202,12 +205,18 @@ const availableBranches = computed(() => {
     return branches;
 });
 
-const officeStyle = (office) => ({
+const containerStyle = (office) => ({
+    transform: `translate(${office.x}px, ${office.y}px)`,
     width: `${office.width}px`,
     height: `${office.height}px`,
-    transform: `translate(${office.x}px, ${office.y}px) rotate(${office.rotation}deg)`,
+    zIndex: office.zIndex,
+});
+
+const officeStyle = (office) => ({
+    width: '100%',
+    height: '100%',
+    transform: `rotate(${office.rotation}deg)`,
     backgroundColor: office.colorClass === 'custom' ? office.customColor : '',
-    zIndex: office.zIndex
 });
 
 // Methods
@@ -432,7 +441,7 @@ const clearDesign = () => {
 
 const initInteract = () => {
     const gridSize = 10;
-    interact('.office-object')
+    interact('.office-container')
         .draggable({
             inertia: false,
             modifiers: [
@@ -597,16 +606,28 @@ body {
     height: 100%;
     position: relative;
 }
-.office-object {
+.office-container {
     position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-weight: 600;
-    font-size: 1rem;
     cursor: move;
     user-select: none;
+}
+.office-name {
+    position: absolute;
+    top: -22px; /* Position name above the shape */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    z-index: 10;
+}
+.office-object {
+    position: absolute;
+    width: 100%;
+    height: 100%;
     box-sizing: border-box; /* Important for interact.js resizing */
     border: 2px solid transparent;
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
@@ -621,7 +642,7 @@ body {
 .shape-circle { border-radius: 50%; }
 
 /* For rotation handle (pseudo-element) */
-.office-object.selected::after {
+.office-container.selected .office-object::after {
     content: 'Alt+Drag';
     position: absolute;
     bottom: -30px;
