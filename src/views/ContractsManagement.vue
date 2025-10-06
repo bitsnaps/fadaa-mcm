@@ -36,7 +36,7 @@ const tableFields = computed(() => [
   { key: 'payment_terms', label: t('contracts.tableHeaders.paymentTerms'), sortable: true },
   { key: 'start_date', label: t('contracts.tableHeaders.startDate'), sortable: true, formatter: formatDateContract },
   { key: 'end_date', label: t('contracts.tableHeaders.endDate'), sortable: true, formatter: formatDateContract },
-  { key: 'monthly_rate', label: t('contracts.tableHeaders.monthlyRate', 'Monthly Rate'), sortable: true, formatter: (value) => { const n = typeof value === 'number' ? value : parseFloat(value); return Number.isFinite(n) ? n : 'N/A'; } },
+  { key: 'monthly_rate', label: t('contracts.tableHeaders.monthlyRate', 'Monthly Rate'), sortable: true },
   { key: 'total_amount', label: t('contracts.tableHeaders.totalAmount', 'Total Amount'), sortable: false },
   { key: 'actions', label: t('contracts.tableHeaders.actions'), class: 'text-center' }
 ]);
@@ -178,13 +178,28 @@ const filteredContracts = computed(() => {
     );
   }
 
-  // Transform data for BTable
-  return filtered.map(contract => ({
-    ...contract,
-    client_name: contract.Client?.company_name || 'N/A',
-    office_name: contract.Office?.name || 'N/A',
-    total_amount: calculateTotalAmount(contract)
-  }));
+  return filtered.map(contract => {
+    const clientBearsTax = contract.taxes?.some(tax => tax.bearer === 'Client');
+    let monthlyRateDisplay;
+    let totalAmountDisplay;
+
+    if (clientBearsTax) {
+      monthlyRateDisplay = calculateMonthlyRateWithTaxes(contract);
+      totalAmountDisplay = monthlyRateDisplay;
+    } else {
+      monthlyRateDisplay = parseFloat(contract.monthly_rate);
+      totalAmountDisplay = calculateTotalAmount(contract);
+    }
+
+    return {
+      ...contract,
+      client_name: contract.Client?.company_name || 'N/A',
+      office_name: contract.Office?.name || 'N/A',
+      monthly_rate_display: monthlyRateDisplay,
+      total_amount_display: totalAmountDisplay,
+      original_contract: contract // Keep a reference to the original for modals
+    };
+  });
 });
 
 // For BTable, we don't need paginatedContracts as BTable handles pagination internally
@@ -202,25 +217,44 @@ const formatDateContract = (date) => {
   return formatDate(date);
 };
 
-const calculateTotalAmount = (contract) => {
+const calculateMonthlyRateWithTaxes = (contract) => {
   const monthlyRate = parseFloat(contract.monthly_rate);
-  
   if (isNaN(monthlyRate)) return 0;
 
-  // Support both API include alias 'taxes' and potential 'Taxes'
   const taxes = contract.taxes || [];
-
-  if (taxes.length === 0) {
-    return monthlyRate;
-  }
-
-  const totalTaxRate = taxes.reduce((sum, tax) => {
-    const rate = parseFloat(tax.rate);
-    return sum + (isNaN(rate) ? 0 : rate);
+  const clientTaxRate = taxes.reduce((sum, tax) => {
+    if (tax.bearer === 'Client') {
+      const rate = parseFloat(tax.rate);
+      return sum + (isNaN(rate) ? 0 : rate);
+    }
+    return sum;
   }, 0);
 
-  const totalAmount = monthlyRate * (1 + totalTaxRate / 100);
-  return totalAmount;
+  return monthlyRate * (1 + clientTaxRate / 100);
+};
+
+const calculateTotalAmount = (contract) => {
+    const monthlyRate = parseFloat(contract.monthly_rate);
+    if (isNaN(monthlyRate)) return 0;
+
+    const taxes = contract.taxes || [];
+
+    // Check if any tax is borne by the client
+    const clientBearsTax = taxes.some(tax => tax.bearer === 'Client');
+
+    if (clientBearsTax) {
+        return calculateMonthlyRateWithTaxes(contract);
+    }
+
+    const companyTaxRate = taxes.reduce((sum, tax) => {
+        if (tax.bearer === 'Company') {
+            const rate = parseFloat(tax.rate);
+            return sum + (isNaN(rate) ? 0 : rate);
+        }
+        return sum;
+    }, 0);
+
+    return monthlyRate * (1 + companyTaxRate / 100);
 };
 
 const viewDocument = (docUrl) => {
@@ -479,16 +513,16 @@ const submitDocumentUpload = async () => {
             </template>
 
             <template #cell(monthly_rate)="data">
-              {{ formatCurrency(data.value, '') }}
+              {{ formatCurrency(data.item.monthly_rate_display, '') }}
             </template>
 
             <template #cell(total_amount)="data">
-              {{ formatCurrency(data.value, '') }}
+              {{ formatCurrency(data.item.total_amount_display, '') }}
             </template>
 
             <template #cell(actions)="data">
               <div class="text-center">
-                <button @click="openViewContractModal(data.item)" class="btn btn-sm btn-outline-info me-1" :title="t('contracts.viewContract')">
+                <button @click="openViewContractModal(data.item.original_contract)" class="btn btn-sm btn-outline-info me-1" :title="t('contracts.viewContract')">
                   <i class="bi bi-eye"></i>
                 </button>
                 <button @click="downloadDocument(data.item.document_url)" :disabled="!data.item.document_url" class="btn btn-sm btn-outline-primary me-1" :title="t('contracts.downloadContract')">
