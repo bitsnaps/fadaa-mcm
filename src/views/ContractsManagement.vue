@@ -343,9 +343,14 @@ const submitNewContract = async () => {
 
   Object.keys(contractData).forEach(key => {
     if (key === 'tax_ids') {
-      contractData[key].forEach(taxId => {
-        formData.append('tax_ids[]', taxId);
-      });
+      if (contractData[key].length > 0) {
+        contractData[key].forEach(taxId => {
+          formData.append('tax_ids[]', taxId);
+        });
+      } else {
+        // Ensure the key is sent even when the array is empty
+        formData.append('tax_ids[]', '');
+      }
     } else if (key === 'document' && contractData[key]) {
       formData.append(key, contractData[key]);
     } else if (key !== 'document' && contractData[key] !== null && contractData[key] !== undefined) {
