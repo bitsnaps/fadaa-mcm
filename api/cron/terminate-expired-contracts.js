@@ -22,9 +22,9 @@ const terminateExpiredContracts = async () => {
     }
 
     for (const contract of expiredContracts) {
-      contract.status = 'Terminated';
+      contract.status = 'Expired';
       await contract.save();
-      console.log(`Contract with ID ${contract.id} has been terminated.`);
+      console.log(`Contract with ID ${contract.id} has been marked as expired.`);
 
       // Make the office available again
       await models.Office.update(
@@ -34,9 +34,9 @@ const terminateExpiredContracts = async () => {
       console.log(`Office with ID ${contract.office_id} is now available.`);
     }
 
-    console.log(`${expiredContracts.length} contracts have been terminated.`);
+    console.log(`${expiredContracts.length} contracts have been marked as expired.`);
   } catch (error) {
-    console.error('Error terminating expired contracts:', error);
+    console.error('Error expiring contracts:', error);
   }
 };
 
