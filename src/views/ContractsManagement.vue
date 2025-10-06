@@ -161,6 +161,15 @@ watch(() => newContract.value.payment_terms, (newVal) => {
   newContract.value.end_date = endDate.toISOString().split('T')[0];
 });
 
+watch([() => newContract.value.start_date, () => newContract.value.end_date], () => {
+  // Clear the selected office when the dates change
+  // to force the user to re-select from the newly filtered list.
+  // We only do this if the office was already selected.
+  if (newContract.value.office_id) {
+    newContract.value.office_id = null;
+  }
+});
+
 watch(searchTerm, () => {
   currentPage.value = 1;
 });
@@ -210,6 +219,21 @@ const areDatesValid = computed(() => {
     return true;
   }
   return new Date(newContract.value.start_date) < new Date(newContract.value.end_date);
+});
+
+const officeFetchParams = computed(() => {
+  const params = {};
+  if (newContract.value.start_date) {
+    params.start_date = newContract.value.start_date;
+  }
+  if (newContract.value.end_date) {
+    params.end_date = newContract.value.end_date;
+  }
+  // Pass the current contract ID when editing to exclude it from the conflict check
+  if (isEditMode.value && newContract.value.id) {
+    params.current_contract_id = newContract.value.id;
+  }
+  return params;
 });
 
 const formatDateContract = (date) => {
@@ -597,12 +621,13 @@ const submitDocumentUpload = async () => {
                                   id="office"
                                   v-model="v$.office_id.$model"
                                   :class="{'is-invalid': v$.office_id.$error || errors.office_id}"
-                                  fetch-url="/offices"
+                                  fetch-url="/misc/offices-available"
                                   label-key="name"
                                   value-key="id"
                                   :placeholder="t('contracts.selectOfficePlaceholder', 'Search and select a office...')"
                                   :clearable="true"
-                                />                                
+                                  :fetch-params="officeFetchParams"
+                                />
                                 <div v-if="v$.office_id.$error" class="invalid-feedback">
                                     <p v-for="error of v$.office_id.$errors" :key="error.$uid">{{ error.$message }}</p>
                                 </div>

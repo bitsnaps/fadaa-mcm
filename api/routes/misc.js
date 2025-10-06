@@ -44,6 +44,74 @@ miscApp.get('/offices', authMiddleware, async (c) => {
     }
 });
 
+// GET /api/offices-available - Get a list of available offices for dropdowns
+miscApp.get('/offices-available', authMiddleware, async (c) => {
+    try {
+        const { Op } = require('sequelize');
+        const { branch_id, start_date, end_date, current_contract_id } = c.req.query();
+        const whereClause = {
+            status: { [Op.notIn]: ['Maintenance', 'Unavailable'] }
+        };
+
+        if (branch_id) {
+            whereClause.branch_id = branch_id;
+        }
+
+        // If start_date and end_date are provided, find offices that are already booked
+        if (start_date && end_date) {
+            const contractWhere = {
+                [Op.or]: [
+                    { // Contract starts within the selected range
+                        start_date: { [Op.between]: [start_date, end_date] }
+                    },
+                    { // Contract ends within the selected range
+                        end_date: { [Op.between]: [start_date, end_date] }
+                    },
+                    { // Contract envelops the selected range
+                        [Op.and]: [
+                            { start_date: { [Op.lte]: start_date } },
+                            { end_date: { [Op.gte]: end_date } }
+                        ]
+                    }
+                ],
+                status: ['Active', 'Pending']
+            };
+
+            // If editing a contract, exclude it from the conflict check
+            if (current_contract_id) {
+                contractWhere.id = { [Op.ne]: current_contract_id };
+            }
+
+            const conflictingContracts = await models.Contract.findAll({
+                where: contractWhere,
+                attributes: ['office_id']
+            });
+
+            const bookedOfficeIds = conflictingContracts.map(contract => contract.office_id).filter(id => id);
+
+            if (bookedOfficeIds.length > 0) {
+                whereClause.id = { [Op.notIn]: bookedOfficeIds };
+            }
+        }
+
+        const offices = await models.Office.findAll({
+            where: whereClause,
+            attributes: ['id', 'name', 'branch_id'],
+            include: [{
+                model: models.Branch,
+                as: 'branch',
+                attributes: ['id', 'name']
+            }],
+            order: [['name', 'ASC']]
+        });
+        
+        // In server-side mode, SmartSelect expects `items` and `total`
+        return c.json({ success: true, items: offices, total: offices.length });
+    } catch (error) {
+        return handleRouteError(c, 'Error fetching available offices', error);
+    }
+});
+
 // GET /api/investments-list - Get a simplified list of investments for dropdowns
 miscApp.get('/investments', authMiddleware, async (c) => {
     try {

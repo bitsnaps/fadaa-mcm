@@ -10,6 +10,42 @@ const { createNotification } = require('../services/notificationService');
 
 const contractApp = new Hono();
 
+// Helper function to check office availability
+async function isOfficeAvailable(office_id, start_date, end_date, profile_id, exclude_contract_id = null) {
+    const office = await models.Office.findByPk(office_id);
+    if (!office || office.status === 'Maintenance' || office.status === 'Unavailable') {
+        return { available: false, message: 'This office is not available for booking.' };
+    }
+
+    const where = {
+        office_id,
+        profile_id,
+        status: { [Op.ne]: 'Terminated' },
+        [Op.or]: [
+            { start_date: { [Op.between]: [start_date, end_date] } },
+            { end_date: { [Op.between]: [start_date, end_date] } },
+            {
+                [Op.and]: [
+                    { start_date: { [Op.lte]: start_date } },
+                    { end_date: { [Op.gte]: end_date } }
+                ]
+            }
+        ]
+    };
+
+    if (exclude_contract_id) {
+        where.id = { [Op.ne]: exclude_contract_id };
+    }
+
+    const existingContract = await models.Contract.findOne({ where });
+
+    if (existingContract) {
+        return { available: false, message: 'This office is already booked for the selected dates.' };
+    }
+
+    return { available: true };
+}
+
 contractApp.use('*', authMiddleware);
 contractApp.use('/', branchRestriction());
 
@@ -84,39 +120,10 @@ contractApp.post('/', uploadMiddleware('contracts', 'document'), async (c) => {
         const { client_id, office_id, start_date, end_date, monthly_rate, profile_id, notes, payment_terms, service_type } = body;
         const documentUrl = c.req.filePath;
 
-        const office = await models.Office.findByPk(office_id);
-        if (!office || office.status == 'Maintenance' || office.status == 'Unavailable') {
-            return c.json({ errors: { office_id: 'This office is not available for booking.' } }, 422);
-        }
-
-        const existingContract = await models.Contract.findOne({
-            where: {
-                office_id,
-                profile_id,
-                status: { [Op.ne]: 'Terminated' },
-                [Op.or]: [
-                    {
-                        start_date: {
-                            [Op.between]: [start_date, end_date]
-                        }
-                    },
-                    {
-                        end_date: {
-                            [Op.between]: [start_date, end_date]
-                        }
-                    },
-                    {
-                        [Op.and]: [
-                            { start_date: { [Op.lte]: start_date } },
-                            { end_date: { [Op.gte]: end_date } }
-                        ]
-                    }
-                ]
-            }
-        });
-
-        if (existingContract) {
-            return c.json({ errors: { office_id: 'This office is already booked for the selected dates.' } }, 422);
+        // Validate office availability
+        const availability = await isOfficeAvailable(office_id, start_date, end_date, profile_id);
+        if (!availability.available) {
+            return c.json({ errors: { office_id: availability.message } }, 422);
         }
 
         const newContract = await models.Contract.create({
@@ -176,42 +183,11 @@ contractApp.put('/:id', uploadMiddleware('contracts', 'document'), async (c) => 
             return c.json({ success: false, message: 'Contract not found' }, 404);
         }
 
-        if (start_date && end_date) {
-            const targetOfficeId = office_id || contract.office_id;
-            const office = await models.Office.findByPk(targetOfficeId);
-            if (office && office.status !== 'Maintenance' && office.status !== 'Unavailable' && office.id !== contract.office_id) {
-                return c.json({ errors: { office_id: 'This office is not available for booking.' } }, 422);
-            }
-
-            const existingContract = await models.Contract.findOne({
-                where: {
-                    id: { [Op.ne]: id },
-                    office_id: targetOfficeId,
-                    profile_id: contract.profile_id,
-                    status: { [Op.ne]: 'Terminated' },
-                    [Op.or]: [
-                        {
-                            start_date: {
-                                [Op.between]: [start_date, end_date]
-                            }
-                        },
-                        {
-                            end_date: {
-                                [Op.between]: [start_date, end_date]
-                            }
-                        },
-                        {
-                            [Op.and]: [
-                                { start_date: { [Op.lte]: start_date } },
-                                { end_date: { [Op.gte]: end_date } }
-                            ]
-                        }
-                    ]
-                }
-            });
-
-            if (existingContract) {
-                return c.json({ errors: { office_id: 'This office is already booked for the selected dates.' } }, 422);
+        // Validate office availability if dates or office have changed
+        if ((start_date && end_date) || office_id !== contract.office_id) {
+            const availability = await isOfficeAvailable(office_id, start_date, end_date, contract.profile_id, id);
+            if (!availability.available) {
+                return c.json({ errors: { office_id: availability.message } }, 422);
             }
         }
 
