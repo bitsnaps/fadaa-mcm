@@ -43,7 +43,7 @@
 
     <!-- MAIN APP STRUCTURE -->
     <div v-if="projectInitialized" class="main-canvas-area">
-        <div class="canvas">
+        <div class="canvas" :style="canvasStyle">
             <div v-for="office in currentDesign.offices" :key="office.id"
                  class="office-container"
                  :style="containerStyle(office)"
@@ -55,6 +55,11 @@
                      :style="officeStyle(office)">
                 </div>
             </div>
+        </div>
+        <div class="zoom-controls">
+            <button class="btn btn-sm btn-light" @click="zoomIn"><i class="bi bi-zoom-in"></i></button>
+            <button class="btn btn-sm btn-light" @click="zoomOut"><i class="bi bi-zoom-out"></i></button>
+            <button class="btn btn-sm btn-light" @click="resetZoom"><i class="bi bi-aspect-ratio"></i></button>
         </div>
     </div>
          
@@ -180,6 +185,7 @@ const isShiftPressed = ref(false);
 const editingName = ref('');
 const isSaving = ref(false);
 const transformInputs = ref({ x: null, y: null, width: null, height: null });
+const zoomLevel = ref(1);
 
 let setupModal, editNameModal;
 const setup = reactive({ branchId: null });
@@ -205,6 +211,10 @@ const availableBranches = computed(() => {
     return branches;
 });
 
+const canvasStyle = computed(() => ({
+    transform: `scale(${zoomLevel.value})`,
+}));
+
 const containerStyle = (office) => ({
     transform: `translate(${office.x}px, ${office.y}px)`,
     width: `${office.width}px`,
@@ -218,6 +228,10 @@ const officeStyle = (office) => ({
     transform: `rotate(${office.rotation}deg)`,
     backgroundColor: office.colorClass === 'custom' ? office.customColor : '',
 });
+
+const zoomIn = () => zoomLevel.value = Math.min(zoomLevel.value + 0.1, 2);
+const zoomOut = () => zoomLevel.value = Math.max(zoomLevel.value - 0.1, 0.5);
+const resetZoom = () => zoomLevel.value = 1;
 
 // Methods
 const switchBranch = (index) => {
@@ -599,12 +613,14 @@ body {
         linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
         linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
     background-size: 10px 10px; /* Grid size */
-    overflow: hidden;
+    overflow: auto; /* Change to auto to allow scrolling when zoomed */
 }
 .canvas {
     width: 100%;
     height: 100%;
     position: relative;
+    transform-origin: top left;
+    transition: transform 0.2s ease-in-out;
 }
 .office-container {
     position: absolute;
@@ -652,5 +668,14 @@ body {
     padding: 2px 5px;
     border-radius: 3px;
     opacity: 0.7;
+}
+
+.zoom-controls {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 100;
+    display: flex;
+    gap: 0.5rem;
 }
 </style>
