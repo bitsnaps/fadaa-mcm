@@ -188,24 +188,12 @@ const filteredContracts = computed(() => {
   }
 
   return filtered.map(contract => {
-    const clientBearsTax = contract.taxes?.some(tax => tax.bearer === 'Client');
-    let monthlyRateDisplay;
-    let totalAmountDisplay;
-
-    if (clientBearsTax) {
-      monthlyRateDisplay = calculateMonthlyRateWithTaxes(contract);
-      totalAmountDisplay = monthlyRateDisplay;
-    } else {
-      monthlyRateDisplay = parseFloat(contract.monthly_rate);
-      totalAmountDisplay = calculateTotalAmount(contract);
-    }
-
     return {
       ...contract,
       client_name: contract.Client?.company_name || 'N/A',
       office_name: contract.Office?.name || 'N/A',
-      monthly_rate_display: monthlyRateDisplay,
-      total_amount_display: totalAmountDisplay,
+      monthly_rate_display: parseFloat(contract.monthly_rate),
+      total_amount_display: calculateTotalAmount(contract),
       original_contract: contract // Keep a reference to the original for modals
     };
   });
@@ -241,34 +229,20 @@ const formatDateContract = (date) => {
   return formatDate(date);
 };
 
-const calculateMonthlyRateWithTaxes = (contract) => {
-  const monthlyRate = parseFloat(contract.monthly_rate);
-  if (isNaN(monthlyRate)) return 0;
-
-  const taxes = contract.taxes || [];
-  const clientTaxRate = taxes.reduce((sum, tax) => {
-    if (tax.bearer === 'Client') {
-      const rate = parseFloat(tax.rate);
-      return sum + (isNaN(rate) ? 0 : rate);
-    }
-    return sum;
-  }, 0);
-
-  return monthlyRate * (1 + clientTaxRate / 100);
-};
-
 const calculateTotalAmount = (contract) => {
     const monthlyRate = parseFloat(contract.monthly_rate);
     if (isNaN(monthlyRate)) return 0;
 
     const taxes = contract.taxes || [];
+    let totalAmount = monthlyRate;
 
-    // Check if any tax is borne by the client
-    const clientBearsTax = taxes.some(tax => tax.bearer === 'Client');
-
-    if (clientBearsTax) {
-        return calculateMonthlyRateWithTaxes(contract);
-    }
+    const clientTaxRate = taxes.reduce((sum, tax) => {
+        if (tax.bearer === 'Client') {
+            const rate = parseFloat(tax.rate);
+            return sum + (isNaN(rate) ? 0 : rate);
+        }
+        return sum;
+    }, 0);
 
     const companyTaxRate = taxes.reduce((sum, tax) => {
         if (tax.bearer === 'Company') {
@@ -278,7 +252,15 @@ const calculateTotalAmount = (contract) => {
         return sum;
     }, 0);
 
-    return monthlyRate * (1 + companyTaxRate / 100);
+    if (clientTaxRate > 0) {
+        totalAmount -= monthlyRate * (clientTaxRate / 100);
+    }
+
+    if (companyTaxRate > 0) {
+        totalAmount += monthlyRate * (companyTaxRate / 100);
+    }
+
+    return totalAmount;
 };
 
 const viewDocument = (docUrl) => {
