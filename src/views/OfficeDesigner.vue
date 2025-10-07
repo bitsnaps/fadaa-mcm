@@ -315,6 +315,7 @@ const handleSelection = (event, officeId) => {
     } else {
         selectedOfficeIds.value = [officeId];
     }
+    updateTransformInputs();
 };
 
 const handleSelectionFromList = (officeId) => {
@@ -325,6 +326,7 @@ const handleSelectionFromList = (officeId) => {
     } else {
         selectedOfficeIds.value.push(officeId);
     }
+    updateTransformInputs();
 };
 
 const changeSelected = (property, value) => {
@@ -408,6 +410,7 @@ const duplicateSelected = () => {
 const deleteSelected = () => {
     currentDesign.value.offices = currentDesign.value.offices.filter(o => !selectedOfficeIds.value.includes(o.id));
     selectedOfficeIds.value = [];
+    updateTransformInputs();
 };
 
 const saveDesign = async () => {
@@ -525,6 +528,17 @@ const initInteract = () => {
                 }
             }
         });
+};
+
+const updateTransformInputs = () => {
+    if (selectedOfficeIds.value.length === 1) {
+        const office = currentDesign.value.offices.find(o => o.id === selectedOfficeIds.value[0]);
+        if (office) {
+            transformInputs.value = { x: office.x, y: office.y, width: office.width, height: office.height };
+        }
+    } else {
+        transformInputs.value = { x: null, y: null, width: null, height: null };
+    }
 };
 
 // Lifecycle and Event Listeners
