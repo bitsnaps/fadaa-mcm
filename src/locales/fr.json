@@ -636,7 +636,8 @@
     "notApplicable": "N/A",
     "form": {
         "attachments": "Pièce Jointe"
-    }
+    },
+    "selectType":"Sélectionner un type"
   },
   "contracts": {
     "title": "Gestion des Contrats",

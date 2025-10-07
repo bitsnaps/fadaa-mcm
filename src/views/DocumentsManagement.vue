@@ -3,6 +3,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useFilePreview } from '@/composables/useFilePreview';
 import FilePreview from '@/components/FilePreview.vue';
+import SmartSelect from '@/components/SmartSelect.vue';
 import { getDocuments, addDocument, updateDocument, deleteDocument } from '@/services/DocumentService';
 import { getClients, getClientInvestments } from '@/services/ClientService';
 import { getInvestmentsList } from '@/services/InvestmentService';
@@ -35,6 +36,8 @@ const clients = ref([]);
 const allInvestments = ref([]);
 const filteredInvestments = ref([]);
 const documentToDelete = ref(null);
+
+const docTypes = ["NIF", "NIS", "BOAL", "RC", "STATUT", "C20", "Other"].map(t => ({ value: t, label: t }));
 
 // Pagination
 const currentPage = ref(1);
@@ -116,6 +119,27 @@ watch(() => newDocument.value.client_id, async (newClientId) => {
   }
 });
 
+watch(() => editingDocument.value?.client_id, async (newClientId) => {
+  if (editingDocument.value) {
+    editingDocument.value.investment_id = null;
+    if (newClientId) {
+      try {
+        const response = await getClientInvestments(newClientId);
+        if (response.data.success) {
+          filteredInvestments.value = response.data.data;
+        } else {
+          filteredInvestments.value = [];
+        }
+      } catch (error) {
+        console.error('Error fetching client investments:', error);
+        filteredInvestments.value = [];
+      }
+    } else {
+      filteredInvestments.value = [];
+    }
+  }
+});
+
 const formatDate = (date) => {
   if (!date) return 'N/A';
   return format(new Date(date), 'yyyy-MM-dd');
@@ -134,12 +158,29 @@ const downloadDocument = (docUrl) => {
 
 const openAddDocumentModal = () => {
   newDocument.value = { client_id: null, investment_id: null, title: '', type: 'Other', document: null };
+  // Also reset investments list when opening the modal
+  filteredInvestments.value = [];
   const modalInstance = Modal.getOrCreateInstance(addDocumentModal.value);
   modalInstance.show();
 };
 
-const openEditDocumentModal = (doc) => {
-  editingDocument.value = { ...doc };
+const openEditDocumentModal = async (doc) => {
+  editingDocument.value = { ...doc, document: null };
+  if (doc.client_id) {
+    try {
+      const response = await getClientInvestments(doc.client_id);
+      if (response.data.success) {
+        filteredInvestments.value = response.data.data;
+      } else {
+        filteredInvestments.value = [];
+      }
+    } catch (error) {
+      console.error('Error fetching client investments:', error);
+      filteredInvestments.value = [];
+    }
+  } else {
+    filteredInvestments.value = [];
+  }
   const modalInstance = Modal.getOrCreateInstance(editDocumentModal.value);
   modalInstance.show();
 };
@@ -150,8 +191,13 @@ const openDeleteModal = (doc) => {
   deleteModal.show();
 };
 
-const handleFileChange = (event) => {
-  newDocument.value.document = event.target.files[0];
+const handleFileChange = (event, isEdit = false) => {
+  const file = event.target.files[0];
+  if (isEdit) {
+    editingDocument.value.document = file;
+  } else {
+    newDocument.value.document = file;
+  }
 };
 
 const submitNewDocument = async () => {
@@ -184,18 +230,32 @@ const submitNewDocument = async () => {
 
 const submitUpdateDocument = async () => {
   isSubmitting.value = true;
+  const formData = new FormData();
+
+  // Append all fields from editingDocument to formData
+  for (const key in editingDocument.value) {
+    if (editingDocument.value[key] !== null && editingDocument.value[key] !== undefined) {
+      formData.append(key, editingDocument.value[key]);
+    }
+  }
+  
+  // Ensure we are not sending null for investment_id
+  if (!editingDocument.value.investment_id) {
+    formData.delete('investment_id');
+  }
+
   try {
-    const response = await updateDocument(editingDocument.value.id, editingDocument.value);
+    const response = await updateDocument(editingDocument.value.id, formData);
     if (response.data.success) {
       const modalInstance = Modal.getInstance(editDocumentModal.value);
       modalInstance.hide();
       fetchDocuments(currentPage.value);
     } else {
-
+      // Handle server-side validation errors or other issues
+      console.error('Update failed:', response.data.message);
     }
   } catch (error) {
     console.error('Error updating document:', error);
-
   } finally {
     isSubmitting.value = false;
   }
@@ -316,10 +376,15 @@ const confirmDeleteDocument = async () => {
               </div>
               <div class="mb-3">
                 <label for="doc-client" class="form-label">{{ t('documents.tableHeaders.client') }} <span class="text-danger">*</span></label>
-                <select id="doc-client" class="form-select" v-model="newDocument.client_id" required>
-                  <option :value="null" disabled>-- {{ t('documents.selectClient') }} --</option>
-                  <option v-for="client in clients" :key="client.id" :value="client.id">{{ client.company_name }}</option>
-                </select>
+                <SmartSelect
+                  id="doc-client"
+                  v-model="newDocument.client_id"
+                  fetch-url="/clients"
+                  label-key="company_name"
+                  value-key="id"
+                  :placeholder="t('documents.selectClient')"
+                  required
+                />
               </div>
               <div class="mb-3">
                 <label for="doc-investment" class="form-label">{{ t('documents.tableHeaders.investment') }}</label>
@@ -330,16 +395,19 @@ const confirmDeleteDocument = async () => {
               </div>
               <div class="mb-3">
                 <label for="doc-type" class="form-label">{{ t('documents.tableHeaders.type') }} <span class="text-danger">*</span></label>
-                <select id="doc-type" class="form-select" v-model="newDocument.type" required>
-                  <option>Contract</option>
-                  <option>Report</option>
-                  <option>Identification</option>
-                  <option>Other</option>
-                </select>
+                <SmartSelect
+                  id="doc-type"
+                  v-model="newDocument.type"
+                  :items="docTypes"
+                  label-key="label"
+                  value-key="value"
+                  :placeholder="t('documents.selectType')"
+                  required
+                />
               </div>
               <div class="mb-3">
                 <label for="document-file" class="form-label">{{ t('documents.form.attachments') }} <span class="text-danger">*</span></label>
-                <input type="file" id="document-file" class="form-control" @change="handleFileChange" required>
+                <input type="file" id="document-file" class="form-control" @change="(e) => handleFileChange(e, false)" required>
               </div>
             </form>
           </div>
@@ -369,13 +437,35 @@ const confirmDeleteDocument = async () => {
                 <input type="text" id="edit-doc-title" class="form-control" v-model="editingDocument.title" required>
               </div>
               <div class="mb-3">
-                <label for="edit-doc-type" class="form-label">{{ t('documents.tableHeaders.type') }} <span class="text-danger">*</span></label>
-                <select id="edit-doc-type" class="form-select" v-model="editingDocument.type" required>
-                  <option>Contract</option>
-                  <option>Report</option>
-                  <option>Identification</option>
-                  <option>Other</option>
+                <label for="edit-doc-client" class="form-label">{{ t('documents.tableHeaders.client') }} <span class="text-danger">*</span></label>
+                <SmartSelect
+                  id="edit-doc-client"
+                  v-model="editingDocument.client_id"
+                  fetch-url="/clients"
+                  label-key="company_name"
+                  value-key="id"
+                  :placeholder="t('documents.selectClient')"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="edit-doc-investment" class="form-label">{{ t('documents.tableHeaders.investment') }}</label>
+                <select id="edit-doc-investment" class="form-select" v-model="editingDocument.investment_id" :disabled="!editingDocument.client_id">
+                  <option :value="null">-- {{ t('documents.selectInvestment') }} --</option>
+                  <option v-for="investment in filteredInvestments" :key="investment.id" :value="investment.id">{{ investment.name }}</option>
                 </select>
+              </div>
+              <div class="mb-3">
+                <label for="edit-doc-type" class="form-label">{{ t('documents.tableHeaders.type') }} <span class="text-danger">*</span></label>
+                <SmartSelect
+                  id="edit-doc-type"
+                  v-model="editingDocument.type"
+                  :items="docTypes"
+                  label-key="label"
+                  value-key="value"
+                  :placeholder="t('documents.selectType')"
+                  required
+                />
               </div>
             </form>
           </div>

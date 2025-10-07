@@ -635,7 +635,8 @@
     "notApplicable": "N/A",
     "form": {
         "attachments": "Attachment"
-    }
+    },
+    "selectType":"Select a type"
   },
   "contracts": {
     "title": "Contract Management",

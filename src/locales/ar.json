@@ -634,7 +634,8 @@
     "notApplicable": "غير متاح",
     "form": {
       "attachments": "المرفق"
-    }
+    },
+    "selectType":"حدد النوع"
   },
   "contracts": {
     "title": "إدارة العقود",
