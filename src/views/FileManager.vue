@@ -125,6 +125,7 @@ const tableFields = computed(() => [
 
 const downloadFile = async (file) => {
   try {
+    console.log('File path being sent to download service:', file.path);
     const response = await FileManagerService.downloadFile(file.path);
     const blob = new Blob([response.data], { type: response.headers['content-type'] });
     const url = window.URL.createObjectURL(blob);

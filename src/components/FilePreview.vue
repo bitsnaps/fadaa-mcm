@@ -78,7 +78,7 @@ onUnmounted(() => {
       <iframe :src="fileUrl" width="100%" height="500px"></iframe>
     </div>
     <div v-else>
-      <p>{{ t('filePreview.unsupported') }} - {{ fileUrl }}</p>
+      <p>{{ t('filePreview.unsupported') }}</p>
     </div>
   </div>
 </template>
