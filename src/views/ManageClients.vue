@@ -4,10 +4,11 @@ import { useRouter } from 'vue-router';
 import { BTable, BPagination } from 'bootstrap-vue-next';
 import * as bootstrap from 'bootstrap';
 import { useI18n } from 'vue-i18n';
-import { getClients, deleteClient } from '@/services/ClientService';
+import { getClients, deleteClient, exportClients } from '@/services/ClientService';
 import { getBranchesWithContracts } from '@/services/BranchService';
 import { formatDate } from '@/helpers/utils';
 import { useAuthStore } from '@/stores/auth';
+import { saveAs } from 'file-saver';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -108,15 +109,40 @@ const removeClient = async (clientId) => {
     }
 };
 
+const exportListing = async (format) => {
+  try {
+    const config = {
+      format: format,
+      q: searchTerm.value,
+      branchId: selectedBranch.value,
+    };
+    const response = await exportClients(config);
+    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+    saveAs(blob, `clients-${new Date().toISOString().split('T')[0]}.${format}`);
+  } catch (error) {
+    console.error(`Error exporting clients as ${format}:`, error);
+  }
+};
 </script>
 
 <template>
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2>{{ $t('manageClients.title') }}</h2>
-      <router-link to="/add-client" class="btn btn-primary">
-        <i class="bi bi-plus-circle me-2"></i>{{ $t('manageClients.addNewClient') }}
-      </router-link>
+      <div class="btn-group">
+        <router-link to="/add-client" class="btn btn-primary">
+          <i class="bi bi-plus-circle me-2"></i>{{ $t('manageClients.addNewClient') }}
+        </router-link>
+        <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-download me-2"></i> {{ $t('manageClients.export.title') }}
+          <span class="visually-hidden">Toggle Dropdown</span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#" @click.prevent="exportListing('csv')">{{ $t('manageClients.export.csv') }}</a></li>
+          <li><a class="dropdown-item" href="#" @click.prevent="exportListing('xlsx')">{{ $t('manageClients.export.xlsx') }}</a></li>
+          <li><a class="dropdown-item" href="#" @click.prevent="exportListing('pdf')">{{ $t('manageClients.export.pdf') }}</a></li>
+        </ul>
+      </div>
     </div>
 
     <div class="row mb-3">

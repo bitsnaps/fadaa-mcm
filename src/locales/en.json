@@ -553,7 +553,13 @@
       "inactive": "Inactive",
       "lead": "Lead"
     },
-    "allBranches": "All Branches"
+    "allBranches": "All Branches",
+    "export": {
+      "title": "Export",
+      "csv": "Export as CSV",
+      "xlsx": "Export as XLSX",
+      "pdf": "Export as PDF"
+    }
   },
   "addClient": {
     "addTitle": "Add New Client",

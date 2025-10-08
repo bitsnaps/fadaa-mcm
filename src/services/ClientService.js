@@ -15,3 +15,9 @@ export const deleteClient = (clientId) => {
 export const getTotalClients = () => {
     return apiClient.get('/clients/total');
 };
+
+export const exportClients = (config) => {
+  return apiClient.post('/clients/export', config, {
+    responseType: 'blob',
+  });
+};

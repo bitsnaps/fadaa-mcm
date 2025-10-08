@@ -1,4 +1,7 @@
 const { Hono } = require('hono');
+const ExcelJS = require('exceljs');
+const { jsPDF } = require("jspdf");
+const autoTable = require('jspdf-autotable').default; // note .default
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
@@ -303,6 +306,89 @@ clientsApp.delete('/:id', async (c) => {
         }
     } catch (error) {
         return handleRouteError(c, `Error deleting client ${id}`, error);
+    }
+});
+
+clientsApp.post('/export', async (c) => {
+    try {
+        const { format, q, branchId: reqBranchId } = await c.req.json();
+        const branchId = c.get('user').isAdmin() ? reqBranchId : (reqBranchId || c.req.branch_id || c.get('user')['branch_id']);
+
+        let where = {};
+        if (q) {
+            where.company_name = { [Op.like]: `%${q}%` };
+        }
+
+        let findOptions = {
+            where,
+            order: [['company_name', 'ASC']],
+            include: [],
+        };
+
+        if (branchId) {
+            findOptions.include.push({
+                model: models.Contract,
+                required: false,
+                attributes: [],
+                include: [{
+                    model: models.Office,
+                    required: true,
+                    attributes: [],
+                    where: { branch_id: branchId }
+                }]
+            });
+        }
+
+        const clients = await models.Client.findAll(findOptions);
+
+        const clientsData = clients.map(client => ({
+            id: client.id,
+            company_name: client.company_name,
+            email: client.email,
+            phone_number: client.phone_number,
+            status: client.status,
+            created_at: client.created_at,
+        }));
+
+        if (format === 'xlsx') {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Clients');
+            worksheet.columns = [
+                { header: 'ID', key: 'id', width: 10 },
+                { header: 'Company Name', key: 'company_name', width: 30 },
+                { header: 'Email', key: 'email', width: 30 },
+                { header: 'Phone', key: 'phone_number', width: 20 },
+                { header: 'Status', key: 'status', width: 15 },
+                { header: 'Registration Date', key: 'created_at', width: 20 },
+            ];
+            worksheet.addRows(clientsData);
+            const buffer = await workbook.xlsx.writeBuffer();
+            c.header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            return c.body(buffer);
+        } else if (format === 'csv') {
+            let csv = 'ID,Company Name,Email,Phone,Status,Registration Date\n';
+            clientsData.forEach(client => {
+                csv += `${client.id},"${client.company_name}","${client.email}",${client.phone_number},${client.status},${client.created_at}\n`;
+            });
+            c.header('Content-Type', 'text/csv');
+            return c.body(csv);
+        } else if (format === 'pdf') {
+            const doc = new jsPDF();
+            doc.text('Clients List', 14, 16);
+            autoTable(doc, {
+                startY: 26, // Adds 10 units of vertical space below the title
+                head: [['ID', 'Company Name', 'Email', 'Phone', 'Status', 'Registration Date']],
+                body: clientsData.map(c => [c.id, c.company_name, c.email, c.phone_number, c.status, c.created_at.toISOString().split('T')[0]]),
+            });
+            const pdfBuffer = doc.output('arraybuffer');
+            c.header('Content-Type', 'application/pdf');
+            return c.body(pdfBuffer);
+        }
+
+        return c.json({ success: false, message: 'Unsupported format' }, 400);
+
+    } catch (error) {
+        return handleRouteError(c, 'Error exporting clients', error);
     }
 });
 

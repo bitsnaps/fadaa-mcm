@@ -554,7 +554,13 @@
       "inactive": "Inactif",
       "lead": "Prospect"
     },
-    "allBranches": "Toutes les agences"
+    "allBranches": "Toutes les agences",
+    "export": {
+      "title": "Exporter",
+      "csv": "Exporter en CSV",
+      "xlsx": "Exporter en XLSX",
+      "pdf": "Exporter en PDF"
+    }
   },
   "addClient": {
     "addTitle": "Ajouter un Nouveau Client",

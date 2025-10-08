@@ -552,7 +552,13 @@
       "inactive": "غير نشط",
       "lead": "عميل محتمل"
     },
-    "allBranches": "جميع الفروع"
+    "allBranches": "جميع الفروع",
+    "export": {
+      "title": "تصدير",
+      "csv": "تصدير بصيغة CSV",
+      "xlsx": "تصدير بصيغة XLSX",
+      "pdf": "تصدير بصيغة PDF"
+    }
   },
   "addClient": {
     "addTitle": "إضافة عميل جديد",
