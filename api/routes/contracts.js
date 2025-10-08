@@ -1,4 +1,7 @@
 const { Hono } = require('hono');
+const ExcelJS = require('exceljs');
+const { jsPDF } = require("jspdf");
+const autoTable = require('jspdf-autotable').default; // note .default
 const { Op } = require('sequelize');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
@@ -352,6 +355,93 @@ contractApp.post('/:id/document', uploadMiddleware('contracts', 'document'), asy
 contractApp.get('/download/*', async (c) => {
     const filePath = c.req.path.replace('/api/contracts/download/uploads/', '');
     return downloadFile(c, filePath);
+});
+
+contractApp.post('/export', async (c) => {
+    try {
+        const { format, profile_id, branchId: reqBranchId } = await c.req.json();
+        const branchId = c.get('user').isAdmin() ? reqBranchId : (reqBranchId || c.req.branch_id || c.get('user')['branch_id']);
+
+        let whereClause = {};
+        let includeClause = [
+            { model: models.Client, attributes: ['id', 'company_name'] },
+            { model: models.Profile },
+            { model: models.Office, attributes: ['id', 'name'] },
+            { model: models.Tax, as: 'taxes' }
+        ];
+
+        if (branchId) {
+            includeClause.push({
+                model: models.Office,
+                where: { branch_id: branchId },
+                required: true
+            });
+        }
+
+        if (profile_id) {
+            whereClause.profile_id = profile_id;
+        }
+
+        const contracts = await models.Contract.findAll({
+            where: whereClause,
+            include: includeClause
+        });
+
+        const contractsData = contracts.map(contract => ({
+            id: contract.id,
+            client_name: contract.Client ? contract.Client.company_name : 'N/A',
+            office_name: contract.Office ? contract.Office.name : 'N/A',
+            status: contract.status,
+            service_type: contract.service_type,
+            payment_terms: contract.payment_terms,
+            start_date: contract.start_date,
+            end_date: contract.end_date,
+            monthly_rate: contract.monthly_rate,
+        }));
+
+        if (format === 'xlsx') {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Contracts');
+            worksheet.columns = [
+                { header: 'ID', key: 'id', width: 10 },
+                { header: 'Client', key: 'client_name', width: 30 },
+                { header: 'Office', key: 'office_name', width: 20 },
+                { header: 'Status', key: 'status', width: 15 },
+                { header: 'Service Type', key: 'service_type', width: 20 },
+                { header: 'Payment Terms', key: 'payment_terms', width: 20 },
+                { header: 'Start Date', key: 'start_date', width: 20 },
+                { header: 'End Date', key: 'end_date', width: 20 },
+                { header: 'Monthly Rate', key: 'monthly_rate', width: 15 },
+            ];
+            worksheet.addRows(contractsData);
+            const buffer = await workbook.xlsx.writeBuffer();
+            c.header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            return c.body(buffer);
+        } else if (format === 'csv') {
+            let csv = 'ID,Client,Office,Status,Service Type,Payment Terms,Start Date,End Date,Monthly Rate\n';
+            contractsData.forEach(c => {
+                csv += `${c.id},"${c.client_name}","${c.office_name}",${c.status},${c.service_type},${c.payment_terms},${c.start_date.toISOString().split('T')[0]},${c.end_date.toISOString().split('T')[0]},${c.monthly_rate}\n`;
+            });
+            c.header('Content-Type', 'text/csv');
+            return c.body(csv);
+        } else if (format === 'pdf') {
+            const doc = new jsPDF({ orientation: 'landscape' });
+            doc.text('Contracts List', 14, 16);
+            autoTable(doc, {
+                startY: 20,
+                head: [['ID', 'Client', 'Office', 'Status', 'Service Type', 'Payment Terms', 'Start Date', 'End Date', 'Monthly Rate']],
+                body: contractsData.map(c => [c.id, c.client_name, c.office_name, c.status, c.service_type, c.payment_terms, c.start_date.toISOString().split('T')[0], c.end_date.toISOString().split('T')[0], c.monthly_rate]),
+            });
+            const pdfBuffer = doc.output('arraybuffer');
+            c.header('Content-Type', 'application/pdf');
+            return c.body(pdfBuffer);
+        }
+
+        return c.json({ success: false, message: 'Unsupported format' }, 400);
+
+    } catch (error) {
+        return handleRouteError(c, 'Error exporting contracts', error);
+    }
 });
 
 module.exports = contractApp;

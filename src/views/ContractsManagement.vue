@@ -3,9 +3,10 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { BTable, BPagination } from 'bootstrap-vue-next';
 import apiClient from '@/services/ApiClient';
-import { getContracts, addContract, updateContract } from '@/services/ContractService';
+import { getContracts, addContract, updateContract, exportContracts } from '@/services/ContractService';
 import { Modal } from 'bootstrap';
 import { useVuelidate } from '@vuelidate/core';
+import { saveAs } from 'file-saver';
 import { required, minValue } from '@vuelidate/validators';
 import SmartSelect from '@/components/SmartSelect.vue';
 
@@ -466,6 +467,20 @@ const submitDocumentUpload = async () => {
     selectedContractId.value = null;
   }
 };
+
+const exportListing = async (format) => {
+  try {
+    const config = {
+      format: format,
+      profile_id: activeProfileId.value,
+    };
+    const response = await exportContracts(config);
+    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+    saveAs(blob, `contracts-${new Date().toISOString().split('T')[0]}.${format}`);
+  } catch (error) {
+    console.error(`Error exporting contracts as ${format}:`, error);
+  }
+};
 </script>
 
 <template>
@@ -483,9 +498,20 @@ const submitDocumentUpload = async () => {
               :placeholder="t('contracts.searchPlaceholder')"
             />
           </div>
-          <button class="btn btn-primary" @click="openAddContractModal(profileId)">
-            <i class="bi bi-plus-lg me-2"></i>{{ t('contracts.addNewContract') }}
-          </button>
+          <div class="btn-group">
+            <button class="btn btn-primary" @click="openAddContractModal(profileId)">
+              <i class="bi bi-plus-lg me-2"></i>{{ t('contracts.addNewContract') }}
+            </button>
+            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-download me-2"></i> {{ t('manageClients.export.title') }}
+              <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" @click.prevent="exportListing('csv')">{{ t('manageClients.export.csv') }}</a></li>
+              <li><a class="dropdown-item" href="#" @click.prevent="exportListing('xlsx')">{{ t('manageClients.export.xlsx') }}</a></li>
+              <li><a class="dropdown-item" href="#" @click.prevent="exportListing('pdf')">{{ t('manageClients.export.pdf') }}</a></li>
+            </ul>
+          </div>
         </div>
 
         <div v-if="isLoading" class="text-center">

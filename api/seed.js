@@ -61,7 +61,7 @@ const seedDatabase = async () => {
 
         // Ensure an active profile exists and will be used in financial calcs and investments
         const [realValuesProfile] = await Profile.findOrCreate({
-            where: { name: 'Real Values' },
+            where: { name: 'Real' },
             defaults: { description: 'Default active profile for real operations', is_active: true }
         });
 

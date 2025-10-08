@@ -19,3 +19,9 @@ export const updateContract = (id, formData) => {
         }
     });
 };
+
+export const exportContracts = (config) => {
+    return apiClient.post('/contracts/export', config, {
+        responseType: 'blob',
+    });
+};

@@ -11,7 +11,7 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
-      comment: 'The name of the profile, e.g., "Real Values" or "Simulation Q1".'
+      comment: 'The name of the profile, e.g., "Real" or "Simulation Q1".'
     },
     description: {
       type: DataTypes.TEXT,

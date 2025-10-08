@@ -348,7 +348,7 @@ app.post('/api/create-tax', async (c) => {
   });
 
 // Create a new profile
-// curl -X POST http://localhost:3000/api/create-profile -H "Content-Type: application/json" -d '{ "name": "Real Values", "description": "Default active profile for real operations", "is_active": true }'
+// curl -X POST http://localhost:3000/api/create-profile -H "Content-Type: application/json" -d '{ "name": "Real", "description": "Default active profile for real operations", "is_active": true }'
 app.post('/api/create-profile', async (c) => {
     try {
         const { name, description, is_active } = await c.req.json();

@@ -5,7 +5,7 @@ const createTestInvestment = async () => {
     try {
         const investorUser = await User.findOne({ where: { email: 'investor@fadaa.dz' } });
         const mainBranch = await Branch.findOne({ where: { name: 'Main Branch' } });
-        const realValuesProfile = await Profile.findOne({ where: { name: 'Real Values' } });
+        const realValuesProfile = await Profile.findOne({ where: { name: 'Real' } });
         const mainClient = await Client.findOne({ where: { company_name: 'Main Client' } });
 
         if (!investorUser || !mainBranch || !realValuesProfile || !mainClient) {
