@@ -40,6 +40,7 @@
             </template>
             <template #cell(actions)="data">
               <div class="text-center">
+                <BButton variant="info" size="sm" class="me-2" @click="previewFile(data.item)"><i class="bi bi-eye"></i></BButton>
                 <BButton variant="primary" size="sm" class="me-2" @click="downloadFile(data.item)"><i class="bi bi-download"></i></BButton>
                 <BButton variant="danger" size="sm" @click="deleteFile(data.item)"><i class="bi bi-trash"></i></BButton>
               </div>
@@ -123,13 +124,35 @@ const tableFields = computed(() => [
   { key: 'actions', label: t('fileManager.tableHeaders.actions') }
 ]);
 
-const downloadFile = async (file) => {
+const getFilePath = (file) => {
+  return file.path.startsWith('/') && import.meta.env.PROD ? file.path.substring(1) : file.path;
+}
+
+const previewFile = async (file) => {
   try {
-    console.log('File path being sent to download service:', file.path);
-    const response = await FileManagerService.downloadFile(file.path);
+    const path = getFilePath(file);
+    const response = await FileManagerService.downloadFile(path);
     const blob = new Blob([response.data], { type: response.headers['content-type'] });
     const url = window.URL.createObjectURL(blob);
     window.open(url);
+  } catch (error) {
+    console.error('Error previewing file:', error);
+  }
+};
+
+const downloadFile = async (file) => {
+  try {
+    const path = getFilePath(file);
+    const response = await FileManagerService.downloadFile(path);
+    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   } catch (error) {
     console.error('Error downloading file:', error);
   }
