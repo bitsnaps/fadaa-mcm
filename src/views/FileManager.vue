@@ -124,14 +124,9 @@ const tableFields = computed(() => [
   { key: 'actions', label: t('fileManager.tableHeaders.actions') }
 ]);
 
-const getFilePath = (file) => {
-  return file.path.startsWith('/') && import.meta.env.PROD ? file.path.substring(1) : file.path;
-}
-
 const previewFile = async (file) => {
   try {
-    const path = getFilePath(file);
-    const response = await FileManagerService.downloadFile(path);
+    const response = await FileManagerService.previewFile(file.path);
     const blob = new Blob([response.data], { type: response.headers['content-type'] });
     const url = window.URL.createObjectURL(blob);
     window.open(url);
@@ -142,8 +137,7 @@ const previewFile = async (file) => {
 
 const downloadFile = async (file) => {
   try {
-    const path = getFilePath(file);
-    const response = await FileManagerService.downloadFile(path);
+    const response = await FileManagerService.downloadFile(file.path);
     const blob = new Blob([response.data], { type: response.headers['content-type'] });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');

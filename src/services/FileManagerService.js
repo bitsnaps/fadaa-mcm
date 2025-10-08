@@ -11,5 +11,10 @@ export default {
     return apiClient.get(`/files/download/${encodeURIComponent(filePath)}`, {
       responseType: 'blob',
     });
+  },
+  previewFile(filePath) {
+    return apiClient.get(`/files/preview/${encodeURIComponent(filePath)}`, {
+      responseType: 'blob',
+    });
   }
 };
