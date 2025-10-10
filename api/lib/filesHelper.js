@@ -9,9 +9,8 @@ const getUploadDir = () => {
 
 const resolveFilePath = (filePath) => {
     const uploadDir = getUploadDir();
-    // Sanitize the file path by removing any leading slashes and 'uploads' segments
-    const sanitizedPath = filePath.replace(/^\/+/, '').replace(/^uploads\/?/, '');
-    return path.join(uploadDir, sanitizedPath);
+    const relativePath = filePath.startsWith('/uploads') ? filePath.substring('/uploads'.length) : filePath;
+    return path.join(uploadDir, relativePath);
 };
 
 const getContentType = (fileName) => {
