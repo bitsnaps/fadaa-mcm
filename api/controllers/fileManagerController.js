@@ -85,10 +85,30 @@ const isFileLinked = async (filePath) => {
     return false;
 };
 
+// Helper to extract full requested path after wildcard route and normalize to start with /uploads
+const extractRequestedPath = (c, variant) => {
+  const base = variant === 'download' ? '/api/files/download/' : '/api/files/preview/';
+  const fullPath = c.req.path || '';
+  let raw = '';
+  if (fullPath.startsWith(base)) {
+    raw = fullPath.slice(base.length);
+  } else {
+    // Fallback for non-wildcard matching
+    const params = c.req.param();
+    raw = params.filePath || '';
+  }
+  const decoded = decodeURIComponent(raw);
+  if (decoded.startsWith('/uploads')) return decoded;
+  if (decoded.startsWith('uploads/')) return '/' + decoded;
+  if (decoded) return '/uploads/' + decoded;
+  return decoded;
+};
+
 const downloadFile = async (c) => {
     try {
-        const { filePath } = c.req.param();
-        const decodedPath = decodeURIComponent(filePath);
+        // const { filePath } = c.req.param();
+        // const decodedPath = decodeURIComponent(filePath);
+        const decodedPath = extractRequestedPath(c, 'download');
         const sourcePath = resolveFilePath(decodedPath);
         
         if (fs.existsSync(sourcePath)) {
@@ -111,8 +131,9 @@ const downloadFile = async (c) => {
 
 const previewFile = async (c) => {
     try {
-        const { filePath } = c.req.param();
-        const decodedPath = decodeURIComponent(filePath);
+        // const { filePath } = c.req.param();
+        // const decodedPath = decodeURIComponent(filePath);
+        const decodedPath = extractRequestedPath(c, 'preview');
         const sourcePath = resolveFilePath(decodedPath);
 
         if (fs.existsSync(sourcePath)) {

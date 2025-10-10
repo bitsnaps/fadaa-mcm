@@ -12,8 +12,9 @@ const fileManagerApp = new Hono();
 fileManagerApp.use('*', authMiddleware, adminMiddleware );
 
 fileManagerApp.get('/', listFiles);
-fileManagerApp.get('/download/:filePath', downloadFile);
-fileManagerApp.get('/preview/:filePath', previewFile);
+// Update routes to use wildcard to capture full file paths in production proxies
+fileManagerApp.get('/download/*', downloadFile);
+fileManagerApp.get('/preview/*', previewFile);
 fileManagerApp.delete('/:filePath', deleteFile);
 
 module.exports = fileManagerApp;
