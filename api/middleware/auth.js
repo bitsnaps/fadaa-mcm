@@ -85,6 +85,25 @@ const assistantMiddleware = async (c, next) => {
     }
 };
 
+const managerMiddleware = async (c, next) => {
+  const user = c.get('user');
+  if (!user) {
+    return c.json({ success: false, message: 'Unauthorized' }, 401);
+  }
+
+  try {
+
+    if (user.role && (user.role === 'admin' || user.role === 'manager')) {
+      await next();
+    } else {
+      return c.json({ success: false, message: 'Forbidden' }, 403);
+    }
+  } catch (error) {
+    console.error('Error in managerMiddleware middleware:', error);
+    return c.json({ success: false, message: 'Internal Server Error' }, 500);
+  }
+};
+
 // Investor-only middleware
 const investorMiddleware = async (c, next) => {
     try {
@@ -108,6 +127,7 @@ module.exports = {
     authMiddleware,
     adminMiddleware,
     assistantMiddleware,
+    managerMiddleware,
     adminOrInvestorMiddleware,
     investorMiddleware
 };

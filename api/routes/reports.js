@@ -4,14 +4,13 @@ const autoTable = require('jspdf-autotable').default; // note .default
 const ExcelJS = require('exceljs');
 const { Op } = require('sequelize');
 const models = require('../models');
-const { authMiddleware } = require('../middleware/auth');
-const reportAuth = require('../middleware/reportAuth');
+const { authMiddleware, managerMiddleware } = require('../middleware/auth');
 const { handleRouteError } = require('../lib/errorHandler');
 const { getMonthlyReport, getAnnualReport, downloadMonthlyReport, downloadAnnualReport } = require('../controllers/reportController');
 
 const reportsApp = new Hono();
 
-reportsApp.use('*', authMiddleware, reportAuth);
+reportsApp.use('*', authMiddleware, managerMiddleware);
 
 reportsApp.get('/monthly', getMonthlyReport);
 reportsApp.get('/annual', getAnnualReport);
