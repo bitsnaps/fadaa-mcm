@@ -141,7 +141,7 @@ async function fetchBranches() {
                     <option v-for="client in clients" :key="client.id" :value="client.id">{{ client.company_name }}</option>
                   </select>
                 </div>
-                <div class="col-md-2" v-if="user.role.name.toLowerCase() !== 'manager'">
+                <div class="col-md-2" v-if="user && user.role.name.toLowerCase() !== 'manager'">
                   <label for="branch" class="form-label">{{ $t('monthlyReport.filters.branch') }}</label>
                   <select id="branch" class="form-select" v-model="filters.branchId">
                     <option :value="null">{{ $t('monthlyReport.filters.allBranches') }}</option>

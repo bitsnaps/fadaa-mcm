@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useAuthStore } from '@/stores/auth';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 import ReportService from '@/services/ReportService';
@@ -12,6 +13,9 @@ import { saveAs } from 'file-saver';
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
 const { t } = useI18n();
+const authStore = useAuthStore();
+
+const user = computed(() => authStore.user);
 
 const branches = ref([]);
 const activeProfileId = ref(null);
@@ -74,7 +78,12 @@ async function downloadReport(format) {
 }
 
 onMounted(() => {
-  fetchBranches();
+  if (user.value.role.name.toLowerCase() === 'manager') {
+    filters.value.branchId = user.value.branch_id;
+    fetchBranches();
+  } else {
+    fetchBranches();
+  }
 });
 
 watch(activeProfileId, (newProfileId) => {
@@ -118,7 +127,7 @@ async function fetchBranches() {
                     <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
                   </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4" v-if="user && user.role.name.toLowerCase() !== 'manager'">
                   <label for="branch" class="form-label">{{ $t('annualReport.filters.branch') }}</label>
                   <select id="branch" class="form-select" v-model="filters.branchId">
                     <option :value="null">{{ $t('annualReport.filters.allBranches') }}</option>
