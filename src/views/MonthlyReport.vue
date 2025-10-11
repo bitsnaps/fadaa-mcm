@@ -1,12 +1,16 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useAuthStore } from '@/stores/auth';
 import ReportService from '@/services/ReportService';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import ApiClient from '@/services/ApiClient';
 import { saveAs } from 'file-saver';
 
 const { t } = useI18n();
+const authStore = useAuthStore();
+
+const user = computed(() => authStore.user);
 
 const clients = ref([]);
 const branches = ref([]);
@@ -62,7 +66,12 @@ async function downloadReport(format) {
 
 onMounted(() => {
   fetchClients();
-  fetchBranches();
+  if (user.value.role.name.toLowerCase() === 'manager') {
+    filters.value.branchId = user.value.branch_id;
+    fetchBranches();
+  } else {
+    fetchBranches();
+  }
 });
 
 watch(activeProfileId, (newProfileId) => {
@@ -132,7 +141,7 @@ async function fetchBranches() {
                     <option v-for="client in clients" :key="client.id" :value="client.id">{{ client.company_name }}</option>
                   </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2" v-if="user.role.name.toLowerCase() !== 'manager'">
                   <label for="branch" class="form-label">{{ $t('monthlyReport.filters.branch') }}</label>
                   <select id="branch" class="form-select" v-model="filters.branchId">
                     <option :value="null">{{ $t('monthlyReport.filters.allBranches') }}</option>
