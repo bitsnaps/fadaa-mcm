@@ -74,6 +74,7 @@
     "manageBranches": "Gestion Agences",
     "manageServiceCategories": "Gestion Catégories Services",
     "assistantDashboard": "Tableau de Bord Assistant",
+    "managerDashboard": "Tableau de Bord Manager",
     "manageClients": "Gestion Clients",
     "manageOffices": "Gestion des Bureaux",
     "documentsContractsManagement": "Gestion Documents & Contrats",
@@ -1092,6 +1093,44 @@
   },
   "assistantDashboard": {
     "title": "Tableau de Bord Assistant",
+    "renewals": {
+      "title": "Renouvellements de Contrats Clients",
+      "empty": "Aucun renouvellement en attente."
+    },
+    "expiringContracts": {
+      "title": "Contrats Expirant (Prochains 30 Jours)",
+      "empty": "Aucun contrat n'expire bientôt."
+    },
+    "prospects": {
+      "title": "Liste des Prospects",
+      "contact": "Contacter",
+      "empty": "Aucun prospect dans la liste."
+    },
+    "offices": {
+      "title": "Aperçu de l'État des Bureaux",
+      "empty": "Aucune donnée sur l'état des bureaux disponible.",
+      "table": {
+        "name": "Nom du Bureau",
+        "status": "Statut",
+        "capacity": "Capacité",
+        "branch": "Agence",
+        "actions": "Actions"
+      }
+    },
+    "tasksApprovals": {
+      "title": "Tâches / Approbations",
+      "loading": "Chargement des tâches...",
+      "noPending": "Aucune tâche en attente.",
+      "due": "Échéance",
+      "priority": "Priorité",
+      "status": "Statut",
+      "complete": "Terminer",
+      "viewAll": "Voir Tout",
+      "completedMsg": "Tâche marquée comme terminée."
+    }
+  },
+  "managerDashboard": {
+    "title": "Tableau de Bord Manager",
     "renewals": {
       "title": "Renouvellements de Contrats Clients",
       "empty": "Aucun renouvellement en attente."

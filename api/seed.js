@@ -7,6 +7,7 @@ const seedDatabase = async () => {
         const [adminRole] = await Role.findOrCreate({ where: { name: 'Admin' }, defaults: { description: 'Super user with all permissions' } });
         const [assistantRole] = await Role.findOrCreate({ where: { name: 'Assistant' }, defaults: { description: 'Assists with managing clients and daily tasks' } });
         const [investorRole] = await Role.findOrCreate({ where: { name: 'Investor' }, defaults: { description: 'Can view investment-related data' } });
+        const [managerRole] = await Role.findOrCreate({ where: { name: 'Manager' }, defaults: { description: 'Manages a specific branch and its operations' } });
         // await Role.findOrCreate({ where: { name: 'Client' }, defaults: { description: 'A paying customer' } });
 
         console.log('Roles seeded successfully.');

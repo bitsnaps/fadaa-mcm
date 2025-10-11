@@ -1,12 +1,12 @@
 const { Hono } = require('hono');
 const models = require('../models');
-const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
+const { authMiddleware, assistantMiddleware } = require('../middleware/auth');
 const { handleRouteError } = require('../lib/errorHandler');
 
 const clientServicesApp = new Hono();
 
 // Middleware to ensure user is authenticated and is an admin or assistant
-clientServicesApp.use('*', authMiddleware, adminOrAssistantMiddleware);
+clientServicesApp.use('*', authMiddleware, assistantMiddleware);
 
 // GET /api/client-services/:clientId - Get all services for a specific client
 clientServicesApp.get('/:clientId', async (c) => {

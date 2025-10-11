@@ -1,11 +1,11 @@
 const { Hono } = require('hono');
 const models = require('../models');
-const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
+const { authMiddleware, assistantMiddleware } = require('../middleware/auth');
 const { handleRouteError } = require('../lib/errorHandler');
 
 const withdrawalsApp = new Hono();
 
-withdrawalsApp.use('*', authMiddleware, adminOrAssistantMiddleware);
+withdrawalsApp.use('*', authMiddleware, assistantMiddleware);
 
 async function loadWithdrawalOr404(id) {
   return await models.Withdrawal.findByPk(id);

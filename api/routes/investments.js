@@ -1,13 +1,13 @@
 const { Hono } = require('hono');
 const models = require('../models');
 const { Op } = require('sequelize');
-const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
+const { authMiddleware, assistantMiddleware } = require('../middleware/auth');
 const { getInvestmentCalculations } = require('../controllers/investmentController');
 const { handleRouteError } = require('../lib/errorHandler');
 
 const investmentsApp = new Hono();
 
-investmentsApp.use('*', authMiddleware, adminOrAssistantMiddleware);
+investmentsApp.use('*', authMiddleware, assistantMiddleware);
 
 // GET all investments with calculations
 investmentsApp.get('/', async (c) => {

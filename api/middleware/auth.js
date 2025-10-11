@@ -67,7 +67,7 @@ const adminOrInvestorMiddleware = async (c, next) => {
     }
 };
 
-const adminOrAssistantMiddleware = async (c, next) => {
+const assistantMiddleware = async (c, next) => {
     try {
         const user = c.get('user');
         if (!user || !user.role_id) {
@@ -76,8 +76,8 @@ const adminOrAssistantMiddleware = async (c, next) => {
 
         const role = await models.Role.findOne({ where: { id: user.role_id } });
 
-        if (!role || !['admin', 'assistant'].includes(role.name.toLowerCase())) {
-            return c.json({ success: false, message: 'Forbidden, admins or assistants only' }, 403);
+        if (!role || !['admin', 'manager', 'assistant'].includes(role.name.toLowerCase())) {
+            return c.json({ success: false, message: 'Sorry! You do not have enough permissions to access this page.' }, 403);
         }
         await next();
     } catch (error) {
@@ -107,7 +107,7 @@ const investorMiddleware = async (c, next) => {
 module.exports = {
     authMiddleware,
     adminMiddleware,
-    adminOrAssistantMiddleware,
+    assistantMiddleware,
     adminOrInvestorMiddleware,
     investorMiddleware
 };

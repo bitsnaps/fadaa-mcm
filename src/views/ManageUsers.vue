@@ -41,7 +41,7 @@
                     <i class="bi bi-pencil-fill"></i>
                   </button>
                   <button
-                    v-if="['assistant','investor'].includes(user.role.name.toLowerCase())"
+                    v-if="['assistant','investor','manager'].includes(user.role.name.toLowerCase())"
                     class="btn btn-sm btn-outline-warning me-2"
                     @click="showResetPasswordModal(user)"
                   >
@@ -310,6 +310,7 @@ const getRoleClass = (roleName) => {
     case 'assistant': return 'warning text-dark';
     case 'investor': return 'info text-dark';
     case 'client': return 'success';
+    case 'manager': return 'primary';
     default: return 'secondary';
   }
 };

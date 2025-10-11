@@ -30,7 +30,7 @@ const checkExpiringInvestments = async () => {
       include: [{
         model: models.Role,
         as: 'role',
-        where: { name: { [Op.in]: ['Admin', 'Assistant'] } },
+        where: { name: { [Op.in]: ['Admin', 'Manager', 'Assistant'] } },
         attributes: [],
       }],
     });

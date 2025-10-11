@@ -38,7 +38,7 @@ const toggleSidebar = () => {
 
 const showSidebar = computed(() => {
   // Show toggle only if authenticated and not on login page, and user role is admin or assistant
-  return isAuthenticated.value && ['admin', 'assistant'].includes(userRole.value) && route.path !== '/login';
+  return isAuthenticated.value && ['admin', 'manager', 'assistant'].includes(userRole.value) && route.path !== '/login';
 });
 
 const isSidebarCollapsed = computed(() => sidebarStore.isCollapsed );

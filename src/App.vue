@@ -40,7 +40,7 @@ const notificationStore = useNotificationStore();
 
 const showSidebar = computed(() => {
   // Show sidebar only for admin and assistant roles and if authenticated
-  return isAuthenticated.value && ['admin', 'assistant'].includes(userRole.value) && route.path !== '/login';
+  return isAuthenticated.value && ['admin', 'manager', 'assistant'].includes(userRole.value) && route.path !== '/login';
 });
 
 watch(() => notificationStore.notification, (newNotification) => {

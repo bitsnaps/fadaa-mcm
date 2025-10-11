@@ -47,19 +47,25 @@ const toggleFinancial = () => {
             {{ $t('sidebar.assistantDashboard') }}
           </router-link>
         </li>
+        <li class="nav-item" v-if="userRole === 'manager'">
+          <router-link to="/manager-dashboard" class="nav-link" active-class="active-fadaa">
+            <i class="bi bi-person-video2 me-2"></i>
+            {{ $t('sidebar.managerDashboard') }}
+          </router-link>
+        </li>
 
         <!-- Management & Operations Group -->
         <li class="nav-item">
           <a href="#" class="nav-link d-flex justify-content-between align-items-center"
              @click.prevent="toggleManagement"
-             v-if="userRole === 'admin' || userRole === 'assistant'">
+             v-if="userRole === 'admin' || userRole === 'assistant' || userRole === 'manager'">
             <span>
               <i class="bi bi-gear-wide-connected me-2"></i>
               {{ $t('sidebar.managementOperations') }}
             </span>
             <i class="bi" :class="isManagementCollapsed ? 'bi-chevron-right' : 'bi-chevron-down'"></i>
           </a>
-          <ul class="nav flex-column ms-3" v-show="!isManagementCollapsed" v-if="userRole === 'admin' || userRole === 'assistant'">
+          <ul class="nav flex-column ms-3" v-show="!isManagementCollapsed" v-if="userRole === 'admin' || userRole === 'assistant' || userRole === 'manager'">
             <li class="nav-item" v-if="userRole === 'admin'">
               <router-link to="/manage-users" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-people-fill me-2"></i>
@@ -84,13 +90,13 @@ const toggleFinancial = () => {
                 {{ $t('sidebar.manageTaxes') }}
               </router-link>
             </li>
-            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant' || userRole === 'manager'">
               <router-link to="/manage-clients" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-person-lines-fill me-2"></i>
                 {{ $t('sidebar.manageClients') }}
               </router-link>
             </li>
-            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant' || userRole === 'manager'">
               <router-link to="/add-client" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-person-plus-fill me-2"></i>
                 {{ $t('sidebar.addClient') }}
@@ -102,25 +108,25 @@ const toggleFinancial = () => {
                 {{ $t('sidebar.manageOffices') }}
               </router-link>
             </li>
-            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant' || userRole === 'manager'">
               <router-link to="/documents-management" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-file-earmark-zip-fill me-2"></i>
                 {{ $t('documents.title') }}
               </router-link>
             </li>
-            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant' || userRole === 'manager'">
               <router-link to="/compliance-management" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-shield-check me-2"></i>
                 {{ $t('sidebar.complianceManagement') }}
               </router-link>
             </li>
-            <li class="nav-item" v-if="userRole === 'assistant'">
+            <li class="nav-item" v-if="userRole === 'assistant' || userRole === 'manager'">
               <router-link to="/tasks" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-list-task me-2"></i>
                 {{ $t('sidebar.tasks') }}
               </router-link>
             </li>
-            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant' || userRole === 'manager'">
               <router-link to="/office-designer" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-clipboard-fill me-2"></i>
                 {{ $t('sidebar.officeDesigner') }}
@@ -151,21 +157,21 @@ const toggleFinancial = () => {
         <li class="nav-item">
           <a href="#" class="nav-link d-flex justify-content-between align-items-center"
              @click.prevent="toggleFinancial"
-             v-if="userRole === 'admin' || userRole === 'assistant'">
+             v-if="userRole === 'admin' || userRole === 'assistant' || userRole === 'manager'">
             <span>
               <i class="bi bi-graph-up-arrow me-2"></i>
               {{ $t('sidebar.financialAnalytics') }}
             </span>
             <i class="bi" :class="isFinancialCollapsed ? 'bi-chevron-right' : 'bi-chevron-down'"></i>
           </a>
-          <ul class="nav flex-column ms-3" v-show="!isFinancialCollapsed" v-if="userRole === 'admin' || userRole === 'assistant'">
-            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+          <ul class="nav flex-column ms-3" v-show="!isFinancialCollapsed" v-if="userRole === 'admin' || userRole === 'assistant' || userRole === 'manager'">
+            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant' || userRole === 'manager'">
               <router-link to="/contracts-management" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-file-earmark-text-fill me-2"></i>
                 {{ $t('contracts.title') }}
               </router-link>
             </li>
-            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant' || userRole === 'manager'">
               <router-link to="/manage-client-services" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-hdd-stack-fill me-2"></i>
                 {{ $t('sidebar.manageClientServices') }}
@@ -183,13 +189,13 @@ const toggleFinancial = () => {
                 {{ $t('sidebar.manageWithdrawals') }}
               </router-link>
             </li>
-            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant' || userRole === 'manager'">
               <router-link to="/manage-incomes" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-cash-coin me-2"></i>
                 {{ $t('sidebar.manageIncomes') }}
               </router-link>
             </li>
-            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant'">
+            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant' || userRole === 'manager'">
               <router-link to="/manage-expenses" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-cash-stack me-2"></i>
                 {{ $t('sidebar.manageExpenses') }}
@@ -212,13 +218,13 @@ const toggleFinancial = () => {
 
       </ul>
 
-      <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase" v-if="userRole === 'admin'">
+      <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase" v-if="userRole === 'admin' || userRole === 'manager'">
         <span>{{ $t('sidebar.reports') }}</span>
         <!-- <a class="link-secondary" href="#" aria-label="Add a new report">
           <i class="bi bi-plus-circle"></i>
         </a> -->
       </h6>
-      <ul class="nav flex-column mb-2" v-if="userRole === 'admin'">
+      <ul class="nav flex-column mb-2" v-if="userRole === 'admin' || userRole === 'manager'">
         <li class="nav-item">
           <router-link to="/monthly-report" class="nav-link" active-class="active-fadaa">
             <i class="bi bi-file-earmark-text me-2"></i>

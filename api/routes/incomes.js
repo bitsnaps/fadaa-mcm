@@ -1,13 +1,13 @@
 const { Hono } = require('hono');
 const models = require('../models');
-const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
+const { authMiddleware, assistantMiddleware } = require('../middleware/auth');
 const { createNotification } = require('../services/notificationService');
 const { Op } = require('sequelize');
 const { handleRouteError } = require('../lib/errorHandler');
 
 const incomesApp = new Hono();
 
-incomesApp.use('*', authMiddleware, adminOrAssistantMiddleware); // Apply middleware to all income routes
+incomesApp.use('*', authMiddleware, assistantMiddleware); // Apply middleware to all income routes
 
 // GET total income for a given period (e.g., current month)
 incomesApp.get('/total', async (c) => {

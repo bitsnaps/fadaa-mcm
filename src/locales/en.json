@@ -74,6 +74,7 @@
     "manageBranches": "Branch Management",
     "manageServiceCategories": "Service Categories Management",
     "assistantDashboard": "Assistant Dashboard",
+    "managerDashboard": "Manager Dashboard",
     "manageClients": "Client Management",
     "manageOffices": "Office Management",
     "documentsContractsManagement": "Documents & Contracts Management",
@@ -1091,6 +1092,44 @@
   },
   "assistantDashboard": {
     "title": "Assistant Dashboard",
+    "renewals": {
+      "title": "Client Contract Renewals",
+      "empty": "No contract renewals available."
+    },
+    "expiringContracts": {
+      "title": "Expiring Contracts (Next 30 Days)",
+      "empty": "No expiring contracts found."
+    },
+    "prospects": {
+      "title": "Prospect List",
+      "contact": "Contact",
+      "empty": "No prospects available."
+    },
+    "offices": {
+      "title": "Office Status Overview",
+      "empty": "No office status data available.",
+      "table": {
+        "name": "Office Name",
+        "branch": "Branch",
+        "status": "Status",
+        "capacity": "Capacity",
+        "actions": "Actions"
+      }
+    },
+    "tasksApprovals": {
+      "title": "Tasks / Approvals",
+      "loading": "Loading tasks...",
+      "noPending": "No pending tasks.",
+      "due": "Due",
+      "priority": "Priority",
+      "status": "Status",
+      "complete": "Complete",
+      "viewAll": "View All",
+      "completedMsg": "Task marked as completed."
+    }
+  },
+  "managerDashboard": {
+    "title": "Manager Dashboard",
     "renewals": {
       "title": "Client Contract Renewals",
       "empty": "No contract renewals available."

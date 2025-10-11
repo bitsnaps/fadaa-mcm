@@ -74,6 +74,7 @@
     "manageBranches": "إدارة الفروع",
     "manageServiceCategories": "إدارة فئات الخدمات",
     "assistantDashboard": "لوحة تحكم المساعد",
+    "managerDashboard": "لوحة تحكم المدير",
     "manageClients": "إدارة العملاء",
     "manageOffices": "إدارة المكاتب",
     "documentsContractsManagement": "إدارة المستندات والعقود",
@@ -1090,6 +1091,44 @@
   },
   "assistantDashboard": {
     "title": "لوحة تحكم المساعد",
+    "renewals": {
+      "title": "تجديدات عقود العملاء",
+      "empty": "لا توجد تجديدات عقود متاحة."
+    },
+    "expiringContracts": {
+      "title": "العقود التي تنتهي صلاحيتها (30 يومًا القادمة)",
+      "empty": "لم يتم العثور على عقود تنتهي صلاحيتها."
+    },
+    "prospects": {
+      "title": "قائمة العملاء المحتملين",
+      "contact": "اتصل",
+      "empty": "لا يوجد عملاء محتملون متاحون."
+    },
+    "offices": {
+      "title": "نظرة عامة على حالة المكاتب",
+      "empty": "لا توجد بيانات متاحة عن حالة المكاتب.",
+      "table": {
+        "name": "اسم المكتب",
+        "branch": "الفرع",
+        "status": "الحالة",
+        "capacity": "السعة",
+        "actions": "الإجراءات"
+      }
+    },
+    "tasksApprovals": {
+      "title": "المهام / الموافقات",
+      "loading": "جاري تحميل المهام...",
+      "noPending": "لا توجد مهام معلقة.",
+      "due": "مستحق",
+      "priority": "الأولوية",
+      "status": "الحالة",
+      "complete": "إكمال",
+      "viewAll": "عرض الكل",
+      "completedMsg": "تم وضع علامة على المهمة كمكتملة."
+    }
+  },
+  "managerDashboard": {
+    "title": "لوحة تحكم المدير",
     "renewals": {
       "title": "تجديدات عقود العملاء",
       "empty": "لا توجد تجديدات عقود متاحة."

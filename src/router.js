@@ -5,6 +5,7 @@ import i18n from '@/i18n';
 import Login from './views/Login.vue';
 import AdminDashboard from './views/AdminDashboard.vue';
 import AssistantDashboard from './views/AssistantDashboard.vue';
+import ManagerDashboard from './views/ManagerDashboard.vue';
 import InvestorDashboard from './views/InvestorDashboard.vue';
 import ManageClients from './views/ManageClients.vue';
 import AddClient from './views/AddClient.vue';
@@ -64,6 +65,11 @@ const routes = [
     meta: { requiresAuth: true, roles: ['assistant'] } // Changed to roles array
   },
   {
+    path: '/manager-dashboard',
+    components: { default: ManagerDashboard, header: Navbar },
+    meta: { requiresAuth: true, roles: ['manager'] }
+  },
+  {
     path: '/manage-users',
     name: 'ManageUsers',
     components: { default: ManageUsers, header: Navbar }, // Use ManageUsers component and Navbar
@@ -79,26 +85,26 @@ const routes = [
     path: '/manage-clients',
     name: 'ManageClients',
     component: ManageClients,
-    meta: { requiresAuth: true, roles: ['admin','assistant'] }
+    meta: { requiresAuth: true, roles: ['admin','manager', 'assistant'] }
   },
   {
     path: '/add-client',
     name: 'AddClient',
     component: AddClient,
-    meta: { requiresAuth: true, roles: ['admin','assistant'] }
+    meta: { requiresAuth: true, roles: ['admin', 'manager','assistant'] }
   },
   {
     path: '/edit-client/:clientId',
     name: 'EditClient',
     component: AddClient,
-    meta: { requiresAuth: true, roles: ['admin', 'assistant'] },
+    meta: { requiresAuth: true, roles: ['admin', 'manager', 'assistant'] },
     props: true
   },
   {
     path: '/tasks',
     name: 'Tasks',
     components: { default: Tasks, header: Navbar }, // Use Tasks component and Navbar
-    meta: { requiresAuth: true, roles: ['assistant'] }
+    meta: { requiresAuth: true, roles: ['assistant', 'manager'] }
   },
   {
     path: '/profile',
@@ -116,19 +122,19 @@ const routes = [
     path: '/investment-tracking',
     name: 'InvestmentTracking',
     components: { default: InvestmentTracking, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+    meta: { requiresAuth: true, roles: ['admin', 'assistant', 'manager'] }
   },
   {
     path: '/financial-reporting',
     name: 'FinancialReporting',
     components: { default: FinancialReporting, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+    meta: { requiresAuth: true, roles: ['admin', 'assistant', 'manager'] }
   },
   {
     path: '/compliance-management',
     name: 'ComplianceManagement',
     components: { default: ComplianceManagement, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+    meta: { requiresAuth: true, roles: ['admin', 'assistant', 'manager'] }
   },
   {
     path: '/client-portal',
@@ -140,7 +146,7 @@ const routes = [
     path: '/manage-notifications',
     name: 'ManageNotifications',
     components: { default: ManageNotifications, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+    meta: { requiresAuth: true, roles: ['admin', 'assistant', 'manager'] }
   },
   {
     path: '/manage-branches',
@@ -158,7 +164,7 @@ const routes = [
     path: '/manage-client-services',
     name: 'ManageClientServices',
     components: { default: ManageClientServices, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+    meta: { requiresAuth: true, roles: ['admin', 'assistant', 'manager'] }
   },
   {
     path: '/manage-offices',
@@ -176,31 +182,31 @@ const routes = [
     path: '/contracts-management',
     name: 'ContractsManagement',
     components: { default: ContractsManagement, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+    meta: { requiresAuth: true, roles: ['admin', 'assistant', 'manager'] }
   },
   {
     path: '/documents-management',
     name: 'DocumentsManagement',
     components: { default: DocumentsManagement, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+    meta: { requiresAuth: true, roles: ['admin', 'assistant', 'manager'] }
   },
   {
     path: '/office-designer',
     name: 'OfficeDesigner',
     components: { default: OfficeDesigner, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+    meta: { requiresAuth: true, roles: ['admin', 'assistant', 'manager'] }
   },
   {
     path: '/monthly-report',
     name: 'MonthlyReport',
     components: { default: MonthlyReport, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin'] }
+    meta: { requiresAuth: true, roles: ['admin', 'manager'] }
   },
   {
     path: '/annual-report',
     name: 'AnnualReport',
     components: { default: AnnualReport, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin'] }
+    meta: { requiresAuth: true, roles: ['admin', 'manager'] }
   },
   {
     path: '/manage-taxes',
@@ -218,13 +224,13 @@ const routes = [
     path: '/manage-incomes',
     name: 'ManageIncomes',
     components: { default: ManageIncomes, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+    meta: { requiresAuth: true, roles: ['admin', 'manager', 'assistant'] }
   },
   {
     path: '/manage-expenses',
     name: 'ManageExpenses',
     components: { default: ManageExpenses, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin', 'assistant'] }
+    meta: { requiresAuth: true, roles: ['admin','manager', 'assistant'] }
   },
   {
     path: '/manage-withdrawals',
@@ -272,6 +278,7 @@ router.beforeEach((to, from, next) => {
       // Redirect to their respective dashboard or a generic unauthorized page
       if (userRole === 'admin') next('/admin-dashboard');
       else if (userRole === 'assistant') next('/assistant-dashboard');
+      else if (userRole === 'manager') next('/manager-dashboard');
       else if (userRole === 'investor') next('/investor-dashboard');
       else if (userRole === 'client') next('/client-portal');
       else next('/login'); // Fallback if role is unknown
@@ -280,6 +287,7 @@ router.beforeEach((to, from, next) => {
         // Redirect to their respective dashboard or a generic unauthorized page
         if (userRole === 'admin') next('/admin-dashboard');
         else if (userRole === 'assistant') next('/assistant-dashboard');
+        else if (userRole === 'manager') next('/manager-dashboard');
         else if (userRole === 'investor') next('/investor-dashboard');
         else next('/login'); // Fallback if role is unknown
     } else {

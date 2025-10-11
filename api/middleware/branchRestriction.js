@@ -8,7 +8,7 @@ const branchRestriction = (model) => async (c, next) => {
   try {
     const user = await User.findByPk(c.req.user.id, { include: { model: Role, as: 'role' } });
 
-    if (user && user.role && user.role.name.toLowerCase() === 'assistant' && user.branch_id) {
+    if (user && user.role && (user.role.name.toLowerCase() === 'assistant' || user.role.name.toLowerCase() === 'manager') && user.branch_id) {
       c.req.branch_id = user.branch_id;
     }
 

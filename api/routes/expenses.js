@@ -1,13 +1,13 @@
 const { Hono } = require('hono');
 const models = require('../models');
-const { authMiddleware, adminOrAssistantMiddleware } = require('../middleware/auth');
+const { authMiddleware, assistantMiddleware } = require('../middleware/auth');
 const { createNotification } = require('../services/notificationService');
 const { Op } = require('sequelize');
 const { handleRouteError } = require('../lib/errorHandler');
 
 const expensesApp = new Hono();
 
-expensesApp.use('*', authMiddleware, adminOrAssistantMiddleware);
+expensesApp.use('*', authMiddleware, assistantMiddleware);
 
 // GET total expenses for a given period (e.g., current month)
 expensesApp.get('/total', async (c) => {
