@@ -60,10 +60,11 @@
             <button class="btn btn-sm btn-light" @click="zoomIn"><i class="bi bi-zoom-in"></i></button>
             <button class="btn btn-sm btn-light" @click="zoomOut"><i class="bi bi-zoom-out"></i></button>
             <button class="btn btn-sm btn-light" @click="resetZoom"><i class="bi bi-aspect-ratio"></i></button>
+            <button class="btn btn-sm btn-light" @click="toggleFullScreen"><i class="bi" :class="fullscreenIcon"></i></button>
         </div>
     </div>
          
-    <div v-if="projectInitialized" class="control-panel">
+    <div v-if="projectInitialized && !isFullscreen" class="control-panel">
         <div class="mb-4">
             <h4 class="mb-0">{{ currentDesign.branchName }}</h4>
             <small class="text-muted">{{ $t('officeDesigner.main.title') }}</small>
@@ -186,7 +187,8 @@ const editingName = ref('');
 const isSaving = ref(false);
 const transformInputs = ref({ x: null, y: null, width: null, height: null });
 const zoomLevel = ref(1);
-
+const isFullscreen = ref(false);
+ 
 let setupModal, editNameModal;
 const setup = reactive({ branchId: null });
 
@@ -215,6 +217,8 @@ const canvasStyle = computed(() => ({
     transform: `scale(${zoomLevel.value})`,
 }));
 
+const fullscreenIcon = computed(() => isFullscreen.value ? 'bi-fullscreen-exit' : 'bi-fullscreen');
+
 const containerStyle = (office) => ({
     transform: `translate(${office.x}px, ${office.y}px)`,
     width: `${office.width}px`,
@@ -232,6 +236,15 @@ const officeStyle = (office) => ({
 const zoomIn = () => zoomLevel.value = Math.min(zoomLevel.value + 0.1, 2);
 const zoomOut = () => zoomLevel.value = Math.max(zoomLevel.value - 0.1, 0.5);
 const resetZoom = () => zoomLevel.value = 1;
+
+const toggleFullScreen = () => {
+    const mainElement = document.getElementById('main');
+    if (!document.fullscreenElement) {
+        mainElement.requestFullscreen().then(() => isFullscreen.value = true);
+    } else {
+        document.exitFullscreen().then(() => isFullscreen.value = false);
+    }
+};
 
 // Methods
 const switchBranch = (index) => {
@@ -583,18 +596,18 @@ onMounted(async () => {
             openSetupModal();
         }
     }
+});
 
-    const handleKeyDown = (e) => { if (e.key === 'Shift') isShiftPressed.value = true; };
-    const handleKeyUp = (e) => { if (e.key === 'Shift') isShiftPressed.value = false; };
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+const handleKeyDown = (e) => { if (e.key === 'Shift') isShiftPressed.value = true; };
+const handleKeyUp = (e) => { if (e.key === 'Shift') isShiftPressed.value = false; };
+window.addEventListener('keydown', handleKeyDown);
+window.addEventListener('keyup', handleKeyUp);
 
-    onUnmounted(() => {
-        window.removeEventListener('keydown', handleKeyDown);
-        window.removeEventListener('keyup', handleKeyUp);
-        if (setupModal) setupModal.dispose();
-        if (editNameModal) editNameModal.dispose();
-    });
+onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('keyup', handleKeyUp);
+    if (setupModal) setupModal.dispose();
+    if (editNameModal) editNameModal.dispose();
 });
 
 </script>
