@@ -1,11 +1,19 @@
 import ApiClient from './ApiClient';
+import { useAuthStore } from '@/stores/auth';
 
 export default {
   getAllProfiles() {
-    return ApiClient.get('/profiles');
+    const authStore = useAuthStore();
+    const userRole = authStore.userRole;
+
+    if (userRole === 'admin') {
+      return ApiClient.get('/profiles');
+    }
+    
+    return ApiClient.get('/profiles/active');
   },
   getActiveProfile() {
-    return ApiClient.get('/profiles/active-profile');
+    return ApiClient.get('/profiles/active?single=true');
   },
   createProfile(profileData) {
     return ApiClient.post('/profiles', profileData);

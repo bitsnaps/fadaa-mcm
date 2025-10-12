@@ -12,16 +12,24 @@ exports.getAllProfiles = async (c) => {
   }
 };
 
-// Get the currently active profile
-exports.getActiveProfile = async (c) => {
+// Get active profile(s) for public consumption
+exports.getPublicProfiles = async (c) => {
   try {
-    const activeProfile = await Profile.findOne({ where: { is_active: true } });
-    if (!activeProfile) {
-      return c.json({ message: 'No active profile found.' }, 404);
+    const { single } = c.req.query();
+    const where = { is_active: true };
+
+    if (single === 'true') {
+      const activeProfile = await Profile.findOne({ where });
+      if (!activeProfile) {
+        return c.json({ message: 'No active profile found.' }, 404);
+      }
+      return c.json(activeProfile);
     }
-    return c.json(activeProfile);
+
+    const profiles = await Profile.findAll({ where });
+    return c.json(profiles);
   } catch (error) {
-    return handleRouteError(c, 'Error fetching active profile', error);
+    return handleRouteError(c, 'Error fetching active profile(s)', error);
   }
 };
 
