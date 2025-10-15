@@ -8,7 +8,8 @@ export default {
     return apiClient.delete(`/files/${encodeURIComponent(filePath)}`);
   },
   downloadFile(filePath) {
-    return apiClient.get(`/files/download/${encodeURIComponent(filePath)}`, {
+    // return apiClient.get(`/files/download/${encodeURIComponent(filePath)}`, {
+    return apiClient.get(`/files/download/${filePath}`, {
       responseType: 'blob',
     });
   }
