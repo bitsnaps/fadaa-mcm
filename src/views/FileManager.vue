@@ -41,9 +41,9 @@
             <template #cell(actions)="data">
               <div class="text-center">
                 <!-- <BButton variant="info" size="sm" class="me-2" @click="previewFile(data.item)"><i class="bi bi-eye"></i></BButton> -->
-                <BButton variant="warning" size="sm" class="me-2" :href="getFilePath(data.item).replace('/public/','/')"><i class="bi bi-eye"></i></BButton>
+                <BButton variant="warning" size="sm" class="me-2" :href="getFilePath(data.item)"><i class="bi bi-eye"></i></BButton>
                 <!-- <BButton variant="primary" size="sm" class="me-2" @click="downloadFile(data.item)"><i class="bi bi-download"></i></BButton> -->
-                <BButton variant="success" size="sm" class="me-2" :href="getFilePath(data.item)"><i class="bi bi-download"></i></BButton>
+                <BButton variant="success" size="sm" class="me-2" :href="`/public/${data.item.path.startsWith('/')?data.item.path.substring(1):data.item.path}`"><i class="bi bi-download"></i></BButton>
                 <BButton variant="danger" size="sm" @click="deleteFile(data.item)"><i class="bi bi-trash"></i></BButton>
               </div>
             </template>
@@ -128,7 +128,7 @@ const tableFields = computed(() => [
 
 const getFilePath = (file) => {
   const basePath = '/public';
-  return file.path.startsWith('/') && import.meta.env.PROD ? file.path.substring(1) : `${basePath}${file.path}`;
+  return file.path.startsWith('/') /*&& import.meta.env.PROD*/ ? `${basePath}/${file.path.substring(1)}` : `${basePath}${file.path}`;
 }
 
 const previewFile = async (file) => {
