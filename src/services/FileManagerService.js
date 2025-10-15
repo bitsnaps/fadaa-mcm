@@ -5,7 +5,8 @@ export default {
     return apiClient.get(`/files?page=${page}&limit=${limit}&search=${search}`);
   },
   deleteFile(filePath) {
-    return apiClient.delete(`/files/${encodeURIComponent(filePath)}`);
+    // return apiClient.delete(`/files/${encodeURIComponent(filePath)}`);
+    return apiClient.delete(`/files/${filePath}`);
   },
   downloadFile(filePath) {
     // return apiClient.get(`/files/download/${encodeURIComponent(filePath)}`, {
