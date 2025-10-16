@@ -5,10 +5,10 @@ export default {
     return apiClient.get(`/files?page=${page}&limit=${limit}&search=${search}`);
   },
   deleteFile(filePath) {
-    return apiClient.delete(`/files/${filePath}`);
+    return apiClient.delete(`/files/delete?path=${encodeURIComponent(filePath)}`);
   },
   downloadFile(filePath) {
-    return apiClient.get(`/files/download${filePath.startsWith('/') ? filePath : '/' + filePath}`, {
+    return apiClient.get(`/files/download?path=${encodeURIComponent(filePath)}`, {
       responseType: 'blob',
     });
   }

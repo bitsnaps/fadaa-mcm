@@ -87,6 +87,11 @@ const isFileLinked = async (filePath) => {
 
 // Helper to extract full requested path after wildcard route and normalize to start with /uploads
 const extractRequestedPath = (c, variant) => {
+  const path = c.req.query('path');
+  if (path) {
+    return path.startsWith('/uploads') ? path : `/uploads/${path}`;
+  }
+
   const base = variant === 'download' ? '/api/files/download/' : '/api/files/preview/';
   const fullPath = c.req.path || '';
   let raw = '';

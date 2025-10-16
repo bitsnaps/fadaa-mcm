@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, computed, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import apiClient from '@/services/ApiClient';
+import FileManagerService from '@/services/FileManagerService';
 
 const props = defineProps({
   file: {
@@ -34,9 +34,7 @@ const isText = computed(() => fileType.value.startsWith('text/'));
 
 const fetchAndSetFile = async (file) => {
   try {
-    const response = await apiClient.get(`/files/download/${encodeURIComponent(file.file_path)}`, {
-      responseType: 'blob',
-    });
+    const response = await FileManagerService.downloadFile(file.file_path);
     const blob = new Blob([response.data], { type: response.headers['content-type'] });
     fileUrl.value = URL.createObjectURL(blob);
     fileType.value = response.headers['content-type'];
