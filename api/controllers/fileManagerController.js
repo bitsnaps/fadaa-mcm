@@ -92,6 +92,8 @@ const extractRequestedPath = (c, variant) => {
   let raw = '';
   if (fullPath.startsWith(base)) {
     raw = fullPath.slice(base.length);
+  } else if (fullPath.startsWith('/api/files/download/documents/')) {
+    raw = fullPath.slice('/api/files/download/documents/'.length);
   } else {
     // Fallback for non-wildcard matching
     const params = c.req.param();
@@ -159,4 +161,5 @@ module.exports = {
     deleteFile,
     downloadFile,
     previewFile,
+    extractRequestedPath
 };

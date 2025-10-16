@@ -10,7 +10,8 @@ import { getInvestmentsList } from '@/services/InvestmentService';
 import { useAuthStore } from '@/stores/auth';
 import { Modal } from 'bootstrap';
 import { format } from 'date-fns';
-import { downloadFile } from '../helpers/files';
+import { downloadFile as downloadFileHelper } from '../helpers/files';
+import FileManagerService from '@/services/FileManagerService';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -152,8 +153,33 @@ const viewDocument = (doc) => {
   });
 };
 
-const downloadDocument = (docUrl) => {
-  downloadFile('documents', docUrl);
+const downloadDocument = async (docUrl) => {
+  try {
+    const response = await FileManagerService.downloadFile(docUrl.replace('/uploads', ''));
+    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    
+    // Extract filename from content-disposition header
+    const contentDisposition = response.headers['content-disposition'];
+    let filename = 'downloaded-file';
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+      if (filenameMatch.length > 1) {
+        filename = filenameMatch[1];
+      }
+    }
+    
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+
+  } catch (error) {
+    console.error('Error downloading document:', error);
+    // showErrorToast('Failed to download document.');
+  }
 };
 
 const openAddDocumentModal = () => {
