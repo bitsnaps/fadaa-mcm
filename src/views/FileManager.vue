@@ -2,7 +2,7 @@
   <div class="container-fluid mt-4">
     <h1 class="h3 mb-4 text-gray-800">{{ t('fileManager.title') }}</h1>
 
-    <BTabs v-model:index="activeTab" @activate-tab="handleTabActivation">
+    <BTabs v-model="activeTab" @activate-tab="handleTabActivation">
       <BTab :title="t('fileManager.title')" :active="activeTab === 0">
         <div class="d-flex justify-content-between align-items-center my-4">
           <input
@@ -24,8 +24,8 @@
           <BTable
             :items="files"
             :fields="tableFields"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
+            :sort-by="sortBy"
+            :sort-desc="sortDesc"
             responsive
             striped
             hover
@@ -41,9 +41,7 @@
             <template #cell(actions)="data">
               <div class="text-center">
                 <BButton variant="info" size="sm" class="me-2" @click="previewFile(data.item)"><i class="bi bi-eye"></i></BButton>
-                <!-- <BButton variant="warning" size="sm" class="me-2" :href="getFilePath(data.item)"><i class="bi bi-eye"></i></BButton> -->
                 <BButton variant="primary" size="sm" class="me-2" @click="downloadFile(data.item)"><i class="bi bi-download"></i></BButton>
-                <!-- <BButton variant="success" size="sm" class="me-2" :href="`/public/${data.item.path.startsWith('/')?data.item.path.substring(1):data.item.path}`"><i class="bi bi-download"></i></BButton> -->
                 <BButton variant="danger" size="sm" @click="deleteFile(data.item)"><i class="bi bi-trash"></i></BButton>
               </div>
             </template>
@@ -65,6 +63,21 @@
         <Trash ref="trash" />
       </BTab>
     </BTabs>
+
+    <!-- File Preview Modal -->
+    <div class="modal fade" id="filePreviewModal" tabindex="-1" aria-labelledby="filePreviewModalLabel">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="filePreviewModalLabel">{{ selectedFile ? selectedFile.name : 'File Preview' }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <FilePreview v-if="selectedFile" :file="selectedFile" />
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -75,9 +88,12 @@ import { BTable, BPagination, BButton, BTabs, BTab } from 'bootstrap-vue-next';
 import FileManagerService from '@/services/FileManagerService';
 import Trash from '@/components/Trash.vue';
 import { formatBytes } from '@/helpers/files';
+import { useFilePreview } from '@/composables/useFilePreview';
+import FilePreview from '@/components/FilePreview.vue';
 
 const { t } = useI18n();
 const files = ref([]);
+const { selectedFile, openPreviewModal } = useFilePreview();
 const isLoading = ref(true);
 const searchTerm = ref('');
 const activeTab = ref(0);
@@ -128,19 +144,14 @@ const tableFields = computed(() => [
 
 const getFilePath = (file) => {
   const basePath = '/public';
-  return file.path.startsWith('/') /*&& import.meta.env.PROD*/ ? `${basePath}/${file.path.substring(1)}` : `${basePath}${file.path}`;
+  return file.path.startsWith('/') ? `${basePath}${file.path}` : `${basePath}/${file.path}`;
 }
 
-const previewFile = async (file) => {
-  try {
-    const path = getFilePath(file);
-    const response = await FileManagerService.downloadFile(path.replace('/public',''));
-    const blob = new Blob([response.data], { type: response.headers['content-type'] });
-    const url = window.URL.createObjectURL(blob);
-    window.open(url);
-  } catch (error) {
-    console.error('Error previewing file:', error);
-  }
+const previewFile = (file) => {
+  openPreviewModal({
+    name: file.name,
+    file_path: getFilePath(file).replace('/public','')
+  });
 };
 
 const downloadFile = async (file) => {
@@ -179,3 +190,7 @@ onMounted(fetchFiles);
 
 watch(currentPage, fetchFiles);
 </script>
+
+<style scoped>
+/* Add any specific styles for FileManager.vue here */
+</style>
