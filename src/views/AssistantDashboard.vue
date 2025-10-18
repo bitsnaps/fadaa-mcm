@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container container-fluid">
-    <h2 class="mb-4">{{ t('assistantDashboard.title') }} | {{ authStore.userRole }}</h2>
+    <h2 class="mb-4">{{ t('assistantDashboard.title') }}</h2>
 
     <ProfileTabs @update:activeProfile="handleProfileUpdate">
       <template #default="{ profileId }">
