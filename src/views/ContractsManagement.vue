@@ -19,6 +19,7 @@ const { showErrorToast } = useToast();
 
 const contracts = ref([]);
 const searchTerm = ref('');
+const originalPaymentTerms = ref('');
 const isLoading = ref(true);
 const isSubmitting = ref(false);
 const activeProfileId = ref(null);
@@ -137,6 +138,8 @@ onMounted(() => {
 
 watch(() => newContract.value.payment_terms, (newVal) => {
   if (!newVal) return;
+  // If in edit mode and the payment terms haven't changed from the original, do not update dates
+  if (isEditMode.value && newVal === originalPaymentTerms.value) return;
 
   const today = new Date();
   let startDate = new Date(today);
@@ -351,6 +354,7 @@ const openEditContractModal = async (contract) => {
     service_type: contractData.service_type || '',
     original_office_id: contractData.office_id // Keep track of the original office
   };
+  originalPaymentTerms.value = contractData.payment_terms || '';
   
   errors.value = {};
   v$.value.$reset();
