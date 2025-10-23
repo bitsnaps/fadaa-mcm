@@ -22,12 +22,16 @@ miscApp.get('/clients', authMiddleware, async (c) => {
 // GET /api/offices - Get a list of offices for a given branch if branch_id is provided
 miscApp.get('/offices', authMiddleware, async (c) => {
     try {
-        const { branch_id } = c.req.query();
+        const { branch_id, q } = c.req.query();
         const whereClause = { status: 'Available' };
 
         if (branch_id) {
             whereClause.branch_id = branch_id;
         }
+
+        if (q && q.length > 0) {
+            whereClause.name = { [Op.like]: `%${q}%` };
+        }        
 
         const offices = await models.Office.findAll({
             where: whereClause,
@@ -48,10 +52,15 @@ miscApp.get('/offices', authMiddleware, async (c) => {
 // GET /api/offices-available - Get a list of available offices for dropdowns
 miscApp.get('/offices-available', authMiddleware, async (c) => {
     try {
-        const { branch_id, start_date, end_date, current_contract_id } = c.req.query();
+        const { branch_id, start_date, end_date, current_contract_id, q } = c.req.query();
+        
         const whereClause = {
             status: { [Op.notIn]: ['Maintenance', 'Unavailable'] } // do not include 'Occupied' because an office will maybe be free in the future
         };
+
+        if (q && q.length > 0) {
+            whereClause.name = { [Op.like]: `%${q}%` };
+        }
 
         if (branch_id) {
             whereClause.branch_id = branch_id;
