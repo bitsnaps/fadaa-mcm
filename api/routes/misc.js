@@ -1,4 +1,5 @@
 const { Hono } = require('hono');
+const { Op } = require('sequelize');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { handleRouteError } = require('../lib/errorHandler');
@@ -18,7 +19,7 @@ miscApp.get('/clients', authMiddleware, async (c) => {
     }
 });
 
-// GET /api/offices-available - Get a list of available offices for dropdowns
+// GET /api/offices - Get a list of offices for a given branch if branch_id is provided
 miscApp.get('/offices', authMiddleware, async (c) => {
     try {
         const { branch_id } = c.req.query();
@@ -47,10 +48,9 @@ miscApp.get('/offices', authMiddleware, async (c) => {
 // GET /api/offices-available - Get a list of available offices for dropdowns
 miscApp.get('/offices-available', authMiddleware, async (c) => {
     try {
-        const { Op } = require('sequelize');
         const { branch_id, start_date, end_date, current_contract_id } = c.req.query();
         const whereClause = {
-            status: { [Op.notIn]: ['Maintenance', 'Unavailable'] }
+            status: { [Op.notIn]: ['Maintenance', 'Unavailable'] } // do not include 'Occupied' because an office will maybe be free in the future
         };
 
         if (branch_id) {
@@ -58,7 +58,7 @@ miscApp.get('/offices-available', authMiddleware, async (c) => {
         }
 
         // If start_date and end_date are provided, find offices that are already booked
-        if (start_date && end_date) {
+        if (start_date && end_date) { // this check should be applied only when creating a new contract
             const contractWhere = {
                 [Op.or]: [
                     { // Contract starts within the selected range

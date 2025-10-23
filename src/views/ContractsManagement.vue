@@ -213,14 +213,24 @@ const areDatesValid = computed(() => {
   return new Date(newContract.value.start_date) < new Date(newContract.value.end_date);
 });
 
+const officeApiUrl = computed(() => {
+  return '/misc/offices-available';
+  // return isEditMode.value ? '/offices' : '/misc/offices-available';
+});
+
 const officeFetchParams = computed(() => {
   const params = {};
-  if (newContract.value.start_date) {
-    params.start_date = newContract.value.start_date;
+
+  // Only add date filters when creating a new contract
+  if (!isEditMode.value) {
+    if (newContract.value.start_date) {
+      params.start_date = newContract.value.start_date;
+    }
+    if (newContract.value.end_date) {
+      params.end_date = newContract.value.end_date;
+    }
   }
-  if (newContract.value.end_date) {
-    params.end_date = newContract.value.end_date;
-  }
+
   // Pass the current contract ID when editing to exclude it from the conflict check
   if (isEditMode.value && newContract.value.id) {
     params.current_contract_id = newContract.value.id;
@@ -633,7 +643,7 @@ const exportListing = async (format) => {
                                   id="office"
                                   v-model="v$.office_id.$model"
                                   :class="{'is-invalid': v$.office_id.$error || errors.office_id}"
-                                  fetch-url="/misc/offices-available"
+                                  :fetch-url="officeApiUrl"
                                   label-key="name"
                                   value-key="id"
                                   :placeholder="t('contracts.selectOfficePlaceholder', 'Search and select a office...')"
