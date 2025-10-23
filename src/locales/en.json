@@ -441,7 +441,7 @@
     "editUser": "Edit User",
     "addUserTitle": "Add User",
     "branch": "Branch",
-    "noBranch": "No Branch Assigned",
+    "selectBranch": "Select the branch",
     "password": "Password",
     "phone": "Phone Number",
     "active": "Active",

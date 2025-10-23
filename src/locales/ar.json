@@ -440,7 +440,7 @@
     "editUser": "تحرير المستخدم",
     "addUserTitle": "إضافة مستخدم",
     "branch": "الفرع",
-    "noBranch": "لا يوجد فرع مخصص",
+    "selectBranch": "حدد الفرع",
     "password": "كلمة المرور",
     "phone": "رقم الهاتف",
     "active": "نشط",

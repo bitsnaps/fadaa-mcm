@@ -443,7 +443,7 @@
     "editUser": "Modifier l'Utilisateur",
     "addUserTitle": "Ajouter un Utilisateur",
     "branch": "Agence",
-    "noBranch": "Aucune Agence Assignée",
+    "selectBranch": "Sélectionner thela branche",
     "password": "Mot de Passe",
     "active": "Actif",
     "inactive": "Inactif",

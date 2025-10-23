@@ -32,7 +32,7 @@
                 <td>{{ user.id }}</td>
                 <td>{{ user.first_name }} {{ user.last_name }}</td>
                 <td>{{ user.email }}</td>
-                <td>{{ user.branch.name }}</td>
+                <td>{{ user.branch?.name }}</td>
                 <td><span :class="`badge bg-${getRoleClass(user.role.name)}`">{{ user.role.name }}</span></td>
                 <td><span :class="`badge bg-${user.is_active ? 'success' : 'secondary'}`">{{ user.is_active ? $t('manageUsers.active') : $t('manageUsers.inactive') }}</span></td>
                 <td>{{ formatDate(user.created_at) }}</td>
@@ -110,11 +110,14 @@
                     </div>
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="userBranch" class="form-label">{{ $t('manageUsers.branch') }}</label>
-                    <select class="form-select" id="userBranch" v-model="currentUser.branch_id">
-                      <option :value="null">{{ $t('manageUsers.noBranch') }}</option>
+                    <label for="userBranch" class="form-label">{{ $t('manageUsers.branch') }} <span class="text-danger">*</span></label>
+                    <select class="form-select" id="userBranch" v-model="v$.branch_id.$model" :class="{ 'is-invalid': v$.branch_id.$error }">
+                      <option :value="null" disabled>{{ $t('manageUsers.selectBranch') }}</option>
                       <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
                     </select>
+                    <div v-if="v$.branch_id.$error" class="invalid-feedback">
+                      <p v-for="error of v$.branch_id.$errors" :key="error.$uid">{{ error.$message }}</p>
+                    </div>
                   </div>
                 </div>
                 <div class="mb-3" v-if="!editingUser">
@@ -254,6 +257,7 @@ const rules = computed(() => ({
   last_name: { required },
   email: { required, email },
   role_id: { required },
+  branch_id: { required },
   password: {
     required: !editingUser.value,
     minLength: !editingUser.value || currentUser.value.password ? minLength(3) : {},
