@@ -22,7 +22,7 @@ officesApp.get('/:id', authMiddleware, async (c) => {
         if (!office) {
             return c.json({ success: false, message: 'Office not found' }, 404);
         }
-        return c.json({ success: true, data: office });
+        return c.json({ success: true, item: office });
     } catch (error) {
         return handleRouteError(c, `Error fetching office ${id}`, error);
     }

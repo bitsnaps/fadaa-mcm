@@ -169,7 +169,7 @@ clientsApp.get('/:id', async (c) => {
         if (!client) {
             return c.json({ success: false, message: 'Client not found' }, 404);
         }
-        return c.json({ success: true, data: client });
+        return c.json({ success: true, item: client });
     } catch (error) {
         return handleRouteError(c, `Error fetching client ${id}`, error);
     }

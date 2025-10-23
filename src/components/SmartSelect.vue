@@ -109,9 +109,10 @@ const selectedLabel = computed(() => {
 
 // Helper functions
 const getItemValue = (item) => item[props.valueKey];
-const getItemLabel = (item) => item[props.labelKey];
+const getItemLabel = (item) => item ? item[props.labelKey] : '';
 
 const isSelected = (item) => {
+  if (!item || props.modelValue === null) return false;
   return getItemValue(item) === props.modelValue;
 };
 
@@ -125,9 +126,12 @@ const openDropdown = async () => {
   await nextTick();
   searchInputRef.value?.focus();
   
-  // Load initial data for server mode
-  if (isServerMode.value && serverItems.value.length === 0) {
-    await fetchServerItems();
+  // Load full list for server mode if only the initial item is present
+  if (isServerMode.value) {
+    const shouldFetchFullList = serverItems.value.length <= 1;
+    if (shouldFetchFullList) {
+      await fetchServerItems(true); // `true` to reset the list
+    }
   }
 };
 
@@ -225,6 +229,36 @@ const loadMore = () => {
   currentPage.value += 1;
   emit('load-more', { page: currentPage.value });
   fetchServerItems(false);
+};
+
+const fetchInitialSelectedItem = async (id) => {
+  if (!isServerMode.value || !id) return;
+  
+  // Check if the item is already in the list
+  if (serverItems.value.some(item => getItemValue(item) === id)) {
+    return;
+  }
+  
+  // Construct a URL to fetch a single item.
+  // This assumes a RESTful convention like /api/clients/123.
+  // We remove the '-available' part for single-item fetching.
+  const singleItemUrl = props.fetchUrl.replace('-available', '');
+  
+  loading.value = true;
+  try {
+    const response = await apiClient.get(`${singleItemUrl}/${id}`);
+    if (response.data.success && response.data.item) {
+      // Add the fetched item to the list if it's not already there
+      const exists = serverItems.value.some(item => getItemValue(item) === getItemValue(response.data.item));
+      if (!exists) {
+        serverItems.value.unshift(response.data.item);
+      }
+    }
+  } catch (error) {
+    console.error(`Failed to fetch initial selected item ${id}:`, error);
+  } finally {
+    loading.value = false;
+  }
 };
 
 // Watch search query with debounce
@@ -326,6 +360,16 @@ const handleClickOutside = (e) => {
 // Lifecycle
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
+  if (isServerMode.value && props.modelValue) {
+    fetchInitialSelectedItem(props.modelValue);
+  }
+});
+
+// Watch for external changes to modelValue
+watch(() => props.modelValue, (newValue, oldValue) => {
+  if (newValue !== oldValue && isServerMode.value && newValue) {
+    fetchInitialSelectedItem(newValue);
+  }
 });
 
 onBeforeUnmount(() => {
