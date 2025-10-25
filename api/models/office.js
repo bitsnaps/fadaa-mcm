@@ -20,6 +20,11 @@ module.exports = (sequelize) => {
     capacity: {
       type: DataTypes.INTEGER,
     },
+    area: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      note: 'Surface area of the office in square meters',
+    },
     status: {
       type: DataTypes.ENUM('Available', 'Occupied', 'Maintenance', 'Unavailable'),
       allowNull: false,

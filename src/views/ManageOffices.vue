@@ -29,6 +29,7 @@ const officeForm = ref({
   amenities: '',
   status: 'Available',
   type: 'Private Suite',
+  area: null,
 });
 
 const rules = computed(() => ({
@@ -91,7 +92,7 @@ const viewOfficeDetails = (office) => {
 
 const openAddOfficeModal = () => {
   isEditMode.value = false;
-  officeForm.value = { id: null, name: '', branch_id: null, capacity: 1, amenities: '', status: 'Available', type: 'Private Suite' };
+  officeForm.value = { id: null, name: '', branch_id: null, capacity: 1, amenities: '', status: 'Available', type: 'Private Suite', area: null };
   v$.value.$reset();
   errors.server = '';
   if(addEditOfficeModal) addEditOfficeModal.show();
@@ -100,6 +101,8 @@ const openAddOfficeModal = () => {
 const openEditOfficeModal = (office) => {
   isEditMode.value = true;
   officeForm.value = { ...office, branch_id: office.branch?.id, amenities: Array.isArray(office.amenities) ? office.amenities.join(', ') : office.amenities };
+  // Ensure area is a number if it exists, otherwise null
+  officeForm.value.area = office.area ? parseFloat(office.area) : null;
   v$.value.$reset();
   errors.server = '';
   if(addEditOfficeModal) addEditOfficeModal.show();
@@ -180,6 +183,7 @@ const changePage = (page) => {
             <th scope="col">{{ t('offices.tableHeaders.branch') }}</th>
             <th scope="col">{{ t('offices.tableHeaders.status') }}</th>
             <th scope="col">{{ t('offices.tableHeaders.capacity') }}</th>
+            <th scope="col">{{ t('offices.tableHeaders.area') }}</th>
             <th scope="col">{{ t('offices.tableHeaders.actions') }}</th>
           </tr>
         </thead>
@@ -198,6 +202,7 @@ const changePage = (page) => {
               </span>
             </td>
             <td>{{ office.capacity }}</td>
+            <td>{{ office.area }}</td>
             <td>
               <button @click="viewOfficeDetails(office)" class="btn btn-sm btn-outline-info me-1" :title="t('offices.viewDetails')">
                 <i class="bi bi-eye"></i>
@@ -244,6 +249,7 @@ const changePage = (page) => {
             <p><strong>{{ t('offices.details.branch') }}:</strong> {{ selectedOffice.branch?.name }}</p>
             <p><strong>{{ t('offices.details.status') }}:</strong> {{ t(`offices.status.${selectedOffice.status.toLowerCase()}`) }}</p>
             <p><strong>{{ t('offices.details.capacity') }}:</strong> {{ selectedOffice.capacity }}</p>
+            <p><strong>{{ t('offices.details.area') }}:</strong> {{ selectedOffice.area }} m²</p>
             <p><strong>{{ t('offices.details.amenities') }}:</strong> {{ selectedOffice.amenities }}</p>
           </div>
         </div>
@@ -292,6 +298,10 @@ const changePage = (page) => {
               <div class="mb-3">
                 <label for="officeCapacity" class="form-label">{{ t('offices.addEditOfficeModal.capacity') }}</label>
                 <input type="number" class="form-control" id="officeCapacity" v-model.number="officeForm.capacity" min="1">
+              </div>
+              <div class="mb-3">
+                <label for="officeArea" class="form-label">{{ t('offices.addEditOfficeModal.area') }}</label>
+                <input type="number" class="form-control" id="officeArea" v-model.number="officeForm.area" min="0" step="0.1">
               </div>
               <div class="mb-3">
                 <label class="form-label">{{ t('offices.addEditOfficeModal.status') }} <span class="text-danger">*</span></label>

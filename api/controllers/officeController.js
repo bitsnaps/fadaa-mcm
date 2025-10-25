@@ -16,7 +16,8 @@ const getOffices = async (c) => {
             [Op.or]: [
                 { name: { [Op.like]: `%${searchQuery}%` } },
                 { '$branch.name$': { [Op.like]: `%${searchQuery}%` } },
-                { status: { [Op.like]: `%${searchQuery}%` } }
+                { status: { [Op.like]: `%${searchQuery}%` } },
+                { area: { [Op.like]: `%${searchQuery}%` } }
             ]
         } : {};
 

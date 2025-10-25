@@ -713,6 +713,7 @@
       "branch": "Agence",
       "status": "Statut",
       "capacity": "Capacité",
+      "area": "Superficie",
       "actions": "Actions",
       "type": "Type"
     },
@@ -733,6 +734,7 @@
       "branch": "Agence",
       "status": "Statut",
       "capacity": "Capacité",
+      "area": "Superficie",
       "amenities": "Équipements"
     },
     "amenities": {
@@ -748,6 +750,7 @@
       "officeName": "Nom du Bureau",
       "branch": "Agence",
       "capacity": "Capacité",
+      "area": "Superficie",
       "amenities": "Équipements",
       "status": "Statut",
       "close": "Fermer",

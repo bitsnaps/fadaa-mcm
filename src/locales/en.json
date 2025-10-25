@@ -712,6 +712,7 @@
       "branch": "Branch",
       "status": "Status",
       "capacity": "Capacity",
+      "area": "Area",
       "actions": "Actions",
       "type": "Type"
     },
@@ -732,6 +733,7 @@
       "branch": "Branch",
       "status": "Status",
       "capacity": "Capacity",
+      "area": "Area",
       "amenities": "Amenities"
     },
     "amenities": {
@@ -747,6 +749,7 @@
       "officeName": "Office Name",
       "branch": "Branch",
       "capacity": "Capacity",
+      "area": "Area",
       "amenities": "Amenities",
       "status": "Status",
       "close": "Close",

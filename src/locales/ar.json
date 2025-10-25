@@ -711,6 +711,7 @@
       "branch": "الفرع",
       "status": "الحالة",
       "capacity": "السعة",
+      "area": "المساحة",
       "actions": "الإجراءات",
       "type": "النوع"
     },
@@ -731,6 +732,7 @@
       "branch": "الفرع",
       "status": "الحالة",
       "capacity": "السعة",
+      "area": "المساحة",
       "amenities": "المرافق"
     },
     "amenities": {
@@ -746,6 +748,7 @@
       "officeName": "اسم المكتب",
       "branch": "الفرع",
       "capacity": "السعة",
+      "area": "المساحة",
       "amenities": "المرافق",
       "status": "الحالة",
       "close": "إغلاق",

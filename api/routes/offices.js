@@ -31,8 +31,8 @@ officesApp.get('/:id', authMiddleware, async (c) => {
 // POST a new office
 officesApp.post('/', authMiddleware, async (c) => {
     try {
-        const { name, branch_id, capacity, status, amenities, type } = await c.req.json();
-        const newOffice = await models.Office.create({ name, branch_id, capacity, status, amenities, type });
+        const { name, branch_id, capacity, status, amenities, type, area } = await c.req.json();
+        const newOffice = await models.Office.create({ name, branch_id, capacity, status, amenities, type, area });
         return c.json({ success: true, message: 'Office created successfully', data: newOffice }, 201);
     } catch (error) {
         if (error.name === 'SequelizeValidationError') {
@@ -50,7 +50,7 @@ officesApp.post('/', authMiddleware, async (c) => {
 officesApp.put('/:id', authMiddleware, async (c) => {
     const { id } = c.req.param();
     try {
-        const { name, branch_id, capacity, status, amenities, type } = await c.req.json();
+        const { name, branch_id, capacity, status, amenities, type, area } = await c.req.json();
         const user = c.get('user');
 
         const office = await models.Office.findByPk(id);
@@ -73,7 +73,7 @@ officesApp.put('/:id', authMiddleware, async (c) => {
             return c.json({ success: true, message: 'Booking request sent to admin for approval.' });
         }
 
-        await office.update({ name, branch_id, capacity, status, amenities, type });
+        await office.update({ name, branch_id, capacity, status, amenities, type, area });
         return c.json({ success: true, message: 'Office updated successfully', data: office });
     } catch (error) {
         if (error.name === 'SequelizeValidationError') {
