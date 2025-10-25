@@ -669,7 +669,9 @@
       "endDate": "تاريخ الانتهاء",
       "actions": "الإجراءات",
       "monthlyRate": "المعدل الشهري",
-      "totalAmount": "المبلغ الإجمالي"
+      "totalAmount": "المبلغ الإجمالي",
+      "area": "المساحة",
+      "activity": "النشاط"
     },
     "status": {
       "active": "نشط",

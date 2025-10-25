@@ -670,7 +670,9 @@
       "endDate": "End Date",
       "actions": "Actions",
       "monthlyRate": "Monthly Rate",
-      "totalAmount": "Total Amount"
+      "totalAmount": "Total Amount",
+      "area": "Area",
+      "activity": "Activity"
     },
     "status": {
       "active": "Active",

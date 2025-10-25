@@ -36,6 +36,14 @@ module.exports = (sequelize) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    area: {
+       type: DataTypes.INTEGER,
+       allowNull: true,
+    },
+    activity: {
+       type: DataTypes.STRING,
+       allowNull: true,
+    },
    profile_id: {
      type: DataTypes.INTEGER,
      allowNull: false,

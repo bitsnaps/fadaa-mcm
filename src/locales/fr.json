@@ -671,7 +671,9 @@
       "endDate": "Date de Fin",
       "actions": "Actions",
       "monthlyRate": "Tarif Mensuel",
-      "totalAmount": "Montant Total"
+      "totalAmount": "Montant Total",
+      "area": "Superficie",
+      "activity": "Activité"
     },
     "status": {
       "active": "Actif",

@@ -59,7 +59,9 @@ const newContract = ref({
   status: 'Active',
   notes: '',
   payment_terms: '',
-  service_type: ''
+  service_type: '',
+  area: null,
+  activity: ''
 });
 
 const rules = computed(() => ({
@@ -322,7 +324,9 @@ const openAddContractModal = async (profileIdFromSlot = null) => {
     document: null,
     tax_ids: [],
     profile_id: profileIdFromSlot || activeProfileId.value,
-    status: 'Active'
+    status: 'Active',
+    area: null,
+    activity: ''
   };
   errors.value = {};
   v$.value.$reset();
@@ -362,6 +366,8 @@ const openEditContractModal = async (contract) => {
     notes: contractData.notes || '',
     payment_terms: contractData.payment_terms || '',
     service_type: contractData.service_type || '',
+    area: contractData.area || null,
+    activity: contractData.activity || '',
     original_office_id: contractData.office_id // Keep track of the original office
   };
   originalPaymentTerms.value = contractData.payment_terms || '';
@@ -741,6 +747,16 @@ const exportListing = async (format) => {
                             <label for="notes" class="form-label">{{ t('contracts.notes') }}</label>
                             <textarea id="notes" class="form-control" v-model="newContract.notes" rows="3"></textarea>
                         </div>
+                       <div class="row">
+                           <div class="col-md-6 mb-3">
+                               <label for="area" class="form-label">{{ t('contracts.tableHeaders.area') }}</label>
+                               <input type="number" id="area" class="form-control" v-model.number="newContract.area" min="0">
+                           </div>
+                           <div class="col-md-6 mb-3">
+                               <label for="activity" class="form-label">{{ t('contracts.tableHeaders.activity') }}</label>
+                               <input type="text" id="activity" class="form-control" v-model="newContract.activity">
+                           </div>
+                       </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -770,6 +786,8 @@ const exportListing = async (format) => {
             <p><strong>{{ t('contracts.tableHeaders.status') }}:</strong> <span :class="getStatusClass(selectedContract.status)">{{ selectedContract.status }}</span></p>
             <p><strong>{{ t('contracts.tableHeaders.paymentTerms') }}:</strong> {{ selectedContract.payment_terms }}</p>
             <p><strong>{{ t('addClient.form.serviceType') }}:</strong> {{ selectedContract.service_type }}</p>
+            <p><strong>{{ t('contracts.tableHeaders.area') }}:</strong> {{ selectedContract.area }} m²</p>
+            <p><strong>{{ t('contracts.tableHeaders.activity') }}:</strong> {{ selectedContract.activity }}</p>
             <div v-if="selectedContract.notes">
               <p><strong>{{ t('contracts.notes') }}:</strong></p>
               <p>{{ selectedContract.notes }}</p>
