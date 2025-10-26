@@ -74,7 +74,7 @@
                     <th>{{ t('assistantDashboard.offices.table.status') }}</th>
                     <th>{{ t('assistantDashboard.offices.table.capacity') }}</th>
                     <th>{{ t('assistantDashboard.offices.table.branch') }}</th>
-                    <th>{{ t('assistantDashboard.offices.table.actions') }}</th>
+                    <!-- <th>{{ t('assistantDashboard.offices.table.actions') }}</th> -->
                   </tr>
                 </thead>
                 <tbody>
@@ -83,10 +83,10 @@
                     <td><span :class="statusBadge(office.status)">{{ office.status || 'Active' }}</span></td>
                     <td>{{ office.capacity || '—' }}</td>
                     <td>{{ office.branch?.name || '—' }}</td>
-                    <td>
+                    <!-- <td>
                       <button class="btn btn-sm btn-fadaa-orange me-1"><i class="bi bi-pencil-square me-1"></i>{{ t('common.edit') }}</button>
                       <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-info-circle-fill me-1"></i>{{ t('common.details') }}</button>
-                    </td>
+                    </td> -->
                   </tr>
                 </tbody>
               </table>
@@ -126,7 +126,7 @@
       </div>
 
       <!-- Data Export Section -->
-      <div class="col-12 mt-4">
+      <!-- <div class="col-12 mt-4">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-yellow">
             <h5 class="mb-0"><i class="bi bi-download me-2"></i>Data Export</h5>
@@ -149,7 +149,7 @@
             </button>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
         </div>
       </template>
@@ -345,6 +345,7 @@ onMounted(() => {
   // fetchTasks will be called from handleProfileUpdate
 });
 
+/*
 const exportData = async (format) => {
   if (!activeProfileId.value) {
     showErrorToast(t('dashboard.selectProfileFirst'));
@@ -396,7 +397,7 @@ const exportData = async (format) => {
   } finally {
     isExporting.value[format] = false;
   }
-};
+};*/
 
 const statusBadge = (status) => {
   switch (status) {

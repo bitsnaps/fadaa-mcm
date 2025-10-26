@@ -126,7 +126,7 @@ const toggleFinancial = () => {
                 {{ $t('sidebar.tasks') }}
               </router-link>
             </li>
-            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'assistant' || userRole === 'manager'">
+            <li class="nav-item" v-if="userRole === 'admin'">
               <router-link to="/office-designer" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-clipboard-fill me-2"></i>
                 {{ $t('sidebar.officeDesigner') }}
