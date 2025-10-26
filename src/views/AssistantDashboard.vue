@@ -16,7 +16,7 @@
             <ul class="list-group list-group-flush">
               <li v-for="renewal in renewals" :key="renewal.id" class="list-group-item d-flex justify-content-between align-items-center">
                 {{ renewal.client }} - {{ renewal.daysLeft }} {{ t('common.daysLeft') }}
-                <button class="btn btn-sm btn-fadaa-orange"><i class="bi bi-eye-fill me-1"></i>{{ t('common.view') }}</button>
+                <button class="btn btn-sm btn-fadaa-orange" @click="openViewContractModal(renewal.id)"><i class="bi bi-eye-fill me-1"></i>{{ t('common.view') }}</button>
               </li>
             </ul>
             <div v-if="renewals.length === 0" class="text-center text-muted mt-2">{{ t('assistantDashboard.renewals.empty') }}</div>
@@ -155,20 +155,64 @@
       </template>
     </ProfileTabs>
   </div>
+
+  <!-- View Contract Modal -->
+  <div class="modal fade" ref="viewContractModal" tabindex="-1" aria-labelledby="viewContractModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="viewContractModalLabel">{{ t('contracts.viewContractTitle', 'Contract Details') }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" v-if="selectedContract">
+          <div v-if="contractLoading" class="text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          <div v-else>
+            <p><strong>{{ t('contracts.tableHeaders.client') }}:</strong> {{ selectedContract.Client?.company_name }}</p>
+            <p><strong>{{ t('contracts.tableHeaders.office') }}:</strong> {{ selectedContract.Office?.name }}</p>
+            <p><strong>{{ t('contracts.tableHeaders.startDate') }}:</strong> {{ formatDate(selectedContract.start_date) }}</p>
+            <p><strong>{{ t('contracts.tableHeaders.endDate') }}:</strong> {{ formatDate(selectedContract.end_date) }}</p>
+            <p><strong>{{ t('contracts.tableHeaders.monthlyRate') }}:</strong> {{ formatCurrency(selectedContract.monthly_rate) }}</p>
+            <p><strong>{{ t('contracts.tableHeaders.status') }}:</strong> <span :class="statusBadge(selectedContract.status)">{{ selectedContract.status }}</span></p>
+            <p><strong>{{ t('contracts.tableHeaders.paymentTerms') }}:</strong> {{ selectedContract.payment_terms }}</p>
+            <p><strong>{{ t('addClient.form.serviceType') }}:</strong> {{ selectedContract.service_type }}</p>
+            <div v-if="selectedContract.notes">
+              <p><strong>{{ t('contracts.notes') }}:</strong></p>
+              <p>{{ selectedContract.notes }}</p>
+            </div>
+            <div v-if="selectedContract.taxes && selectedContract.taxes.length > 0">
+              <strong>{{ t('manageTaxes.title') }}:</strong>
+              <ul>
+                <li v-for="tax in selectedContract.taxes" :key="tax.id">{{ tax.name }} ({{ tax.rate }}%)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('manageUsers.close') }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { Modal } from 'bootstrap';
 import { useAuthStore } from '@/stores/auth';
 import { useToast } from '@/helpers/toast';
 import { useI18n } from 'vue-i18n';
 import { getTasks as apiGetTasks, updateTask as apiUpdateTask } from '@/services/TaskService';
-import { getContracts } from '@/services/ContractService';
+import { getContracts, getContract } from '@/services/ContractService';
 import { getClients } from '@/services/ClientService';
 import { getOffices } from '@/services/OfficeService';
 import ReportService from '@/services/ReportService';
 import { useRouter } from 'vue-router';
 import ProfileTabs from '@/components/ProfileTabs.vue';
+import { formatCurrency } from '@/helpers/utils.js';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -223,6 +267,36 @@ const expiringContracts = ref([]);
 const prospects = ref([]);
 const offices = ref([]);
 const activeProfileId = ref(null);
+
+const viewContractModal = ref(null);
+const selectedContract = ref(null);
+const contractLoading = ref(false);
+
+const openViewContractModal = async (contractId) => {
+  if (!contractId) return;
+
+  const modalInstance = Modal.getOrCreateInstance(viewContractModal.value);
+  modalInstance.show();
+
+  contractLoading.value = true;
+  selectedContract.value = null; // Clear previous data
+
+  try {
+    const response = await getContract(contractId, { profile_id: activeProfileId.value });
+    if (response.data.success) {
+      selectedContract.value = response.data.contract;
+    } else {
+      showErrorToast(t('contracts.fetchError'));
+      modalInstance.hide();
+    }
+  } catch (error) {
+    console.error(`Failed to fetch contract ${contractId}:`, error);
+    showErrorToast(t('contracts.fetchError'));
+    modalInstance.hide();
+  } finally {
+    contractLoading.value = false;
+  }
+};
 
 const loadAssistantDashboard = async (profileId = null) => {
   if (!profileId) return;

@@ -4,6 +4,10 @@ export const getContracts = (params) => {
     return apiClient.get('/contracts', { params });
 };
 
+export const getContract = (id, params) => {
+    return apiClient.get(`/contracts/${id}`, { params });
+};
+
 export const addContract = (formData) => {
     return apiClient.post('/contracts', formData, {
         headers: {
