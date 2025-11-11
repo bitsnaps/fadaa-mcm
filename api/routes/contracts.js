@@ -49,6 +49,20 @@ async function isOfficeAvailable(office_id, start_date, end_date, profile_id, ex
     return { available: true };
 }
 
+function getContractDurationInMonths(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    let months = (end.getFullYear() - start.getFullYear()) * 12;
+    months -= start.getMonth();
+    months += end.getMonth();
+
+    // If the end day is not the last day of the month, we might need to adjust.
+    // This is a simplified calculation and might need refinement based on business rules.
+    // For now, we add one to include the start month.
+    return months <= 0 ? 1 : months + 1;
+}
+
 contractApp.use('*', authMiddleware);
 contractApp.use('/', branchRestriction());
 
@@ -90,7 +104,23 @@ contractApp.get('/', async (c) => {
             where: whereClause,
             include: includeClause
         });
-        return c.json({ success: true, contracts });
+
+        const contractsWithNetTotal = contracts.map(contract => {
+            const contractJSON = contract.toJSON();
+            const durationInMonths = getContractDurationInMonths(contract.start_date, contract.end_date);
+            const companyTaxRate = contract.taxes.reduce((sum, tax) => {
+                if (tax.bearer === 'Company') {
+                    return sum + (parseFloat(tax.rate) || 0);
+                }
+                return sum;
+            }, 0);
+
+            const netTotalAmount = parseFloat(contract.monthly_rate) * durationInMonths * (1 - (companyTaxRate / 100));
+            contractJSON.net_total_amount = netTotalAmount;
+            return contractJSON;
+        });
+
+        return c.json({ success: true, contracts: contractsWithNetTotal });
     } catch (error) {
         console.error('Error fetching contracts:', error);
         return c.json({ success: false, message: 'Failed to fetch contracts' }, 500);
@@ -109,7 +139,20 @@ contractApp.get('/:id', async (c) => {
       ]
     });
     if (!contract) return c.json({ success: false, message: 'Contract not found' }, 404);
-    return c.json({ success: true, contract });
+
+    const contractJSON = contract.toJSON();
+    const durationInMonths = getContractDurationInMonths(contract.start_date, contract.end_date);
+    const companyTaxRate = contract.taxes.reduce((sum, tax) => {
+        if (tax.bearer === 'Company') {
+            return sum + (parseFloat(tax.rate) || 0);
+        }
+        return sum;
+    }, 0);
+
+    const netTotalAmount = parseFloat(contract.monthly_rate) * durationInMonths * (1 - (companyTaxRate / 100));
+    contractJSON.net_total_amount = netTotalAmount;
+
+    return c.json({ success: true, contract: contractJSON });
   } catch (error) {
     return handleRouteError(c, `Error fetching contract ${id}`, error);
   }

@@ -35,9 +35,14 @@
                     <div class="d-flex justify-content-between mt-3">
                         <div>
                           <button type="button" class="btn btn-outline-secondary me-2" @click="setFilterToCurrentMonth">{{ $t('investmentTracking.filters.thisMonth') }}</button>
-                          <button type="button" class="btn btn-outline-secondary" @click="setFilterToCurrentYear">{{ $t('investmentTracking.filters.thisYear') }}</button>
+                          <button type="button" class="btn btn-outline-secondary me-2" @click="setFilterToCurrentYear">{{ $t('investmentTracking.filters.thisYear') }}</button>
+                          <button type="button" class="btn btn-outline-primary" @click="refreshFinancialData">
+                            <i class="bi bi-arrow-clockwise me-1"></i>{{ $t('financialReporting.customReport.refreshCharts') || 'Refresh Charts' }}
+                          </button>
                         </div>
-                        <button type="submit" class="btn btn-fadaa-primary"><i class="bi bi-download me-2"></i>{{ $t('financialReporting.customReport.downloadReport') }}</button>
+                        <button type="submit" class="btn btn-fadaa-primary">
+                          <i class="bi bi-download me-2"></i>{{ $t('financialReporting.customReport.downloadReport') }}
+                        </button>
                       </div>
                   </form>
                   <div v-if="reportGeneratedMessage" class="alert alert-success mt-3" role="alert">
@@ -69,96 +74,51 @@
             </div>
           </div>
 
-          <!-- Section 2: Expense Breakdown Bar Chart -->
-          <div class="row mb-4">
-            <div class="col-lg-7">
-              <div class="card shadow-sm">
-                <div class="card-header bg-fadaa-light-blue">
-                  <h5 class="mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>{{ $t('financialReporting.expenseBreakdown.title') }}</h5>
+          <!-- Section 2: Category Breakdowns -->
+           <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-fadaa-light-blue">
+                            <h5 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>{{ t('incomes.title') }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <Doughnut id="income-category-chart" v-if="incomeByCategoryChartData.labels && incomeByCategoryChartData.labels.length" :data="incomeByCategoryChartData" :options="pieChartOptions" />
+                            <p v-else class="text-center text-muted">{{ $t('financialReporting.revenueVsExpenses.loading') }}</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                  <Bar id="expense-barchart" v-if="expenseBreakdownChartData.datasets? expenseBreakdownChartData.datasets.length:false" :data="expenseBreakdownChartData" :options="barChartOptions" />
-                  <p v-else class="text-center text-muted">{{ $t('financialReporting.revenueVsExpenses.loading') }}</p>
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-fadaa-light-blue">
+                            <h5 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>{{ t('expenses.title') }}</h5>
+                        </div>
+                        <div class="card-body">
+                             <Doughnut id="expense-category-chart" v-if="expenseByCategoryChartData.labels && expenseByCategoryChartData.labels.length" :data="expenseByCategoryChartData" :options="pieChartOptions" />
+                             <p v-else class="text-center text-muted">{{ $t('financialReporting.revenueVsExpenses.loading') }}</p>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-            <div class="col-lg-5">
-              <div class="card shadow-sm">
-                <div class="card-header bg-fadaa-light-blue">
-                  <h5 class="mb-0"><i class="bi bi-wallet2 me-2"></i>{{ $t('financialReporting.expenseBreakdown.summaryTitle') }}</h5>
-                </div>
-                <div class="card-body">
-                  <ul class="list-group list-group-flush">
-                    <li v-for="(item, index) in expenseSummary" :key="index" class="list-group-item d-flex justify-content-between align-items-center">
-                      <span><i :class="`bi ${item.icon} me-2`" :style="{color: item.color}"></i>{{ item.category }}</span>
-                      <span class="fw-bold">{{ formatCurrency(item.amount) }} </span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-          <!-- Section 3: Investment Breakdown by Type -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="card shadow-sm">
-          <div class="card-header bg-fadaa-light-blue">
-            <h5 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>{{ $t('financialReporting.investmentBreakdown.title') }}</h5>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-4">
-                <Doughnut id="investment-pie-chart" v-if="investmentBreakdown.labels.length" :data="investmentBreakdown" :options="pieChartOptions" />
-                <p v-else class="text-center text-muted">{{ $t('financialReporting.revenueVsExpenses.loading') }}</p>
-              </div>
-              <div class="col-md-8">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>{{ $t('financialReporting.investmentBreakdown.type') }}</th>
-                      <th>{{ $t('financialReporting.investmentBreakdown.totalInvested') }}</th>
-                      <th>{{ $t('financialReporting.investmentBreakdown.totalProfitShare') }}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(label, index) in investmentBreakdown.labels" :key="index">
-                      <td>{{ label }}</td>
-                      <td>{{ formatCurrency(investmentBreakdown.datasets[0].data[index]) }}</td>
-                      <td>{{ formatCurrency(investmentBreakdown.profitShares[index]) }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
         <div v-if="!activeProfileId" class="text-center">
           <p>{{ $t('financialReporting.noProfileSelected') }}</p>
         </div>
       </template>
     </ProfileTabs>
-
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { Line, Bar, Doughnut } from 'vue-chartjs';
+import { Line, Doughnut } from 'vue-chartjs';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import {
   Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler, ArcElement
 } from 'chart.js';
 import { formatCurrency } from '@/helpers/utils.js';
-import FinancialsService from '@/services/FinancialsService.js';
-import { getExpenses } from '@/services/ExpenseService';
-import { getInvestments } from '@/services/InvestmentService';
 import ReportService from '@/services/ReportService';
 import { saveAs } from 'file-saver';
-
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler, ArcElement);
 
@@ -222,9 +182,9 @@ const setFilterToCurrentYear = () => {
 
 // --- Chart Data & Options ---
 const revenueExpenseChartData = ref({ labels: [], datasets: [] });
-const expenseBreakdownChartData = ref({ labels: [], datasets: [] });
-const investmentBreakdown = ref({ labels: [], datasets: [{ data: [] }], profitShares: [] });
-const expenseSummary = ref([]);
+const incomeByCategoryChartData = ref({ labels: [], datasets: [] });
+const expenseByCategoryChartData = ref({ labels: [], datasets: [] });
+
 const lineChartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
@@ -238,18 +198,7 @@ const lineChartOptions = ref({
     x: { grid: { display: false } },
   },
 });
-const barChartOptions = ref({
-  responsive: true,
-  maintainAspectRatio: false,
-  indexAxis: 'y',
-  plugins: {
-    legend: { display: false },
-    title: { display: true, text: t('financialReporting.expenseBreakdown.chartTitle'), font: { size: 16 } },
-  },
-  scales: {
-    x: { beginAtZero: true, title: { display: true, text: t('financialReporting.revenueVsExpenses.amountInThousands') } },
-  },
-});
+
 const pieChartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
@@ -259,7 +208,6 @@ const pieChartOptions = ref({
     },
     title: {
       display: true,
-      text: t('financialReporting.investmentBreakdown.chartTitle'),
       font: { size: 16 },
     },
   },
@@ -270,171 +218,82 @@ const fetchFinancialData = async () => {
   if (!activeProfileId.value) return;
 
   try {
-    // Fetch data for Revenue vs. Expenses chart
-    await fetchRevenueExpenseData();
-    // Fetch data for Expense Breakdown chart
-    await fetchExpenseBreakdownData();
-    // Fetch data for Investment Breakdown
-    await fetchInvestmentData();
+    const paramsPeriod =
+      reportConfig.value.startDate && reportConfig.value.endDate
+        ? null
+        : revExpFilter.value;
 
-  } catch (error) {
-    console.error('Error fetching financial data:', error);
-    // Maybe show a toast notification to the user
-  }
-};
-
-const fetchRevenueExpenseData = async () => {
-  const isQuarterly = revExpFilter.value === 'quarterly';
-  const now = new Date();
-  let startDate, endDate;
-
-  if (isQuarterly) {
-    // Current quarter
-    const quarter = Math.floor(now.getMonth() / 3);
-    startDate = new Date(now.getFullYear(), quarter * 3, 1);
-    endDate = new Date(now.getFullYear(), quarter * 3 + 3, 0);
-  } else {
-    // Current year
-    startDate = new Date(now.getFullYear(), 0, 1);
-    endDate = new Date(now.getFullYear(), 11, 31);
-  }
-
-  try {
-    const response = await FinancialsService.getRevenueSeries(
+    const response = await ReportService.getFinancialSummary(
       activeProfileId.value,
-      startDate.toISOString().split('T')[0],
-      endDate.toISOString().split('T')[0]
-    );
-    const seriesData = response.data.data;
-
-    const monthNames = seriesData.labels.map(dateString =>
-      new Date(dateString).toLocaleString(locale.value || 'en', { month: 'short' })
+      paramsPeriod,
+      reportConfig.value.startDate,
+      reportConfig.value.endDate,
     );
 
-    revenueExpenseChartData.value = {
-      labels: monthNames,
-      datasets: [
-        {
-          label: t('financialReporting.revenueVsExpenses.revenue'),
-          borderColor: '#0D6EFD',
-          backgroundColor: 'rgba(13, 110, 253, 0.1)',
-          tension: 0.3,
-          fill: true,
-          data: seriesData.netRevenue,
-        },
-        {
-          label: t('financialReporting.revenueVsExpenses.expenses'),
-          borderColor: '#DC3545',
-          backgroundColor: 'rgba(220, 53, 69, 0.1)',
-          tension: 0.3,
-          fill: true,
-          data: seriesData.totalExpense,
-        },
-      ],
-    };
+    if (response.data && response.data.success) {
+      const { evolution, incomeByCategory, expenseByCategory } = response.data.data;
 
-    lineChartOptions.value.plugins.title.text = isQuarterly
-      ? t('financialReporting.revenueVsExpenses.chartTitleQuarterly')
-      : t('financialReporting.revenueVsExpenses.chartTitleYearly');
-    lineChartOptions.value.scales.y.title.text = t('financialReporting.revenueVsExpenses.amount');
-
-  } catch (error) {
-    console.error('Error fetching revenue/expense data:', error);
-    revenueExpenseChartData.value = { labels: [], datasets: [] };
-  }
-};
-
-
-const fetchExpenseBreakdownData = async () => {
-  try {
-    const response = await getExpenses(activeProfileId.value);
-    const expenses = response.data.success? response.data.data: [];
-    // Aggregate expenses by category
-    const breakdown = expenses.reduce((acc, expense) => {
-      const category = expense.category || 'Uncategorized';
-      acc[category] = (acc[category] || 0) + parseFloat(expense.amount);
-      return acc;
-    }, {});
-
-    const expenseCategories = Object.keys(breakdown);
-    const expenseData = Object.values(breakdown);
-    const expenseColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
-
-    expenseBreakdownChartData.value = {
-      labels: expenseCategories,
-      datasets: [{
-        label: t('financialReporting.expenseBreakdown.chartTitle'),
-        backgroundColor: expenseColors,
-        data: expenseData,
-      }],
-    };
-    
-    // Update expense summary
-    expenseSummary.value = expenseCategories.map((category, index) => ({
-      category,
-      amount: expenseData[index],
-      icon: getCategoryIcon(category),
-      color: expenseColors[index % expenseColors.length],
-    }));
-
-  } catch (error) {
-    console.error('Error fetching expense breakdown:', error);
-    expenseBreakdownChartData.value = { labels: [], datasets: [] };
-    expenseSummary.value = [];
-  }
-};
-
-const fetchInvestmentData = async () => {
-  if (!activeProfileId.value) return;
-  try {
-    const response = await getInvestments(activeProfileId.value);
-    if (response.data.success) {
-      const investments = response.data.data;
-      const breakdown = investments.reduce((acc, investment) => {
-        const type = investment.type || 'Uncategorized';
-        if (!acc[type]) {
-          acc[type] = { totalInvested: 0, totalProfitShare: 0 };
-        }
-        acc[type].totalInvested += investment.investment_amount;
-        acc[type].totalProfitShare += investment.yourProfitShareSelectedPeriod || 0;
-        return acc;
-      }, {});
-
-      const labels = Object.keys(breakdown);
-      const totalInvestedData = labels.map(label => breakdown[label].totalInvested);
-      const profitSharesData = labels.map(label => breakdown[label].totalProfitShare);
-
-      investmentBreakdown.value = {
+      const labels = Object.keys(evolution).sort();
+      revenueExpenseChartData.value = {
         labels,
         datasets: [
           {
-            backgroundColor: ['#42A5F5', '#66BB6A', '#FFA726', '#26A69A', '#AB47BC'],
-            data: totalInvestedData,
+            label: t('financialReporting.revenueVsExpenses.revenue'),
+            borderColor: '#0D6EFD',
+            backgroundColor: 'rgba(13, 110, 253, 0.1)',
+            tension: 0.3,
+            fill: true,
+            data: labels.map((l) => evolution[l].income),
+          },
+          {
+            label: t('financialReporting.revenueVsExpenses.expenses'),
+            borderColor: '#DC3545',
+            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+            tension: 0.3,
+            fill: true,
+            data: labels.map((l) => evolution[l].expense),
           },
         ],
-        profitShares: profitSharesData,
       };
+
+      incomeByCategoryChartData.value = {
+        labels: Object.keys(incomeByCategory),
+        datasets: [
+          {
+            backgroundColor: ['#42A5F5', '#66BB6A', '#FFA726', '#26A69A', '#AB47BC'],
+            data: Object.values(incomeByCategory),
+          },
+        ],
+      };
+
+      expenseByCategoryChartData.value = {
+        labels: Object.keys(expenseByCategory),
+        datasets: [
+          {
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
+            data: Object.values(expenseByCategory),
+          },
+        ],
+      };
+    } else {
+      revenueExpenseChartData.value = { labels: [], datasets: [] };
+      incomeByCategoryChartData.value = { labels: [], datasets: [] };
+      expenseByCategoryChartData.value = { labels: [], datasets: [] };
     }
   } catch (error) {
-    console.error('Error fetching investment data:', error);
+    console.error('Error fetching financial data:', error);
+    revenueExpenseChartData.value = { labels: [], datasets: [] };
+    incomeByCategoryChartData.value = { labels: [], datasets: [] };
+    expenseByCategoryChartData.value = { labels: [], datasets: [] };
   }
 };
 
-
-const getCategoryIcon = (categoryKey) => {
-  // This mapping may need to be adjusted based on actual category names from the backend
-  const key = categoryKey.toLowerCase();
-  if (key.includes('rent')) return 'bi-building';
-  if (key.includes('salaries')) return 'bi-people-fill';
-  if (key.includes('marketing')) return 'bi-megaphone-fill';
-  if (key.includes('supplies')) return 'bi-box-seam';
-  if (key.includes('utilities')) return 'bi-lightbulb-fill';
-  return 'bi-cash-coin';
+const refreshFinancialData = () => {
+  fetchFinancialData();
 };
 
 const setRevExpFilter = (filter) => {
   revExpFilter.value = filter;
-  fetchRevenueExpenseData(); // Refetch data when filter changes
 };
 
 const handleProfileUpdate = (profileId) => {
@@ -453,7 +312,6 @@ onMounted(() => {
     fetchFinancialData();
   }
 });
-
 </script>
 
 <style scoped>
@@ -493,10 +351,6 @@ onMounted(() => {
 
 .form-label {
   font-weight: 500;
-}
-
-#expense-barchart {
-  height: 300px;
 }
 
 #revenue-expense-chart {

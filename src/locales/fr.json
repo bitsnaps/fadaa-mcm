@@ -66,13 +66,15 @@
     "daysLeft": "jours restants",
     "na": "N/D",
     "cancel": "Annuler",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "category": "Catégorie"
   },
   "sidebar": {
     "adminDashboard": "Tableau de Bord Administrateur",
     "manageUsers": "Gestion Utilisateurs",
     "manageBranches": "Gestion Agences",
     "manageServiceCategories": "Gestion Catégories Services",
+    "manageCategories": "Gestion des Catégories",
     "assistantDashboard": "Tableau de Bord Assistant",
     "managerDashboard": "Tableau de Bord Manager",
     "manageClients": "Gestion Clients",
@@ -100,6 +102,12 @@
     "financialAnalytics": "Analyses Financières & Suivi",
     "fileManager": "Gestionnaire de Fichiers",
     "managePendingDeletions": "Suppressions en attente"
+  },
+  "manageExpenses": {
+    "title": "Dépenses"
+  },
+  "manageIncomes": {
+    "title": "Revenus"
   },
   "managePendingDeletions": {
     "date": "Date",
@@ -248,11 +256,13 @@
       "transaction_date": "Date de Transaction",
       "branch": "Agence",
       "registered_by": "Enregistré par",
+      "category": "Catégorie",
       "actions": "Actions"
     },
     "description": {
       "placeholder": "Veuillez introduire le nom de l'entité"
     },
+    "selectCategoryPlaceholder": "Sélectionnez une catégorie...",
     "edit": "Modifier",
     "delete": "Supprimer"
   },
@@ -269,8 +279,10 @@
       "transaction_date": "Date de Transaction",
       "branch": "Agence",
       "registered_by": "Enregistré par",
+      "category": "Catégorie",
       "actions": "Actions"
     },
+    "selectCategoryPlaceholder": "Sélectionnez une catégorie...",
     "edit": "Modifier",
     "delete": "Supprimer"
   },
@@ -672,6 +684,7 @@
       "actions": "Actions",
       "monthlyRate": "Tarif Mensuel",
       "totalAmount": "Montant Total",
+      "netTotalAmount": "Total Net",
       "area": "Superficie",
       "activity": "Activité"
     },
@@ -883,7 +896,8 @@
       "endDate": "Date de Fin",
       "format": "Format",
       "downloadReport": "Télécharger le Rapport",
-      "generatingMessage": "Rapport ({type}) pour la période du {startDate} au {endDate} au format {format} généré avec succès."
+      "generatingMessage": "Rapport ({type}) pour la période du {startDate} au {endDate} au format {format} généré avec succès.",
+      "refreshCharts": "Rafraîchir"
     },
     "revenueVsExpenses": {
       "title": "Revenus vs. Dépenses",

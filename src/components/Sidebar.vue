@@ -85,6 +85,12 @@ const toggleFinancial = () => {
               </router-link>
             </li>
             <li class="nav-item" v-if="userRole === 'admin'">
+              <router-link to="/manage-categories" class="nav-link" active-class="active-fadaa">
+                <i class="bi bi-tags-fill me-2"></i>
+                {{ $t('sidebar.manageCategories') }}
+              </router-link>
+            </li>
+            <li class="nav-item" v-if="userRole === 'admin'">
               <router-link to="/manage-taxes" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-receipt-cutoff me-2"></i>
                 {{ $t('sidebar.manageTaxes') }}

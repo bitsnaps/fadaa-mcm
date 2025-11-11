@@ -3,12 +3,12 @@ import ApiClient from './ApiClient';
 export default {
   generateReport(config) {
     return ApiClient.post('/reports/generate', config, {
-      responseType: 'blob', // Important for file downloads
+      responseType: 'blob',
     });
   },
   downloadReport(config) {
     return ApiClient.post('/reports/generate', config, {
-      responseType: 'blob', // Important for file downloads
+      responseType: 'blob',
     });
   },
   getMonthlyReport(filters) {
@@ -26,5 +26,20 @@ export default {
     return ApiClient.post('/reports/annual/download', config, {
       responseType: 'blob',
     });
+  },
+  getFinancialSummary(profileId, period, startDate, endDate) {
+    const params = {
+      profile_id: profileId,
+    };
+
+    if (startDate && endDate) {
+      params.startDate = startDate;
+      params.endDate = endDate;
+    } else if (period) {
+      params.period = period;
+    }
+
+    console.debug('[ReportService.getFinancialSummary] Request params:', params);
+    return ApiClient.get('/reports/financial-summary', { params });
   },
 };

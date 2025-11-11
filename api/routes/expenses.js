@@ -56,7 +56,8 @@ expensesApp.get('/', async (c) => {
         include: [
           { model: models.Branch },
           { model: models.Profile },
-          { model: models.User, as: 'registered_by_user', attributes: ['id', 'first_name', 'last_name'] }
+          { model: models.User, as: 'registered_by_user', attributes: ['id', 'first_name', 'last_name'] },
+          { model: models.ExpenseCategory, as: 'category' }
         ],
         order: [['transaction_date', 'DESC']],
       });
@@ -119,7 +120,8 @@ expensesApp.post('/', async (c) => {
       const finalExpense = await models.Expense.findByPk(newExpense.id, {
         include: [
           { model: models.Branch },
-          { model: models.User, as: 'registered_by_user', attributes: ['id', 'first_name', 'last_name'] }
+          { model: models.User, as: 'registered_by_user', attributes: ['id', 'first_name', 'last_name'] },
+          { model: models.ExpenseCategory, as: 'category' }
         ],
       });
       return c.json({ success: true, message: 'Expense created successfully', data: finalExpense }, 201);
@@ -150,7 +152,8 @@ expensesApp.put('/:id', async (c) => {
       const finalExpense = await models.Expense.findByPk(id, {
         include: [
           { model: models.Branch },
-          { model: models.User, as: 'registered_by_user', attributes: ['id', 'first_name', 'last_name'] }
+          { model: models.User, as: 'registered_by_user', attributes: ['id', 'first_name', 'last_name'] },
+          { model: models.ExpenseCategory, as: 'category' }
         ],
       });
       return c.json({ success: true, message: 'Expense updated successfully', data: finalExpense });

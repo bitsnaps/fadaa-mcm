@@ -39,7 +39,7 @@ const tableFields = computed(() => [
   { key: 'start_date', label: t('contracts.tableHeaders.startDate'), sortable: true, formatter: formatDateContract },
   { key: 'end_date', label: t('contracts.tableHeaders.endDate'), sortable: true, formatter: formatDateContract },
   { key: 'monthly_rate', label: t('contracts.tableHeaders.monthlyRate', 'Monthly Rate'), sortable: true },
-  { key: 'total_amount', label: t('contracts.tableHeaders.totalAmount', 'Total Amount'), sortable: false },
+  { key: 'net_total_amount', label: t('contracts.tableHeaders.netTotalAmount', 'Net Total'), sortable: true },
   { key: 'actions', label: t('contracts.tableHeaders.actions'), class: 'text-center' }
 ]);
 
@@ -86,6 +86,7 @@ const documentToUpload = ref(null);
 const isUploading = ref(false);
 
 const openViewContractModal = (contract) => {
+  // The 'original_contract' is now passed directly from the table
   selectedContract.value = contract;
   const modalInstance = Modal.getOrCreateInstance(viewContractModal.value);
   modalInstance.show();
@@ -198,9 +199,7 @@ const filteredContracts = computed(() => {
       ...contract,
       client_name: contract.Client?.company_name || 'N/A',
       office_name: contract.Office?.name || 'N/A',
-      monthly_rate_display: parseFloat(contract.monthly_rate),
-      total_amount_display: calculateTotalAmount(contract),
-      original_contract: contract // Keep a reference to the original for modals
+      monthly_rate_display: parseFloat(contract.monthly_rate)
     };
   });
 });
@@ -245,39 +244,6 @@ const formatDateContract = (date) => {
   return formatDate(date);
 };
 
-const calculateTotalAmount = (contract) => {
-    const monthlyRate = parseFloat(contract.monthly_rate);
-    if (isNaN(monthlyRate)) return 0;
-
-    const taxes = contract.taxes || [];
-    let totalAmount = monthlyRate;
-
-    const clientTaxRate = taxes.reduce((sum, tax) => {
-        if (tax.bearer === 'Client') {
-            const rate = parseFloat(tax.rate);
-            return sum + (isNaN(rate) ? 0 : rate);
-        }
-        return sum;
-    }, 0);
-
-    const companyTaxRate = taxes.reduce((sum, tax) => {
-        if (tax.bearer === 'Company') {
-            const rate = parseFloat(tax.rate);
-            return sum + (isNaN(rate) ? 0 : rate);
-        }
-        return sum;
-    }, 0);
-
-    if (clientTaxRate > 0) {
-        totalAmount -= monthlyRate * (clientTaxRate / 100);
-    }
-
-    if (companyTaxRate > 0) {
-        totalAmount += monthlyRate * (companyTaxRate / 100);
-    }
-
-    return totalAmount;
-};
 
 const viewDocument = (docUrl) => {
   if(docUrl) {
@@ -568,13 +534,13 @@ const exportListing = async (format) => {
               {{ formatCurrency(data.item.monthly_rate_display, '') }}
             </template>
 
-            <template #cell(total_amount)="data">
-              {{ formatCurrency(data.item.total_amount_display, '') }}
+            <template #cell(net_total_amount)="data">
+              {{ formatCurrency(data.item.net_total_amount, '') }}
             </template>
 
             <template #cell(actions)="data">
               <div class="text-center">
-                <button @click="openViewContractModal(data.item.original_contract)" class="btn btn-sm btn-outline-info me-1" :title="t('contracts.viewContract')">
+                <button @click="openViewContractModal(data.item)" class="btn btn-sm btn-outline-info me-1" :title="t('contracts.viewContract')">
                   <i class="bi bi-eye"></i>
                 </button>
                 <button @click="downloadDocument(data.item.document_url)" :disabled="!data.item.document_url" class="btn btn-sm btn-outline-primary me-1" :title="t('contracts.downloadContract')">
@@ -783,6 +749,7 @@ const exportListing = async (format) => {
             <p><strong>{{ t('contracts.tableHeaders.startDate') }}:</strong> {{ formatDate(selectedContract.start_date) }}</p>
             <p><strong>{{ t('contracts.tableHeaders.endDate') }}:</strong> {{ formatDate(selectedContract.end_date) }}</p>
             <p><strong>{{ t('contracts.tableHeaders.monthlyRate') }}:</strong> {{ formatCurrency(selectedContract.monthly_rate) }}</p>
+            <p><strong>{{ t('contracts.tableHeaders.netTotalAmount') }}:</strong> {{ formatCurrency(selectedContract.net_total_amount) }}</p>
             <p><strong>{{ t('contracts.tableHeaders.status') }}:</strong> <span :class="getStatusClass(selectedContract.status)">{{ selectedContract.status }}</span></p>
             <p><strong>{{ t('contracts.tableHeaders.paymentTerms') }}:</strong> {{ selectedContract.payment_terms }}</p>
             <p><strong>{{ t('addClient.form.serviceType') }}:</strong> {{ selectedContract.service_type }}</p>

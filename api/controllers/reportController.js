@@ -130,9 +130,127 @@ async function downloadAnnualReport(c) {
   }
 }
 
+async function getFinancialSummary(c) {
+    try {
+        const {
+            profile_id,
+            period = 'this_month',
+            startDate: startDateParam,
+            endDate: endDateParam,
+        } = c.req.query();
+
+        if (!profile_id) {
+            return c.json({ success: false, message: 'profile_id is required' }, 400);
+        }
+
+        const now = new Date();
+        let startDate;
+        let endDate;
+
+        if (startDateParam && endDateParam) {
+            // Explicit custom range (inclusive full days)
+            startDate = new Date(startDateParam);
+            endDate = new Date(endDateParam);
+            startDate.setHours(0, 0, 0, 0);
+            endDate.setHours(23, 59, 59, 999);
+        } else {
+            // Derived ranges based on period
+            switch (period) {
+                case 'yearly':
+                case 'this_year':
+                    startDate = new Date(now.getFullYear(), 0, 1);
+                    endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+                    break;
+                case 'quarterly':
+                    // Last 3 full months including current month
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+                    startDate = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+                    break;
+                case 'last_30_days':
+                    endDate = new Date();
+                    endDate.setHours(23, 59, 59, 999);
+                    startDate = new Date();
+                    startDate.setDate(startDate.getDate() - 30);
+                    startDate.setHours(0, 0, 0, 0);
+                    break;
+                case 'this_month':
+                default:
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+                    break;
+            }
+        }
+
+        const incomeWhere = {
+            profile_id,
+            transaction_date: {
+                [Op.between]: [startDate, endDate],
+            },
+        };
+
+        const expenseWhere = {
+            profile_id,
+            transaction_date: {
+                [Op.between]: [startDate, endDate],
+            },
+        };
+
+        const incomes = await models.Income.findAll({
+            where: incomeWhere,
+            include: [{ model: models.IncomeCategory, as: 'category' }],
+        });
+
+        const expenses = await models.Expense.findAll({
+            where: expenseWhere,
+            include: [{ model: models.ExpenseCategory, as: 'category' }],
+        });
+
+        const evolution = {};
+        incomes.forEach((inc) => {
+            if (!inc.transaction_date) return;
+            const month = inc.transaction_date.toISOString().slice(0, 7);
+            if (!evolution[month]) evolution[month] = { income: 0, expense: 0 };
+            evolution[month].income += Number(inc.amount) || 0;
+        });
+        expenses.forEach((exp) => {
+            if (!exp.transaction_date) return;
+            const month = exp.transaction_date.toISOString().slice(0, 7);
+            if (!evolution[month]) evolution[month] = { income: 0, expense: 0 };
+            evolution[month].expense += Number(exp.amount) || 0;
+        });
+
+        const incomeByCategory = {};
+        incomes.forEach((inc) => {
+            const categoryName = inc.category ? inc.category.name : 'Uncategorized';
+            if (!incomeByCategory[categoryName]) incomeByCategory[categoryName] = 0;
+            incomeByCategory[categoryName] += Number(inc.amount) || 0;
+        });
+
+        const expenseByCategory = {};
+        expenses.forEach((exp) => {
+            const categoryName = exp.category ? exp.category.name : 'Uncategorized';
+            if (!expenseByCategory[categoryName]) expenseByCategory[categoryName] = 0;
+            expenseByCategory[categoryName] += Number(exp.amount) || 0;
+        });
+
+        return c.json({
+            success: true,
+            data: {
+                evolution,
+                incomeByCategory,
+                expenseByCategory,
+            },
+        });
+    } catch (error) {
+        console.error('Error generating financial summary:', error);
+        return c.json({ success: false, message: 'Failed to generate financial summary' }, 500);
+    }
+}
+
 module.exports = {
   getMonthlyReport,
   getAnnualReport,
   downloadMonthlyReport,
   downloadAnnualReport,
+  getFinancialSummary,
 };

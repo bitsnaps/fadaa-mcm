@@ -66,13 +66,15 @@
     "delete": "Delete",
     "details": "Details",
     "cancel": "Cancel",
-    "save": "Save"
+    "save": "Save",
+    "category": "Category"
   },
   "sidebar": {
     "adminDashboard": "Admin Dashboard",
     "manageUsers": "User Management",
     "manageBranches": "Branch Management",
     "manageServiceCategories": "Service Categories Management",
+    "manageCategories": "Categories Management",
     "assistantDashboard": "Assistant Dashboard",
     "managerDashboard": "Manager Dashboard",
     "manageClients": "Client Management",
@@ -100,6 +102,12 @@
     "financialAnalytics": "Financial Analytics & Tracking",
     "fileManager": "File Manager",
     "managePendingDeletions": "Pending Deletions"
+  },
+  "manageExpenses": {
+    "title": "Expenses"
+  },
+  "manageIncomes": {
+    "title": "Incomes"
   },
   "managePendingDeletions": {
     "date": "Date",
@@ -246,11 +254,13 @@
       "transaction_date": "Transaction Date",
       "branch": "Branch",
       "registered_by": "Registered By",
+      "category": "Category",
       "actions": "Actions"
     },
     "description": {
       "placeholder": "Please enter the entity name"
     },
+    "selectCategoryPlaceholder": "Select a category...",
     "edit": "Edit",
     "delete": "Delete"
   },
@@ -267,8 +277,10 @@
       "transaction_date": "Transaction Date",
       "branch": "Branch",
       "registered_by": "Registered By",
+      "category": "Category",
       "actions": "Actions"
     },
+    "selectCategoryPlaceholder": "Select a category...",
     "edit": "Edit",
     "delete": "Delete"
   },
@@ -671,6 +683,7 @@
       "actions": "Actions",
       "monthlyRate": "Monthly Rate",
       "totalAmount": "Total Amount",
+      "netTotalAmount": "Net Total",
       "area": "Area",
       "activity": "Activity"
     },
@@ -882,7 +895,8 @@
       "endDate": "End Date",
       "format": "Format",
       "downloadReport": "Download Report",
-      "generatingMessage": "Report ({type}) for the period from {startDate} to {endDate} in {format} format generated successfully."
+      "generatingMessage": "Report ({type}) for the period from {startDate} to {endDate} in {format} format generated successfully.",
+      "refreshCharts": "Refresh"
     },
     "revenueVsExpenses": {
       "title": "Revenue vs. Expenses",

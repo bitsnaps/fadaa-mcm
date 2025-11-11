@@ -6,7 +6,7 @@ const { Op } = require('sequelize');
 const models = require('../models');
 const { authMiddleware, managerMiddleware } = require('../middleware/auth');
 const { handleRouteError } = require('../lib/errorHandler');
-const { getMonthlyReport, getAnnualReport, downloadMonthlyReport, downloadAnnualReport } = require('../controllers/reportController');
+const { getMonthlyReport, getAnnualReport, downloadMonthlyReport, downloadAnnualReport, getFinancialSummary } = require('../controllers/reportController');
 
 const reportsApp = new Hono();
 
@@ -14,6 +14,7 @@ reportsApp.use('*', authMiddleware, managerMiddleware);
 
 reportsApp.get('/monthly', getMonthlyReport);
 reportsApp.get('/annual', getAnnualReport);
+reportsApp.get('/financial-summary', getFinancialSummary);
 reportsApp.post('/monthly/download', downloadMonthlyReport);
 reportsApp.post('/annual/download', downloadAnnualReport);
 

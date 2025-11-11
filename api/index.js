@@ -35,6 +35,7 @@ const fileManagerApp = require('./routes/fileManager');
 const trashManagerApp = require('./routes/trashManager');
 const withdrawalsApp = require('./routes/withdrawals');
 const pendingDeletionsApp = require('./routes/pendingDeletions');
+const categoryApp = require('./routes/categories');
 const { hashPassword } = require('./lib/auth');
 const { authMiddleware, adminMiddleware } = require('./middleware/auth');
 const { getUploadDir } = require('./lib/filesHelper');
@@ -82,6 +83,7 @@ app.route('/api/system-settings', systemSettingsApp);
 app.route('/api/files', fileManagerApp);
 app.route('/api/trash', trashManagerApp);
 app.route('/api/pending-deletions', pendingDeletionsApp);
+app.route('/api/categories', categoryApp);
 
 
 // --- Static File Serving ---

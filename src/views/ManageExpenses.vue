@@ -2,19 +2,21 @@
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { BTable, BPagination } from 'bootstrap-vue-next';
-import { getExpenses, addExpense, updateExpense, deleteExpense } from '@/services/ExpenseService';
+import { getExpenses, addExpense, updateExpense, deleteExpense, getExpensesByCategories } from '@/services/ExpenseService';
 import { getBranches } from '@/services/BranchService';
 import { useAuthStore } from '@/stores/auth'; // To get registered_by user ID
 import { Modal } from 'bootstrap';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, minValue } from '@vuelidate/validators';
+import SmartSelect from '@/components/SmartSelect.vue';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
 
 const expenses = ref([]);
 const branches = ref([]);
+const expenseCategories = ref([]);
 const isLoading = ref(true);
 const searchTerm = ref('');
 const isSubmitting = ref(false);
@@ -69,6 +71,7 @@ const fetchBranches = async () => {
 
 onMounted(() => {
     fetchBranches();
+    fetchExpenseCategories();
     modalInstance.value = new Modal(addExpenseModal.value);
 });
 
@@ -85,7 +88,8 @@ const filteredExpenses = computed(() => {
     return filtered.filter(exp =>
         (exp.description && exp.description.toLowerCase().includes(searchTerm.value.toLowerCase())) ||
         (exp.Branch && exp.Branch.name.toLowerCase().includes(searchTerm.value.toLowerCase())) ||
-        (exp.registered_by_user && `${exp.registered_by_user.first_name} ${exp.registered_by_user.last_name}`.toLowerCase().includes(searchTerm.value.toLowerCase()))
+        (exp.registered_by_user && `${exp.registered_by_user.first_name} ${exp.registered_by_user.last_name}`.toLowerCase().includes(searchTerm.value.toLowerCase())) ||
+        (exp.category && exp.category.name.toLowerCase().includes(searchTerm.value.toLowerCase()))
     );
 });
 
@@ -101,6 +105,7 @@ const tableFields = computed(() => {
     }
 
     fields.push({ key: 'registered_by_name', label: t('expenses.tableHeaders.registered_by'), sortable: true });
+    fields.push({ key: 'category_name', label: t('expenses.tableHeaders.category'), sortable: true });
     fields.push({ key: 'actions', label: t('expenses.tableHeaders.actions') });
 
     return fields;
@@ -111,6 +116,11 @@ const tableItems = computed(() =>
         ...exp,
         branch_name: exp.Branch ? exp.Branch.name : 'N/A',
         registered_by_name: exp.registered_by_user ? `${exp.registered_by_user.first_name} ${exp.registered_by_user.last_name}` : 'N/A',
+        category_name: (exp.category && exp.category.name)
+            ? exp.category.name
+            : (Array.isArray(expenseCategories.value)
+                ? (expenseCategories.value.find(cat => cat.id === exp.category_id)?.name || 'N/A')
+                : 'N/A'),
         transaction_date: exp.transaction_date ? (typeof exp.transaction_date === 'string' ? exp.transaction_date.slice(0, 10) : '') : ''
     }))
 );
@@ -127,6 +137,7 @@ const openAddModal = () => {
         branch_id: isAdmin.value ? null : authStore.user.branch_id,
         registered_by: authStore.user.id, // Set current user as registered_by
         profile_id: activeProfileId.value,
+        category_id: null,
     };
     errors.value = {};
     v$.value.$reset();
@@ -150,6 +161,7 @@ const rules = computed(() => ({
     description: { required },
     transaction_date: { required },
     branch_id: { required },
+    category_id: { required },
 }));
 
 const v$ = useVuelidate(rules, currentExpense);
@@ -195,6 +207,16 @@ const handleDelete = async (id) => {
         } catch (error) {
             console.error('Failed to delete expense:', error);
         }
+    }
+};
+const fetchExpenseCategories = async () => {
+    try {
+        const response = await getExpensesByCategories();
+        if (response.data.success) {
+            expenseCategories.value = response.data.categories;
+        }
+    } catch (error) {
+        console.error('Failed to fetch expense categories:', error);
     }
 };
 </script>
@@ -291,21 +313,43 @@ const handleDelete = async (id) => {
                                     <div v-if="errors.branch_id" class="invalid-feedback">{{ errors.branch_id }}</div>
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="exp-description" class="form-label">{{ t('expenses.tableHeaders.description') }} <span class="text-danger">*</span></label>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="exp-category" class="form-label">{{ t('expenses.tableHeaders.category') }} <span class="text-danger">*</span></label>
+                                    <SmartSelect
+                                        id="exp-category"
+                                        v-model="v$.category_id.$model"
+                                        :class="{'is-invalid': v$.category_id.$error || errors.category_id}"
+                                        fetch-url="/categories/expenses"
+                                        label-key="name"
+                                        value-key="id"
+                                        :placeholder="t('expenses.selectCategoryPlaceholder', 'Select a category...')"
+                                        :clearable="true"
+                                        />
+                                    <div v-if="v$.category_id.$error" class="invalid-feedback">
+                                        <p v-for="error of v$.category_id.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                    </div>
+                                    <div v-if="errors.category_id" class="invalid-feedback">{{ errors.category_id }}</div>
+                                </div>
+                            
+                                <div class="col-md-6 mb-3">
+                                    <label for="exp-transaction-date" class="form-label">{{ t('expenses.tableHeaders.transaction_date') }} <span class="text-danger">*</span></label>
+                                    <input type="date" id="exp-transaction-date" class="form-control" v-model="v$.transaction_date.$model" :class="{'is-invalid': v$.transaction_date.$error || errors.transaction_date}">
+                                    <div v-if="v$.transaction_date.$error" class="invalid-feedback">
+                                        <p v-for="error of v$.transaction_date.$errors" :key="error.$uid">{{ error.$message }}</p>
+                                    </div>
+                                    <div v-if="errors.transaction_date" class="invalid-feedback">{{ errors.transaction_date }}</div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="mb-3">
+                               <label for="exp-description" class="form-label">{{ t('expenses.tableHeaders.description') }} <span class="text-danger">*</span></label>
                                 <textarea id="exp-description" class="form-control" v-model="v$.description.$model" :class="{'is-invalid': v$.description.$error || errors.description}"></textarea>
                                 <div v-if="v$.description.$error" class="invalid-feedback">
                                     <p v-for="error of v$.description.$errors" :key="error.$uid">{{ error.$message }}</p>
                                 </div>
                                 <div v-if="errors.description" class="invalid-feedback">{{ errors.description }}</div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="exp-transaction-date" class="form-label">{{ t('expenses.tableHeaders.transaction_date') }} <span class="text-danger">*</span></label>
-                                <input type="date" id="exp-transaction-date" class="form-control" v-model="v$.transaction_date.$model" :class="{'is-invalid': v$.transaction_date.$error || errors.transaction_date}">
-                                <div v-if="v$.transaction_date.$error" class="invalid-feedback">
-                                    <p v-for="error of v$.transaction_date.$errors" :key="error.$uid">{{ error.$message }}</p>
-                                </div>
-                                <div v-if="errors.transaction_date" class="invalid-feedback">{{ errors.transaction_date }}</div>
+                                </div>                                
                             </div>
                         </form>
                     </div>

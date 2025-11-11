@@ -19,3 +19,7 @@ export const updateIncome = (id, incomeData) => {
 export const deleteIncome = (id) => {
   return apiClient.delete(`/incomes/${id}`);
 };
+
+export const getIncomesByCategories = () => {
+  return apiClient.get('/categories/incomes');
+};

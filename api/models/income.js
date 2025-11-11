@@ -43,6 +43,14 @@ module.exports = (sequelize) => {
         key: 'id'
       }
     },
+    category_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'income_categories',
+        key: 'id'
+      }
+    },
   }, {
     tableName: 'incomes',
     timestamps: true,

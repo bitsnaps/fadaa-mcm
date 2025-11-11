@@ -19,3 +19,7 @@ export const updateExpense = (id, expenseData) => {
 export const deleteExpense = (id) => {
   return apiClient.delete(`/expenses/${id}`);
 };
+
+export const getExpensesByCategories = () => {
+  return apiClient.get('/categories/expenses');
+};

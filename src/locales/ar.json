@@ -66,13 +66,15 @@
     "delete": "حذف",
     "details": "التفاصيل",
     "cancel": "إلغاء",
-    "save": "حفظ"
+    "save": "حفظ",
+    "category": "الفئة"
   },
   "sidebar": {
     "adminDashboard": "لوحة تحكم الإدارة",
     "manageUsers": "إدارة المستخدمين",
     "manageBranches": "إدارة الفروع",
     "manageServiceCategories": "إدارة فئات الخدمات",
+    "manageCategories": "إدارة الفئات",
     "assistantDashboard": "لوحة تحكم المساعد",
     "managerDashboard": "لوحة تحكم المدير",
     "manageClients": "إدارة العملاء",
@@ -101,6 +103,12 @@
     "fileManager": "إدارة الملفات",
     "managePendingDeletions": "عمليات الحذف المعلقة"
   },
+  "manageExpenses": {
+    "title": "المصروفات"
+  },
+  "manageIncomes": {
+    "title": "الإيرادات"
+  },  
   "managePendingDeletions": {
     "date": "التاريخ",
     "title": "إدارة عمليات الحذف المعلقة",
@@ -246,11 +254,13 @@
       "transaction_date": "تاريخ المعاملة",
       "branch": "الفرع",
       "registered_by": "المسجل بواسطة",
+      "category": "الفئة",
       "actions": "الإجراءات"
     },
     "description": {
       "placeholder": "يرجى إدخال اسم الكيان"
     },
+    "selectCategoryPlaceholder": "اختر فئة...",
     "edit": "تحرير",
     "delete": "حذف"
   },
@@ -267,8 +277,10 @@
       "transaction_date": "تاريخ المعاملة",
       "branch": "الفرع",
       "registered_by": "المسجل بواسطة",
+      "category": "الفئة",
       "actions": "الإجراءات"
     },
+    "selectCategoryPlaceholder": "اختر فئة...",
     "edit": "تحرير",
     "delete": "حذف"
   },
@@ -670,6 +682,7 @@
       "actions": "الإجراءات",
       "monthlyRate": "المعدل الشهري",
       "totalAmount": "المبلغ الإجمالي",
+      "netTotalAmount": "المبلغ الصافي",
       "area": "المساحة",
       "activity": "النشاط"
     },
@@ -881,7 +894,8 @@
       "endDate": "تاريخ الانتهاء",
       "format": "التنسيق",
       "downloadReport": "تحميل التقرير",
-      "generatingMessage": "تم إنشاء التقرير ({type}) للفترة من {startDate} إلى {endDate} بتنسيق {format} بنجاح."
+      "generatingMessage": "تم إنشاء التقرير ({type}) للفترة من {startDate} إلى {endDate} بتنسيق {format} بنجاح.",
+      "refreshCharts": "تحديث"
     },
     "revenueVsExpenses": {
       "title": "الإيرادات مقابل المصروفات",

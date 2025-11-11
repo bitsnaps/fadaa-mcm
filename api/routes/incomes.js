@@ -113,7 +113,8 @@ incomesApp.get('/', async (c) => {
         include: [
           { model: models.Branch },
           { model: models.Profile },
-          { model: models.User, as: 'registered_by_user', attributes: ['id', 'first_name', 'last_name'] }
+          { model: models.User, as: 'registered_by_user', attributes: ['id', 'first_name', 'last_name'] },
+          { model: models.IncomeCategory, as: 'category' }
         ],
         order: [['transaction_date', 'DESC']],
       });

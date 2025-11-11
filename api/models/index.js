@@ -50,7 +50,8 @@ const {
   User, Role, Branch, Client, Office, Contract, ServiceCategory,
   ClientService, Document, Task, Notification, FinancialReport,
   ComplianceReport, Investment, OfficeDesign,
-  SystemSetting, ActivityLog, Tax, ContractTax, Income, Expense, Profile, Withdrawal, ClientAttachment, PendingDeletion
+  SystemSetting, ActivityLog, Tax, ContractTax, Income, Expense, Profile, Withdrawal, ClientAttachment, PendingDeletion,
+  ExpenseCategory, IncomeCategory
 } = db;
 
 // User associations
@@ -177,6 +178,17 @@ Expense.belongsTo(Branch, { foreignKey: 'branch_id' });
 Branch.hasMany(Expense, { foreignKey: 'branch_id' });
 Expense.belongsTo(User, { as: 'registered_by_user', foreignKey: 'registered_by' });
 User.hasMany(Expense, { as: 'registered_expenses', foreignKey: 'registered_by' });
+
+// Category associations
+if (IncomeCategory) {
+    Income.belongsTo(IncomeCategory, { as: 'category', foreignKey: 'category_id' });
+    IncomeCategory.hasMany(Income, { as: 'incomes', foreignKey: 'category_id' });
+}
+if (ExpenseCategory) {
+    Expense.belongsTo(ExpenseCategory, { as: 'category', foreignKey: 'category_id' });
+    ExpenseCategory.hasMany(Expense, { as: 'expenses', foreignKey: 'category_id' });
+}
+
 // PendingDeletion associations
 if (PendingDeletion) {
   User.hasMany(PendingDeletion, { as: 'deletion_requests', foreignKey: 'requester_id' });
