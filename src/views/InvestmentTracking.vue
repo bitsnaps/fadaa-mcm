@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useI18n } from 'vue-i18n';
 import { Line, Doughnut } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, ArcElement, Filler } from 'chart.js';
-import { formatCurrency, formatDate } from "@/helpers/utils.js";
+import { formatCurrency, formatDate, formatDateForInput } from "@/helpers/utils.js";
 import ApiClient from '@/services/ApiClient.js';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 
@@ -352,8 +352,8 @@ const setFilterToCurrentMonth = () => {
   const now = new Date();
   const s = new Date(now.getFullYear(), now.getMonth(), 1);
   const e = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  fromDate.value = s.toISOString().split('T')[0];
-  toDate.value = e.toISOString().split('T')[0];
+  fromDate.value = formatDateForInput(s);
+  toDate.value = formatDateForInput(e);
   fetchInvestments(activeProfileId.value);
   fetchChartData(activeProfileId.value);
   fetchProfitSharePayouts(activeProfileId.value);
@@ -363,8 +363,8 @@ const setFilterToCurrentYear = () => {
   const now = new Date();
   const s = new Date(now.getFullYear(), 0, 1);
   const e = new Date(now.getFullYear(), 11, 31);
-  fromDate.value = s.toISOString().split('T')[0];
-  toDate.value = e.toISOString().split('T')[0];
+  fromDate.value = formatDateForInput(s);
+  toDate.value = formatDateForInput(e);
   fetchInvestments(activeProfileId.value);
   fetchChartData(activeProfileId.value);
   fetchProfitSharePayouts(activeProfileId.value);

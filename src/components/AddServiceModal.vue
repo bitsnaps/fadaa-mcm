@@ -76,6 +76,7 @@ import apiClient from '@/services/ApiClient';
 import { useI18n } from 'vue-i18n';
 import { useVuelidate } from '@vuelidate/core';
 import { required, minValue } from '@vuelidate/validators';
+import { formatDateForInput } from '@/helpers/utils';
 
 const { t } = useI18n();
 
@@ -106,7 +107,7 @@ const newService = ref({
   notes: '',
   status: 'Active',
   taxId: null,
-  transaction_date: new Date().toISOString().split('T')[0]
+  transaction_date: formatDateForInput()
 });
 
 const rules = computed(() => ({
@@ -148,7 +149,10 @@ const fetchTaxes = async () => {
 
 const resetModal = () => {
   if (props.editingService) {
-    newService.value = { ...props.editingService };
+    newService.value = {
+        ...props.editingService,
+        transaction_date: formatDateForInput(props.editingService.transaction_date)
+    };
   } else {
     newService.value = {
       categoryId: '',
@@ -157,7 +161,7 @@ const resetModal = () => {
       notes: '',
       status: 'Active',
       taxId: null,
-      transaction_date: new Date().toISOString().split('T')[0]
+      transaction_date: formatDateForInput()
     };
   }
   v$.value.$reset();
@@ -216,7 +220,7 @@ watch(() => props.editingService, (newVal) => {
       notes: newVal.notes,
       status: newVal.status,
       taxId: newVal.taxId,
-      transaction_date: newVal.transaction_date ? newVal.transaction_date.split('T')[0] : new Date().toISOString().split('T')[0]
+      transaction_date: formatDateForInput(newVal.transaction_date)
     };
   } else {
     resetModal();

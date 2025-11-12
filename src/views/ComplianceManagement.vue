@@ -244,7 +244,7 @@ const openDeadlineModal = (deadline = {}) => {
   editingDeadline.value = { ...deadline };
   // Format date for the input field
   if (editingDeadline.value.due_date) {
-    editingDeadline.value.due_date = new Date(editingDeadline.value.due_date).toISOString().split('T')[0];
+    editingDeadline.value.due_date = formatDateForInput(editingDeadline.value.due_date);
   }
   if (!deadlineModal) {
     deadlineModal = new bootstrap.Modal(document.getElementById('deadlineModal'));

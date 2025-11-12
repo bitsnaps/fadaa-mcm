@@ -116,7 +116,7 @@ import ProfileTabs from '@/components/ProfileTabs.vue';
 import {
   Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler, ArcElement
 } from 'chart.js';
-import { formatCurrency } from '@/helpers/utils.js';
+import { formatCurrency, formatDateForInput } from '@/helpers/utils.js';
 import ReportService from '@/services/ReportService';
 import { saveAs } from 'file-saver';
 
@@ -129,8 +129,8 @@ const revExpFilter = ref('quarterly'); // quarterly, yearly
 
 // --- Report Generation Config ---
 const reportConfig = ref({
-  startDate: new Date().toISOString().split('T')[0],
-  endDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0],
+  startDate: formatDateForInput(),
+  endDate: formatDateForInput(new Date(new Date().setDate(new Date().getDate() + 30))),
   format: 'pdf',
 });
 const reportGeneratedMessage = ref('');
@@ -168,16 +168,16 @@ const setFilterToCurrentMonth = () => {
   const now = new Date();
   const s = new Date(now.getFullYear(), now.getMonth(), 1);
   const e = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  reportConfig.value.startDate = s.toISOString().split('T')[0];
-  reportConfig.value.endDate = e.toISOString().split('T')[0];
+  reportConfig.value.startDate = formatDateForInput(s);
+  reportConfig.value.endDate = formatDateForInput(e);
 };
 
 const setFilterToCurrentYear = () => {
   const now = new Date();
   const s = new Date(now.getFullYear(), 0, 1);
   const e = new Date(now.getFullYear(), 11, 31);
-  reportConfig.value.startDate = s.toISOString().split('T')[0];
-  reportConfig.value.endDate = e.toISOString().split('T')[0];
+  reportConfig.value.startDate = formatDateForInput(s);
+  reportConfig.value.endDate = formatDateForInput(e);
 };
 
 // --- Chart Data & Options ---

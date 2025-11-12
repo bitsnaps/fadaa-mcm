@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { getInvestmentsByInvestor } from '@/services/InvestmentService';
 import { useVuelidate } from '@vuelidate/core';
 import { required, minValue } from '@vuelidate/validators';
+import { formatDateForInput } from '@/helpers/utils';
 
 const { t } = useI18n();
 
@@ -50,7 +51,10 @@ watch(() => form.value.investor_id, async (newInvestorId) => {
 watch(() => props.showModal, (isShown) => {
   if (isShown) {
     if (props.withdrawal) {
-      form.value = { ...props.withdrawal };
+      form.value = { 
+          ...props.withdrawal,
+          requested_at: formatDateForInput(props.withdrawal.requested_at)
+      };
     } else {
       form.value = {
         status: 'pending',
@@ -60,7 +64,7 @@ watch(() => props.showModal, (isShown) => {
         amount: null,
         payment_method: 'cash',
         notes: '',
-        requested_at: new Date().toISOString().slice(0, 10)
+        requested_at: formatDateForInput()
       };
     }
   }

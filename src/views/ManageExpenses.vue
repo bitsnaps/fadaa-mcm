@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { BTable, BPagination } from 'bootstrap-vue-next';
-import { getExpenses, addExpense, updateExpense, deleteExpense, getExpensesByCategories } from '@/services/ExpenseService';
+import { getExpenses, addExpense, updateExpense, deleteExpense } from '@/services/ExpenseService';
 import { getBranches } from '@/services/BranchService';
 import { useAuthStore } from '@/stores/auth'; // To get registered_by user ID
 import { Modal } from 'bootstrap';
@@ -10,6 +10,8 @@ import ProfileTabs from '@/components/ProfileTabs.vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, minValue } from '@vuelidate/validators';
 import SmartSelect from '@/components/SmartSelect.vue';
+import { formatDateForInput } from '@/helpers/utils';
+import apiClient from '@/services/ApiClient';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -116,12 +118,8 @@ const tableItems = computed(() =>
         ...exp,
         branch_name: exp.Branch ? exp.Branch.name : 'N/A',
         registered_by_name: exp.registered_by_user ? `${exp.registered_by_user.first_name} ${exp.registered_by_user.last_name}` : 'N/A',
-        category_name: (exp.category && exp.category.name)
-            ? exp.category.name
-            : (Array.isArray(expenseCategories.value)
-                ? (expenseCategories.value.find(cat => cat.id === exp.category_id)?.name || 'N/A')
-                : 'N/A'),
-        transaction_date: exp.transaction_date ? (typeof exp.transaction_date === 'string' ? exp.transaction_date.slice(0, 10) : '') : ''
+        category_name: exp.Category ? exp.Category.name : 'N/A',
+        transaction_date: formatDateForInput(exp.transaction_date)
     }))
 );
 
@@ -133,7 +131,7 @@ const openAddModal = () => {
     currentExpense.value = {
         amount: 0,
         description: null,
-        transaction_date: new Date().toISOString().slice(0, 10), // Default to today's date
+        transaction_date: formatDateForInput(), // Default to today's date
         branch_id: isAdmin.value ? null : authStore.user.branch_id,
         registered_by: authStore.user.id, // Set current user as registered_by
         profile_id: activeProfileId.value,
@@ -146,7 +144,7 @@ const openAddModal = () => {
 
 const openEditModal = (expense) => {
     isEditMode.value = true;
-    currentExpense.value = { ...expense, transaction_date: expense.transaction_date.slice(0, 10) }; // Format date for input
+    currentExpense.value = { ...expense, transaction_date: formatDateForInput(expense.transaction_date) }; // Format date for input
     errors.value = {};
     v$.value.$reset();
     modalInstance.value.show();
@@ -211,7 +209,7 @@ const handleDelete = async (id) => {
 };
 const fetchExpenseCategories = async () => {
     try {
-        const response = await getExpensesByCategories();
+        const response = await apiClient.get('/categories/expenses');
         if (response.data.success) {
             expenseCategories.value = response.data.categories;
         }

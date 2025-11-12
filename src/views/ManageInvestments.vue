@@ -9,6 +9,7 @@ import { Modal } from 'bootstrap';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, minValue, maxValue } from '@vuelidate/validators';
+import { formatDateForInput } from '@/helpers/utils';
 
 const { t } = useI18n();
 
@@ -103,8 +104,8 @@ const tableItems = computed(() =>
         investor_name: inv.investor ? `${inv.investor.first_name} ${inv.investor.last_name}` : 'N/A',
         branch_name: inv.Branch ? inv.Branch.name : 'N/A',
         type: t(`investments.tableHeaders.${inv.type.toLowerCase()}`),
-        starting_date: inv.starting_date ? (typeof inv.starting_date === 'string' ? inv.starting_date.slice(0, 10) : '') : '',
-        ending_date: inv.ending_date ? (typeof inv.ending_date === 'string' ? inv.ending_date.slice(0, 10) : '') : ''
+        starting_date: formatDateForInput(inv.starting_date),
+        ending_date: formatDateForInput(inv.ending_date)
     }))
 );
 
@@ -132,8 +133,8 @@ const openEditModal = (investment) => {
     isEditMode.value = true;
     currentInvestment.value = {
         ...investment,
-        starting_date: investment.starting_date ? new Date(investment.starting_date).toISOString().split('T')[0] : '',
-        ending_date: investment.ending_date ? new Date(investment.ending_date).toISOString().split('T')[0] : ''
+        starting_date: formatDateForInput(investment.starting_date),
+        ending_date: formatDateForInput(investment.ending_date)
     };
     errors.value = {};
     v$.value.$reset();

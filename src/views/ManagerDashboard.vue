@@ -300,7 +300,7 @@ const exportData = async (format) => {
     
     // Extract filename from content-disposition header if available, otherwise create one
     const disposition = response.headers['content-disposition'];
-    let filename = `manager-dashboard-${activeProfileId.value}-${new Date().toISOString().split('T')[0]}.${format}`;
+    let filename = `manager-dashboard-${activeProfileId.value}-${formatDateForInput()}.${format}`;
     if (disposition && disposition.indexOf('attachment') !== -1) {
       const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
       const matches = filenameRegex.exec(disposition);

@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { BTable, BPagination } from 'bootstrap-vue-next';
-import { getIncomes, addIncome, updateIncome, deleteIncome, getIncomesByCategories } from '@/services/IncomeService';
+import { getIncomes, addIncome, updateIncome, deleteIncome } from '@/services/IncomeService';
 import { getBranches } from '@/services/BranchService';
 import { useAuthStore } from '@/stores/auth'; // To get registered_by user ID
 import { Modal } from 'bootstrap';
@@ -10,6 +10,8 @@ import ProfileTabs from '@/components/ProfileTabs.vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, minValue } from '@vuelidate/validators';
 import SmartSelect from '@/components/SmartSelect.vue';
+import { formatDateForInput } from '@/helpers/utils';
+import apiClient from '@/services/ApiClient';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -117,12 +119,8 @@ const tableItems = computed(() =>
         ...inc,
         branch_name: inc.Branch ? inc.Branch.name : 'N/A',
         registered_by_name: inc.registered_by_user ? `${inc.registered_by_user.first_name} ${inc.registered_by_user.last_name}` : 'N/A',
-        category_name: (inc.category && inc.category.name)
-            ? inc.category.name
-            : (Array.isArray(incomeCategories.value)
-                ? (incomeCategories.value.find(cat => cat.id === inc.category_id)?.name || 'N/A')
-                : 'N/A'),
-        transaction_date: inc.transaction_date ? (typeof inc.transaction_date === 'string' ? inc.transaction_date.slice(0, 10) : '') : ''
+        category_name: inc.Category ? inc.Category.name : 'N/A',
+        transaction_date: formatDateForInput(inc.transaction_date)
     }))
 );
 
@@ -134,7 +132,7 @@ const openAddModal = () => {
     currentIncome.value = {
         amount: 0,
         description: null,
-        transaction_date: new Date().toISOString().slice(0, 10), // Default to today's date
+        transaction_date: formatDateForInput(), // Default to today's date
         branch_id: isAdmin.value ? null : authStore.user.branch_id,
         registered_by: authStore.user.id, // Set current user as registered_by
         profile_id: activeProfileId.value,
@@ -147,7 +145,7 @@ const openAddModal = () => {
 
 const openEditModal = (income) => {
     isEditMode.value = true;
-    currentIncome.value = { ...income, transaction_date: income.transaction_date.slice(0, 10) }; // Format date for input
+    currentIncome.value = { ...income, transaction_date: formatDateForInput(income.transaction_date) }; // Format date for input
     errors.value = {};
     v$.value.$reset();
     modalInstance.value.show();
@@ -212,7 +210,7 @@ const handleDelete = async (id) => {
 };
 const fetchIncomeCategories = async () => {
     try {
-        const response = await getIncomesByCategories();
+        const response = await apiClient.get('/categories/incomes');
         if (response.data.success) {
             incomeCategories.value = response.data.categories;
         }
@@ -357,7 +355,7 @@ const fetchIncomeCategories = async () => {
                                         <p v-for="error of v$.description.$errors" :key="error.$uid">{{ error.$message }}</p>
                                     </div>
                                     <div v-if="errors.description" class="invalid-feedback">{{ errors.description }}</div>
-                                </div>                                
+                                </div>
                             </div>
                         </form>
                     </div>

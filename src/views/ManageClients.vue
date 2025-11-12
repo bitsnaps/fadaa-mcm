@@ -6,7 +6,7 @@ import * as bootstrap from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { getClients, deleteClient, exportClients } from '@/services/ClientService';
 import { getBranchesWithContracts } from '@/services/BranchService';
-import { formatDate } from '@/helpers/utils';
+import { formatDate, formatDateForInput } from '@/helpers/utils';
 import { useAuthStore } from '@/stores/auth';
 import { saveAs } from 'file-saver';
 
@@ -118,7 +118,7 @@ const exportListing = async (format) => {
     };
     const response = await exportClients(config);
     const blob = new Blob([response.data], { type: response.headers['content-type'] });
-    saveAs(blob, `clients-${new Date().toISOString().split('T')[0]}.${format}`);
+    saveAs(blob, `clients-${formatDateForInput()}.${format}`);
   } catch (error) {
     console.error(`Error exporting clients as ${format}:`, error);
   }

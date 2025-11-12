@@ -11,7 +11,7 @@ import { required, minValue } from '@vuelidate/validators';
 import SmartSelect from '@/components/SmartSelect.vue';
 
 import ProfileTabs from '@/components/ProfileTabs.vue';
-import { formatCurrency, formatDate } from '@/helpers/utils.js';
+import { formatCurrency, formatDate, formatDateForInput } from '@/helpers/utils.js';
 import { downloadFile } from '@/helpers/files.js';
 import { useToast } from '@/helpers/toast';
 const { t } = useI18n();
@@ -164,8 +164,8 @@ watch(() => newContract.value.payment_terms, (newVal) => {
       break;
   }
 
-  newContract.value.start_date = startDate.toISOString().split('T')[0];
-  newContract.value.end_date = endDate.toISOString().split('T')[0];
+  newContract.value.start_date = formatDateForInput(startDate);
+  newContract.value.end_date = formatDateForInput(endDate);
 });
 
 watch([() => newContract.value.start_date, () => newContract.value.end_date], () => {
@@ -322,8 +322,8 @@ const openEditContractModal = async (contract) => {
     id: contractData.id,
     client_id: contractData.client_id,
     office_id: contractData.office_id,
-    start_date: contractData.start_date ? new Date(contractData.start_date).toISOString().split('T')[0] : '',
-    end_date: contractData.end_date ? new Date(contractData.end_date).toISOString().split('T')[0] : '',
+    start_date: formatDateForInput(contractData.start_date),
+    end_date: formatDateForInput(contractData.end_date),
     monthly_rate: contractData.monthly_rate ? Number(contractData.monthly_rate) : 0,
     document: null, // Don't pre-fill file input
     tax_ids: contractData.taxes ? contractData.taxes.map(t => Number(t.id)) : [],
@@ -462,7 +462,7 @@ const exportListing = async (format) => {
     };
     const response = await exportContracts(config);
     const blob = new Blob([response.data], { type: response.headers['content-type'] });
-    saveAs(blob, `contracts-${new Date().toISOString().split('T')[0]}.${format}`);
+    saveAs(blob, `contracts-${formatDateForInput()}.${format}`);
   } catch (error) {
     console.error(`Error exporting contracts as ${format}:`, error);
   }

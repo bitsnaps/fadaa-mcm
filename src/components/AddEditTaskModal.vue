@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { formatDateForInput } from '@/helpers/utils';
 
 const { t } = useI18n();
 
@@ -20,7 +21,7 @@ watch(() => props.showModal, (isShown) => {
     if (isEditMode.value) {
       form.value = { 
         ...props.task,
-        due_date: props.task.due_date ? new Date(props.task.due_date).toISOString().split('T')[0] : ''
+        due_date: formatDateForInput(props.task.due_date)
       };
     } else {
       form.value = {
@@ -28,7 +29,7 @@ watch(() => props.showModal, (isShown) => {
         description: '',
         status: 'pending',
         priority: 'medium',
-        due_date: new Date().toISOString().split('T')[0],
+        due_date: formatDateForInput(),
       };
     }
   }

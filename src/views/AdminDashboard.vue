@@ -207,7 +207,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, Filler } from 'chart.js';
-import { formatCurrency } from '@/helpers/utils.js';
+import { formatCurrency, formatDateForInput } from '@/helpers/utils.js';
 import { useToast } from '@/helpers/toast';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import { getTotalClients } from '@/services/ClientService';
@@ -259,8 +259,8 @@ const initThisMonth = () => {
   const now = new Date();
   const s = new Date(now.getFullYear(), now.getMonth(), 1);
   const e = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-  fromDate.value = s.toISOString().split('T')[0];
-  toDate.value = e.toISOString().split('T')[0];
+  fromDate.value = formatDateForInput(s);
+  toDate.value = formatDateForInput(e);
 };
 
 const resetToThisMonth = () => {
@@ -279,8 +279,8 @@ const setToThisYear = () => {
   const now = new Date();
   const s = new Date(now.getFullYear(), 0, 1);
   const e = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
-  fromDate.value = s.toISOString().split('T')[0];
-  toDate.value = e.toISOString().split('T')[0];
+  fromDate.value = formatDateForInput(s);
+  toDate.value = formatDateForInput(e);
   if (activeProfileId.value) applyDateFilter();
 };
 
@@ -408,8 +408,8 @@ const exportData = async (format) => {
       const now = new Date();
       const sDate = new Date(now.getFullYear(), now.getMonth(), 1);
       const eDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      s = sDate.toISOString().split('T')[0];
-      e = eDate.toISOString().split('T')[0];
+      s = formatDateForInput(sDate);
+      e = formatDateForInput(eDate);
     }
 
     const config = {
@@ -425,7 +425,7 @@ const exportData = async (format) => {
     const blob = new Blob([response.data], { type: response.headers['content-type'] });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    const filename = `financial-report-${activeProfileId.value}-${new Date().toISOString().split('T')[0]}.${format}`;
+    const filename = `financial-report-${activeProfileId.value}-${formatDateForInput()}.${format}`;
     link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();

@@ -24,3 +24,11 @@ export const formatDate = (dateString) => {
     day: 'numeric'
   }).format(date);
 };
+
+export const formatDateForInput = (dateString = null) => {
+  const date = dateString ? new Date(dateString) : new Date();
+  // Adjust for timezone offset to prevent off-by-one-day errors
+  const offset = date.getTimezoneOffset();
+  const adjustedDate = new Date(date.getTime() - (offset*60*1000));
+  return adjustedDate.toISOString().split('T')[0];
+};
