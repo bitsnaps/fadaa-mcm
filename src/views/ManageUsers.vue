@@ -47,7 +47,11 @@
                   >
                     <i class="bi bi-key-fill"></i>
                   </button>
-                  <button class="btn btn-sm btn-outline-danger" @click="confirmDeleteUser(user)">
+                  <button
+                    v-if="canDeleteUser(user)"
+                    class="btn btn-sm btn-outline-danger"
+                    @click="confirmDeleteUser(user)"
+                  >
                     <i class="bi bi-trash-fill"></i>
                   </button>
                 </td>
@@ -224,9 +228,11 @@ import { usePasswordToggle } from '@/composables/usePasswordToggle';
 import { formatDate } from '@/helpers/utils';
 import { useVuelidate } from '@vuelidate/core';
 import { required, email, minLength } from '@vuelidate/validators';
+import { useAuthStore } from '@/stores/auth';
 
 const { t } = useI18n();
 const { passwordFieldType, isPasswordVisible, togglePasswordVisibility } = usePasswordToggle();
+const authStore = useAuthStore();
 
 const users = ref([]);
 const roles = ref([]);
@@ -365,6 +371,11 @@ const saveUser = async () => {
     }
     console.error('Failed to save user:', error);
   }
+};
+
+const canDeleteUser = (user) => {
+  if (!authStore.user) return false;
+  return user.id !== authStore.user.id;
 };
 
 const confirmDeleteUser = (user) => {
