@@ -14,19 +14,41 @@ function calculateContractRevenueForPeriod(contracts, startDate, endDate) {
     if (contractStart < startDate) {
       continue;
     }
+
+    // Calculate net monthly rate if taxes are present and borne by company
+    let netMonthlyRate = parseFloat(contract.monthly_rate) || 0;
+    if (contract.taxes && Array.isArray(contract.taxes)) {
+      contract.taxes.forEach(tax => {
+        if (tax.bearer === 'Company') {
+          const taxAmount = netMonthlyRate * (parseFloat(tax.rate) / 100);
+          netMonthlyRate -= taxAmount;
+        }
+      });
+    }
     
     // Iterate through each month of the contract
     let current = new Date(contractStart);
-    while (current < contractEnd) {
+    // Ensure we start at the beginning of the month for comparison
+    current.setDate(1);
+    current.setHours(0, 0, 0, 0);
+
+    const periodStart = new Date(startDate);
+    periodStart.setDate(1);
+    periodStart.setHours(0, 0, 0, 0);
+
+    const periodEnd = new Date(endDate);
+    periodEnd.setHours(23, 59, 59, 999);
+
+    while (current < contractEnd && current <= periodEnd) {
       // Check if the current month is within the specified period
-      if (current >= startDate && current <= endDate) {
-        totalRevenue += parseFloat(contract.monthly_rate);
+      if (current >= periodStart && current <= periodEnd) {
+        totalRevenue += netMonthlyRate;
         
       }
       current.setMonth(current.getMonth() + 1);
     }
   }
-
+  
   return totalRevenue;
 }
 
@@ -62,7 +84,9 @@ async function getAnnualReportData(filters) {
     profile_id,
     [Op.and]: [{ start_date: { [Op.lte]: endDate } }, { end_date: { [Op.gte]: startDate } }]
   };
-  const includeOptions = [];
+  const includeOptions = [
+    { model: models.Tax, as: 'taxes', through: { attributes: [] } }
+  ];
   if (branchId) {
     includeOptions.push({
       model: models.Office,
@@ -150,7 +174,7 @@ async function calculateAnnualReportMetrics(filters) {
 
 // --- Other existing functions ---
 
-async function calculateServiceRevenueExlcTax({ startDate, endDate, profile_id, withTaxes = false }) {
+async function calculateServiceRevenueExlcTax({ startDate, endDate, profile_id, withTaxes = true }) {
     const where = {};
     if (startDate && endDate) {
         where.transaction_date = { [Op.between]: [startDate, endDate] };
@@ -167,7 +191,7 @@ async function calculateServiceRevenueExlcTax({ startDate, endDate, profile_id, 
     return calculateServiceRevenue({ clientServices, withTaxes });
 }
 
-function calculateServiceRevenue({ clientServices, withTaxes = false }) {
+function calculateServiceRevenue({ clientServices, withTaxes = true }) {
     let totalRevenue = 0;
     clientServices.forEach(service => {
         let serviceRevenue = parseFloat(service.price) || 0;
@@ -229,7 +253,9 @@ async function calculateMonthlyReportMetrics(filters) {
   };
   if (clientId) contractWhere.client_id = clientId;
 
-  const includeOptions = [];
+  const includeOptions = [
+    { model: models.Tax, as: 'taxes', through: { attributes: [] } }
+  ];
   if (branchId) {
     includeOptions.push({
       model: models.Office,
