@@ -38,26 +38,39 @@ investmentsApp.get('/', async (c) => {
         const enrichedInvestments = await Promise.all(
             investments.map(async (investment) => {
                 const invJson = investment.toJSON();
-                let calcInput;
-                if (startDate && endDate) {
-                    const rangeStart = new Date(startDate);
-                    const rangeEnd = new Date(endDate);
-                    const invStart = invJson.starting_date ? new Date(invJson.starting_date) : new Date(0);
-                    const invEnd = invJson.ending_date ? new Date(invJson.ending_date) : new Date();
-                    const clippedStart = new Date(Math.max(invStart.getTime(), rangeStart.getTime()));
-                    const clippedEnd = new Date(Math.min(invEnd.getTime(), rangeEnd.getTime()));
-                    calcInput = { ...invJson, starting_date: clippedStart, ending_date: clippedEnd };
-                } else {
-                    const s = invJson.starting_date ? new Date(invJson.starting_date) : new Date(0);
-                    const e = invJson.ending_date ? new Date(invJson.ending_date) : new Date();
-                    calcInput = { ...invJson, starting_date: s, ending_date: e };
+                try {
+                    let calcInput;
+                    if (startDate && endDate) {
+                        const rangeStart = new Date(startDate);
+                        const rangeEnd = new Date(endDate);
+                        const invStart = invJson.starting_date ? new Date(invJson.starting_date) : new Date(0);
+                        const invEnd = invJson.ending_date ? new Date(invJson.ending_date) : new Date();
+                        const clippedStart = new Date(Math.max(invStart.getTime(), rangeStart.getTime()));
+                        const clippedEnd = new Date(Math.min(invEnd.getTime(), rangeEnd.getTime()));
+                        calcInput = { ...invJson, starting_date: clippedStart, ending_date: clippedEnd };
+                    } else {
+                        const s = invJson.starting_date ? new Date(invJson.starting_date) : new Date(0);
+                        const e = invJson.ending_date ? new Date(invJson.ending_date) : new Date();
+                        calcInput = { ...invJson, starting_date: s, ending_date: e };
+                    }
+                    const calculations = await getInvestmentCalculations([calcInput]);
+                    const comp = (calculations && calculations[invJson.id]) ? calculations[invJson.id] : {
+                        branchNetProfitSelectedPeriod: 0,
+                        yourProfitShareSelectedPeriod: 0
+                    };
+                    return {
+                        ...invJson,
+                        ...comp,
+                    };
+                } catch (calcError) {
+                    console.error(`Error calculating for investment ID ${invJson.id}:`, calcError);
+                    return {
+                        ...invJson,
+                        branchNetProfitSelectedPeriod: 0,
+                        yourProfitShareSelectedPeriod: 0,
+                        calculationError: calcError.message
+                    };
                 }
-                const calculations = await getInvestmentCalculations([calcInput]);
-                const comp = (calculations && calculations[invJson.id]) ? calculations[invJson.id] : {};
-                return {
-                    ...invJson,
-                    ...comp,
-                };
             })
         );
 
@@ -66,7 +79,7 @@ investmentsApp.get('/', async (c) => {
         return c.json({ success: true, data: enrichedInvestments });
     } catch (error) {
         console.error('Error fetching investments:', error);
-        return c.json({ success: false, message: 'Failed to fetch investments' }, 500);
+        return c.json({ success: false, message: 'Failed to fetch investments', error: error.message, stack: error.stack }, 500);
     }
 });
 

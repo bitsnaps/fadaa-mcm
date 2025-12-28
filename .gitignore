@@ -39,3 +39,4 @@ docs/
 # uploads
 public/uploads
 
+api/*_issue.js

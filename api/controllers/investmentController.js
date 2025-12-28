@@ -36,7 +36,7 @@ const calculateComprehensiveProfits = async (investments) => {
       },
     };
 
-    const serviceRevenue = await models.ClientService.sum('price', { where: serviceWhereClause });
+    const serviceRevenue = await models.ClientService.sum('price', { where: serviceWhereClause }) || 0;
 
     const contractWhere = {
       profile_id,
@@ -46,19 +46,19 @@ const calculateComprehensiveProfits = async (investments) => {
       ]
     };
     const contracts = await models.Contract.findAll({ where: contractWhere });
-    const contractRevenue = calculateContractRevenueForPeriod(contracts, new Date(investment.starting_date), new Date(investment.ending_date));
+    const contractRevenue = calculateContractRevenueForPeriod(contracts, new Date(investment.starting_date), new Date(investment.ending_date)) || 0;
 
-    const incomeAmount = await models.Income.sum('amount', { where: whereClause });
+    const incomeAmount = await models.Income.sum('amount', { where: whereClause }) || 0;
 
-    const totalIncome = incomeAmount + serviceRevenue + contractRevenue;
-    const totalExpense = await models.Expense.sum('amount', { where: whereClause });
+    const totalIncome = (parseFloat(incomeAmount) || 0) + (parseFloat(serviceRevenue) || 0) + (parseFloat(contractRevenue) || 0);
+    const totalExpense = await models.Expense.sum('amount', { where: whereClause }) || 0;
 
-    const totalNetProfit = totalIncome - totalExpense;
-    const grossProfitShare = totalNetProfit * (percentage / 100);
+    const totalNetProfit = totalIncome - (parseFloat(totalExpense) || 0);
+    const grossProfitShare = totalNetProfit * (parseFloat(percentage) / 100);
 
     const applicableTaxes = await models.Tax.findAll({ where: { bearer: 'Client' } });
     const totalTaxAmount = applicableTaxes.reduce((sum, tax) => {
-      return sum + (grossProfitShare * (tax.rate / 100));
+      return sum + (grossProfitShare * (parseFloat(tax.rate) / 100));
     }, 0);
 
     // console.log('\n**** calculateComprehensiveProfits (for investment.id =', investment.id, '):\n');  
@@ -111,14 +111,14 @@ const calculateContractualProfits = async (investments) => {
       ]
     };
     const contracts = await models.Contract.findAll({ where: contractWhere });
-    const contractRevenue = calculateContractRevenueForPeriod(contracts, new Date(investment.starting_date), new Date(investment.ending_date));
+    const contractRevenue = calculateContractRevenueForPeriod(contracts, new Date(investment.starting_date), new Date(investment.ending_date)) || 0;
 
-    const totalNetProfit = contractRevenue; // For contractual, profit is just the revenue
-    const grossProfitShare = totalNetProfit * (percentage / 100);
+    const totalNetProfit = parseFloat(contractRevenue) || 0; // For contractual, profit is just the revenue
+    const grossProfitShare = totalNetProfit * (parseFloat(percentage) / 100);
 
     const applicableTaxes = await models.Tax.findAll({ where: { bearer: 'Client' } });
     const totalTaxAmount = applicableTaxes.reduce((sum, tax) => {
-      return sum + (grossProfitShare * (tax.rate / 100));
+      return sum + (grossProfitShare * (parseFloat(tax.rate || 0) / 100));
     }, 0);
 
     const netProfitShare = grossProfitShare - totalTaxAmount;

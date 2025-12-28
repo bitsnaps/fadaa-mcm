@@ -4,11 +4,18 @@ const models = require('../models');
 // --- Pure Calculation Functions ---
 
 function calculateContractRevenueForPeriod(contracts, startDate, endDate) {
+  if (!startDate || isNaN(new Date(startDate).getTime())) startDate = new Date(0);
+  if (!endDate || isNaN(new Date(endDate).getTime())) endDate = new Date();
+
   let totalRevenue = 0;
 
   for (const contract of contracts) {
     const contractStart = new Date(contract.start_date);
     const contractEnd = new Date(contract.end_date);
+
+    if (isNaN(contractStart.getTime()) || isNaN(contractEnd.getTime())) {
+      continue;
+    }
 
     // For investment calculations, ignore contracts that started before the investment period.
     if (contractStart < startDate) {
