@@ -32,3 +32,28 @@ export const formatDateForInput = (dateString = null) => {
   const adjustedDate = new Date(date.getTime() - (offset*60*1000));
   return adjustedDate.toISOString().split('T')[0];
 };
+
+
+/**
+ * Calculates the duration in months between two dates.
+ * 
+ * @param {string|Date} startDate The start date of the period.
+ * @param {string|Date} endDate The end date of the period.
+ * @returns {number} The duration in months.
+ */
+export function getContractDurationInMonths(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    let months = (end.getFullYear() - start.getFullYear()) * 12;
+    months -= start.getMonth();
+    months += end.getMonth();
+
+    // Adjust if the end day is less than the start day
+    if (end.getDate() < start.getDate()) {
+        months--;
+    }
+    
+    // Ensure minimum of 1 month if start <= end
+    return months <= 0 ? 1 : months;
+}

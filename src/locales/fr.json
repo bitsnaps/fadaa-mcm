@@ -716,7 +716,9 @@
     "errors": {
       "officeBooked": "Le bureau est déjà réservé pour la période sélectionnée dans ce profil.",
       "officeNotAvailable": "Le bureau sélectionné n'est pas disponible."
-    }
+    },
+    "duration": "Durée",
+    "months": "Mois"
   },
   "offices": {
     "manageOffices": "Gérer les Bureaux",

@@ -714,7 +714,9 @@
     "errors": {
       "officeBooked": "المكتب محجوز بالفعل للفترة المحددة في هذا الملف الشخصي.",
       "officeNotAvailable": "المكتب المحدد غير متاح."
-    }
+    },
+    "duration": "المدة",
+    "months": "شهر"
   },
   "offices": {
     "manageOffices": "إدارة المكاتب",

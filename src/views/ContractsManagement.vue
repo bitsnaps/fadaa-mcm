@@ -11,9 +11,10 @@ import { required, minValue } from '@vuelidate/validators';
 import SmartSelect from '@/components/SmartSelect.vue';
 
 import ProfileTabs from '@/components/ProfileTabs.vue';
-import { formatCurrency, formatDate, formatDateForInput } from '@/helpers/utils.js';
+import { formatCurrency, formatDate, formatDateForInput, getContractDurationInMonths } from '@/helpers/utils.js';
 import { downloadFile } from '@/helpers/files.js';
 import { useToast } from '@/helpers/toast';
+
 const { t } = useI18n();
 const { showErrorToast } = useToast();
 
@@ -212,6 +213,13 @@ const areDatesValid = computed(() => {
     return true;
   }
   return new Date(newContract.value.start_date) < new Date(newContract.value.end_date);
+});
+
+const contractDuration = computed(() => {
+  if (newContract.value.start_date && newContract.value.end_date && areDatesValid.value) {
+    return getContractDurationInMonths(newContract.value.start_date, newContract.value.end_date);
+  }
+  return null;
 });
 
 const officeApiUrl = computed(() => {
@@ -667,6 +675,9 @@ const exportListing = async (format) => {
                                 <div v-if="errors.end_date" class="invalid-feedback">{{ errors.end_date }}</div>
                                 <div v-if="!areDatesValid" class="text-danger mt-1">
                                     {{ t('contracts.endDateBeforeStartDateError') }}
+                                </div>
+                                <div v-if="contractDuration" class="form-text text-primary">
+                                    <i class="bi bi-info-circle"></i> {{ t('contracts.duration', 'Duration') }}: {{ contractDuration }} {{ t('contracts.months', 'months') }}
                                 </div>
                             </div>
                         </div>

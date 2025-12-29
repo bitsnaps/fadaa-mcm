@@ -10,6 +10,7 @@ const branchRestriction = require('../middleware/branchRestriction');
 const { handleRouteError } = require('../lib/errorHandler');
 const { downloadFile } = require('../services/fileService');
 const { createNotification } = require('../services/notificationService');
+const { getContractDurationInMonths } = require('../lib/dateUtils');
 
 const contractApp = new Hono();
 
@@ -47,20 +48,6 @@ async function isOfficeAvailable(office_id, start_date, end_date, profile_id, ex
     }
 
     return { available: true };
-}
-
-function getContractDurationInMonths(startDate, endDate) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    let months = (end.getFullYear() - start.getFullYear()) * 12;
-    months -= start.getMonth();
-    months += end.getMonth();
-
-    // If the end day is not the last day of the month, we might need to adjust.
-    // This is a simplified calculation and might need refinement based on business rules.
-    // For now, we add one to include the start month.
-    return months <= 0 ? 1 : months + 1;
 }
 
 contractApp.use('*', authMiddleware);
