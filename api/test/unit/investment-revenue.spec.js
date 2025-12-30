@@ -21,10 +21,10 @@ describe('Investment Revenue Calculation', () => {
             },
         ];
 
-        const revenue = calculateContractRevenueForPeriod(contracts, investment_start_date, investment_end_date);
+        const revenue = calculateContractRevenueForPeriod(contracts, investment_start_date, investment_end_date, { excludePreExisting: true });
 
         // The old contract should be ignored.
-        // expect(revenue).toBe(24000); // (old result) to be verified
-        expect(revenue).toBe(26000);
+        // New Contract: 2000 * 12 = 24000
+        expect(revenue).toBeCloseTo(24000);
     });
 });

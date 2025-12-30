@@ -17,7 +17,7 @@ describe('Annual Report - Pure Calculations', () => {
     const endDate = new Date('2025-12-31');
     const revenue = calculateContractRevenueForPeriod(contracts, startDate, endDate);
     // 1000*12 + 500*6 = 12000 + 3000 = 15000
-    expect(revenue).toBe(15000);
+    expect(revenue).toBeCloseTo(15000, 2);
   });
 
   it('should calculate total revenue correctly', () => {

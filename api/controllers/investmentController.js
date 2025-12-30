@@ -46,7 +46,7 @@ const calculateComprehensiveProfits = async (investments) => {
       ]
     };
     const contracts = await models.Contract.findAll({ where: contractWhere });
-    const contractRevenue = calculateContractRevenueForPeriod(contracts, new Date(investment.starting_date), new Date(investment.ending_date)) || 0;
+    const contractRevenue = calculateContractRevenueForPeriod(contracts, new Date(investment.starting_date), new Date(investment.ending_date), { excludePreExisting: true }) || 0;
 
     const incomeAmount = await models.Income.sum('amount', { where: whereClause }) || 0;
 
@@ -111,7 +111,7 @@ const calculateContractualProfits = async (investments) => {
       ]
     };
     const contracts = await models.Contract.findAll({ where: contractWhere });
-    const contractRevenue = calculateContractRevenueForPeriod(contracts, new Date(investment.starting_date), new Date(investment.ending_date)) || 0;
+    const contractRevenue = calculateContractRevenueForPeriod(contracts, new Date(investment.starting_date), new Date(investment.ending_date), { excludePreExisting: true }) || 0;
 
     const totalNetProfit = parseFloat(contractRevenue) || 0; // For contractual, profit is just the revenue
     const grossProfitShare = totalNetProfit * (parseFloat(percentage) / 100);

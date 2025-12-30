@@ -1,12 +1,15 @@
 const { Op } = require('sequelize');
 const models = require('../models');
+const { getContractDurationInMonths } = require('./dateUtils');
 
 // --- Pure Calculation Functions ---
 
-function calculateContractRevenueForPeriod(contracts, startDate, endDate) {
+function calculateContractRevenueForPeriod(contracts, startDate, endDate, options = {}) {
   if (!startDate || isNaN(new Date(startDate).getTime())) startDate = new Date(0);
   if (!endDate || isNaN(new Date(endDate).getTime())) endDate = new Date();
 
+  const periodStart = new Date(startDate);
+  const periodEnd = new Date(endDate);
   let totalRevenue = 0;
 
   for (const contract of contracts) {
@@ -17,9 +20,10 @@ function calculateContractRevenueForPeriod(contracts, startDate, endDate) {
       continue;
     }
 
-    // For investment calculations, ignore contracts that started before the investment period.
-    if (contractStart < startDate) {
-      continue;
+    // For specific calculations (like investment ROI), we might want to ignore contracts
+    // that started before the period began.
+    if (options.excludePreExisting && contractStart < periodStart) {
+        continue;
     }
 
     // Calculate net monthly rate if taxes are present and borne by company
@@ -32,27 +36,28 @@ function calculateContractRevenueForPeriod(contracts, startDate, endDate) {
         }
       });
     }
-    
-    // Iterate through each month of the contract
-    let current = new Date(contractStart);
-    // Ensure we start at the beginning of the month for comparison
-    current.setDate(1);
-    current.setHours(0, 0, 0, 0);
 
-    const periodStart = new Date(startDate);
-    periodStart.setDate(1);
-    periodStart.setHours(0, 0, 0, 0);
+    // Calculate total contract revenue based on duration in months
+    const durationInMonths = getContractDurationInMonths(contractStart, contractEnd);
+    const totalContractRevenue = netMonthlyRate * durationInMonths;
 
-    const periodEnd = new Date(endDate);
-    periodEnd.setHours(23, 59, 59, 999);
+    // Calculate daily rate based on total contract duration in days
+    const totalContractDurationMs = contractEnd - contractStart;
+    const totalContractDays = totalContractDurationMs / (1000 * 60 * 60 * 24);
 
-    while (current < contractEnd && current <= periodEnd) {
-      // Check if the current month is within the specified period
-      if (current >= periodStart && current <= periodEnd) {
-        totalRevenue += netMonthlyRate;
-        
-      }
-      current.setMonth(current.getMonth() + 1);
+    if (totalContractDays <= 0) continue;
+
+    const dailyRevenue = totalContractRevenue / totalContractDays;
+
+    // Calculate overlap between contract and period
+    const overlapStart = new Date(Math.max(contractStart, periodStart));
+    const overlapEnd = new Date(Math.min(contractEnd, periodEnd));
+
+    const overlapMs = overlapEnd - overlapStart;
+
+    if (overlapMs > 0) {
+      const overlapDays = overlapMs / (1000 * 60 * 60 * 24);
+      totalRevenue += dailyRevenue * overlapDays;
     }
   }
   
