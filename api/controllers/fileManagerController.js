@@ -55,7 +55,10 @@ const listFiles = async (c) => {
 
 const deleteFile = async (c) => {
     try {
-        const { filePath } = c.req.param();
+        const filePath = c.req.query('path');
+        if (!filePath) {
+            return c.json({ success: false, message: 'File path is required' }, 400);
+        }
         const decodedPath = decodeURIComponent(filePath);
 
         const isLinked = await isFileLinked(decodedPath);
