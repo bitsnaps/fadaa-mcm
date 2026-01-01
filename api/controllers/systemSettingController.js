@@ -13,6 +13,8 @@ const defaultSettings = {
   openAIBaseUrl: 'https://api.openai.com/v1',
 };
 
+const publicKeys = ['siteName', 'siteLogo', 'defaultTheme', 'googleMaps'];
+
 exports.getSettings = async (c) => {
   try {
     const settings = await SystemSetting.findAll();
@@ -22,7 +24,21 @@ exports.getSettings = async (c) => {
     }, {});
 
     const combinedSettings = { ...defaultSettings, ...settingsMap };
-    return c.json(combinedSettings);
+    
+    const user = c.get('user');
+    // If user is admin, return all settings. Otherwise, return only public settings.
+    if (user && user.role === 'admin') {
+        return c.json(combinedSettings);
+    }
+
+    const publicSettings = {};
+    publicKeys.forEach(key => {
+        if (combinedSettings[key] !== undefined) {
+            publicSettings[key] = combinedSettings[key];
+        }
+    });
+
+    return c.json(publicSettings);
   } catch (error) {
     console.error('Error fetching settings:', error);
     return c.json({ error: 'Failed to fetch settings' }, 500);

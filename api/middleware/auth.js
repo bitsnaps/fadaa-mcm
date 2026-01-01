@@ -31,6 +31,30 @@ const authMiddleware = async (c, next) => {
     }
 };
 
+const optionalAuthMiddleware = async (c, next) => {
+    const authHeader = c.req.header('Authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split(' ')[1];
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const user = await models.User.findByPk(decoded.id, {
+                include: [{ model: models.Role, as: 'role' }]
+            });
+
+            if (user) {
+                const userJSON = user.toJSON();
+                userJSON.role = user.role ? user.role.name.toLowerCase() : null;
+                userJSON.isAdmin = () => userJSON.role === 'admin';
+                c.set('user', userJSON);
+            }
+        } catch (error) {
+            // Ignore token errors for optional auth
+            console.warn('Optional auth token error:', error.message);
+        }
+    }
+    await next();
+};
+
 const adminMiddleware = async (c, next) => {
     try {
         const user = c.get('user');
@@ -125,6 +149,7 @@ const investorMiddleware = async (c, next) => {
 
 module.exports = {
     authMiddleware,
+    optionalAuthMiddleware,
     adminMiddleware,
     assistantMiddleware,
     managerMiddleware,
