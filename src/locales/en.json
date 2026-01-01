@@ -411,6 +411,19 @@
       "selectYear": "Select Year",
       "refresh": "Refresh Charts"
     },
+    "details": {
+      "title": "Profit Calculation Details",
+      "serviceRevenue": "Service Revenue",
+      "contractRevenue": "Contract Revenue",
+      "otherIncome": "Other Income",
+      "totalIncome": "Total Income",
+      "totalExpenses": "Total Expenses",
+      "netProfit": "Net Profit",
+      "yourStake": "Your Stake",
+      "grossShare": "Gross Share",
+      "taxes": "Taxes",
+      "netShare": "Net Share"
+    },
     "payoutHistory": {
       "title": "Payout History (Profit Share)",
       "export": "Export",

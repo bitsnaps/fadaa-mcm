@@ -28,6 +28,20 @@ const calculateComprehensiveProfits = async (investments) => {
       whereClause.branch_id = branch_id;
     }
 
+    // Fix: Filter services by branch via Contract -> Office -> Branch
+    const serviceInclude = [];
+    if (branch_id) {
+      serviceInclude.push({
+        model: models.Contract,
+        required: true,
+        include: [{
+          model: models.Office,
+          where: { branch_id: branch_id },
+          required: true
+        }]
+      });
+    }
+
     const serviceWhereClause = {
       profile_id,
       transaction_date: {
@@ -36,7 +50,10 @@ const calculateComprehensiveProfits = async (investments) => {
       },
     };
 
-    const serviceRevenue = await models.ClientService.sum('price', { where: serviceWhereClause }) || 0;
+    const serviceRevenue = await models.ClientService.sum('price', { 
+      where: serviceWhereClause,
+      include: serviceInclude
+    }) || 0;
 
     const contractWhere = {
       profile_id,
@@ -45,7 +62,21 @@ const calculateComprehensiveProfits = async (investments) => {
         { end_date: { [Op.gte]: new Date(starting_date) } }
       ]
     };
-    const contracts = await models.Contract.findAll({ where: contractWhere });
+
+    // Fix: Filter contracts by branch via Office -> Branch
+    const contractInclude = [];
+    if (branch_id) {
+      contractInclude.push({
+        model: models.Office,
+        where: { branch_id: branch_id },
+        required: true
+      });
+    }
+
+    const contracts = await models.Contract.findAll({ 
+      where: contractWhere,
+      include: contractInclude 
+    });
     const contractRevenue = calculateContractRevenueForPeriod(contracts, new Date(investment.starting_date), new Date(investment.ending_date), { excludePreExisting: true }) || 0;
 
     const incomeAmount = await models.Income.sum('amount', { where: whereClause }) || 0;
@@ -76,6 +107,17 @@ const calculateComprehensiveProfits = async (investments) => {
     calculations[id] = {
       branchNetProfitSelectedPeriod: totalNetProfit,
       yourProfitShareSelectedPeriod: netProfitShare,
+      details: {
+        incomeAmount: parseFloat(incomeAmount) || 0,
+        serviceRevenue: parseFloat(serviceRevenue) || 0,
+        contractRevenue: parseFloat(contractRevenue) || 0,
+        totalIncome: parseFloat(totalIncome) || 0,
+        totalExpense: parseFloat(totalExpense) || 0,
+        totalNetProfit: parseFloat(totalNetProfit) || 0,
+        grossProfitShare: parseFloat(grossProfitShare) || 0,
+        totalTaxAmount: parseFloat(totalTaxAmount) || 0,
+        netProfitShare: parseFloat(netProfitShare) || 0
+      }
     };
   }
 
@@ -93,7 +135,7 @@ const calculateContractualProfits = async (investments) => {
   const calculations = {};
 
   for (const investment of investments) {
-    const { percentage, starting_date, ending_date, profile_id, id } = investment;
+    const { branch_id, percentage, starting_date, ending_date, profile_id, id } = investment;
 
     if (!profile_id) {
       calculations[id] = {
@@ -110,7 +152,21 @@ const calculateContractualProfits = async (investments) => {
         { end_date: { [Op.gte]: new Date(starting_date) } }
       ]
     };
-    const contracts = await models.Contract.findAll({ where: contractWhere });
+
+    // Fix: Filter contracts by branch via Office -> Branch
+    const contractInclude = [];
+    if (branch_id) {
+      contractInclude.push({
+        model: models.Office,
+        where: { branch_id: branch_id },
+        required: true
+      });
+    }
+
+    const contracts = await models.Contract.findAll({ 
+      where: contractWhere,
+      include: contractInclude
+    });
     const contractRevenue = calculateContractRevenueForPeriod(contracts, new Date(investment.starting_date), new Date(investment.ending_date), { excludePreExisting: true }) || 0;
 
     const totalNetProfit = parseFloat(contractRevenue) || 0; // For contractual, profit is just the revenue
@@ -126,6 +182,13 @@ const calculateContractualProfits = async (investments) => {
     calculations[id] = {
       branchNetProfitSelectedPeriod: totalNetProfit,
       yourProfitShareSelectedPeriod: netProfitShare,
+      details: {
+        contractRevenue: parseFloat(contractRevenue) || 0,
+        totalNetProfit: parseFloat(totalNetProfit) || 0,
+        grossProfitShare: parseFloat(grossProfitShare) || 0,
+        totalTaxAmount: parseFloat(totalTaxAmount) || 0,
+        netProfitShare: parseFloat(netProfitShare) || 0
+      }
     };
   }
 

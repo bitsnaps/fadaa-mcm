@@ -412,6 +412,19 @@
       "selectYear": "Sélectionner l'Année",
       "refresh": "Actualiser les Graphiques"
     },
+    "details": {
+      "title": "Détails du calcul des bénéfices",
+      "serviceRevenue": "Revenus de services",
+      "contractRevenue": "Revenus contractuels",
+      "otherIncome": "Autres revenus",
+      "totalIncome": "Revenu total",
+      "totalExpenses": "Dépenses totales",
+      "netProfit": "Bénéfice net",
+      "yourStake": "Votre mise",
+      "grossShare": "Part brute",
+      "taxes": "Taxes",
+      "netShare": "Part nette"
+    },    
     "payoutHistory": {
       "title": "Historique des Paiements (Part de Bénéfice)",
       "export": "Exporter",

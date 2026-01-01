@@ -62,6 +62,7 @@ const branchInvestments = computed(() => {
     return {
       id: inv.id,
       branchName: inv.Branch ? inv.Branch.name : 'N/A',
+      investorName: inv.investor ? `${inv.investor.first_name} ${inv.investor.last_name}` : 'N/A',
       investmentAmount: inv.investment_amount,
       participationPercentage: inv.percentage,
       type: inv.type,
@@ -73,6 +74,7 @@ const branchInvestments = computed(() => {
       totalIncome: inv.totalIncome || 0,
       totalExpenses: inv.totalExpenses || 0,
       status: status,
+      details: inv.details || null,
     };
   });
 });
@@ -130,6 +132,14 @@ const chartData = ref({
 
 const isChartLoading = ref(false);
 const chartError = ref(null);
+
+const selectedInvestment = ref(null);
+const showDetailsModal = ref(false);
+
+const openDetailsModal = (investment) => {
+  selectedInvestment.value = investment;
+  showDetailsModal.value = true;
+};
 
 // Chart options
 const lineChartOptions = computed(() => ({
@@ -546,6 +556,7 @@ const getStatusTranslation = (status) => {
               <thead>
                 <tr>
                   <th>{{ $t('investmentTracking.breakdown.branchName') }}</th>
+                  <th>{{ $t('investments.tableHeaders.investor') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.investmentAmount') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.typeOfInvestment') }}</th>
                   <th>{{ $t('investmentTracking.breakdown.yourStake') }}</th>
@@ -561,6 +572,7 @@ const getStatusTranslation = (status) => {
               <tbody>
                 <tr v-for="branch in filteredInvestments" :key="branch.id">
                   <td>{{ branch.branchName }}</td>
+                  <td>{{ branch.investorName }}</td>
                   <td>{{ formatCurrency(branch.investmentAmount, '') }}</td>
                   <td>{{ t(`investments.tableHeaders.${branch.type.toLowerCase()}`) }} </td>
                   <td>{{ branch.participationPercentage }}%</td>
@@ -569,13 +581,19 @@ const getStatusTranslation = (status) => {
                   <!-- <td>{{ formatCurrency(branch.totalIncome, '') }}</td>
                   <td>{{ formatCurrency(branch.totalExpenses, '') }}</td> -->
                   <td>{{ formatCurrency(branch.branchNetProfitSelectedPeriod, '') }}</td>
-                  <td>{{ formatCurrency(branch.yourProfitShareSelectedPeriod, '') }}</td>
-                  <td><span :class="['badge', getStatusClass(branch.status)]">{{ getStatusTranslation(branch.status) }}</span></td>
+                  <td>
+                    {{ formatCurrency(branch.yourProfitShareSelectedPeriod, '') }}
+                  </td>
+                  <td>
+                    <span :class="['badge', getStatusClass(branch.status)]">{{ getStatusTranslation(branch.status) }}</span>
+                    <span v-if="branch.details" class="badge bg-primary cursor-pointer" @click="openDetailsModal(branch)">{{ $t('common.details') }}</span>                    
+                  </td>
                 </tr>
               </tbody>
               <tfoot v-if="filteredInvestments.length > 0" class="table-light">
                 <tr class="fw-bold">
                   <td>{{ $t('investmentTracking.breakdown.totals') }}</td>
+                  <td>-</td>
                   <td>{{ formatCurrency(investmentTotals.totalInvested, '') }}</td>
                   <td>-</td>
                   <td>-</td>
@@ -693,6 +711,73 @@ const getStatusTranslation = (status) => {
     <div v-else class="text-center p-5">
       <p>{{ $t('investmentTracking.selectProfilePrompt') }}</p>
     </div>
+
+    <!-- Details Modal -->
+    <BModal v-model="showDetailsModal" :title="$t('investmentTracking.details.title')" hide-footer ok-only>
+      <div v-if="selectedInvestment && selectedInvestment.details">
+        <h6 class="fw-bold mb-3">{{ selectedInvestment.branchName }} - {{ t(`investments.tableHeaders.${selectedInvestment.type.toLowerCase()}`) }}</h6>
+        
+        <div class="list-group list-group-flush">
+          <!-- Comprehensive Specifics -->
+          <div v-if="selectedInvestment.type === 'Comprehensive'">
+             <div class="list-group-item d-flex justify-content-between">
+                <span>{{ $t('investmentTracking.details.serviceRevenue') }}</span>
+                <span>{{ formatCurrency(selectedInvestment.details.serviceRevenue, '') }}</span>
+             </div>
+             <div class="list-group-item d-flex justify-content-between">
+                <span>{{ $t('investmentTracking.details.contractRevenue') }}</span>
+                <span>{{ formatCurrency(selectedInvestment.details.contractRevenue, '') }}</span>
+             </div>
+             <div class="list-group-item d-flex justify-content-between">
+                <span>{{ $t('investmentTracking.details.otherIncome') }}</span>
+                <span>{{ formatCurrency(selectedInvestment.details.incomeAmount, '') }}</span>
+             </div>
+             <div class="list-group-item d-flex justify-content-between fw-bold bg-light">
+                <span>{{ $t('investmentTracking.details.totalIncome') }}</span>
+                <span>{{ formatCurrency(selectedInvestment.details.totalIncome, '') }}</span>
+             </div>
+             <div class="list-group-item d-flex justify-content-between text-danger">
+                <span>{{ $t('investmentTracking.details.totalExpenses') }}</span>
+                <span>-{{ formatCurrency(selectedInvestment.details.totalExpense, '') }}</span>
+             </div>
+          </div>
+
+          <!-- Contractual Specifics -->
+           <div v-if="selectedInvestment.type === 'Contractual'">
+             <div class="list-group-item d-flex justify-content-between fw-bold bg-light">
+                <span>{{ $t('investmentTracking.details.contractRevenue') }}</span>
+                <span>{{ formatCurrency(selectedInvestment.details.contractRevenue, '') }}</span>
+             </div>
+          </div>
+
+          <!-- Common Totals -->
+          <div class="list-group-item d-flex justify-content-between fw-bold border-top-2">
+            <span>{{ $t('investmentTracking.details.netProfit') }}</span>
+            <span>{{ formatCurrency(selectedInvestment.details.totalNetProfit, '') }}</span>
+          </div>
+          
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ $t('investmentTracking.details.yourStake') }}</span>
+            <span class="badge bg-primary rounded-pill">{{ selectedInvestment.participationPercentage }}%</span>
+          </div>
+
+          <div class="list-group-item d-flex justify-content-between">
+            <span>{{ $t('investmentTracking.details.grossShare') }}</span>
+            <span>{{ formatCurrency(selectedInvestment.details.grossProfitShare, '') }}</span>
+          </div>
+
+          <div class="list-group-item d-flex justify-content-between text-danger">
+            <span>{{ $t('investmentTracking.details.taxes') }}</span>
+            <span>-{{ formatCurrency(selectedInvestment.details.totalTaxAmount, '') }}</span>
+          </div>
+
+          <div class="list-group-item d-flex justify-content-between fw-bold bg-success-soft">
+            <span>{{ $t('investmentTracking.details.netShare') }}</span>
+            <span>{{ formatCurrency(selectedInvestment.details.netProfitShare, '') }}</span>
+          </div>
+        </div>
+      </div>
+    </BModal>
 </div>
 </template>
 

@@ -410,6 +410,19 @@
       "selectYear": "اختر السنة",
       "refresh": "تحديث الرسوم البيانية"
     },
+    "details": {
+      "title": "تفاصيل حساب الربح",
+      "serviceRevenue": "إيرادات الخدمات",
+      "contractRevenue": "الدخل التعاقدي",
+      "otherIncome": "دخل آخر",
+      "totalIncome": "إجمالي الدخل",
+      "totalExpenses": "إجمالي المصاريف",
+      "netProfit": "صافي الربح",
+      "yourStake": "حصة المساهمة",
+      "grossShare": "الحصة الإجمالية",
+      "taxes": "الضرائب",
+      "netShare": "صافي الحصة"
+    },        
     "payoutHistory": {
       "title": "تاريخ الدفعات (حصة الربح)",
       "export": "تصدير",
