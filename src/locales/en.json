@@ -423,7 +423,16 @@
       "yourStake": "Your Stake",
       "grossShare": "Gross Share",
       "taxes": "Taxes",
-      "netShare": "Net Share"
+      "netShare": "Net Share",
+      "formulas": {
+        "totalIncome": "Services + Contracts + Other Income",
+        "netProfitComprehensive": "Total Income - Total Expenses",
+        "netProfitContractual": "Equal to Contract Revenue",
+        "grossShare": "Net Profit × Your Stake %",
+        "taxes": "Gross Share × Tax Rate",
+        "taxesDetailed": "Sum of (Gross Share × Tax Rate)",
+        "netShare": "Gross Share - Taxes"
+      }
     },
     "payoutHistory": {
       "title": "Payout History (Profit Share)",

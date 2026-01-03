@@ -72,6 +72,14 @@ const calculateComprehensiveProfits = async (investments) => {
         required: true
       });
     }
+    
+    // Include taxes for contracts
+    contractInclude.push({
+      model: models.Tax,
+      as: 'taxes',
+      where: { bearer: 'Client' },
+      required: false
+    });
 
     const contracts = await models.Contract.findAll({ 
       where: contractWhere,
@@ -87,10 +95,25 @@ const calculateComprehensiveProfits = async (investments) => {
     const totalNetProfit = totalIncome - (parseFloat(totalExpense) || 0);
     const grossProfitShare = totalNetProfit * (parseFloat(percentage) / 100);
 
-    const applicableTaxes = await models.Tax.findAll({ where: { bearer: 'Client' } });
-    const totalTaxAmount = applicableTaxes.reduce((sum, tax) => {
-      return sum + (grossProfitShare * (parseFloat(tax.rate) / 100));
-    }, 0);
+    // Extract unique applicable taxes from the contracts
+    const uniqueTaxesMap = new Map();
+    contracts.forEach(contract => {
+      if (contract.taxes) {
+        contract.taxes.forEach(tax => {
+          if (!uniqueTaxesMap.has(tax.id)) {
+            uniqueTaxesMap.set(tax.id, tax);
+          }
+        });
+      }
+    });
+    const applicableTaxes = Array.from(uniqueTaxesMap.values());
+
+    const appliedTaxes = applicableTaxes.map(tax => ({
+      name: tax.name,
+      rate: parseFloat(tax.rate),
+      amount: grossProfitShare * (parseFloat(tax.rate) / 100)
+    }));
+    const totalTaxAmount = appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0);
 
     // console.log('\n**** calculateComprehensiveProfits (for investment.id =', investment.id, '):\n');  
     // console.log('incomeAmount = ', incomeAmount);
@@ -116,6 +139,7 @@ const calculateComprehensiveProfits = async (investments) => {
         totalNetProfit: parseFloat(totalNetProfit) || 0,
         grossProfitShare: parseFloat(grossProfitShare) || 0,
         totalTaxAmount: parseFloat(totalTaxAmount) || 0,
+        appliedTaxes: appliedTaxes,
         netProfitShare: parseFloat(netProfitShare) || 0
       }
     };
@@ -163,6 +187,14 @@ const calculateContractualProfits = async (investments) => {
       });
     }
 
+    // Include taxes for contracts
+    contractInclude.push({
+      model: models.Tax,
+      as: 'taxes',
+      where: { bearer: 'Client' },
+      required: false
+    });
+
     const contracts = await models.Contract.findAll({ 
       where: contractWhere,
       include: contractInclude
@@ -172,10 +204,25 @@ const calculateContractualProfits = async (investments) => {
     const totalNetProfit = parseFloat(contractRevenue) || 0; // For contractual, profit is just the revenue
     const grossProfitShare = totalNetProfit * (parseFloat(percentage) / 100);
 
-    const applicableTaxes = await models.Tax.findAll({ where: { bearer: 'Client' } });
-    const totalTaxAmount = applicableTaxes.reduce((sum, tax) => {
-      return sum + (grossProfitShare * (parseFloat(tax.rate || 0) / 100));
-    }, 0);
+    // Extract unique applicable taxes from the contracts
+    const uniqueTaxesMap = new Map();
+    contracts.forEach(contract => {
+      if (contract.taxes) {
+        contract.taxes.forEach(tax => {
+          if (!uniqueTaxesMap.has(tax.id)) {
+            uniqueTaxesMap.set(tax.id, tax);
+          }
+        });
+      }
+    });
+    const applicableTaxes = Array.from(uniqueTaxesMap.values());
+
+    const appliedTaxes = applicableTaxes.map(tax => ({
+      name: tax.name,
+      rate: parseFloat(tax.rate || 0),
+      amount: grossProfitShare * (parseFloat(tax.rate || 0) / 100)
+    }));
+    const totalTaxAmount = appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0);
 
     const netProfitShare = grossProfitShare - totalTaxAmount;
 
@@ -187,6 +234,7 @@ const calculateContractualProfits = async (investments) => {
         totalNetProfit: parseFloat(totalNetProfit) || 0,
         grossProfitShare: parseFloat(grossProfitShare) || 0,
         totalTaxAmount: parseFloat(totalTaxAmount) || 0,
+        appliedTaxes: appliedTaxes,
         netProfitShare: parseFloat(netProfitShare) || 0
       }
     };

@@ -732,7 +732,10 @@ const getStatusTranslation = (status) => {
                 <span>{{ formatCurrency(selectedInvestment.details.incomeAmount, '') }}</span>
              </div>
              <div class="list-group-item d-flex justify-content-between fw-bold bg-light">
-                <span>{{ $t('investmentTracking.details.totalIncome') }}</span>
+                <div>
+                  <span>{{ $t('investmentTracking.details.totalIncome') }}</span>
+                  <small class="d-block text-muted fw-normal" style="font-size: 0.75rem;">{{ $t('investmentTracking.details.formulas.totalIncome') }}</small>
+                </div>
                 <span>{{ formatCurrency(selectedInvestment.details.totalIncome, '') }}</span>
              </div>
              <div class="list-group-item d-flex justify-content-between text-danger">
@@ -751,7 +754,12 @@ const getStatusTranslation = (status) => {
 
           <!-- Common Totals -->
           <div class="list-group-item d-flex justify-content-between fw-bold border-top-2">
-            <span>{{ $t('investmentTracking.details.netProfit') }}</span>
+            <div>
+              <span>{{ $t('investmentTracking.details.netProfit') }}</span>
+              <small class="d-block text-muted fw-normal" style="font-size: 0.75rem;">
+                {{ selectedInvestment.type === 'Comprehensive' ? $t('investmentTracking.details.formulas.netProfitComprehensive') : $t('investmentTracking.details.formulas.netProfitContractual') }}
+              </small>
+            </div>
             <span>{{ formatCurrency(selectedInvestment.details.totalNetProfit, '') }}</span>
           </div>
           
@@ -761,17 +769,29 @@ const getStatusTranslation = (status) => {
           </div>
 
           <div class="list-group-item d-flex justify-content-between">
-            <span>{{ $t('investmentTracking.details.grossShare') }}</span>
+            <div>
+              <span>{{ $t('investmentTracking.details.grossShare') }}</span>
+              <small class="d-block text-muted fw-normal" style="font-size: 0.75rem;">{{ $t('investmentTracking.details.formulas.grossShare') }}</small>
+            </div>
             <span>{{ formatCurrency(selectedInvestment.details.grossProfitShare, '') }}</span>
           </div>
 
           <div class="list-group-item d-flex justify-content-between text-danger">
-            <span>{{ $t('investmentTracking.details.taxes') }}</span>
+            <div>
+              <span>{{ $t('investmentTracking.details.taxes') }}</span>
+              <div v-for="tax in selectedInvestment.details.appliedTaxes" :key="tax.name" class="text-muted small ps-2">
+                {{ tax.name }} ({{ tax.rate }}%): {{ formatCurrency(tax.amount) }}
+              </div>
+              <small class="d-block text-muted fw-normal" style="font-size: 0.75rem;">{{ $t('investmentTracking.details.formulas.taxesDetailed') }}</small>
+            </div>
             <span>-{{ formatCurrency(selectedInvestment.details.totalTaxAmount, '') }}</span>
           </div>
 
           <div class="list-group-item d-flex justify-content-between fw-bold bg-success-soft">
-            <span>{{ $t('investmentTracking.details.netShare') }}</span>
+            <div>
+              <span>{{ $t('investmentTracking.details.netShare') }}</span>
+              <small class="d-block text-muted fw-normal" style="font-size: 0.75rem;">{{ $t('investmentTracking.details.formulas.netShare') }}</small>
+            </div>
             <span>{{ formatCurrency(selectedInvestment.details.netProfitShare, '') }}</span>
           </div>
         </div>

@@ -424,7 +424,16 @@
       "yourStake": "Votre mise",
       "grossShare": "Part brute",
       "taxes": "Taxes",
-      "netShare": "Part nette"
+      "netShare": "Part nette",
+      "formulas": {
+        "totalIncome": "Services + Contrats + Autres Revenus",
+        "netProfitComprehensive": "Revenu Total - Dépenses Totales",
+        "netProfitContractual": "Égal au Revenu Contractuel",
+        "grossShare": "Bénéfice Net × Votre Part %",
+        "taxes": "Part Brute × Taux d'Imposition",
+        "taxesDetailed": "Somme de (Part Brute × Taux d'Imposition)",
+        "netShare": "Part Brute - Taxes"
+      }
     },    
     "payoutHistory": {
       "title": "Historique des Paiements (Part de Bénéfice)",

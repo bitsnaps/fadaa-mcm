@@ -422,7 +422,16 @@
       "yourStake": "حصة المساهمة",
       "grossShare": "الحصة الإجمالية",
       "taxes": "الضرائب",
-      "netShare": "صافي الحصة"
+      "netShare": "صافي الحصة",
+      "formulas": {
+        "totalIncome": "الخدمات + العقود + إيرادات أخرى",
+        "netProfitComprehensive": "إجمالي الدخل - إجمالي المصاريف",
+        "netProfitContractual": "يساوي الدخل التعاقدي",
+        "grossShare": "صافي الربح × حصتك %",
+        "taxes": "الحصة الإجمالية × معدل الضريبة",
+        "taxesDetailed": "مجموع (الحصة الإجمالية × معدل الضريبة)",
+        "netShare": "الحصة الإجمالية - الضرائب"
+      }
     },        
     "payoutHistory": {
       "title": "تاريخ الدفعات (حصة الربح)",
