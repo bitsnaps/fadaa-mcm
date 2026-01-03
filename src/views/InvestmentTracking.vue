@@ -40,7 +40,6 @@ const investmentSummary = computed(() => {
   }
 
   const totalInvested = investments.value.reduce((sum, inv) => sum + inv.investment_amount, 0);
-  const activeInvestments = investments.value.filter(inv => new Date(inv.ending_date) > new Date());
 
   // Profit share and ROI calculation
   const totalProfitShare = investments.value.reduce((sum, inv) => sum + (inv.yourProfitShareSelectedPeriod || 0), 0);
@@ -51,7 +50,7 @@ const investmentSummary = computed(() => {
     totalInvested,
     totalProfitShare,
     overallROI: overallROI.toFixed(2),
-    activeInvestmentsCount: activeInvestments.length,
+    activeInvestmentsCount: investments.value.length,
     nextPayoutDate: 'N/A', // This would require specific logic/data
   };
 });
@@ -521,7 +520,7 @@ const getStatusTranslation = (status) => {
                   <div class="row no-gutters align-items-center">
                     <div class="col m-2">
                       <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ $t('investmentTracking.summary.activeInvestments') }}</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ investmentSummary.activeInvestmentsCount }} {{ $t('investmentTracking.summary.agencies') }}</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ investmentSummary.activeInvestmentsCount }} {{ $t('investmentTracking.summary.investments') }}</div>
                        <small class="text-muted">{{ $t('investmentTracking.summary.nextPayout') }}: {{ investmentSummary.nextPayoutDate }}</small>
                     </div>
                     <div class="col-auto">
