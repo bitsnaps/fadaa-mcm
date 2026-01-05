@@ -19,7 +19,8 @@
       "title": "Notifications",
       "urgentContract": "Contrat XYZ sur le point d'expirer (Urgent)",
       "pendingApproval": "Demande d'approbation en attente (Avertissement)",
-      "systemMaintenance": "Maintenance système prévue (Normal)"
+      "systemMaintenance": "Maintenance système prévue (Normal)",
+      "viewAll": "Afficher tout"
     },
     "recentActivities": {
       "title": "Activités Récentes (Clients)"

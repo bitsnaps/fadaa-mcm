@@ -19,7 +19,8 @@
       "title": "Notifications",
       "urgentContract": "Contract XYZ about to expire (Urgent)",
       "pendingApproval": "Pending approval request (Warning)",
-      "systemMaintenance": "Scheduled system maintenance (Normal)"
+      "systemMaintenance": "Scheduled system maintenance (Normal)",
+      "viewAll": "View all"
     },
     "recentActivities": {
       "title": "Recent Activities (Clients)"

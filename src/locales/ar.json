@@ -19,7 +19,8 @@
       "title": "الإشعارات",
       "urgentContract": "عقد XYZ على وشك الانتهاء (عاجل)",
       "pendingApproval": "طلب الموافقة في انتظار (تحذير)",
-      "systemMaintenance": "صيانة النظام المجدولة (عادي)"
+      "systemMaintenance": "صيانة النظام المجدولة (عادي)",
+      "viewAll": "عرض الكل"
     },
     "recentActivities": {
       "title": "الأنشطة الأخيرة (العملاء)"

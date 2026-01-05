@@ -65,18 +65,32 @@
 			
       	<!-- Section 3: Notifications -->
       	<div class="col-lg-6">
-        <div class="card shadow-sm">
-          <div class="card-header bg-fadaa-yellow">
-            <h5 class="mb-0"><i class="bi bi-bell-fill m-2"></i>{{ $t('dashboard.notifications.title') }}</h5>
-          </div>
-          <div class="card-body">
-            <ul class="list-group list-group-flush">
-              <li v-for="notification in notifications" :key="notification.id" class="list-group-item d-flex align-items-center" :class="`list-group-item-${notification.type || 'info'}`">
-                <i :class="`bi ${getNotificationIcon(notification.type)} m-2 fs-4`"></i> {{ notification.message }}
-              </li>
-            </ul>
-          </div>
-        </div>
+      	 <div class="card shadow-sm">
+      	   <div class="card-header bg-fadaa-yellow">
+      	     <h5 class="mb-0"><i class="bi bi-bell-fill m-2"></i>{{ $t('dashboard.notifications.title') }}</h5>
+      	   </div>
+      	   <div class="card-body">
+      	     <ul class="list-group list-group-flush">
+      	       <li v-for="notification in paginatedNotifications" :key="notification.id" class="list-group-item d-flex align-items-center" :class="`list-group-item-${notification.type || 'info'}`">
+      	         <i :class="`bi ${getNotificationIcon(notification.type)} m-2 fs-4`"></i> {{ notification.message }}
+      	       </li>
+      	     </ul>
+      	     <div v-if="totalNotificationPages > 1" class="d-flex justify-content-center align-items-center mt-3">
+      	       <button class="btn btn-sm btn-outline-secondary me-2" @click="prevNotificationPage" :disabled="currentNotificationPage === 1">
+      	         <i class="bi bi-chevron-left"></i>
+      	       </button>
+      	       <span class="small text-muted">{{ currentNotificationPage }} / {{ totalNotificationPages }}</span>
+      	       <button class="btn btn-sm btn-outline-secondary ms-2" @click="nextNotificationPage" :disabled="currentNotificationPage === totalNotificationPages">
+      	         <i class="bi bi-chevron-right"></i>
+      	       </button>
+      	     </div>
+      	     <div class="text-center mt-3">
+      	       <router-link to="/manage-notifications" class="text-decoration-none small text-muted">
+      	         {{ $t('dashboard.notifications.viewAll') || 'View All Notifications' }} <i class="bi bi-arrow-right"></i>
+      	       </router-link>
+      	     </div>
+      	   </div>
+      	 </div>
       </div>
 	  		
 		</div>
@@ -262,6 +276,25 @@ const nextActivityPage = () => {
 
 const prevActivityPage = () => {
   if (currentActivityPage.value > 1) currentActivityPage.value--;
+};
+
+// Notifications Pagination
+const currentNotificationPage = ref(1);
+const notificationPageSize = 5;
+
+const totalNotificationPages = computed(() => Math.ceil(notifications.value.length / notificationPageSize));
+
+const paginatedNotifications = computed(() => {
+  const start = (currentNotificationPage.value - 1) * notificationPageSize;
+  return notifications.value.slice(start, start + notificationPageSize);
+});
+
+const nextNotificationPage = () => {
+  if (currentNotificationPage.value < totalNotificationPages.value) currentNotificationPage.value++;
+};
+
+const prevNotificationPage = () => {
+  if (currentNotificationPage.value > 1) currentNotificationPage.value--;
 };
 
 // Date range state
