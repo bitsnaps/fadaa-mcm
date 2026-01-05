@@ -94,12 +94,21 @@
           </div>
           <div class="card-body">
             <ul class="list-unstyled">
-              <li v-for="activity in recentActivities" :key="activity.id" class="mb-2">
+              <li v-for="activity in paginatedActivities" :key="activity.id" class="mb-2">
                 <i :class="`bi ${getActivityIcon(activity.action)} m-2`"></i>
                 {{ activity.action }} - {{ activity.details ? activity.details.message : '' }}
                 <span class="text-muted small">({{ formatDistanceToNow(new Date(activity.created_at), { addSuffix: true, locale: fr }) }})</span>
               </li>
             </ul>
+            <div v-if="totalActivityPages > 1" class="d-flex justify-content-center align-items-center mt-3">
+              <button class="btn btn-sm btn-outline-secondary me-2" @click="prevActivityPage" :disabled="currentActivityPage === 1">
+                <i class="bi bi-chevron-left"></i>
+              </button>
+              <span class="small text-muted">{{ currentActivityPage }} / {{ totalActivityPages }}</span>
+              <button class="btn btn-sm btn-outline-secondary ms-2" @click="nextActivityPage" :disabled="currentActivityPage === totalActivityPages">
+                <i class="bi bi-chevron-right"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div><!-- Recent Activities -->
@@ -235,6 +244,25 @@ const notifications = ref([]);
 const recentActivities = ref([]);
 const assistants = ref([]);
 const offices = ref([]);
+
+// Activities Pagination
+const currentActivityPage = ref(1);
+const activityPageSize = 10;
+
+const totalActivityPages = computed(() => Math.ceil(recentActivities.value.length / activityPageSize));
+
+const paginatedActivities = computed(() => {
+  const start = (currentActivityPage.value - 1) * activityPageSize;
+  return recentActivities.value.slice(start, start + activityPageSize);
+});
+
+const nextActivityPage = () => {
+  if (currentActivityPage.value < totalActivityPages.value) currentActivityPage.value++;
+};
+
+const prevActivityPage = () => {
+  if (currentActivityPage.value > 1) currentActivityPage.value--;
+};
 
 // Date range state
 const fromDate = ref(localStorage.getItem('adminDashboard-fromDate') || '');
