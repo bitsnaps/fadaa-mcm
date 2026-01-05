@@ -49,19 +49,48 @@ investorApp.get('/investments', async (c) => {
 
     const data = await Promise.all(
       investments.map(async (inv) => {
+        const invJson = inv.toJSON ? inv.toJSON() : inv;
         const accruedShare = await computeAccruedProfitShareToDate(inv);
         const committed = await sumCommittedWithdrawals(inv.id);
         const available = Math.max(accruedShare - committed, 0);
-        const calcInput = { ...(inv.toJSON ? inv.toJSON() : inv), ending_date: new Date() };
+        
+        // Existing calculation for current status (up to now)
+        const calcInput = { ...invJson, ending_date: new Date() };
         const calcMap = await getInvestmentCalculations([calcInput]);
         const calc = calcMap?.[inv.id] || {};
 
+        // Monthly Profit Calculation
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+        
+        const invStart = new Date(invJson.starting_date);
+        const invEnd = new Date(invJson.ending_date);
+        
+        // Intersection for monthly profit
+        const monthlyStart = new Date(Math.max(startOfMonth.getTime(), invStart.getTime()));
+        const monthlyEnd = new Date(Math.min(endOfMonth.getTime(), invEnd.getTime()));
+        
+        let monthlyProfit = 0;
+        if (monthlyStart <= monthlyEnd) {
+             const monthlyInput = { ...invJson, starting_date: monthlyStart, ending_date: monthlyEnd };
+             const monthlyCalcMap = await getInvestmentCalculations([monthlyInput]);
+             monthlyProfit = monthlyCalcMap?.[inv.id]?.yourProfitShareSelectedPeriod || 0;
+        }
+
+        // Projected Profit (Full Contract Duration)
+        const projectedInput = { ...invJson }; // Use original dates
+        const projectedCalcMap = await getInvestmentCalculations([projectedInput]);
+        const projectedProfit = projectedCalcMap?.[inv.id]?.yourProfitShareSelectedPeriod || 0;
+
         return {
-          ...inv.toJSON(),
+          ...invJson,
           yourProfitShareSelectedPeriod: accruedShare,
           branchNetProfitSelectedPeriod: calc.branchNetProfitSelectedPeriod || 0,
           withdrawalsCommitted: committed,
           availableForWithdrawal: available,
+          monthlyProfit,
+          projectedProfit
         };
       })
     );

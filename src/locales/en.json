@@ -1227,6 +1227,8 @@
         "branch": "Branch",
         "revenue": "Revenue",
         "share": "Share",
+        "monthlyProfit": "Monthly Profit",
+        "projectedProfit": "Projected Profit",
         "clients": "Clients",
         "status": "Status"
       },

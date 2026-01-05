@@ -1228,6 +1228,8 @@
         "branch": "Agence",
         "revenue": "Revenu",
         "share": "Part",
+        "monthlyProfit": "Bénéfice mensuel",
+        "projectedProfit": "Bénéfice prévisionnel",
         "clients": "Clients",
         "status": "Statut"
       },

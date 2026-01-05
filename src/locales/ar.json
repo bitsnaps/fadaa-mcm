@@ -1226,6 +1226,8 @@
         "branch": "الفرع",
         "revenue": "الإيرادات",
         "share": "الحصة",
+        "monthlyProfit": "الربح الشهري",
+        "projectedProfit": "الربح المتوقع",
         "clients": "العملاء",
         "status": "الحالة"
       },

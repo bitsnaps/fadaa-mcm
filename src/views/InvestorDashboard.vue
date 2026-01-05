@@ -331,23 +331,25 @@ const documents = ref([]);
                   <tr>
                     <th>{{ $t('investorDashboard.investmentDetails.table.branch') }}</th>
                     <th>{{ $t('investorDashboard.investmentDetails.table.share') }}</th>
+                    <th>{{ $t('investorDashboard.investmentDetails.table.monthlyProfit') }}</th>
+                    <th>{{ $t('investorDashboard.investmentDetails.table.projectedProfit') }}</th>
                     <th>{{ $t('investorDashboard.withdrawals.kpis.accrued') }}</th>
                     <th>{{ $t('investorDashboard.withdrawals.kpis.committed') }}</th>
                     <th>{{ $t('investorDashboard.withdrawals.kpis.available') }}</th>
-                    <!-- <th>{{ $t('investorDashboard.investmentDetails.table.status') }}</th> -->
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-if="myInvestments.length === 0">
-                    <td colspan="6" class="text-center">{{ $t('investorDashboard.investmentDetails.noData') }}</td>
+                    <td colspan="7" class="text-center">{{ $t('investorDashboard.investmentDetails.noData') }}</td>
                   </tr>
                   <tr v-for="inv in myInvestments" :key="inv.id">
                     <td>{{ inv.Branch?.name || inv.name }}</td>
                     <td>{{ inv.percentage }}%</td>
+                    <td>{{ formatCurrency(inv.monthlyProfit || 0) }}</td>
+                    <td>{{ formatCurrency(inv.projectedProfit || 0) }}</td>
                     <td>{{ formatCurrency(inv.yourProfitShareSelectedPeriod || 0) }}</td>
                     <td>{{ formatCurrency(inv.withdrawalsCommitted || 0) }}</td>
                     <td>{{ formatCurrency(inv.availableForWithdrawal != null ? inv.availableForWithdrawal : Math.max((inv.yourProfitShareSelectedPeriod || 0) - (inv.withdrawalsCommitted || 0), 0)) }}</td>
-                    <!-- <td><span :class="['badge', (inv.status==='active' ? 'bg-success' : 'bg-warning')]">{{ $t(`investorDashboard.statuses.${inv.status || 'active'}`) }}</span></td> -->
                   </tr>
                 </tbody>
               </table>
