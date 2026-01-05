@@ -126,6 +126,7 @@
                     <option value="HighValueTransaction">{{ $t('notifications.types.HighValueTransaction') }}</option>
                     <option value="OfficeBookingRequest">{{ $t('notifications.types.OfficeBookingRequest') }}</option>
                     <option value="ClientDeletion">{{ $t('notifications.types.ClientDeletion') }}</option>
+                    <option value="WithdrawalRequest">{{ $t('notifications.types.WithdrawalRequest') }}</option>
                 </select>
             </div>
             <div class="mb-3" v-if="isAdmin">

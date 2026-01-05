@@ -7,6 +7,7 @@ const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
 const branchRestriction = require('../middleware/branchRestriction');
 const { createNotification } = require('../services/notificationService');
+const userService = require('../services/userService');
 const { Op } = require('sequelize');
 const { handleRouteError } = require('../lib/errorHandler');
 
@@ -242,14 +243,7 @@ clientsApp.delete('/:id', async (c) => {
             await client.destroy();
 
             // Notify admins about the client deletion
-            const admins = await models.User.findAll({
-                include: [{
-                    model: models.Role,
-                    as: 'role',
-                    where: { name: 'Admin' },
-                    attributes: [],
-                }],
-            });
+            const admins = await userService.getAdmins();
             const message = `Client ${deletedClientName} has been deleted by ${user.email}.`;
 
             for (const admin of admins) {
@@ -282,14 +276,7 @@ clientsApp.delete('/:id', async (c) => {
                 entity_id: id,
             });
 
-            const admins = await models.User.findAll({
-                include: [{
-                    model: models.Role,
-                    as: 'role',
-                    where: { name: 'Admin' },
-                    attributes: [],
-                }],
-            });
+            const admins = await userService.getAdmins();
             const message = `User ${user.email} has requested to delete client ${client.company_name || `${client.first_name} ${client.last_name}`}.`;
 
             for (const admin of admins) {

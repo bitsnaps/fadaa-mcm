@@ -107,6 +107,30 @@ withdrawalsApp.put('/:id', async (c) => {
     if (status === 'paid' && wd.status !== 'paid') {
       updateData.paid_at = new Date();
       updateData.approved_at = wd.approved_at || new Date();
+
+      // Create Expense record for the withdrawal
+      try {
+        const investment = await models.Investment.findByPk(wd.investment_id);
+        if (investment && investment.branch_id) {
+          const [withdrawalCategory] = await models.ExpenseCategory.findOrCreate({
+            where: { name: 'Withdrawal' },
+            defaults: { description: 'Withdrawal of investment funds' }
+          });
+
+          await models.Expense.create({
+            amount: amount !== undefined ? amount : wd.amount,
+            description: `Withdrawal for investment #${wd.investment_id}`,
+            transaction_date: new Date(),
+            branch_id: investment.branch_id,
+            registered_by: user.id,
+            profile_id: wd.profile_id,
+            category_id: withdrawalCategory.id
+          });
+        }
+      } catch (expenseError) {
+        console.error('Failed to create expense for withdrawal:', expenseError);
+        // We log but don't fail the withdrawal update
+      }
     }
 
     await wd.update(updateData);

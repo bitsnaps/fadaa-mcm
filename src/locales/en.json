@@ -1302,7 +1302,8 @@
         "pending": "Pending",
         "approved": "Approved",
         "paid": "Paid",
-        "rejected": "Rejected"
+        "rejected": "Rejected",
+        "cancelled": "Cancelled"
       }      
     }
   },
@@ -1433,7 +1434,8 @@
         "HighValueTransaction": "High Value Transaction",
         "OfficeBookingRequest": "Office Booking Request",
         "ClientDeletion": "Client Deletion",
-        "DeletionRequest": "Deletion Request"
+        "DeletionRequest": "Deletion Request",
+        "WithdrawalRequest": "Withdrawal Request"
     },
     "markAllAsRead": "Mark all as read",
     "editModalTitle": "Edit Notification",

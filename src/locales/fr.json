@@ -1280,7 +1280,8 @@
         "pending": "En attente",
         "approved": "Approuvé",
         "paid": "Payé",
-        "rejected": "Rejeté"
+        "rejected": "Rejeté",
+        "cancelled": "Annulé"
       }         
     },
     "documents": {
@@ -1437,7 +1438,8 @@
         "HighValueTransaction": "Transaction de Haute Valeur",
         "OfficeBookingRequest": "Demande de Réservation de Bureau",
         "ClientDeletion": "Suppression de Client",
-        "DeletionRequest": "Demande de suppression"
+        "DeletionRequest": "Demande de suppression",
+        "WithdrawalRequest": "Demande de retrait"
     },
     "markAllAsRead": "Marquer tout comme lu",
     "editModalTitle": "Modifier la Notification",

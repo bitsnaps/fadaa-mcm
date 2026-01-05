@@ -230,8 +230,8 @@ onMounted(() => {
                     <td>{{ w.id }}</td>
                     <td>{{ new Date(w.requested_at || w.created_at).toLocaleString() }}</td>
                     <td>
-                      <div>{{ w.investor?.first_name }} {{ w.investor?.last_name }}</div>
-                      <small class="text-muted">ID: {{ w.investor?.id }}</small>
+                      <!-- <div>{{ w.investor?.first_name }} {{ w.investor?.last_name }}</div> -->
+                      <div class="text-muted">ID: {{ w.investor_id }} </div>
                     </td>
                     <td>
                       <div>{{ w.Investment?.name || ('#' + w.investment_id) }}</div>

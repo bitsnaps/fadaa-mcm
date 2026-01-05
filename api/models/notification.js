@@ -21,7 +21,8 @@ module.exports = (sequelize) => {
         'HighValueTransaction',
         'OfficeBookingRequest',
         'ClientDeletion',
-        'DeletionRequest'
+        'DeletionRequest',
+        'WithdrawalRequest'
       ),
       allowNull: false,
     },

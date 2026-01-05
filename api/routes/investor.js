@@ -2,6 +2,8 @@ const { Hono } = require('hono');
 const models = require('../models');
 const { authMiddleware, adminOrInvestorMiddleware } = require('../middleware/auth');
 const { getInvestmentCalculations } = require('../controllers/investmentController');
+const { createNotification } = require('../services/notificationService');
+const userService = require('../services/userService');
 const { handleRouteError } = require('../lib/errorHandler');
 
 const Op = models.Sequelize.Op;
@@ -315,6 +317,24 @@ investorApp.post('/withdrawals', async (c) => {
       notes: notes || null,
       requested_at: new Date(),
     });
+
+
+    // Notify Admins
+    try {
+      const admins = await userService.getAdmins();
+
+      for (const admin of admins) {
+        await createNotification({
+          userId: admin.id,
+          type: 'WithdrawalRequest',
+          message: `New withdrawal request of ${amount} from ${user.first_name} ${user.last_name}`,
+          relatedEntityType: 'withdrawal',
+          relatedEntityId: parseInt(newWithdrawal.id)
+        });
+      }
+    } catch (notifyError) {
+      console.error('Failed to notify admins:', notifyError);
+    }
 
     // Activity log
     try {

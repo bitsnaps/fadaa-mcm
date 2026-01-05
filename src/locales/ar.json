@@ -1301,7 +1301,8 @@
         "pending": "معلق",
         "approved": "موافق عليه",
         "paid": "مدفوع",
-        "rejected": "مرفوض"
+        "rejected": "مرفوض",
+        "cancelled": "ملغى"
       }
     }
   },
@@ -1432,7 +1433,8 @@
       "HighValueTransaction": "معاملة ذات قيمة عالية",
       "OfficeBookingRequest": "طلب حجز مكتب",
       "ClientDeletion": "حذف العميل",
-      "DeletionRequest": "طلب حذف"
+      "DeletionRequest": "طلب حذف",
+      "WithdrawalRequest": "طلب سحب"
   },
     "markAllAsRead": "وضع علامة على الكل كمقروء",
     "editModalTitle": "تحرير الإشعار",
