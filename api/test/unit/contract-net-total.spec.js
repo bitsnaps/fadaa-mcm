@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-const models = require('../../models');
 
 function getContractDurationInMonths(startDate, endDate) {
   const start = new Date(startDate);
