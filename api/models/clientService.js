@@ -55,6 +55,14 @@ module.exports = (sequelize) => {
         key: 'id'
       }
    },
+   contract_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'contracts',
+        key: 'id'
+      }
+   },
    profile_id: {
      type: DataTypes.INTEGER,
      allowNull: false,

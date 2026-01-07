@@ -46,6 +46,17 @@ clientServicesApp.post('/:clientId', async (c) => {
     try {
         const { categoryId, paymentType, price, notes, taxId, profile_id, status, transaction_date } = await c.req.json();
 
+        const txDate = transaction_date ? new Date(transaction_date) : new Date();
+
+        // Find active contract for this client at the transaction date
+        const activeContract = await models.Contract.findOne({
+            where: {
+                client_id: clientId,
+                start_date: { [models.Op.lte]: txDate },
+                end_date: { [models.Op.gte]: txDate }
+            }
+        });
+
         const newService = await models.ClientService.create({
             client_id: clientId,
             profile_id: profile_id,
@@ -55,7 +66,8 @@ clientServicesApp.post('/:clientId', async (c) => {
             notes,
             status,
             taxId,
-            transaction_date: transaction_date ? new Date(transaction_date) : new Date()
+            contract_id: activeContract ? activeContract.id : null,
+            transaction_date: txDate
         });
 
         return c.json({ success: true, message: 'Service added successfully', service: newService }, 201);
@@ -82,6 +94,23 @@ clientServicesApp.put('/:serviceId', async (c) => {
             return c.json({ success: false, message: 'Service not found' }, 404);
         }
 
+        let contractId = service.contract_id;
+        const newTxDate = transaction_date ? new Date(transaction_date) : service.transaction_date;
+
+        // If date changed or no contract assigned, try to find one
+        if (transaction_date || !contractId) {
+             const activeContract = await models.Contract.findOne({
+                where: {
+                    client_id: service.client_id,
+                    start_date: { [models.Op.lte]: newTxDate },
+                    end_date: { [models.Op.gte]: newTxDate }
+                }
+            });
+            if (activeContract) {
+                contractId = activeContract.id;
+            }
+        }
+
         await service.update({
             service_category_id: categoryId,
             payment_type: paymentType,
@@ -89,7 +118,8 @@ clientServicesApp.put('/:serviceId', async (c) => {
             notes,
             taxId,
             status,
-            transaction_date: transaction_date ? new Date(transaction_date) : service.transaction_date
+            contract_id: contractId,
+            transaction_date: newTxDate
         });
 
         return c.json({ success: true, message: 'Service updated successfully', service });
