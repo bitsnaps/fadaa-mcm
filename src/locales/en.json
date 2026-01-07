@@ -738,7 +738,8 @@
     "endDateBeforeStartDateError": "The end date must be later than the start date.",
     "errors": {
       "officeBooked": "Office is already booked for the selected period in this profile.",
-      "officeNotAvailable": "The selected office is not available."
+      "officeNotAvailable": "The selected office is not available.",
+      "fetchError": "Error fetching contract details."
     },
     "duration": "Duration",
     "months": "Months"

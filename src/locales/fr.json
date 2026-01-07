@@ -739,7 +739,8 @@
     "endDateBeforeStartDateError": "La date de fin doit être postérieure à la date de début.",
     "errors": {
       "officeBooked": "Le bureau est déjà réservé pour la période sélectionnée dans ce profil.",
-      "officeNotAvailable": "Le bureau sélectionné n'est pas disponible."
+      "officeNotAvailable": "Le bureau sélectionné n'est pas disponible.",
+      "fetchError": "Erreur lors de la récupération les détails du contract."
     },
     "duration": "Durée",
     "months": "Mois"

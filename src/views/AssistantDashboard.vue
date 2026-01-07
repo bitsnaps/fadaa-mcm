@@ -286,12 +286,12 @@ const openViewContractModal = async (contractId) => {
     if (response.data.success) {
       selectedContract.value = response.data.contract;
     } else {
-      showErrorToast(t('contracts.fetchError'));
+      showErrorToast(t('contracts.errors.fetchError'));
       modalInstance.hide();
     }
   } catch (error) {
     console.error(`Failed to fetch contract ${contractId}:`, error);
-    showErrorToast(t('contracts.fetchError'));
+    showErrorToast(t('contracts.errors.fetchError'));
     modalInstance.hide();
   } finally {
     contractLoading.value = false;

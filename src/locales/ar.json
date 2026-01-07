@@ -737,7 +737,8 @@
     "endDateBeforeStartDateError": "يجب أن تكون تاريخ الانتهاء لاحقاً لتاريخ البدء.",
     "errors": {
       "officeBooked": "المكتب محجوز بالفعل للفترة المحددة في هذا الملف الشخصي.",
-      "officeNotAvailable": "المكتب المحدد غير متاح."
+      "officeNotAvailable": "المكتب المحدد غير متاح.",
+      "fetchError": "حدث خطأ أثناء جلب تفاصيل العقد "      
     },
     "duration": "المدة",
     "months": "شهر"
