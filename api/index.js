@@ -112,6 +112,105 @@ app.get('/api/csrf', async (c) => {
     });
 });
 
+/*/ Fix orphaned contract records
+const { Op } = require('sequelize');
+
+app.post('/api/fix', async (c) => {
+
+  try {
+    console.log('Starting repair of ClientService contract links...');
+
+    // Find all services without a contract_id
+    const orphanServices = await models.ClientService.findAll({
+      where: {
+        contract_id: null
+      }
+    });
+
+    console.log(`Found ${orphanServices.length} services without a contract.`);
+
+    let fixedCount = 0;
+    let skippedCount = 0;
+
+    for (const service of orphanServices) {
+      // Use transaction_date or fallback to created_at if null or invalid
+      let txDate = new Date(service.transaction_date);
+      
+      if (!service.transaction_date || isNaN(txDate.getTime())) {
+          txDate = new Date(service.created_at);
+      }
+      
+      if (isNaN(txDate.getTime())) {
+         console.log(`Skipping Service ${service.id}: Fully invalid date (tx: ${service.transaction_date}, created: ${service.created_at})`);
+         continue;
+      }
+
+      // Find an active contract for this client at the time of the transaction
+      const activeContract = await models.Contract.findOne({
+        where: {
+          client_id: service.client_id,
+          start_date: { [Op.lte]: txDate },
+          end_date: { [Op.gte]: txDate }
+        }
+      });
+
+      let targetContract = activeContract;
+
+      if (!targetContract) {
+        // Aggressive matching: find the closest contract for this client
+        targetContract = await models.Contract.findOne({
+          where: { client_id: service.client_id },
+          order: [
+            // Order by absolute difference in time (Sequelize might need a specific way to do this,
+            // but we can just pick the first one or the one with start_date closest to txDate)
+            [models.sequelize.fn('ABS', models.sequelize.where(models.sequelize.col('start_date'), '-', txDate)), 'ASC']
+          ],
+          limit: 1
+        });
+
+        if (!targetContract) {
+          // Fallback: just get any contract for this client if the above fails
+          targetContract = await models.Contract.findOne({
+            where: { client_id: service.client_id },
+            order: [['start_date', 'ASC']],
+            limit: 1
+          });
+        }
+      }
+
+      if (targetContract) {
+        service.contract_id = targetContract.id;
+        await service.save();
+        fixedCount++;
+        console.log(`Linked Service ${service.id} to Contract ${targetContract.id} (Aggressive match: ${!activeContract})`);
+      } else {
+        skippedCount++;
+        console.log(`No contract found at all for Service ${service.id} (Client ${service.client_id})`);
+      }
+    }
+
+    console.log('Repair complete.');
+    console.log(`Fixed: ${fixedCount}`);
+    console.log(`Skipped (no matching contract found): ${skippedCount}`);
+
+      return c.json({
+        success: true,
+        message: {
+          fixed: `Fixed: ${fixedCount}`,
+          skipped: `Skipped (no matching contract found): ${skippedCount}`
+        }
+      })
+          
+  } catch (error) {
+    console.error('Error during repair:', error);
+    return c.json({
+      success: false,
+      message: `Error: ${error}`
+    })    
+  }
+})
+*/
+
 // 1- Should be executed with:
 // curl -X POST /api/install
 app.post('/api/install', async (c) => {

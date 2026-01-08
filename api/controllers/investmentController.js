@@ -1,6 +1,6 @@
 const models = require('../models');
 const { Op } = require('sequelize');
-const { calculateContractRevenueForPeriod } = require('../lib/calculations');
+const { calculateContractRevenueForPeriod, calculateServiceRevenue } = require('../lib/calculations');
 
 const calculateComprehensiveProfits = async (investments) => {
   const calculations = {};
@@ -50,10 +50,18 @@ const calculateComprehensiveProfits = async (investments) => {
       },
     };
 
-    const serviceRevenue = await models.ClientService.sum('price', { 
+    // Include Tax model to calculate net revenue
+    const serviceIncludeWithTax = [
+      ...serviceInclude,
+      { model: models.Tax, attributes: ['rate', 'bearer'] }
+    ];
+
+    const clientServices = await models.ClientService.findAll({
       where: serviceWhereClause,
-      include: serviceInclude
-    }) || 0;
+      include: serviceIncludeWithTax
+    });
+
+    const serviceRevenue = calculateServiceRevenue({ clientServices, withTaxes: true });
 
     const contractWhere = {
       profile_id,
@@ -77,7 +85,7 @@ const calculateComprehensiveProfits = async (investments) => {
     contractInclude.push({
       model: models.Tax,
       as: 'taxes',
-      where: { bearer: 'Client' },
+      // Removed where: { bearer: 'Client' } to include all taxes (Company taxes need to be deducted from revenue)
       required: false
     });
 
@@ -106,7 +114,11 @@ const calculateComprehensiveProfits = async (investments) => {
         });
       }
     });
-    const applicableTaxes = Array.from(uniqueTaxesMap.values());
+    // Filter out Company taxes from the "Taxes" deduction step because they are already deducted from the Revenue
+    // Only taxes that are specifically applied to the Share/Dividend should be here,
+    // OR if there are Client taxes that for some reason reduce the share (unlikely).
+    // For now, we exclude Company taxes to prevent double deduction.
+    const applicableTaxes = Array.from(uniqueTaxesMap.values()).filter(t => t.bearer !== 'Company');
 
     const appliedTaxes = applicableTaxes.map(tax => ({
       name: tax.name,
@@ -191,7 +203,7 @@ const calculateContractualProfits = async (investments) => {
     contractInclude.push({
       model: models.Tax,
       as: 'taxes',
-      where: { bearer: 'Client' },
+      // Removed where: { bearer: 'Client' } to include all taxes
       required: false
     });
 
@@ -215,7 +227,8 @@ const calculateContractualProfits = async (investments) => {
         });
       }
     });
-    const applicableTaxes = Array.from(uniqueTaxesMap.values());
+    // Filter out Company taxes from "Taxes" deduction to avoid double counting (already deducted from Revenue)
+    const applicableTaxes = Array.from(uniqueTaxesMap.values()).filter(t => t.bearer !== 'Company');
 
     const appliedTaxes = applicableTaxes.map(tax => ({
       name: tax.name,

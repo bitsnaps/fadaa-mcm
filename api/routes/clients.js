@@ -107,7 +107,7 @@ clientsApp.get('/', async (c) => {
                     if (service.Tax && service.Tax.rate) {
                         const taxRate = parseFloat(service.Tax.rate) || 0;
                         const taxAmount = servicePrice * (taxRate / 100);
-                        if (service.Tax.bearer === 'Company') {
+                        if (service.Tax.bearer === 'Client') {
                             serviceAmountWithTax += taxAmount;
                         }
                     }
