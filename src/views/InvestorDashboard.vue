@@ -7,7 +7,7 @@ import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, Ca
 import { formatCurrency } from '@/helpers/utils.js';
 import { getMyWithdrawals, createWithdrawal } from '@/services/WithdrawalService';
 import { getMyInvestments } from '@/services/InvestmentService';
-import { getMyDocuments } from '@/services/InvestorService';
+import { getMyDocuments, getProfitShareSeries } from '@/services/InvestorService';
 import profileService from '@/services/profileService';
 import { getInvestorKpis } from '@/services/DashboardService';
 import { useToast } from '@/helpers/toast';
@@ -25,6 +25,7 @@ const invIsLoading = ref(true);
 const invError = ref(null);
 const myInvestments = ref([]);
 const myWithdrawals = ref([]);
+const profitSeries = ref({ labels: [], values: [] });
 const activeProfileId = ref(null);
 const withdrawalForm = ref({
   investment_id: '',
@@ -84,18 +85,26 @@ async function loadInvestorData() {
         icon: d.type === 'Contract' ? 'bi-file-earmark-pdf-fill text-danger' : 'bi-file-earmark-text'
       }));
     }
-    /*/ Revenue series from backend (by month)
+
+    // Load Profit Share Series
     const today = new Date();
     const year = today.getFullYear();
     const startDate = new Date(year, 0, 1);
     const endDate = new Date(year, 11, 31);
-    const resRev = await getRevenueSeries({ profile_id: activeProfileId.value, startDate: startDate.toISOString(), endDate: endDate.toISOString() });
+    const resProfit = await getProfitShareSeries({
+      profile_id: activeProfileId.value,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString()
+    });
     
-    if (resRev.data?.success) {
-      const d = resRev.data.data || {};
-      const months = locale.value === 'fr' ? ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'] : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      revenueSeries.value = { labels: months, values: (d.netRevenue || Array(12).fill(0)) };
-    }*/
+    if (resProfit.data?.success) {
+      const d = resProfit.data.data || {};
+      profitSeries.value = {
+        labels: d.labels || [],
+        values: d.profitShare || []
+      };
+    }
+
     const resKpis = await getInvestorKpis(params);
     if (resKpis.data?.success) {
       kpis.value = resKpis.data.data;
@@ -293,7 +302,7 @@ const documents = ref([]);
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-graph-up me-2 text-fadaa-blue"></i>{{ $t('investorDashboard.kpis.roi') }}</h5>
-            <p class="card-text fs-4 fw-bold">{{ kpis.roi.toFixed(2) }}%</p>
+            <p class="card-text fs-4 fw-bold" :class="{'text-danger': kpis.roi < 0}">{{ kpis.roi.toFixed(2) }}%</p>
           </div>
         </div>
       </div>
@@ -301,7 +310,7 @@ const documents = ref([]);
         <div class="card h-100 shadow-sm text-center">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-currency-euro me-2 text-fadaa-blue"></i>{{ $t('investorDashboard.kpis.totalRevenue') }}</h5>
-            <p class="card-text fs-4 fw-bold"> {{ formatCurrency(kpis.totalRevenue) }}</p>
+            <p class="card-text fs-4 fw-bold" :class="{'text-danger': kpis.totalRevenue < 0}"> {{ formatCurrency(kpis.totalRevenue) }}</p>
           </div>
         </div>
       </div>
@@ -317,7 +326,7 @@ const documents = ref([]);
 
     <!-- Section 2: Revenue Evolution Line Chart -->
     <div class="row mb-4">
-      <div class="col-md-12">
+      <div class="col-md-12 mb-4">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
             <div class="d-flex justify-content-between align-items-center">
@@ -345,9 +354,9 @@ const documents = ref([]);
                   <tr v-for="inv in myInvestments" :key="inv.id">
                     <td>{{ inv.Branch?.name || inv.name }}</td>
                     <td>{{ inv.percentage }}%</td>
-                    <td>{{ formatCurrency(inv.monthlyProfit || 0) }}</td>
-                    <td>{{ formatCurrency(inv.projectedProfit || 0) }}</td>
-                    <td>{{ formatCurrency(inv.yourProfitShareSelectedPeriod || 0) }}</td>
+                    <td :class="{'text-danger fw-bold': inv.monthlyProfit < 0}">{{ formatCurrency(inv.monthlyProfit || 0) }}</td>
+                    <td :class="{'text-danger fw-bold': inv.projectedProfit < 0}">{{ formatCurrency(inv.projectedProfit || 0) }}</td>
+                    <td :class="{'text-danger fw-bold': inv.yourProfitShareSelectedPeriod < 0}">{{ formatCurrency(inv.yourProfitShareSelectedPeriod || 0) }}</td>
                     <td>{{ formatCurrency(inv.withdrawalsCommitted || 0) }}</td>
                     <td>{{ formatCurrency(inv.availableForWithdrawal != null ? inv.availableForWithdrawal : Math.max((inv.yourProfitShareSelectedPeriod || 0) - (inv.withdrawalsCommitted || 0), 0)) }}</td>
                   </tr>
@@ -358,19 +367,36 @@ const documents = ref([]);
         </div>
       </div>
 
-      <!-- Chart (filters removed to simplify investor view) -->
-      <!-- div class="col-md-6">
+      <!-- Monthly Profit Share List -->
+      <div class="col-md-12">
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
             <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0"><i class="bi bi-activity me-2"></i>{{ $t('investorDashboard.revenueEvolution.title') }}</h5>
+              <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>{{ $t('investorDashboard.investmentDetails.table.monthlyProfit') }} ({{ new Date().getFullYear() }})</h5>
             </div>
           </div>
           <div class="card-body">
-            <Line :data="chartData" :options="chartOptions" style="height: 350px;" />
+             <div class="table-responsive">
+              <table class="table table-hover table-bordered">
+                <thead>
+                  <tr>
+                    <th v-for="(label, index) in profitSeries.labels" :key="'h-'+index" class="text-center">{{ label }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td v-for="(value, index) in profitSeries.values" :key="'v-'+index" class="text-center">
+                      <span :class="{'text-success fw-bold': value > 0, 'text-danger fw-bold': value < 0, 'text-muted': value === 0}">
+                        {{ formatCurrency(value) }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div -->
+      </div>
 
     </div>
 
@@ -434,7 +460,7 @@ const documents = ref([]);
             <div class="row text-center">
               <div class="col-6 mb-3">
                 <div class="fw-semibold">{{ $t('investorDashboard.withdrawals.kpis.accrued') }}</div>
-                <div class="fs-5">{{ formatCurrency(totals.accrued) }}</div>
+                <div class="fs-5" :class="{'text-danger fw-bold': totals.accrued < 0}">{{ formatCurrency(totals.accrued) }}</div>
               </div>
               <div class="col-6 mb-3">
                 <div class="fw-semibold">{{ $t('investorDashboard.withdrawals.kpis.withdrawnPaid') }}</div>
