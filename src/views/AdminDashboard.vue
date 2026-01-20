@@ -24,7 +24,7 @@
         </div>
         <!-- Section 1: Major KPIs -->
         <div class="row gy-4 mb-4">
-          <div class="col-md-4">
+          <div class="col-md-3">
             <div class="card h-100 shadow-sm text-center">
               <div class="card-body">
                 <h5 class="card-title"><i class="bi bi-people-fill m-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.clients') }}</h5>
@@ -32,7 +32,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <div class="card h-100 shadow-sm text-center">
               <div class="card-body">
                 <h5 class="card-title"><i class="bi bi-cash-coin m-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.monthlyRevenue') }}</h5>
@@ -40,11 +40,19 @@
               </div>
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <div class="card h-100 shadow-sm text-center">
               <div class="card-body">
                 <h5 class="card-title"><i class="bi bi-graph-up-arrow m-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.monthlyNet') }}</h5>
                 <p class="card-text fs-4 fw-bold">{{ formatCurrency(kpis.monthlyNet) }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card h-100 shadow-sm text-center">
+              <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-wallet2 m-2 text-fadaa-orange"></i>{{ $t('dashboard.kpis.balance') }}</h5>
+                <p class="card-text fs-4 fw-bold">{{ formatCurrency(kpis.companyBalance) }}</p>
               </div>
             </div>
           </div>
@@ -251,6 +259,7 @@ const kpis = ref({
   clients: 0,
   monthlyRevenue: 0,
   monthlyNet: 0,
+  companyBalance: 0,
 });
 
 const activeProfileId = ref(null);
@@ -360,6 +369,7 @@ const fetchDashboardData = async (profileId) => {
     
     kpis.value.monthlyRevenue = revenueSummaryRes.data.data.netRevenue;
     kpis.value.monthlyNet = revenueSummaryRes.data.data.netProfit;
+    kpis.value.companyBalance = revenueSummaryRes.data.data.companyBalance;
 
     // Chart
     const chartRes = await getMonthlyIncomeByBranch({ profile_id: profileId });

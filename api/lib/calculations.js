@@ -350,6 +350,19 @@ async function calculateMonthlyReportMetrics(filters) {
 }
 
 
+function calculateCompanyBalance({
+  lifetimeServicesRevenue = 0,
+  lifetimeContractsRevenue = 0,
+  lifetimeIncomes = 0,
+  lifetimeInvestments = 0,
+  lifetimeExpenses = 0,
+  lifetimeWithdrawals = 0
+}) {
+  const totalInflow = (lifetimeServicesRevenue || 0) + (lifetimeContractsRevenue || 0) + (lifetimeIncomes || 0) + (lifetimeInvestments || 0);
+  const totalOutflow = (lifetimeExpenses || 0) + (lifetimeWithdrawals || 0);
+  return totalInflow - totalOutflow;
+}
+
 module.exports = {
   calculateContractRevenueForPeriod,
   calculateTotalRevenue,
@@ -360,4 +373,5 @@ module.exports = {
   calculateServiceRevenueExlcTax,
   calculateServiceRevenue,
   calculateMonthlyReportMetrics,
+  calculateCompanyBalance,
 };

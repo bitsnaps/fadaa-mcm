@@ -3,7 +3,7 @@ const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { Op } = require('sequelize');
 const { handleRouteError } = require('../lib/errorHandler');
-const { calculateServiceRevenueExlcTax } = require('../lib/calculations');
+const { calculateServiceRevenueExlcTax, calculateContractRevenueForPeriod, calculateCompanyBalance } = require('../lib/calculations');
 
 const financialsApp = new Hono();
 
@@ -90,6 +90,69 @@ financialsApp.get('/revenue-summary', async (c) => {
         const netRevenue = servicesRevenue + contractsRevenue + incomeRevenue;
         const netProfit = netRevenue - totalExpense;
 
+        // --- Calculate Company Balance (Lifetime Accumulation) ---
+        // Balance = (Total Revenue + Total Investments) - (Total Expenses + Total Paid Withdrawals)
+        
+        const balanceEndDate = end || new Date();
+        
+        // A. Lifetime Services Revenue
+        const lifetimeServicesRevenue = await calculateServiceRevenueExlcTax({
+            startDate: new Date(0), // From beginning
+            endDate: balanceEndDate,
+            profile_id,
+            withTaxes: false
+        });
+
+        // B. Lifetime Contracts Revenue
+        const lifetimeContractWhere = {
+            start_date: { [Op.lte]: balanceEndDate }
+        };
+        if (profile_id) lifetimeContractWhere.profile_id = profile_id;
+        
+        const lifetimeContracts = await models.Contract.findAll({
+            where: lifetimeContractWhere,
+            include: [{ model: models.Tax, as: 'taxes', through: { model: models.ContractTax } }]
+        });
+        const lifetimeContractsRevenue = calculateContractRevenueForPeriod(lifetimeContracts, new Date(0), balanceEndDate);
+
+        // C. Lifetime Incomes
+        const lifetimeIncomeWhere = {
+            transaction_date: { [Op.lte]: balanceEndDate }
+        };
+        if (profile_id) lifetimeIncomeWhere.profile_id = profile_id;
+        const lifetimeIncomes = await models.Income.sum('amount', { where: lifetimeIncomeWhere }) || 0;
+
+        // D. Lifetime Expenses
+        const lifetimeExpenseWhere = {
+            transaction_date: { [Op.lte]: balanceEndDate }
+        };
+        if (profile_id) lifetimeExpenseWhere.profile_id = profile_id;
+        const lifetimeExpenses = await models.Expense.sum('amount', { where: lifetimeExpenseWhere }) || 0;
+
+        // E. Lifetime Investments
+        const lifetimeInvestmentWhere = {
+            created_at: { [Op.lte]: balanceEndDate }
+        };
+        if (profile_id) lifetimeInvestmentWhere.profile_id = profile_id;
+        const lifetimeInvestments = await models.Investment.sum('investment_amount', { where: lifetimeInvestmentWhere }) || 0;
+
+        // F. Lifetime Withdrawals (Paid only)
+        const lifetimeWithdrawalWhere = {
+            status: 'paid',
+            paid_at: { [Op.lte]: balanceEndDate }
+        };
+        if (profile_id) lifetimeWithdrawalWhere.profile_id = profile_id;
+        const lifetimeWithdrawals = await models.Withdrawal.sum('amount', { where: lifetimeWithdrawalWhere }) || 0;
+
+        const companyBalance = calculateCompanyBalance({
+            lifetimeServicesRevenue,
+            lifetimeContractsRevenue,
+            lifetimeIncomes,
+            lifetimeInvestments,
+            lifetimeExpenses,
+            lifetimeWithdrawals
+        });
+
         // console.log('------------------------');
         // // For debugging purposes
         // console.log(`Net Revenue: ${netRevenue}`);
@@ -105,6 +168,7 @@ financialsApp.get('/revenue-summary', async (c) => {
             data: {
                 netRevenue,
                 netProfit,
+                companyBalance,
                 totalExpense,
                 servicesRevenue,
                 contractsRevenue,

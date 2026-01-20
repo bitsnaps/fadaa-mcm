@@ -5,7 +5,8 @@
     "kpis": {
       "clients": "عدد العملاء",
       "monthlyRevenue": "الإيرادات الشهرية",
-      "monthlyNet": "الصافي الشهري"
+      "monthlyNet": "الصافي الشهري",
+      "balance": "الرصيد"
     },
     "filter": {
       "thisMonth": "هذا الشهر",
