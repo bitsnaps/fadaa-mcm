@@ -32,7 +32,19 @@ const profitLoading = ref(false);
 
 const availableYears = computed(() => {
   const current = new Date().getFullYear();
-  return Array.from({ length: 5 }, (_, i) => current - i);
+  if (!myInvestments.value || myInvestments.value.length === 0) {
+    return [current];
+  }
+  const startYears = myInvestments.value.map(inv => {
+    const dateStr = inv.starting_date || inv.created_at;
+    return dateStr ? new Date(dateStr).getFullYear() : current;
+  });
+  const minYear = Math.min(...startYears, current);
+  const years = [];
+  for (let y = current; y >= minYear; y--) {
+    years.push(y);
+  }
+  return years;
 });
 
 const withdrawalForm = ref({
