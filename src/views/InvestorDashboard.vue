@@ -27,6 +27,14 @@ const myInvestments = ref([]);
 const myWithdrawals = ref([]);
 const profitSeries = ref({ labels: [], values: [] });
 const activeProfileId = ref(null);
+const selectedYear = ref(new Date().getFullYear());
+const profitLoading = ref(false);
+
+const availableYears = computed(() => {
+  const current = new Date().getFullYear();
+  return Array.from({ length: 5 }, (_, i) => current - i);
+});
+
 const withdrawalForm = ref({
   investment_id: '',
   amount: '',
@@ -62,6 +70,37 @@ const selectedInvestmentAvailable = computed(() => {
   return available;
 });
 
+async function fetchProfitShareSeries() {
+  if (!activeProfileId.value) return;
+  profitLoading.value = true;
+  try {
+    const year = selectedYear.value;
+    const startDate = new Date(year, 0, 1);
+    const endDate = new Date(year, 11, 31);
+    const resProfit = await getProfitShareSeries({
+      profile_id: activeProfileId.value,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString()
+    });
+    
+    if (resProfit.data?.success) {
+      const d = resProfit.data.data || {};
+      profitSeries.value = {
+        labels: d.labels || [],
+        values: d.profitShare || []
+      };
+    }
+  } catch (e) {
+    console.error('Failed to load profit share series', e);
+  } finally {
+    profitLoading.value = false;
+  }
+}
+
+watch(selectedYear, () => {
+  fetchProfitShareSeries();
+});
+
 async function loadInvestorData() {
   if (!activeProfileId.value) return;
   invIsLoading.value = true;
@@ -87,23 +126,7 @@ async function loadInvestorData() {
     }
 
     // Load Profit Share Series
-    const today = new Date();
-    const year = today.getFullYear();
-    const startDate = new Date(year, 0, 1);
-    const endDate = new Date(year, 11, 31);
-    const resProfit = await getProfitShareSeries({
-      profile_id: activeProfileId.value,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString()
-    });
-    
-    if (resProfit.data?.success) {
-      const d = resProfit.data.data || {};
-      profitSeries.value = {
-        labels: d.labels || [],
-        values: d.profitShare || []
-      };
-    }
+    await fetchProfitShareSeries();
 
     const resKpis = await getInvestorKpis(params);
     if (resKpis.data?.success) {
@@ -372,7 +395,10 @@ const documents = ref([]);
         <div class="card shadow-sm">
           <div class="card-header bg-fadaa-light-blue">
             <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>{{ $t('investorDashboard.investmentDetails.table.monthlyProfit') }} ({{ new Date().getFullYear() }})</h5>
+              <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>{{ $t('investorDashboard.investmentDetails.table.monthlyProfit') }}</h5>
+              <select class="form-select form-select-sm w-auto" v-model="selectedYear">
+                <option v-for="y in availableYears" :key="y" :value="y">{{ y }}</option>
+              </select>
             </div>
           </div>
           <div class="card-body">
@@ -384,7 +410,14 @@ const documents = ref([]);
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                  <tr v-if="profitLoading">
+                    <td :colspan="profitSeries.labels.length || 12" class="text-center py-4">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-else>
                     <td v-for="(value, index) in profitSeries.values" :key="'v-'+index" class="text-center">
                       <span :class="{'text-success fw-bold': value > 0, 'text-danger fw-bold': value < 0, 'text-muted': value === 0}">
                         {{ formatCurrency(value) }}
