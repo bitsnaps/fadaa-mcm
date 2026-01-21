@@ -923,7 +923,7 @@
       "format": "التنسيق",
       "downloadReport": "تحميل التقرير",
       "generatingMessage": "تم إنشاء التقرير ({type}) للفترة من {startDate} إلى {endDate} بتنسيق {format} بنجاح.",
-      "refreshCharts": "تحديث"
+      "applyFilter": "تطبيق"
     },
     "revenueVsExpenses": {
       "title": "الإيرادات مقابل المصروفات",

@@ -37,7 +37,7 @@
                           <button type="button" class="btn btn-outline-secondary me-2" @click="setFilterToCurrentMonth">{{ $t('investmentTracking.filters.thisMonth') }}</button>
                           <button type="button" class="btn btn-outline-secondary me-2" @click="setFilterToCurrentYear">{{ $t('investmentTracking.filters.thisYear') }}</button>
                           <button type="button" class="btn btn-outline-primary" @click="refreshFinancialData">
-                            <i class="bi bi-arrow-clockwise me-1"></i>{{ $t('financialReporting.customReport.refreshCharts') || 'Refresh Charts' }}
+                            <i class="bi bi-arrow-clockwise me-1"></i>{{ $t('financialReporting.customReport.applyFilter') || 'Refresh Charts' }}
                           </button>
                         </div>
                         <button type="submit" class="btn btn-fadaa-primary">
@@ -82,7 +82,7 @@
                             <h5 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>{{ t('incomes.title') }}</h5>
                         </div>
                         <div class="card-body">
-                            <Doughnut id="income-category-chart" v-if="incomeByCategoryChartData.labels && incomeByCategoryChartData.labels.length" :data="incomeByCategoryChartData" :options="pieChartOptions" />
+                            <Bar id="income-category-chart" v-if="incomeByCategoryChartData.labels && incomeByCategoryChartData.labels.length" :data="incomeByCategoryChartData" :options="stackedBarOptions" />
                             <p v-else class="text-center text-muted">{{ $t('financialReporting.revenueVsExpenses.loading') }}</p>
                         </div>
                     </div>
@@ -93,12 +93,12 @@
                             <h5 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>{{ t('expenses.title') }}</h5>
                         </div>
                         <div class="card-body">
-                             <Doughnut id="expense-category-chart" v-if="expenseByCategoryChartData.labels && expenseByCategoryChartData.labels.length" :data="expenseByCategoryChartData" :options="pieChartOptions" />
+                             <Bar id="expense-category-chart" v-if="expenseByCategoryChartData.labels && expenseByCategoryChartData.labels.length" :data="expenseByCategoryChartData" :options="stackedBarOptions" />
                              <p v-else class="text-center text-muted">{{ $t('financialReporting.revenueVsExpenses.loading') }}</p>
                         </div>
                     </div>
                 </div>
-            </div>
+          </div>
         </div>
         <div v-if="!activeProfileId" class="text-center">
           <p>{{ $t('financialReporting.noProfileSelected') }}</p>
@@ -109,18 +109,18 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { Line, Doughnut } from 'vue-chartjs';
+import { Line, Bar } from 'vue-chartjs';
 import ProfileTabs from '@/components/ProfileTabs.vue';
 import {
-  Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler, ArcElement
+  Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler, ArcElement, BarController
 } from 'chart.js';
 import { formatCurrency, formatDateForInput } from '@/helpers/utils.js';
 import ReportService from '@/services/ReportService';
 import { saveAs } from 'file-saver';
 
-ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler, ArcElement);
+ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Filler, ArcElement, BarController);
 
 const { t, locale } = useI18n();
 
@@ -199,16 +199,29 @@ const lineChartOptions = ref({
   },
 });
 
-const pieChartOptions = ref({
+const stackedBarOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      position: 'bottom',
+      position: 'top',
     },
     title: {
       display: true,
       font: { size: 16 },
+    },
+    tooltip: {
+      mode: 'index',
+      intersect: false,
+    },
+  },
+  scales: {
+    x: {
+      stacked: true,
+    },
+    y: {
+      stacked: true,
+      beginAtZero: true,
     },
   },
 });
@@ -231,7 +244,7 @@ const fetchFinancialData = async () => {
     );
 
     if (response.data && response.data.success) {
-      const { evolution, incomeByCategory, expenseByCategory } = response.data.data;
+      const { evolution, incomeByMonthByCategory, expenseByMonthByCategory } = response.data.data;
 
       const labels = Object.keys(evolution).sort();
       revenueExpenseChartData.value = {
@@ -256,25 +269,33 @@ const fetchFinancialData = async () => {
         ],
       };
 
-      incomeByCategoryChartData.value = {
-        labels: Object.keys(incomeByCategory),
-        datasets: [
-          {
-            backgroundColor: ['#42A5F5', '#66BB6A', '#FFA726', '#26A69A', '#AB47BC'],
-            data: Object.values(incomeByCategory),
-          },
-        ],
+      const chartColors = ['#42A5F5', '#66BB6A', '#FFA726', '#26A69A', '#AB47BC', '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+
+      const processStackedData = (months, monthlyData) => {
+          if (!monthlyData) return { labels: [], datasets: [] };
+          const categories = new Set();
+          months.forEach(month => {
+              if (monthlyData[month]) {
+                  Object.keys(monthlyData[month]).forEach(cat => categories.add(cat));
+              }
+          });
+
+          const datasets = Array.from(categories).map((category, index) => {
+              return {
+                  label: category,
+                  backgroundColor: chartColors[index % chartColors.length],
+                  data: months.map(month => (monthlyData[month] && monthlyData[month][category]) || 0)
+              };
+          });
+
+          return {
+              labels: months,
+              datasets
+          };
       };
 
-      expenseByCategoryChartData.value = {
-        labels: Object.keys(expenseByCategory),
-        datasets: [
-          {
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
-            data: Object.values(expenseByCategory),
-          },
-        ],
-      };
+      incomeByCategoryChartData.value = processStackedData(labels, incomeByMonthByCategory);
+      expenseByCategoryChartData.value = processStackedData(labels, expenseByMonthByCategory);
     } else {
       revenueExpenseChartData.value = { labels: [], datasets: [] };
       incomeByCategoryChartData.value = { labels: [], datasets: [] };

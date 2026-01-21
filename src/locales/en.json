@@ -924,7 +924,7 @@
       "format": "Format",
       "downloadReport": "Download Report",
       "generatingMessage": "Report ({type}) for the period from {startDate} to {endDate} in {format} format generated successfully.",
-      "refreshCharts": "Refresh"
+      "applyFilter": "Apply"
     },
     "revenueVsExpenses": {
       "title": "Revenue vs. Expenses",

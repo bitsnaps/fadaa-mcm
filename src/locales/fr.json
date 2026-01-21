@@ -925,7 +925,7 @@
       "format": "Format",
       "downloadReport": "Télécharger le Rapport",
       "generatingMessage": "Rapport ({type}) pour la période du {startDate} au {endDate} au format {format} généré avec succès.",
-      "refreshCharts": "Rafraîchir"
+      "applyFilter": "Appliquer"
     },
     "revenueVsExpenses": {
       "title": "Revenus vs. Dépenses",

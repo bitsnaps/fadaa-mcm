@@ -206,31 +206,44 @@ async function getFinancialSummary(c) {
         });
 
         const evolution = {};
+        const incomeByCategory = {};
+        const incomeByMonthByCategory = {};
+
         incomes.forEach((inc) => {
             if (!inc.transaction_date) return;
             const month = inc.transaction_date.toISOString().slice(0, 7);
-            if (!evolution[month]) evolution[month] = { income: 0, expense: 0 };
-            evolution[month].income += Number(inc.amount) || 0;
-        });
-        expenses.forEach((exp) => {
-            if (!exp.transaction_date) return;
-            const month = exp.transaction_date.toISOString().slice(0, 7);
-            if (!evolution[month]) evolution[month] = { income: 0, expense: 0 };
-            evolution[month].expense += Number(exp.amount) || 0;
-        });
-
-        const incomeByCategory = {};
-        incomes.forEach((inc) => {
             const categoryName = inc.category ? inc.category.name : 'Uncategorized';
+            const amount = Number(inc.amount) || 0;
+
+            if (!evolution[month]) evolution[month] = { income: 0, expense: 0 };
+            evolution[month].income += amount;
+
             if (!incomeByCategory[categoryName]) incomeByCategory[categoryName] = 0;
-            incomeByCategory[categoryName] += Number(inc.amount) || 0;
+            incomeByCategory[categoryName] += amount;
+
+            if (!incomeByMonthByCategory[month]) incomeByMonthByCategory[month] = {};
+            if (!incomeByMonthByCategory[month][categoryName]) incomeByMonthByCategory[month][categoryName] = 0;
+            incomeByMonthByCategory[month][categoryName] += amount;
         });
 
         const expenseByCategory = {};
+        const expenseByMonthByCategory = {};
+
         expenses.forEach((exp) => {
+            if (!exp.transaction_date) return;
+            const month = exp.transaction_date.toISOString().slice(0, 7);
             const categoryName = exp.category ? exp.category.name : 'Uncategorized';
+            const amount = Number(exp.amount) || 0;
+
+            if (!evolution[month]) evolution[month] = { income: 0, expense: 0 };
+            evolution[month].expense += amount;
+
             if (!expenseByCategory[categoryName]) expenseByCategory[categoryName] = 0;
-            expenseByCategory[categoryName] += Number(exp.amount) || 0;
+            expenseByCategory[categoryName] += amount;
+
+            if (!expenseByMonthByCategory[month]) expenseByMonthByCategory[month] = {};
+            if (!expenseByMonthByCategory[month][categoryName]) expenseByMonthByCategory[month][categoryName] = 0;
+            expenseByMonthByCategory[month][categoryName] += amount;
         });
 
         return c.json({
@@ -239,6 +252,8 @@ async function getFinancialSummary(c) {
                 evolution,
                 incomeByCategory,
                 expenseByCategory,
+                incomeByMonthByCategory,
+                expenseByMonthByCategory,
             },
         });
     } catch (error) {
