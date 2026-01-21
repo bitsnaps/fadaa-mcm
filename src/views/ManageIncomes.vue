@@ -119,7 +119,7 @@ const tableItems = computed(() =>
         ...inc,
         branch_name: inc.Branch ? inc.Branch.name : 'N/A',
         registered_by_name: inc.registered_by_user ? `${inc.registered_by_user.first_name} ${inc.registered_by_user.last_name}` : 'N/A',
-        category_name: inc.Category ? inc.Category.name : 'N/A',
+        category_name: inc.category ? inc.category.name : 'N/A',
         transaction_date: formatDateForInput(inc.transaction_date)
     }))
 );

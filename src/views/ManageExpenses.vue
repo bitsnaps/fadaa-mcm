@@ -118,7 +118,7 @@ const tableItems = computed(() =>
         ...exp,
         branch_name: exp.Branch ? exp.Branch.name : 'N/A',
         registered_by_name: exp.registered_by_user ? `${exp.registered_by_user.first_name} ${exp.registered_by_user.last_name}` : 'N/A',
-        category_name: exp.Category ? exp.Category.name : 'N/A',
+        category_name: exp.category ? exp.category.name : 'N/A',
         transaction_date: formatDateForInput(exp.transaction_date)
     }))
 );
