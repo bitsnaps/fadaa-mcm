@@ -49,7 +49,6 @@ async function fetchProfiles() {
 }
 
 function onTabChange(newActive) {
-  console.debug('[ProfileTabs] onTabChange payload:', newActive, 'type:', typeof newActive);
   // Normalize payload: could be a numeric index or a tab pane id string
   const payload = String(newActive);
   let newProfile = null;
@@ -75,7 +74,6 @@ function onTabChange(newActive) {
   }
 
   if (newProfile) {
-    console.debug('[ProfileTabs] resolved profile id:', newProfile.id);
     localActiveProfileId.value = newProfile.id; // Update local state for immediate visual feedback
     emit('update:activeProfile', newProfile.id); // Inform parent
   } else {
