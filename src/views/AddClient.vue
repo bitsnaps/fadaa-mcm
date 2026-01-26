@@ -54,7 +54,7 @@ onMounted(async () => {
     try {
         const response = await apiClient.get(`/clients/${clientId.value}`);
         if(response.data.success) {
-            client.value = response.data.data;
+            client.value = response.data.item;
             if (!client.value.attachments) {
               client.value.attachments = [];
             }
