@@ -6,6 +6,7 @@ const path = require('path');
 const { handleRouteError } = require('../lib/errorHandler');
 const { getUploadDir } = require('../lib/filesHelper');
 const { moveFileToTrash } = require('../services/trashService');
+const fs = require('fs');
 
 const clientAttachmentsApp = new Hono();
 clientAttachmentsApp.use('*', authMiddleware);
