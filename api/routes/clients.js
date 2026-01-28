@@ -2,6 +2,8 @@ const { Hono } = require('hono');
 const ExcelJS = require('exceljs');
 const { jsPDF } = require("jspdf");
 const autoTable = require('jspdf-autotable').default; // note .default
+const fs = require('fs');
+const path = require('path');
 const models = require('../models');
 const { authMiddleware } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
@@ -12,6 +14,22 @@ const { Op } = require('sequelize');
 const { handleRouteError } = require('../lib/errorHandler');
 
 const clientsApp = new Hono();
+
+let tajawalFontBase64;
+const getTajawalFontBase64 = () => {
+    if (!tajawalFontBase64) {
+        const fontPath = path.join(__dirname, '../fonts/Tajawal-Regular.ttf');
+        tajawalFontBase64 = fs.readFileSync(fontPath).toString('base64');
+    }
+    return tajawalFontBase64;
+};
+
+const applyTajawalFont = (doc) => {
+    const fontBase64 = getTajawalFontBase64();
+    doc.addFileToVFS('Tajawal-Regular.ttf', fontBase64);
+    doc.addFont('Tajawal-Regular.ttf', 'Tajawal', 'normal');
+    doc.setFont('Tajawal');
+};
 
 clientsApp.use('*', authMiddleware, branchRestriction());
 
@@ -361,11 +379,14 @@ clientsApp.post('/export', async (c) => {
             return c.body(csv);
         } else if (format === 'pdf') {
             const doc = new jsPDF();
+            applyTajawalFont(doc);
             doc.text('Clients List', 14, 16);
             autoTable(doc, {
                 startY: 26, // Adds 10 units of vertical space below the title
                 head: [['ID', 'Company Name', 'Email', 'Phone', 'Status', 'Registration Date']],
                 body: clientsData.map(c => [c.id, c.company_name, c.email, c.phone_number, c.status, c.created_at.toISOString().split('T')[0]]),
+                styles: { font: 'Tajawal', fontStyle: 'normal' },
+                headStyles: { font: 'Tajawal', fontStyle: 'normal' },
             });
             const pdfBuffer = doc.output('arraybuffer');
             c.header('Content-Type', 'application/pdf');
