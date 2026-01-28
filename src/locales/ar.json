@@ -25,13 +25,7 @@
     },
     "assistantPerformance": {
       "title": "أداء المساعدين",
-      "assistant1": "المساعد 1",
-      "statusExcellent": "ممتاز",
-      "statusActive": "نشط",
-      "assistant2": "المساعد 2",
-      "statusGood": "جيد",
-      "assistant3": "المساعد 3",
-      "statusNeedsImprovement": "يحتاج إلى تحسين"
+      "statusActive": "نشط"
     },
     "officeList": {
       "title": "قائمة المكاتب حسب الفرع",
@@ -445,7 +439,6 @@
       "title": "الوصول إلى المستندات",
       "download": "تحميل",
       "investmentContract": "عقد الاستثمار",
-      "performanceReportQ2": "تقرير الأداء ربع السنة الثاني 2024",
       "allBranches": "جميع الفروع"
     },
     "statuses": {
