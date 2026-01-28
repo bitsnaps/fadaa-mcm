@@ -25,13 +25,7 @@
     },
     "assistantPerformance": {
       "title": "Assistant Performance",
-      "assistant1": "Assistant 1",
-      "statusExcellent": "Excellent",
-      "statusActive": "Active",
-      "assistant2": "Assistant 2",
-      "statusGood": "Good",
-      "assistant3": "Assistant 3",
-      "statusNeedsImprovement": "Needs Improvement"
+      "statusActive": "Active"
     },
     "officeList": {
       "title": "Office List by Branch",
@@ -445,7 +439,6 @@
       "title": "Document Access",
       "download": "Download",
       "investmentContract": "Investment Contract",
-      "performanceReportQ2": "Q2 2024 Performance Report",
       "allBranches": "All branches"
     },
     "statuses": {
