@@ -18,9 +18,6 @@
     },
     "notifications": {
       "title": "Notifications",
-      "urgentContract": "Contrat XYZ sur le point d'expirer (Urgent)",
-      "pendingApproval": "Demande d'approbation en attente (Avertissement)",
-      "systemMaintenance": "Maintenance système prévue (Normal)",
       "viewAll": "Afficher tout"
     },
     "recentActivities": {
@@ -57,7 +54,7 @@
       "excel": "Excel",
       "csv": "CSV",
       "pdf": "PDF",
-      "success": "Données exportées avec succès."      
+      "success": "Données exportées avec succès."
     }
   },
   "common": {
@@ -234,7 +231,7 @@
       "percentage": "Pourcentage",
       "type": "Type",
       "comprehensive": "Complet",
-      "contractual": "Contractuel",      
+      "contractual": "Contractuel",
       "investment_amount": "Montant",
       "starting_date": "Début",
       "ending_date": "Fin",
@@ -436,7 +433,7 @@
         "taxesDetailed": "Somme de (Part Brute × Taux d'Imposition)",
         "netShare": "Part Brute - Taxes"
       }
-    },    
+    },
     "payoutHistory": {
       "title": "Historique des Paiements (Part de Bénéfice)",
       "export": "Exporter",
@@ -499,13 +496,13 @@
       "assistant": "Assistant",
       "investor": "Investisseur",
       "client": "Client"
-   },
-   "resetPasswordTitle": "Réinitialiser le mot de passe",
-   "newPassword": "Nouveau mot de passe",
-   "confirmPassword": "Confirmer le mot de passe",
-   "resetPassword": "Réinitialiser le mot de passe",
-   "passwordChangedSuccess": "Mot de passe changé avec succès."
- },
+    },
+    "resetPasswordTitle": "Réinitialiser le mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "passwordChangedSuccess": "Mot de passe changé avec succès."
+  },
   "manageBranches": {
     "id": "ID",
     "title": "Gestion des Agences",
@@ -679,16 +676,16 @@
     "cancel": "Annuler",
     "notApplicable": "N/A",
     "form": {
-        "attachments": "Pièce Jointe"
+      "attachments": "Pièce Jointe"
     },
-    "selectType":"Sélectionner un type"
+    "selectType": "Sélectionner un type"
   },
   "contracts": {
     "title": "Gestion des Contrats",
     "addNewContract": "Ajouter un Nouveau Contrat",
     "searchPlaceholder": "Rechercher par client, bureau ou statut...",
     "selectClientPlaceholder": "Selectioner un Client",
-    "selectOfficePlaceholder": "Selectionner un bureau",    
+    "selectOfficePlaceholder": "Selectionner un bureau",
     "tableHeaders": {
       "client": "Client",
       "office": "Bureau",
@@ -995,7 +992,6 @@
     "recentActivities": {
       "title": "Activités de Conformité Récentes",
       "log": "Enregistrer une Activité",
-      "addTitle": "Enregistrer une Nouvelle Activité",
       "editTitle": "Modifier l'Activité",
       "activity": "Activité",
       "description": "Description",
@@ -1049,7 +1045,7 @@
       "resetDesign": "Réinitialiser les Designs",
       "confirmReset": "Êtes-vous sûr de vouloir effacer tous les designs enregistrés et recommencer ?",
       "designSaved": "Designs enregistrés avec succès !",
-      "layering":"Superposition"
+      "layering": "Superposition"
     }
   },
   "userProfile": {
@@ -1130,7 +1126,6 @@
     "passwordPlaceholder": "Votre mot de passe",
     "loginButton": "Connexion",
     "loggingIn": "Connexion en cours...",
-    "success": "Vous vous êtes connecté avec succès",
     "error": {
       "missingCredentials": "Veuillez saisir l'email et le mot de passe.",
       "invalidCredentials": "Identifiants invalides. Veuillez réessayer.",
@@ -1287,7 +1282,7 @@
         "paid": "Payé",
         "rejected": "Rejeté",
         "cancelled": "Annulé"
-      }         
+      }
     },
     "documents": {
       "title": "Documents",
@@ -1300,61 +1295,61 @@
       "investMore": "Investir Davantage"
     },
     "chart": {
-        "title": "Évolution des Revenus",
-        "monthlyTitle": "Évolution Mensuelle des Revenus",
-        "biYearlyTitle": "Évolution Semestrielle des Revenus",
-        "yearlyTitle": "Évolution Annuelle des Revenus",
-        "monthlyLabel": "Revenu Mensuel",
-        "biYearlyLabel": "Revenu Semestriel",
-        "yearlyLabel": "Revenu Annuel",
-        "revenue": "Revenu (en k)"
+      "title": "Évolution des Revenus",
+      "monthlyTitle": "Évolution Mensuelle des Revenus",
+      "biYearlyTitle": "Évolution Semestrielle des Revenus",
+      "yearlyTitle": "Évolution Annuelle des Revenus",
+      "monthlyLabel": "Revenu Mensuel",
+      "biYearlyLabel": "Revenu Semestriel",
+      "yearlyLabel": "Revenu Annuel",
+      "revenue": "Revenu (en k)"
     },
     "addContract": {
-        "submitButtonAdd": "Ajouter le Contrat"
-    } 
+      "submitButtonAdd": "Ajouter le Contrat"
+    }
   },
   "pagination": {
     "previous": "Précédent",
     "next": "Suivant"
   },
   "withdrawals": {
-      "title": "Retraits",
-      "kpis": {
-        "accrued": "Bénéfice Net Accumulé (à ce jour)",
-        "withdrawnPaid": "Retiré (Payé)",
-        "committed": "Engagé (En attente + Approuvé)",
-        "available": "Disponible"
-      },
-      "form": {
-        "title": "Demander un Retrait",
-        "selectInvestment": "Sélectionner un Investissement",
-        "availableForThisInvestment": "Disponible pour cet investissement",
-        "amount": "Montant",
-        "paymentMethod": "Méthode de Paiement (optionnel)",
-        "notes": "Notes (optionnel)",
-        "submit": "Soumettre la Demande",
-        "validationRequired": "Veuillez sélectionner un investissement et entrer un montant positif.",
-        "validationExceeds": "Le montant demandé dépasse le solde disponible pour l'investissement sélectionné.",
-        "success": "Demande de retrait soumise.",
-        "error": "Échec de la soumission de la demande de retrait."
-      },
-      "history": {
-        "title": "Retraits Récents",
-        "date": "Demandé le",
-        "investment": "Investissement",
-        "amount": "Montant",
-        "status": "Statut"
-      },
-      "statuses": {
-        "pending": "En attente",
-        "approved": "Approuvé",
-        "paid": "Payé",
-        "rejected": "Rejeté"
-      }
+    "title": "Retraits",
+    "kpis": {
+      "accrued": "Bénéfice Net Accumulé (à ce jour)",
+      "withdrawnPaid": "Retiré (Payé)",
+      "committed": "Engagé (En attente + Approuvé)",
+      "available": "Disponible"
+    },
+    "form": {
+      "title": "Demander un Retrait",
+      "selectInvestment": "Sélectionner un Investissement",
+      "availableForThisInvestment": "Disponible pour cet investissement",
+      "amount": "Montant",
+      "paymentMethod": "Méthode de Paiement (optionnel)",
+      "notes": "Notes (optionnel)",
+      "submit": "Soumettre la Demande",
+      "validationRequired": "Veuillez sélectionner un investissement et entrer un montant positif.",
+      "validationExceeds": "Le montant demandé dépasse le solde disponible pour l'investissement sélectionné.",
+      "success": "Demande de retrait soumise.",
+      "error": "Échec de la soumission de la demande de retrait."
+    },
+    "history": {
+      "title": "Retraits Récents",
+      "date": "Demandé le",
+      "investment": "Investissement",
+      "amount": "Montant",
+      "status": "Statut"
+    },
+    "statuses": {
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "paid": "Payé",
+      "rejected": "Rejeté"
+    }
   },
-    "statuses":{
-      "active": "Actif",
-      "pending": "En attente"
+  "statuses": {
+    "active": "Actif",
+    "pending": "En attente"
   },
   "manageWithdrawals": {
     "title": "Gérer les Retraits",
@@ -1435,16 +1430,16 @@
     "markAsRead": "Marquer comme lu",
     "createModalTitle": "Créer une Notification",
     "types": {
-        "NewTask": "Nouvelle Tâche",
-        "TaskUpdate": "Mise à Jour de Tâche",
-        "ContractReminder": "Rappel de Contrat",
-        "SystemAlert": "Alerte Système",
-        "InvestorContractExpiry": "Expiration de Contrat Investisseur",
-        "HighValueTransaction": "Transaction de Haute Valeur",
-        "OfficeBookingRequest": "Demande de Réservation de Bureau",
-        "ClientDeletion": "Suppression de Client",
-        "DeletionRequest": "Demande de suppression",
-        "WithdrawalRequest": "Demande de retrait"
+      "NewTask": "Nouvelle Tâche",
+      "TaskUpdate": "Mise à Jour de Tâche",
+      "ContractReminder": "Rappel de Contrat",
+      "SystemAlert": "Alerte Système",
+      "InvestorContractExpiry": "Expiration de Contrat Investisseur",
+      "HighValueTransaction": "Transaction de Haute Valeur",
+      "OfficeBookingRequest": "Demande de Réservation de Bureau",
+      "ClientDeletion": "Suppression de Client",
+      "DeletionRequest": "Demande de suppression",
+      "WithdrawalRequest": "Demande de retrait"
     },
     "markAllAsRead": "Marquer tout comme lu",
     "editModalTitle": "Modifier la Notification",
@@ -1455,13 +1450,13 @@
     "selectUser": "Sélectionner un utilisateur",
     "unassigned": "Non assigné",
     "sortBy": {
-        "date": "Trier par Date",
-        "type": "Trier par Type",
-        "status": "Trier par Statut"
+      "date": "Trier par Date",
+      "type": "Trier par Type",
+      "status": "Trier par Statut"
     },
     "sortOrder": {
-        "desc": "Décroissant",
-        "asc": "Croissant"
+      "desc": "Décroissant",
+      "asc": "Croissant"
     }
   },
   "errors": {
@@ -1473,8 +1468,7 @@
     "validation": "Certaines entrées sont invalides. Veuillez vérifier vos saisies.",
     "server": "Le serveur a rencontré une erreur. Veuillez réessayer plus tard.",
     "unknown": "Une erreur inconnue est survenue. Veuillez réessayer.",
-    "fetchFailed": "Échec de la récupération de {entity}.",
-    "deletionRequestExists": "Une demande de suppression pour ce {entity} existe déjà."
+    "fetchFailed": "Échec de la récupération de {entity}."
   },
   "locale": "fr"
 }

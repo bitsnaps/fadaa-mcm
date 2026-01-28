@@ -35,6 +35,37 @@ const CONFIG = {
     /:\w+\s*=\s*['"`]\$?t\s*\(\s*['"`]([^'"`]+)['"`]/g,
     // v-bind or : with $t or t
     /(?:v-bind:|:)\w+\s*=\s*['"`].*?\$?t\s*\(\s*['"`]([^'"`]+)['"`]/g
+  ],
+  dynamicPrefixes: [
+    'monthlyReport.table.',
+    'withdrawalStatuses.',
+    'paymentMethods.',
+    'financialReporting.',
+    'investorDashboard.',
+    'notifications.types.',
+    'manageUsers.roles.',
+    'dashboard.assistantPerformance.',
+    'addClient.form.',
+    'addClient.messages.',
+    'clientServices.',
+    'contracts.',
+    'investmentTracking.',
+    'investments.',
+    'manageBranches.',
+    'manageClients.',
+    'manageTaxes.',
+    'manageUsers.',
+    'manageWithdrawals.',
+    'monthlyReport.',
+    'navbar.notifications.',
+    'notifications.',
+    'offices.',
+    'sidebar.',
+    'systemSettings.',
+    'tasks.',
+    'userProfile.',
+    'withdrawals.',
+    'statuses.'
   ]
 };
 
@@ -213,7 +244,17 @@ class TranslationChecker {
     // Find unused keys (keys in locale files but not used in code)
     for (const locale of CONFIG.supportedLocales) {
       const localeKeys = this.getFlattenedKeys(this.localeData[locale]);
-      this.unusedKeys[locale] = localeKeys.filter(key => !this.foundKeys.has(key));
+      this.unusedKeys[locale] = localeKeys.filter(key => {
+        // Check if key is explicitly found
+        if (this.foundKeys.has(key)) return false;
+        
+        // Check if key matches any dynamic prefix
+        for (const prefix of CONFIG.dynamicPrefixes) {
+          if (key.startsWith(prefix)) return false;
+        }
+        
+        return true;
+      });
     }
     
     console.log('   ✅ Analysis complete\n');

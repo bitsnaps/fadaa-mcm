@@ -18,9 +18,6 @@
     },
     "notifications": {
       "title": "Notifications",
-      "urgentContract": "Contract XYZ about to expire (Urgent)",
-      "pendingApproval": "Pending approval request (Warning)",
-      "systemMaintenance": "Scheduled system maintenance (Normal)",
       "viewAll": "View all"
     },
     "recentActivities": {
@@ -370,7 +367,6 @@
       "apply": "Apply",
       "thisMonth": "This Month",
       "thisYear": "This Year"
-
     },
     "selectProfilePrompt": "Please select a profile to view investment tracking.",
     "summary": {
@@ -498,13 +494,13 @@
       "assistant": "Assistant",
       "investor": "Investor",
       "client": "Client"
-   },
-   "resetPasswordTitle": "Reset Password",
-   "newPassword": "New Password",
-   "confirmPassword": "Confirm Password",
-   "resetPassword": "Reset Password",
-   "passwordChangedSuccess": "Password changed successfully."
- },
+    },
+    "resetPasswordTitle": "Reset Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "resetPassword": "Reset Password",
+    "passwordChangedSuccess": "Password changed successfully."
+  },
   "manageBranches": {
     "id": "ID",
     "title": "Branch Management",
@@ -678,9 +674,9 @@
     "cancel": "Cancel",
     "notApplicable": "N/A",
     "form": {
-        "attachments": "Attachment"
+      "attachments": "Attachment"
     },
-    "selectType":"Select a type"
+    "selectType": "Select a type"
   },
   "contracts": {
     "title": "Contract Management",
@@ -994,7 +990,6 @@
     "recentActivities": {
       "title": "Recent Compliance Activities",
       "log": "Log Activity",
-      "addTitle": "Log New Activity",
       "editTitle": "Edit Activity",
       "activity": "Activity",
       "description": "Description",
@@ -1129,7 +1124,6 @@
     "passwordPlaceholder": "Your assword",
     "loginButton": "Login",
     "loggingIn": "Logging in...",
-    "success": "You have successfully logged in",
     "error": {
       "missingCredentials": "Please enter both email and password.",
       "invalidCredentials": "Invalid credentials. Please try again.",
@@ -1265,17 +1259,17 @@
       "investMore": "Invest More"
     },
     "chart": {
-        "title": "Revenue Evolution",
-        "monthlyTitle": "Monthly Revenue Evolution",
-        "biYearlyTitle": "Bi-Yearly Revenue Evolution",
-        "yearlyTitle": "Annual Revenue Evolution",
-        "monthlyLabel": "Monthly Revenue",
-        "biYearlyLabel": "Bi-Yearly Revenue",
-        "yearlyLabel": "Annual Revenue",
-        "revenue": "Revenue (in k)"
+      "title": "Revenue Evolution",
+      "monthlyTitle": "Monthly Revenue Evolution",
+      "biYearlyTitle": "Bi-Yearly Revenue Evolution",
+      "yearlyTitle": "Annual Revenue Evolution",
+      "monthlyLabel": "Monthly Revenue",
+      "biYearlyLabel": "Bi-Yearly Revenue",
+      "yearlyLabel": "Annual Revenue",
+      "revenue": "Revenue (in k)"
     },
     "addContract": {
-        "submitButtonAdd": "Add Contract"
+      "submitButtonAdd": "Add Contract"
     },
     "withdrawals": {
       "title": "Withdrawals",
@@ -1309,7 +1303,7 @@
         "paid": "Paid",
         "rejected": "Rejected",
         "cancelled": "Cancelled"
-      }      
+      }
     }
   },
   "pagination": {
@@ -1318,40 +1312,40 @@
   },
   "locale": "en",
   "withdrawals": {
-      "title": "Withdrawals",
-      "kpis": {
-        "accrued": "Accrued Net Profit (to date)",
-        "withdrawnPaid": "Withdrawn (Paid)",
-        "committed": "Committed (Pending + Approved)",
-        "available": "Available"
-      },
-      "form": {
-        "title": "Request a Withdrawal",
-        "selectInvestment": "Select Investment",
-        "availableForThisInvestment": "Available for this investment",
-        "amount": "Amount",
-        "paymentMethod": "Payment Method (optional)",
-        "notes": "Notes (optional)",
-        "submit": "Submit Request",
-        "validationRequired": "Please select an investment and enter a positive amount.",
-        "validationExceeds": "Requested amount exceeds available balance for the selected investment.",
-        "success": "Withdrawal request submitted.",
-        "error": "Failed to submit withdrawal request."
-      },
-      "history": {
-        "title": "Recent Withdrawals",
-        "date": "Requested At",
-        "investment": "Investment",
-        "amount": "Amount",
-        "status": "Status"
-      },
-      "statuses": {
-        "pending": "Pending",
-        "approved": "Approved",
-        "paid": "Paid",
-        "rejected": "Rejected"
-      }
+    "title": "Withdrawals",
+    "kpis": {
+      "accrued": "Accrued Net Profit (to date)",
+      "withdrawnPaid": "Withdrawn (Paid)",
+      "committed": "Committed (Pending + Approved)",
+      "available": "Available"
     },
+    "form": {
+      "title": "Request a Withdrawal",
+      "selectInvestment": "Select Investment",
+      "availableForThisInvestment": "Available for this investment",
+      "amount": "Amount",
+      "paymentMethod": "Payment Method (optional)",
+      "notes": "Notes (optional)",
+      "submit": "Submit Request",
+      "validationRequired": "Please select an investment and enter a positive amount.",
+      "validationExceeds": "Requested amount exceeds available balance for the selected investment.",
+      "success": "Withdrawal request submitted.",
+      "error": "Failed to submit withdrawal request."
+    },
+    "history": {
+      "title": "Recent Withdrawals",
+      "date": "Requested At",
+      "investment": "Investment",
+      "amount": "Amount",
+      "status": "Status"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "paid": "Paid",
+      "rejected": "Rejected"
+    }
+  },
   "manageWithdrawals": {
     "title": "Manage Withdrawals",
     "add": "Add Withdrawal",
@@ -1431,16 +1425,16 @@
     "markAsRead": "Mark as read",
     "createModalTitle": "Create Notification",
     "types": {
-        "NewTask": "New Task",
-        "TaskUpdate": "Task Update",
-        "ContractReminder": "Contract Reminder",
-        "SystemAlert": "System Alert",
-        "InvestorContractExpiry": "Investor Contract Expiry",
-        "HighValueTransaction": "High Value Transaction",
-        "OfficeBookingRequest": "Office Booking Request",
-        "ClientDeletion": "Client Deletion",
-        "DeletionRequest": "Deletion Request",
-        "WithdrawalRequest": "Withdrawal Request"
+      "NewTask": "New Task",
+      "TaskUpdate": "Task Update",
+      "ContractReminder": "Contract Reminder",
+      "SystemAlert": "System Alert",
+      "InvestorContractExpiry": "Investor Contract Expiry",
+      "HighValueTransaction": "High Value Transaction",
+      "OfficeBookingRequest": "Office Booking Request",
+      "ClientDeletion": "Client Deletion",
+      "DeletionRequest": "Deletion Request",
+      "WithdrawalRequest": "Withdrawal Request"
     },
     "markAllAsRead": "Mark all as read",
     "editModalTitle": "Edit Notification",
@@ -1451,13 +1445,13 @@
     "selectUser": "Select a user",
     "unassigned": "Unassigned",
     "sortBy": {
-        "date": "Sort by Date",
-        "type": "Sort by Type",
-        "status": "Sort by Status"
+      "date": "Sort by Date",
+      "type": "Sort by Type",
+      "status": "Sort by Status"
     },
     "sortOrder": {
-        "desc": "Descending",
-        "asc": "Ascending"
+      "desc": "Descending",
+      "asc": "Ascending"
     }
   },
   "errors": {
@@ -1469,7 +1463,6 @@
     "validation": "Some inputs are invalid. Please review your entries.",
     "server": "The server encountered an error. Please try again later.",
     "unknown": "Something went wrong. Please try again.",
-    "fetchFailed": "Failed to fetch {entity}.",
-    "deletionRequestExists": "A deletion request for this {entity} already exists."
+    "fetchFailed": "Failed to fetch {entity}."
   }
 }

@@ -39,7 +39,7 @@ export default {
       params.period = period;
     }
 
-    console.debug('[ReportService.getFinancialSummary] Request params:', params);
+    // console.debug('[ReportService.getFinancialSummary] Request params:', params);
     return ApiClient.get('/reports/financial-summary', { params });
   },
 };

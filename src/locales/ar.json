@@ -18,9 +18,6 @@
     },
     "notifications": {
       "title": "الإشعارات",
-      "urgentContract": "عقد XYZ على وشك الانتهاء (عاجل)",
-      "pendingApproval": "طلب الموافقة في انتظار (تحذير)",
-      "systemMaintenance": "صيانة النظام المجدولة (عادي)",
       "viewAll": "عرض الكل"
     },
     "recentActivities": {
@@ -110,7 +107,7 @@
   },
   "manageIncomes": {
     "title": "الإيرادات"
-  },  
+  },
   "managePendingDeletions": {
     "date": "التاريخ",
     "title": "إدارة عمليات الحذف المعلقة",
@@ -145,7 +142,7 @@
     "imageAlt": "معاينة الملف",
     "pdfNotSupported": "متصفحك لا يدعم تضمين ملفات PDF. يُرجى تنزيل الملف لعرضه.",
     "unsupported": "نوع الملف غير مدعوم للمعاينة."
-  },  
+  },
   "trash": {
     "title": "سلة المهملات",
     "emptyTrash": "إفراغ سلة المهملات",
@@ -434,7 +431,7 @@
         "taxesDetailed": "مجموع (الحصة الإجمالية × معدل الضريبة)",
         "netShare": "الحصة الإجمالية - الضرائب"
       }
-    },        
+    },
     "payoutHistory": {
       "title": "تاريخ الدفعات (حصة الربح)",
       "export": "تصدير",
@@ -497,13 +494,13 @@
       "assistant": "مساعد",
       "investor": "مستثمر",
       "client": "عميل"
-   },
-   "resetPasswordTitle": "إعادة تعيين كلمة المرور",
-   "newPassword": "كلمة المرور الجديدة",
-   "confirmPassword": "تأكيد كلمة المرور",
-   "resetPassword": "إعادة تعيين كلمة المرور",
-   "passwordChangedSuccess": "تم تغيير كلمة المرور بنجاح."
- },
+    },
+    "resetPasswordTitle": "إعادة تعيين كلمة المرور",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "passwordChangedSuccess": "تم تغيير كلمة المرور بنجاح."
+  },
   "manageBranches": {
     "id": "المعرف",
     "title": "إدارة الفروع",
@@ -679,14 +676,14 @@
     "form": {
       "attachments": "المرفق"
     },
-    "selectType":"حدد النوع"
+    "selectType": "حدد النوع"
   },
   "contracts": {
     "title": "إدارة العقود",
     "addNewContract": "إضافة عقد جديد",
     "searchPlaceholder": "البحث بالعميل أو المكتب أو الحالة...",
     "selectClientPlaceholder": "حدد العميل",
-    "selectOfficePlaceholder": "حدد المكتب",    
+    "selectOfficePlaceholder": "حدد المكتب",
     "tableHeaders": {
       "client": "العميل",
       "office": "المكتب",
@@ -739,7 +736,7 @@
     "errors": {
       "officeBooked": "المكتب محجوز بالفعل للفترة المحددة في هذا الملف الشخصي.",
       "officeNotAvailable": "المكتب المحدد غير متاح.",
-      "fetchError": "حدث خطأ أثناء جلب تفاصيل العقد "      
+      "fetchError": "حدث خطأ أثناء جلب تفاصيل العقد "
     },
     "duration": "المدة",
     "months": "شهر"
@@ -993,7 +990,6 @@
     "recentActivities": {
       "title": "أنشطة الامتثال الأخيرة",
       "log": "تسجيل النشاط",
-      "addTitle": "تسجيل نشاط جديد",
       "editTitle": "تحرير النشاط",
       "activity": "النشاط",
       "description": "الوصف",
@@ -1128,7 +1124,6 @@
     "passwordPlaceholder": "كلمة المرور الخاصة بك",
     "loginButton": "تسجيل الدخول",
     "loggingIn": "جاري تسجيل الدخول...",
-    "success": "لقد قمت بتسجيل الدخول بنجاح",
     "error": {
       "missingCredentials": "يرجى إدخال كل من البريد الإلكتروني وكلمة المرور.",
       "invalidCredentials": "بيانات الاعتماد غير صالحة. يرجى المحاولة مرة أخرى.",
@@ -1440,7 +1435,7 @@
       "ClientDeletion": "حذف العميل",
       "DeletionRequest": "طلب حذف",
       "WithdrawalRequest": "طلب سحب"
-  },
+    },
     "markAllAsRead": "وضع علامة على الكل كمقروء",
     "editModalTitle": "تحرير الإشعار",
     "deleteConfirm": "هل أنت متأكد من رغبتك في حذف هذا الإشعار؟",
@@ -1468,7 +1463,6 @@
     "validation": "بعض المدخلات غير صالحة. يرجى مراجعة إدخالاتك.",
     "server": "واجه الخادم خطأ. يرجى المحاولة مرة أخرى لاحقًا.",
     "unknown": "حدث خطأ غير معروف. يرجى المحاولة مرة أخرى.",
-    "fetchFailed": "فشل في جلب {entity}.",
-    "deletionRequestExists": "طلب حذف لهذا {entity} موجود بالفعل."
+    "fetchFailed": "فشل في جلب {entity}."
   }
 }

@@ -317,9 +317,9 @@ const getNotificationLink = (notification) => {
 
       <BNavbarNav :class="[locale === 'ar' ? 'me-auto' : 'ms-auto', 'align-items-center']">
         <BNavItemDropdown :text="t('navbar.language')" right>
-          <BDropdownItem @click="setLocale('en')">🇺🇸 English</BDropdownItem>
-          <BDropdownItem @click="setLocale('fr')">🇫🇷 Français</BDropdownItem>
-          <BDropdownItem @click="setLocale('ar')">🇩🇿 العربية</BDropdownItem>
+          <BDropdownItem @click="setLocale('en')" :active="locale=='en'">🇺🇸 English</BDropdownItem>
+          <BDropdownItem @click="setLocale('fr')" :active="locale=='fr'">🇫🇷 Français</BDropdownItem>
+          <BDropdownItem @click="setLocale('ar')" :active="locale=='ar'">🇩🇿 العربية</BDropdownItem>
         </BNavItemDropdown>
         <BNavItem v-show="!route.path.endsWith('/login')" v-if="!isAuthenticated" :to="{ path: '/login' }" :active="$route.path === '/login'" link-classes="nav-link">
           {{ t('navbar.login') }}
