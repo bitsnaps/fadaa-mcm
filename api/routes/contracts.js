@@ -13,24 +13,9 @@ const { handleRouteError } = require('../lib/errorHandler');
 const { downloadFile } = require('../services/fileService');
 const { createNotification } = require('../services/notificationService');
 const { getContractDurationInMonths } = require('../lib/dateUtils');
+const { applyArabicFont } = require('../lib/pdfUtils');
 
 const contractApp = new Hono();
-
-let tajawalFontBase64;
-const getTajawalFontBase64 = () => {
-    if (!tajawalFontBase64) {
-        const fontPath = path.join(__dirname, '../fonts/Tajawal-Regular.ttf');
-        tajawalFontBase64 = fs.readFileSync(fontPath).toString('base64');
-    }
-    return tajawalFontBase64;
-};
-
-const applyTajawalFont = (doc) => {
-    const fontBase64 = getTajawalFontBase64();
-    doc.addFileToVFS('Tajawal-Regular.ttf', fontBase64);
-    doc.addFont('Tajawal-Regular.ttf', 'Tajawal', 'normal');
-    doc.setFont('Tajawal');
-};
 
 // Helper function to check office availability
 async function isOfficeAvailable(office_id, start_date, end_date, profile_id, exclude_contract_id = null) {
@@ -478,14 +463,14 @@ contractApp.post('/export', async (c) => {
             return c.body(csv);
         } else if (format === 'pdf') {
             const doc = new jsPDF({ orientation: 'landscape' });
-            applyTajawalFont(doc);
+            applyArabicFont(doc);
             doc.text('Contracts List', 14, 16);
             autoTable(doc, {
                 startY: 20,
                 head: [['ID', 'Client', 'Office', 'Status', 'Service Type', 'Payment Terms', 'Start Date', 'End Date', 'Monthly Rate']],
                 body: contractsData.map(c => [c.id, c.client_name, c.office_name, c.status, c.service_type, c.payment_terms, c.start_date.toISOString().split('T')[0], c.end_date.toISOString().split('T')[0], c.monthly_rate]),
-                styles: { font: 'Tajawal', fontStyle: 'normal' },
-                headStyles: { font: 'Tajawal', fontStyle: 'normal' },
+                styles: { font: 'Amiri', fontStyle: 'normal' },
+                headStyles: { font: 'Amiri', fontStyle: 'normal' },
             });
             const pdfBuffer = doc.output('arraybuffer');
             c.header('Content-Type', 'application/pdf');

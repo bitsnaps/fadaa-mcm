@@ -9,24 +9,9 @@ const models = require('../models');
 const { authMiddleware, managerMiddleware } = require('../middleware/auth');
 const { handleRouteError } = require('../lib/errorHandler');
 const { getMonthlyReport, getAnnualReport, downloadMonthlyReport, downloadAnnualReport, getFinancialSummary } = require('../controllers/reportController');
+const { applyArabicFont } = require('../lib/pdfUtils');
 
 const reportsApp = new Hono();
-
-let tajawalFontBase64;
-const getTajawalFontBase64 = () => {
-  if (!tajawalFontBase64) {
-    const fontPath = path.join(__dirname, '../fonts/Tajawal-Regular.ttf');
-    tajawalFontBase64 = fs.readFileSync(fontPath).toString('base64');
-  }
-  return tajawalFontBase64;
-};
-
-const applyTajawalFont = (doc) => {
-  const fontBase64 = getTajawalFontBase64();
-  doc.addFileToVFS('Tajawal-Regular.ttf', fontBase64);
-  doc.addFont('Tajawal-Regular.ttf', 'Tajawal', 'normal');
-  doc.setFont('Tajawal');
-};
 
 reportsApp.use('*', authMiddleware, managerMiddleware);
 
@@ -69,7 +54,7 @@ reportsApp.post('/generate', async (c) => {
 
     if (format === 'pdf') {
       const doc = new jsPDF();
-      applyTajawalFont(doc);
+      applyArabicFont(doc);
       doc.text(`Financial Report for ${profile.name}`, 14, 16);
       doc.text(`Period: ${startDate} to ${endDate}`, 14, 22);
       
@@ -81,8 +66,8 @@ reportsApp.post('/generate', async (c) => {
           ['Total Expense', totalExpense.toFixed(2)],
           ['Net Profit', netProfit.toFixed(2)],
         ],
-        styles: { font: 'Tajawal', fontStyle: 'normal' },
-        headStyles: { font: 'Tajawal', fontStyle: 'normal' },
+        styles: { font: 'Amiri', fontStyle: 'normal' },
+        headStyles: { font: 'Amiri', fontStyle: 'normal' },
       });
       
       if (incomes.length > 0) {
@@ -95,8 +80,8 @@ reportsApp.post('/generate', async (c) => {
             i.description,
             i.amount.toFixed(2),
           ]),
-          styles: { font: 'Tajawal', fontStyle: 'normal' },
-          headStyles: { font: 'Tajawal', fontStyle: 'normal' },
+          styles: { font: 'Amiri', fontStyle: 'normal' },
+          headStyles: { font: 'Amiri', fontStyle: 'normal' },
         });
       }
       
@@ -111,8 +96,8 @@ reportsApp.post('/generate', async (c) => {
             e.category,
             e.amount.toFixed(2),
           ]),
-          styles: { font: 'Tajawal', fontStyle: 'normal' },
-          headStyles: { font: 'Tajawal', fontStyle: 'normal' },
+          styles: { font: 'Amiri', fontStyle: 'normal' },
+          headStyles: { font: 'Amiri', fontStyle: 'normal' },
         });
       }
       
