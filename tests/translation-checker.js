@@ -75,6 +75,7 @@ class TranslationChecker {
     this.localeData = {};
     this.missingKeys = {};
     this.unusedKeys = {};
+    this.dynamicPrefixes = new Set();
   }
 
   /**
@@ -173,8 +174,13 @@ class TranslationChecker {
         while ((match = pattern.exec(content)) !== null) {
           const key = match[1];
           if (key && !key.includes('${') && !key.includes('{{')) {
-            this.foundKeys.add(key);
-            keysInFile++;
+            // Check if it's a dynamic prefix (ends with .)
+            if (pattern.toString().includes('`([^`$]+)\\${')) {
+              this.dynamicPrefixes.add(key);
+            } else {
+              this.foundKeys.add(key);
+              keysInFile++;
+            }
           }
         }
       }
@@ -249,7 +255,7 @@ class TranslationChecker {
         if (this.foundKeys.has(key)) return false;
         
         // Check if key matches any dynamic prefix
-        for (const prefix of CONFIG.dynamicPrefixes) {
+        for (const prefix of this.dynamicPrefixes) {
           if (key.startsWith(prefix)) return false;
         }
         
