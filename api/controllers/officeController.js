@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 const models = require('../models');
 
 const getOffices = async (c) => {
@@ -14,10 +14,10 @@ const getOffices = async (c) => {
 
         const whereClause = searchQuery ? {
             [Op.or]: [
-                { name: { [Op.like]: `%${searchQuery}%` } },
-                { '$branch.name$': { [Op.like]: `%${searchQuery}%` } },
-                { status: { [Op.like]: `%${searchQuery}%` } },
-                { area: { [Op.like]: `%${searchQuery}%` } }
+                { '$Office.name$': { [Op.like]: `%${searchQuery}%` } },
+                // { name: { [Op.like]: `%${searchQuery}%` } },
+                // { status: { [Op.like]: `%${searchQuery}%` } },
+                // { area: { [Op.like]: `%${searchQuery}%` } }
             ]
         } : {};
 
@@ -26,6 +26,14 @@ const getOffices = async (c) => {
         }
 
         const includeClause = [{ model: models.Branch, as: 'branch' }];
+
+        // Cause conflict when searching by office's name, because it seems that it includes search by branch's name
+        /*if (searchQuery) {
+            // Add branch name search using a nested WHERE condition on the include
+            includeClause[0].where = {
+                name: { [Op.like]: `%${searchQuery}%` }
+            };
+        }*/
 
         if (profile_id) {
             // Use LEFT JOIN to include offices even if they have no contracts for this profile
