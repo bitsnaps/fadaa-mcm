@@ -84,8 +84,7 @@
                           <td>{{ office.capacity || '—' }}</td>
                           <td>{{ office.branch?.name || '—' }}</td>
                           <td>
-                            <button class="btn btn-sm btn-fadaa-orange me-1"><i class="bi bi-pencil-square me-1"></i>{{ t('common.edit') }}</button>
-                            <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-info-circle-fill me-1"></i>{{ t('common.details') }}</button>
+                            <button @click="goToManageOffices" class="btn btn-sm btn-outline-secondary"><i class="bi bi-info-circle-fill me-1"></i>{{ t('common.details') }}</button>
                           </td>
                         </tr>
                       </tbody>
@@ -201,6 +200,8 @@ const fetchTasks = async () => {
 onMounted(fetchTasks);
 
 const goToTasks = () => router.push({ name: 'Tasks' });
+
+const goToManageOffices = () => router.push({ name: 'ManageOffices' });
 
 const formatDate = (dateString) => {
  if (!dateString) return t('common.na') || 'N/A';

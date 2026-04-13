@@ -171,7 +171,7 @@ const routes = [
     path: '/manage-offices',
     name: 'ManageOffices',
     components: { default: ManageOffices, header: Navbar },
-    meta: { requiresAuth: true, roles: ['admin'] }
+    meta: { requiresAuth: true, roles: ['admin', 'manager'] }
   },
   {
     path: '/investment-details/:id',

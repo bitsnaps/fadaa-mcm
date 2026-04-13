@@ -108,7 +108,7 @@ const toggleFinancial = () => {
                 {{ $t('sidebar.addClient') }}
               </router-link>
             </li>
-            <li class="nav-item" v-if="userRole === 'admin'">
+            <li class="nav-item" v-if="userRole === 'admin' || userRole === 'manager'" >
               <router-link to="/manage-offices" class="nav-link" active-class="active-fadaa">
                 <i class="bi bi-buildings-fill me-2"></i>
                 {{ $t('sidebar.manageOffices') }}

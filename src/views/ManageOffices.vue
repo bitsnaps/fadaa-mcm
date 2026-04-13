@@ -6,9 +6,16 @@ import { useI18n } from 'vue-i18n';
 import { getOffices, getBranches, addOffice, updateOffice, deleteOffice as deleteOfficeApi } from '@/services/OfficeService';
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
+import { useAuthStore } from '@/stores/auth';
 
 const router = useRouter();
 const { t } = useI18n();
+const authStore = useAuthStore();
+
+// Computed properties for role checks
+const isAdmin = computed(() => authStore.userRole === 'admin');
+const isManager = computed(() => authStore.userRole === 'manager');
+const userBranchId = computed(() => authStore.user?.branch_id);
 
 const offices = ref([]);
 const branches = ref([]);
@@ -62,7 +69,12 @@ const fetchBranches = async () => {
     try {
         const response = await getBranches();
         if(response.data.success) {
-            branches.value = response.data.branches;
+            // For managers, filter to only show their branch
+            if (isManager.value && userBranchId.value) {
+                branches.value = response.data.branches.filter(b => b.id === userBranchId.value);
+            } else {
+                branches.value = response.data.branches;
+            }
         }
     } catch(error) {
         console.error("Failed to fetch branches:", error);
@@ -92,7 +104,17 @@ const viewOfficeDetails = (office) => {
 
 const openAddOfficeModal = () => {
   isEditMode.value = false;
-  officeForm.value = { id: null, name: '', branch_id: null, capacity: 1, amenities: '', status: 'Available', type: 'Private Suite', area: null };
+  // For managers, pre-select their branch
+  officeForm.value = { 
+    id: null, 
+    name: '', 
+    branch_id: isManager.value && userBranchId.value ? userBranchId.value : null, 
+    capacity: 1, 
+    amenities: '', 
+    status: 'Available', 
+    type: 'Private Suite', 
+    area: null 
+  };
   v$.value.$reset();
   errors.server = '';
   if(addEditOfficeModal) addEditOfficeModal.show();
@@ -160,7 +182,7 @@ const changePage = (page) => {
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2>{{ t('offices.manageOffices') }}</h2>
-      <button class="btn btn-primary" @click="openAddOfficeModal">
+      <button class="btn btn-primary" @click="openAddOfficeModal" v-if="isAdmin">
         <i class="bi bi-plus-circle me-2"></i>{{ t('offices.addNewOffice') }}
       </button>
     </div>
@@ -207,10 +229,10 @@ const changePage = (page) => {
               <button @click="viewOfficeDetails(office)" class="btn btn-sm btn-outline-info me-1" :title="t('offices.viewDetails')">
                 <i class="bi bi-eye"></i>
               </button>
-              <button @click="openEditOfficeModal(office)" class="btn btn-sm btn-outline-warning me-1" :title="t('offices.editOffice')">
+              <button v-if="isAdmin" @click="openEditOfficeModal(office)" class="btn btn-sm btn-outline-warning me-1" :title="t('offices.editOffice')">
                 <i class="bi bi-pencil-square"></i>
               </button>
-              <button @click="deleteOffice(office.id)" class="btn btn-sm btn-outline-danger" :title="t('offices.deleteOffice')">
+              <button v-if="isAdmin" @click="deleteOffice(office.id)" class="btn btn-sm btn-outline-danger" :title="t('offices.deleteOffice')">
                 <i class="bi bi-trash"></i>
               </button>
             </td>

@@ -28,9 +28,13 @@ officesApp.get('/:id', authMiddleware, async (c) => {
     }
 });
 
-// POST a new office
+// POST a new office - admin only
 officesApp.post('/', authMiddleware, async (c) => {
     try {
+        const user = c.get('user');
+        if (user.role === 'manager') {
+            return c.json({ success: false, message: 'Managers can only view offices' }, 403);
+        }
         const { name, branch_id, capacity, status, amenities, type, area } = await c.req.json();
         const newOffice = await models.Office.create({ name, branch_id, capacity, status, amenities, type, area });
         return c.json({ success: true, message: 'Office created successfully', data: newOffice }, 201);
@@ -46,12 +50,15 @@ officesApp.post('/', authMiddleware, async (c) => {
     }
 });
 
-// PUT (update) an office
+// PUT (update) an office - admin only
 officesApp.put('/:id', authMiddleware, async (c) => {
     const { id } = c.req.param();
     try {
-        const { name, branch_id, capacity, status, amenities, type, area } = await c.req.json();
         const user = c.get('user');
+        if (user.role === 'manager') {
+            return c.json({ success: false, message: 'Managers can only view offices' }, 403);
+        }
+        const { name, branch_id, capacity, status, amenities, type, area } = await c.req.json();
 
         const office = await models.Office.findByPk(id);
         if (!office) {
@@ -87,10 +94,14 @@ officesApp.put('/:id', authMiddleware, async (c) => {
     }
 });
 
-// DELETE an office
+// DELETE an office - admin only
 officesApp.delete('/:id', authMiddleware, async (c) => {
     const { id } = c.req.param();
     try {
+        const user = c.get('user');
+        if (user.role === 'manager') {
+            return c.json({ success: false, message: 'Managers can only view offices' }, 403);
+        }
         const office = await models.Office.findByPk(id);
         if (!office) {
             return c.json({ success: false, message: 'Office not found' }, 404);
