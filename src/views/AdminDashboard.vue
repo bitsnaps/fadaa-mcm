@@ -118,7 +118,7 @@
             <ul class="list-unstyled">
               <li v-for="activity in paginatedActivities" :key="activity.id" class="mb-2">
                 <i :class="`bi ${getActivityIcon(activity.action)} m-2`"></i>
-                {{ activity.action }} - {{ activity.details ? activity.details.message : '' }}
+                {{ activity.action }} - {{ activity.details ? (activity.details.message || (activity.details.amount? activity.details.amount+ ' '+(activity.details.payment_method || ''):'' )) : '' }}
                 <span class="text-muted small">({{ formatDistanceToNow(new Date(activity.created_at), { addSuffix: true, locale: fr }) }})</span>
               </li>
             </ul>

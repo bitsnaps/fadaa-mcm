@@ -28,10 +28,12 @@ const getOffices = async (c) => {
         const includeClause = [{ model: models.Branch, as: 'branch' }];
 
         if (profile_id) {
+            // Use LEFT JOIN to include offices even if they have no contracts for this profile
+            // This shows all offices for the admin to manage
             includeClause.push({
                 model: models.Contract,
                 where: { profile_id },
-                required: true,
+                required: false, // Changed from true to false - LEFT JOIN instead of INNER JOIN
                 attributes: [] // We only need the join for filtering
             });
         }
