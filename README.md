@@ -2,6 +2,8 @@
 
 Multi-CoWorking Space Management System.
 
+Backend at `/api`.
+
 ## Installation
 ```bash
 $ npm install
@@ -14,3 +16,6 @@ $ npm run dev
 $ npm run build
 ```
 
+## Environment Variables:
+
+Use `.env.sample` to provide env var.

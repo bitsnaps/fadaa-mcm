@@ -30,6 +30,7 @@ dist/uploads/*
 
 # var env
 .env
+.env.prod*
 api/.env
 api/.env.*
 
